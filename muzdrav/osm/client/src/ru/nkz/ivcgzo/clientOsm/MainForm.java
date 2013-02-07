@@ -11,9 +11,7 @@ import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -38,17 +36,11 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
-import ru.nkz.ivcgzo.thriftOsm.VrachInfo;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
 public class MainForm extends Client<ThriftOsm.Client> {
 	public static ThriftOsm.Client tcl;
-	public static int vrPcod;
-	public static String vrCdol;
-	public static String vrCdolName;
-	public static String vrFio;
 	public static MainForm instance;
-	private static String [] month = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
 	private JFrame frame;
 	private JButton btnSelect;
 	private JScrollPane spPos;
@@ -56,9 +48,8 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	private Vvod vvod;
 	private Timer timer;
 	private ZapVr prevZapvr;
-	private JScrollPane spVrach;
-	private CustomTable<VrachInfo, VrachInfo._Fields> tblVrach;
 	private CustomDateEditor tfDatZap;
+	private JButton btnOk;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftOsm.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -92,19 +83,10 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		btnSelect.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (authInfo.priznd != 7) {
-					if (tblPos.getSelectedItem() != null)
-						vvod.showVvod(tblPos.getSelectedItem());
-				} else {
-					if (tblVrach.getSelectedItem() != null) {
-						VrachInfo vi = tblVrach.getSelectedItem();
-						vrPcod = vi.pcod;
-						vrCdol = vi.cdol;
-						vrCdolName = vi.cdolName;
-						vrFio = String.format("%s %s %s", vi.fam, vi.im, vi.ot);
-						vvod.showVvod(new ZapVr());
-					}
-				}
+				tfDatZap.setVisible(true);
+				btnOk.setVisible(true);
+				if (tblPos.getSelectedItem() != null)
+					vvod.showVvod(tblPos.getSelectedItem());
 			}
 		});
 		JButton btnSearch = new JButton("Поиск");
@@ -144,13 +126,11 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			}
 		});
 		
-		spVrach = new JScrollPane();
-		
 		tfDatZap = new CustomDateEditor();
 		tfDatZap.setDate(System.currentTimeMillis());
 		tfDatZap.setColumns(10);
 		
-		JButton btnOk = new JButton("OK");
+		 btnOk = new JButton("OK");
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			updateZapList();
@@ -164,7 +144,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(spVrach, GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
 						.addComponent(spPos, GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(btnSearch)
@@ -190,20 +169,8 @@ public class MainForm extends Client<ThriftOsm.Client> {
 						.addComponent(btnOk))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(spPos, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(spVrach, GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
 					.addContainerGap())
 		);
-		
-		tblVrach = new CustomTable<>(false, true, VrachInfo.class, 3, "Фамилия", 4, "Имя", 5, "Отчество", 2, "Должность");
-		tblVrach.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2)
-					btnSelect.doClick();
-			}
-		});
-		spVrach.setViewportView(tblVrach);
 		
 		tblPos = new CustomTable<>(false, true, ZapVr.class, 9, "Посл. посещение", 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Серия полиса", 5 ,"Номер полиса");
 		tblPos.setDateField(0);
@@ -220,15 +187,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			tblPos.setFillsViewportHeight(true);
 		spPos.setViewportView(tblPos);
 		
-		if (authInfo.priznd == 7) {
-			spPos.setVisible(false);
-			btnSearch.setVisible(false);
-			frame.setTitle("Режим статистика");
-		} else {
-			spVrach.setVisible(false);
-			vrPcod = authInfo.pcod;
-			vrCdol = authInfo.cdol;
-		}
 		frame.getContentPane().setLayout(groupLayout);
 	}
 
@@ -242,33 +200,19 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		super.onConnect(conn);
 		if (conn instanceof ThriftOsm.Client) {
 			tcl = thrClient;
-			if (authInfo.priznd != 7)
-				updateZapList();
-			else
-				showVrachList();
 			if (vvod == null) {
 				vvod = new Vvod(authInfo.priznd == 7);
 				addChildFrame(vvod);
 			}
 			vvod.onConnect();
-		}
-	}
-	
-	public void showVrachList() {
-		try {
-			tblVrach.setData(tcl.getVrachList(authInfo.clpu, authInfo.cpodr));
-		} catch (KmiacServerException e) {
-			e.printStackTrace();
-		} catch (TException e) {
-			e.printStackTrace();
-			conMan.reconnect(e);
+			if (authInfo.priznd != 7)
+				updateZapList();
+			else
+				vvod.showVvod(new ZapVr());
 		}
 	}
 	
 	public void updateZapList() {
-//		Calendar calendar = GregorianCalendar.getInstance();
-//		calendar.setTimeInMillis(System.currentTimeMillis());
-//		frame.setTitle("Записанные на прием на "+calendar.get(Calendar.DATE)+" "+month[calendar.get(Calendar.MONTH)]+" "+calendar.get(Calendar.YEAR)+" г.");
 		frame.setTitle("Записанные на прием на "+DateFormat.getDateInstance().format(new Date(tfDatZap.getDate().getTime()))+" г.");
 		
 		try {
@@ -296,6 +240,10 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			timer.stop();
 		
 		frame.setVisible(value);
+	}
+	
+	public void close() {
+		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 	}
 	
 	private class ZapVrCellRenderer extends DefaultTableCellRenderer {

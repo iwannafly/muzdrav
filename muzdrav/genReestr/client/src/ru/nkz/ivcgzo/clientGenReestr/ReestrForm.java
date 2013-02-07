@@ -1,7 +1,5 @@
 package ru.nkz.ivcgzo.clientGenReestr;
 
-import java.awt.BorderLayout;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.GroupLayout;
@@ -9,25 +7,19 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
-import javax.swing.JTabbedPane;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.configuration;
-import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
-import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftGenReestr.ReestrNotFoundException;
+import java.awt.Font;
 
 
 public class ReestrForm extends JFrame {
@@ -46,13 +38,17 @@ public class ReestrForm extends JFrame {
 		setJMenuBar(menuBar);
 		
 		JMenu RunMenu = new JMenu("Выполнить");
+		RunMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		menuBar.add(RunMenu);
 		JMenu menu2 = new JMenu("Выгрузка файлов для контроля в ТФ ОМС");
+		menu2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		JMenu menu3 = new JMenu ("Загрузка файла контроля/оплаты реестров");
+		menu3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		RunMenu.add(menu2);
 		RunMenu.add(menu3);
 		
 		JMenuItem ReestrPolMenu = new JMenuItem ("Реестры поликлиники");
+		ReestrPolMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		ReestrPolMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				sfrm = new SettingsForm();
@@ -62,6 +58,7 @@ public class ReestrForm extends JFrame {
 		});
 
 		JMenuItem ReestrLDSMenu = new JMenuItem ("Реестры ЛДС");
+		ReestrLDSMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		ReestrLDSMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				sfrm = new SettingsForm();
@@ -71,6 +68,7 @@ public class ReestrForm extends JFrame {
 		});
 
 		JMenuItem ReestrStMenu = new JMenuItem ("Реестры стационара");
+		ReestrStMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		ReestrStMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				sfrm = new SettingsForm();
@@ -79,7 +77,18 @@ public class ReestrForm extends JFrame {
 			}
 		});
 		
+		JMenuItem ReestrDSPMenu = new JMenuItem ("Реестры ДСП");
+		ReestrDSPMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		ReestrDSPMenu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				sfrm = new SettingsForm();
+				sfrm.Cslu = 4;
+				sfrm.showSettingsForm();
+			}
+		});
+
 		JMenuItem LoadReestrPolMenu = new JMenuItem ("Реестры поликлиники");
+		LoadReestrPolMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		LoadReestrPolMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 		        OpenWindowFileChooser();
@@ -102,6 +111,7 @@ public class ReestrForm extends JFrame {
 		});
 
 		JMenuItem LoadReestrLDSMenu = new JMenuItem ("Реестры ЛДС");
+		LoadReestrLDSMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		LoadReestrLDSMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		        OpenWindowFileChooser();
@@ -123,6 +133,7 @@ public class ReestrForm extends JFrame {
 		});
 
 		JMenuItem LoadReestrStMenu = new JMenuItem ("Реестры стационара");
+		LoadReestrStMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		LoadReestrStMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		        OpenWindowFileChooser();
@@ -142,12 +153,36 @@ public class ReestrForm extends JFrame {
 				}
 			}
 		});
+
+		JMenuItem LoadReestrDSPMenu = new JMenuItem ("Реестры ДСП");
+		LoadReestrDSPMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		LoadReestrDSPMenu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+		        OpenWindowFileChooser();
+				try {
+					pathfile = new File(pathfile).getParentFile().getAbsolutePath();
+					String servPath = MainForm.tcl.getProtokolErrDSP(pathfile);//????
+					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
+					MainForm.conMan.transferFileFromServer(servPath, cliPath);
+					MainForm.conMan.openFileInEditor(cliPath, false);
+				} catch (KmiacServerException e) {
+					e.printStackTrace();
+				} catch (TException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		});
 		menu2.add (ReestrPolMenu);
 		menu2.add (ReestrLDSMenu);
 		menu2.add (ReestrStMenu);
+		menu2.add (ReestrDSPMenu);
 		menu3.add (LoadReestrPolMenu);
 		menu3.add (LoadReestrLDSMenu);
 		menu3.add (LoadReestrStMenu);
+		menu3.add (LoadReestrDSPMenu);
 		
 		JPanel panel = new JPanel();
 		GroupLayout gl_panel = new GroupLayout(panel);

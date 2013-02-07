@@ -44,6 +44,7 @@
   	<copy file="${com_resources.dir}/patientInfo.png" todir="${bin_resources.dir}" />
   	<copy file="${com_resources.dir}/issled.png" todir="${bin_resources.dir}" />
   	<copy file="${com_resources.dir}/hospital.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/Skalpell.png" todir="${bin_resources.dir}" />
   	<copy file="${com_resources.dir}/out.png" todir="${bin_resources.dir}" />
   	<copy file="${com_resources.dir}/lifeHistory.png" todir="${bin_resources.dir}" />
   	<copy file="${com_resources.dir}/personalInfo.png" todir="${bin_resources.dir}" />
@@ -51,6 +52,7 @@
   	<copy file="${com_resources.dir}/stages.png" todir="${bin_resources.dir}" />
   	<copy file="${com_resources.dir}/diary.png" todir="${bin_resources.dir}" />
   	<copy file="${com_resources.dir}/childbirth.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/archive.png" todir="${bin_resources.dir}" />
   </target>
 
   <!-- Создание jar файла -->

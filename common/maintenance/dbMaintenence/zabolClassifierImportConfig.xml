@@ -15,6 +15,9 @@
 		<table srcName="ABY" dstName="n_aby" />
 		<table srcName="AF0" dstName="n_af0" />
 		<table srcName="AI0" dstName="n_ai0" />
+		<table srcName="AJ0" dstName="n_aj0" />
+		<table srcName="AK2" dstName="n_ak2" />
+		<table srcName="AKD" dstName="n_akd" />
 		<table srcName="AL0" dstName="n_al0" />
 		<table srcName="ALK" dstName="n_alk" />
 		<table srcName="AM0" dstName="n_am0" />
@@ -28,6 +31,7 @@
 		<table srcName="AZ51" dstName="n_az51" />
 		<table srcName="AZT" dstName="n_azt" />
 		<table srcName="B00" dstName="n_b00" />
+		<table srcName="BL1" dstName="n_bl1" />
 		<table srcName="BZ5" dstName="n_bz5" />
 		<table srcName="C00" dstName="n_c00" />
 		<table srcName="D0S" dstName="n_dos" />

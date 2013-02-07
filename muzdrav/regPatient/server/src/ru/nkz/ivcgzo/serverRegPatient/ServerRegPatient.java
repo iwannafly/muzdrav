@@ -59,6 +59,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PokazNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Shablon;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
@@ -67,6 +68,8 @@ import ru.nkz.ivcgzo.thriftRegPatient.TerLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient.Iface;
 import ru.nkz.ivcgzo.thriftRegPatient.TipPodrNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.ShablonText;
+import ru.nkz.ivcgzo.thriftRegPatient.Shablon;
 
 /**
  * Класс, имплементирующий трифтовый интерфейс для связи с клиентом.
@@ -100,6 +103,12 @@ public class ServerRegPatient extends Server implements Iface {
     private TResultSetMapper<Gosp, Gosp._Fields> rsmGosp;
     private QueryGenerator<PatientBrief> qgPatientBrief;
     private TResultSetMapper<Anam, Anam._Fields> rsmAnam;
+	private final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
+	@SuppressWarnings("unused")
+	private final Class<?>[] intClasTypes; 
+	private final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClas;
+	@SuppressWarnings("unused")
+	private final Class<?>[] strClasTypes; 
 
 //////////////////////////////// Type Arrays /////////////////////////////////
 
@@ -128,8 +137,8 @@ public class ServerRegPatient extends Server implements Iface {
         Date.class, String.class, String.class, Date.class,
     //  prof          tel           dsv         prizn
         String.class, String.class, Date.class, Integer.class,
-    //  ter_liv        region_liv     birthplace    ogrn_smo
-        Integer.class, Integer.class, String.class, String.class
+    //  ter_liv        region_liv     birthplace    ogrn_smo      obraz
+        Integer.class, Integer.class, String.class, String.class, Integer.class
     };
     private static final Class<?>[] KONTINGENT_TYPES = new Class<?>[] {
     //  id             npasp          kateg          datal
@@ -143,7 +152,9 @@ public class ServerRegPatient extends Server implements Iface {
     //  datar       pol             name_str      ogrn_str
         Date.class, Integer.class, String.class, String.class,
     //  vpolis         spolis        npolis        birthplace
-        Integer.class, String.class, String.class, String.class
+        Integer.class, String.class, String.class, String.class,
+    //  tdoc           docser        docnum     
+        Integer.class, String.class, String.class
     };
     private static final Class<?>[] SIGN_TYPES = new Class<?>[] {
     //  npasp          grup          ph            allerg
@@ -212,14 +223,14 @@ public class ServerRegPatient extends Server implements Iface {
         "npasp", "fam", "im", "ot", "datar", "pol", "jitel", "sgrp", "mrab", "name_mr",
         "ncex", "cpol_pr", "terp", "tdoc", "docser", "docnum",  "datadoc", "odoc",
         "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv",
-        "birthplace", "ogrn_smo"
+        "birthplace", "ogrn_smo", "obraz"
     };
     private static final String[] NAMBK_FIELD_NAMES = {
         "npasp", "nambk", "nuch", "cpol", "datapr", "dataot", "ishod"
     };
     private static final String[] AGENT_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "pol", "name_str", "ogrn_str",
-        "vpolis", "spolis" , "npolis", "birthplace"
+        "vpolis", "spolis" , "npolis", "birthplace", "tdoc", "docser", "docnum"
     };
     private static final String[] KONTINGENT_FIELD_NAMES = {
         "id", "npasp", "kateg", "datal", "name"
@@ -282,6 +293,11 @@ public class ServerRegPatient extends Server implements Iface {
         rsmAllLgota = new TResultSetMapper<>(AllLgota.class, LGOTA_FIELD_NAMES);
         rsmLgota = new TResultSetMapper<>(Lgota.class, LGOTA_FIELD_NAMES);
         rsmAnam = new TResultSetMapper<>(Anam.class, ANAM_FIELD_NAMES);
+		rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, "pcod",        "name");
+		intClasTypes = new Class<?>[] {                              Integer.class, String.class};
+		
+		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
+		strClasTypes = new Class<?>[] {                              String.class, String.class};
     }
 
 ////////////////////////////////////////////////////////////////////////
@@ -587,7 +603,7 @@ public class ServerRegPatient extends Server implements Iface {
             + "patient.datapr, patient.tdoc, patient.docser, patient.docnum, "
             + "patient.datadoc, patient.odoc, patient.snils, patient.dataz, "
             + "patient.prof, tel, patient.dsv, patient.prizn, patient.ter_liv, "
-            + "patient.region_liv, patient.birthplace, patient.ogrn_smo "
+            + "patient.region_liv, patient.birthplace, patient.ogrn_smo, patient.obraz "
             + "FROM patient "
             + "WHERE patient.npasp = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
@@ -804,8 +820,6 @@ public class ServerRegPatient extends Server implements Iface {
 
 //////////////////////// Add Methods ////////////////////////////////////
 
-    //Не нравится этот метод? Мне он тоже не нравится. Говно, а не метод.
-    //TODO перепилить добавление объектов с вложенными пользовательскими типами
     @Override
     public final int addPatient(final PatientFullInfo patinfo)
             throws PatientAlreadyExistException, KmiacServerException {
@@ -816,11 +830,11 @@ public class ServerRegPatient extends Server implements Iface {
                     + "adp_obl, adp_gorod, adp_ul, adp_dom, adp_kv, adm_obl, "
                     + "adm_gorod, adm_ul, adm_dom, adm_kv, mrab, name_mr, "
                     + "ncex, poms_strg, poms_tdoc, pdms_strg, pdms_ser, pdms_nom, "
-                    + "cpol_pr, terp, tdoc, docser, docnum, datadoc, "
-                    + "odoc, snils, dataz, prof, tel, dsv, prizn, ter_liv, region_liv, birthplace, ogrn_smo) "
+                    + "cpol_pr, terp, tdoc, docser, docnum, datadoc, odoc, snils, dataz, prof, tel, dsv,"
+                    + "prizn, ter_liv, region_liv, birthplace, ogrn_smo, obraz) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                     + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                    + "?, ?, ?, ?);", true,
+                    + "?, ?, ?, ?, ?);", true,
                     patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
                     avoidDefaultSqlDateValue(patinfo.getDatar()),
                     patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
@@ -837,9 +851,9 @@ public class ServerRegPatient extends Server implements Iface {
                     patinfo.getTdoc(), patinfo.getDocser(), patinfo.getDocnum(),
                     avoidDefaultSqlDateValue(patinfo.getDatadoc()), patinfo.getOdoc(),
                     patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
-                    patinfo.getProf(), patinfo.getTel(),
-                    avoidDefaultSqlDateValue(patinfo.getDsv()), patinfo.getPrizn(),
-                    patinfo.getTer_liv(), patinfo.getRegion_liv(), patinfo.getBirthplace(), patinfo.getOgrn_smo());
+                    patinfo.getProf(), patinfo.getTel(), avoidDefaultSqlDateValue(patinfo.getDsv()), 
+                    patinfo.getPrizn(), patinfo.getTer_liv(), patinfo.getRegion_liv(), 
+                    patinfo.getBirthplace(), patinfo.getOgrn_smo(), patinfo.getObraz());
                 int id = sme.getGeneratedKeys().getInt("npasp");
                 sme.setCommit();
                 return id;
@@ -906,21 +920,21 @@ public class ServerRegPatient extends Server implements Iface {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isAgentExist(agent)) {
                 final int[] indexes = {
-                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
                 sme.execPreparedT(
-                        "INSERT INTO p_preds (npasp, fam, im, ot, "
-                        + "datar, pol, name_str, ogrn_str, vpolis, "
-                        + "spolis, npolis, birthplace) VALUES (?, ?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?, ?, ?);",
+                        "INSERT INTO p_preds (npasp, fam, im, ot, "+
+                        "datar, pol, name_str, ogrn_str, vpolis, "+
+                        "spolis, npolis, birthplace, tdoc, docser, docnum) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
                         false, agent, AGENT_TYPES, indexes);
                 sme.setCommit();
             } else {
                 final int[] indexes = {
-                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
                 };
                 sme.execPreparedT("UPDATE p_preds SET "
                         + "fam = ?, im = ?, ot = ?, datar = ?, pol = ?, name_str = ?, ogrn_str = ?, "
-                        + "vpolis = ?, spolis = ?, npolis = ?, birthplace  = ? WHERE npasp = ?;", 
+                        + "vpolis = ?, spolis = ?, npolis = ?, birthplace = ?, tdoc = ?, docser = ?, docnum = ? WHERE npasp = ?;", 
                         false, agent, AGENT_TYPES, indexes);
                 sme.setCommit();
             }
@@ -1117,7 +1131,7 @@ public class ServerRegPatient extends Server implements Iface {
                 + "pdms_ser = ?, pdms_nom = ?, cpol_pr = ?, terp = ?, tdoc=?, "
                 + "docser = ?, docnum = ?, datadoc = ?, odoc = ?, snils = ?, "
                 + "dataz = ?, prof = ?, tel = ?, dsv = ?, prizn = ?, ter_liv = ?, "
-                + "region_liv = ?, birthplace = ?, ogrn_smo = ? WHERE npasp = ?", false,
+                + "region_liv = ?, birthplace = ?, ogrn_smo = ?, obraz = ? WHERE npasp = ?", false,
                 patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
                 avoidDefaultSqlDateValue(patinfo.getDatar()),
                 patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
@@ -1135,7 +1149,7 @@ public class ServerRegPatient extends Server implements Iface {
                 avoidDefaultSqlDateValue(patinfo.getDatadoc()), patinfo.getOdoc(),
                 patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
                 patinfo.getProf(), patinfo.getTel(), avoidDefaultSqlDateValue(patinfo.getDsv()),
-                patinfo.getPrizn(), patinfo.getTer_liv(),patinfo.getRegion_liv(), patinfo.getBirthplace(), patinfo.getOgrn_smo(), patinfo.getNpasp());
+                patinfo.getPrizn(), patinfo.getTer_liv(),patinfo.getRegion_liv(), patinfo.getBirthplace(), patinfo.getOgrn_smo(), patinfo.getObraz(), patinfo.getNpasp());
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
@@ -1482,7 +1496,7 @@ public class ServerRegPatient extends Server implements Iface {
                 ogrn,
                 nambk.getNambk(),
                 omsOrg,
-                pat.getPolis_dms().getSer() + pat.getPolis_oms().getNom(),
+                pat.getPolis_oms().getSer() + pat.getPolis_oms().getNom(),
                 pat.getSnils(),
                 "",
                 lgot,
@@ -1954,6 +1968,99 @@ public class ServerRegPatient extends Server implements Iface {
    				throw new KmiacServerException();
    			}
 			return path;
+	}
+
+	@Override
+	public List<StringClassifier> getShOsmPoiskDiag(int cspec, int cslu, String srcText) throws KmiacServerException, TException {
+		String sql = "SELECT DISTINCT sho.diag AS pcod, c00.name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
+		
+		if (srcText != null)
+			sql += "AND ((sho.name LIKE ?) OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
+		sql += "ORDER BY sho.diag ";
+		
+		try (AutoCloseableResultSet	acrs = (srcText == null) ? sse.execPreparedQuery(sql, cspec, cslu, cslu) : sse.execPreparedQuery(sql, cspec, cslu, cslu, srcText, srcText, srcText)) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error searching template");
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getShOsmPoiskName(int cspec, int cslu,
+			String srcText) throws KmiacServerException, TException {
+		String sql = "SELECT DISTINCT sho.id AS pcod, sho.diag, sho.diag || ' ' || substring(din.name from 1 for 1) || ' ' || sho.name AS name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) JOIN n_din din ON (din.pcod = sho.cdin) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
+		
+		if (srcText != null)
+			sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?) OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
+		sql += "ORDER BY sho.diag ";
+		
+		try (AutoCloseableResultSet	acrs = (srcText == null) ? sse.execPreparedQuery(sql, cspec, cslu, cslu) : sse.execPreparedQuery(sql, cspec, cslu, cslu, srcText, srcText, srcText, srcText)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error searching template");
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getShOsmByDiag(int cspec, int cslu,
+			String diag, String srcText) throws KmiacServerException, TException {
+		String sql = "SELECT DISTINCT sho.id AS pcod, sho.name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) AND (sho.diag = ?) ";
+		
+		if (srcText != null)
+			sql += "AND ((sho.name LIKE ?) OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
+		sql += "ORDER BY sho.name ";
+		
+		try (AutoCloseableResultSet	acrs = (srcText == null) ? sse.execPreparedQuery(sql, cspec, cslu, cslu, diag) : sse.execPreparedQuery(sql, cspec, cslu, cslu, diag, srcText, srcText, srcText)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error searching template");
+		}
+	}
+
+	@Override
+	public Shablon getShOsm(int id_sh) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT sho.id, sho.diag, nd.name, sho.name, nsh.pcod, nsh.name, sht.sh_text FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_shablon nsh ON (nsh.pcod = sht.id_n_shablon) WHERE sho.id = ? ORDER BY nsh.pcod ", id_sh)) {
+			if (acrs.getResultSet().next()) {
+				Shablon sho = new Shablon(acrs.getResultSet().getInt(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3), acrs.getResultSet().getString(4), new ArrayList<ShablonText>());
+				do {
+					sho.textList.add(new ShablonText(acrs.getResultSet().getInt(5), acrs.getResultSet().getString(6), acrs.getResultSet().getString(7)));
+				} while (acrs.getResultSet().next());
+				return sho;
+			} else {
+				throw new SQLException("No templates with this id");
+			}
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error loading template by its id");
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getShDopNames(int idRazd)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id AS pcod, name FROM sh_dop WHERE id_n_shablon = ? ", idRazd)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error loading template names by razd id");
+		}
+	}
+
+	@Override
+	public IntegerClassifier getShDop(int id_sh) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id AS pcod, text AS name FROM sh_dop WHERE id = ? ", id_sh)) {
+			if (acrs.getResultSet().next())
+				return rsmIntClas.map(acrs.getResultSet());
+			else
+				throw new SQLException("No templates with this id");
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error loading template by its id");
+		}
 	}
 
 }

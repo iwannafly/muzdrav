@@ -73,6 +73,9 @@ public class ClassifierManager {
 		String sql;
 		
 		switch (cls) {
+		case n_anz:
+			fldPcod = "nstr";
+			break;
 		case n_kderr:
 			fldPcod = "kderr";
 			break;

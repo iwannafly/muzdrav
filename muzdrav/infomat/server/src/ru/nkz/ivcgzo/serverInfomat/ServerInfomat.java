@@ -70,7 +70,7 @@ public class ServerInfomat extends Server implements Iface {
         "npasp", "fam", "im", "ot"
     };
     private static final String[] SHEDULE_DAY_FIELD_NAMES = {
-        "time_n", "time_k", "denn", "vidp"
+        "time_n", "time_k", "vidp", "denn"
     };
 
 

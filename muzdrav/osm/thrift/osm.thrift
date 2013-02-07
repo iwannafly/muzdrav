@@ -68,6 +68,7 @@ struct PvizitAmb {
 	22: optional i32 cpos;
 	23: optional i32 cpol;
 	24: optional i32 kod_ter;
+	25: optional string cdol_name;
 }
 
 struct PdiagAmb {
@@ -111,7 +112,7 @@ struct Priem{
 	8: optional i32 n_lek;
 	9: optional string t_chss;
 	10: optional string t_temp;
-	11: optional string t_ad;
+	11: optional string t_ad_sist;
 	12: optional string t_rost;
 	13: optional string t_ves;
 	14: optional string t_st_localis;
@@ -120,6 +121,7 @@ struct Priem{
 	17: optional string t_status_praesense;
 	18: optional string t_fiz_obsl;
 	19: optional string t_recom;
+	20: optional string t_ad_dist;
 }
 
 struct AnamZab{
@@ -148,6 +150,7 @@ struct PdiagZ{
 	17: optional string named;
 	18: optional i32 ppi;
 	19: optional string nameC00;
+	20: optional i32 id_diag_amb;
 
 }
 
@@ -432,6 +435,9 @@ struct IsslMet {
 	9: optional string cpodr_name;
 	10: optional string clpu_name;
 	11: optional i32 clpu;
+	12: optional i32 pvizitambId;
+	13: optional i32 cpodr;
+	14: optional i32 kod_lab;
 }
 
 struct IsslPokaz {
@@ -455,6 +461,7 @@ struct Napr{
 	5: optional i32 pvizitId; 
 	6: optional string cpodr_name;
 	7: optional string clpu_name;
+	8: optional string diag;
 }
 
 struct NaprKons{
@@ -467,6 +474,7 @@ struct NaprKons{
 	7: optional i32 pvizitId;
 	8: optional string cpodr_name;
 	9: optional string clpu_name;
+	10: optional string diag;
 }
 
 struct IsslInfo{
@@ -512,6 +520,7 @@ struct Protokol{
 	5: optional i32 cpol;
 	6: optional string cpodr_name;
 	7: optional string clpu_name;
+	8: optional i32 nstr;
 }
 
 struct Vypis {
@@ -616,16 +625,27 @@ struct Cotd{
 	3: optional i32 nist;
 	4: optional i32 cotd;
 	5: optional i64 dataz;
+	6: optional i32 stat_type;
 }
 
 struct VrachInfo {
-	1: optional i32 mrabId;
+	1: optional i32 mrab_id;
 	2: optional string cdol;
-	3: optional string cdolName;
-	4: optional string fam;
-	5: optional string im;
-	6: optional string ot;
-	7: optional i32 pcod;
+	3: optional string cdol_name;
+	4: optional i32 pcod;
+	5: optional string short_fio;
+}
+
+struct SpravNetrud {
+	1: optional string fam;
+	2: optional string im;
+	3: optional string oth;
+	4: optional i64 datar;
+	5: optional i32 npasp;
+	6: optional string diag;
+	7: optional i32 userId;
+	8: optional string cpodr_name;
+	9: optional string clpu_name;
 }
 
 exception PvizitNotFoundException {
@@ -698,7 +718,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	PdiagZ getPdiagZ(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagNotFoundException pnf);
 	list<PdiagZ> getPdiagZInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> getPdiagInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	void deleteDiag(1: i32 npasp, 2: string diag, 3: i32 pcod) throws (1: kmiacServer.KmiacServerException kse);
+	void deleteDiag(1: i32 npasp, 2: string diag, 3: i32 pcod, 4: i32 idDiagAmb) throws (1: kmiacServer.KmiacServerException kse);
 
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
 	Pdisp getPdisp(1: i32 npasp, 2: string diag, 3: i32 cpol) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
@@ -730,6 +750,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printKek(1: i32 npasp, 2: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
 	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
 	string printMSK(1: i32 npasp)  throws (1: kmiacServer.KmiacServerException kse);
+	string printAnamZab(1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
+	string printSpravNetrud(1: SpravNetrud sn) throws (1: kmiacServer.KmiacServerException kse);
 
 
 //classifiers
@@ -742,6 +764,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.StringClassifier> get_n_c00(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_tip() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_m00() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_p0c() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_ap0() throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	RdSlStruct getRdSlInfo(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PrdslNotFoundException pnf);
