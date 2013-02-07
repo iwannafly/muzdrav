@@ -46,13 +46,13 @@ import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Svid_Rojd;
 
 //TODO: ЮНИТ-ТЕСТИРОВАНИЕ
-//TODO: СОВМЕСТИМОСТЬ С LibreOffice
 //TODO: НУЖЕН ЛИ toUpperCase В СВИДЕТЕЛЬСТВЕ О РОЖДЕНИИ
 /**
- * Панель ввода\редактирования\отображения информации о новорождённом
+ * Панель ввода\редактирования\отображения информации о новорождённом,
+ * а также заполнения\выдачи медицинского свидетельства о рождении
  * @author Балабаев Никита Дмитриевич
  */
-public class Children extends JPanel {
+public final class Children extends JPanel {
 	
 	private static final long serialVersionUID = 3513837719265529746L;
 	private UserAuthInfo userAuth = null;
@@ -65,7 +65,7 @@ public class Children extends JPanel {
     private JButton btnSaveChild, btnGiveDoc, btnPrintBlank, btnFillDoc;
     private JComboBox<String> cbBirthHappen;
     private CustomTimeEditor cteBirthTime;
-    private JTextField tfDocName;
+    private JCheckBox chckBxDead, chckBxFull;
     private JSpinner spinnerDocNum;
     private JSpinner spinnerHeight;
     private JSpinner spinnerWeight;
@@ -73,16 +73,15 @@ public class Children extends JPanel {
     private JSpinner spinnerApgar5;
     private JSpinner spinnerChildNumGlobal;
     private JSpinner spinnerChildNumLocal;
-    private JCheckBox chckBxDead, chckBxFull;
     private JCheckBox chckBxCriteria1;
     private JCheckBox chckBxCriteria2;
     private JCheckBox chckBxCriteria4;
     private JCheckBox chckBxCriteria3;
-    private JLabel lblBirthHappen;
-    private JLabel lblDocStatus;
+    private JLabel lblBirthHappen, lblDocStatus;
+    private JTextField tfDocName;
 
 	/**
-	 * Создание экземпляра панели отображения информации новорождённого
+	 * Создание экземпляра панели отображения информации о новорождённом
 	 * @param authInfo Информация о вошедшем в систему пользователе
 	 * @param patientInfo Информация о пациенте
 	 */
@@ -653,9 +652,9 @@ public class Children extends JPanel {
 	 */
 	private void setInterface() {
 		this.panelChildEdit = new JPanel();
-		this.panelChildEdit.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true), "\u0418\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F \u043E \u043D\u043E\u0432\u043E\u0440\u043E\u0436\u0434\u0451\u043D\u043D\u043E\u043C", TitledBorder.LEFT, TitledBorder.TOP, null, null));
+		this.panelChildEdit.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true), "Информация о новорождённом", TitledBorder.LEFT, TitledBorder.TOP, null, null));
 		this.panelDoc = new JPanel();
-		this.panelDoc.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true), "\u041C\u0435\u0434\u0438\u0446\u0438\u043D\u0441\u043A\u043E\u0435 \u0441\u0432\u0438\u0434\u0435\u0442\u0435\u043B\u044C\u0441\u0442\u0432\u043E \u043E \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u0438", TitledBorder.LEFT, TitledBorder.TOP, null, null));
+		this.panelDoc.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true), "Медицинское свидетельство о рождении", TitledBorder.LEFT, TitledBorder.TOP, null, null));
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -690,7 +689,6 @@ public class Children extends JPanel {
 		this.tfDocName = new JTextField();
 		this.tfDocName.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDocName.setLabelFor(this.tfDocName);
-		this.tfDocName.setColumns(20);
 		
 		this.btnGiveDoc = new JButton("Выдать свидетельство");
 		this.btnGiveDoc.addMouseListener(new MouseAdapter() {

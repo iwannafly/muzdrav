@@ -1,13 +1,15 @@
 package ru.nkz.ivcgzo.serverHospital;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.apache.thrift.TException;
-import org.junit.Before;
-import org.junit.Test;
 
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
@@ -52,7 +54,7 @@ public class TestServerHospital {
 		}
     	//Ожидание запуска потока:
     	for(int i = 0; (i < Integer.MAX_VALUE) && !ts.isRunning(); i++) ;
-    	assertEquals("is server running", true, ts.isRunning());
+    	assertTrue("is server running", ts.isRunning());
     	ts.stop();
     }
 
@@ -64,7 +66,7 @@ public class TestServerHospital {
     public void testStop() {
     	ThreadedServer ts = new ThreadedServer(testServer);
     	ts.stop();
-    	assertEquals("is server stop serving", true, !ts.isRunning());
+    	assertFalse("is server stop serving", ts.isRunning());
     }
 
     @Test

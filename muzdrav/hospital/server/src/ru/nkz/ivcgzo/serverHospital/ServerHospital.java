@@ -290,11 +290,13 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final List<TSimplePatient> getAllPatientForDoctor(final int doctorId, final int otdNum)
             throws PatientNotFoundException, KmiacServerException {
-        String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.fam, patient.im, "
-                + "patient.ot, patient.datar, c_gosp.datap, c_otd.cotd, c_otd.npal, c_otd.nist "
-                + "FROM c_otd INNER JOIN c_gosp ON c_gosp.id = c_otd.id_gosp "
-                + "INNER JOIN patient ON c_gosp.npasp = patient.npasp "
-                + "WHERE c_otd.vrach = ? AND c_otd.cotd = ? ORDER BY fam, im, ot;";
+        String sqlQuery = "SELECT p.npasp, c_otd.id_gosp, p.fam, p.im, "
+                + "p.ot, p.datar, c_gosp.datap, c_otd.cotd, c_otd.npal, c_otd.nist "
+                + "FROM c_otd "
+                + "INNER JOIN c_gosp ON (c_gosp.id = c_otd.id_gosp) "
+                + "INNER JOIN patient p ON (c_gosp.npasp = p.npasp) "
+                + "WHERE (c_otd.vrach = ?) AND (c_otd.cotd = ?) "
+                + "ORDER BY p.fam, p.im, p.ot;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, doctorId, otdNum)) {
             List<TSimplePatient> patientList = rsmSimplePatient.mapToList(acrs.getResultSet());
             if (patientList.size() > 0) {
