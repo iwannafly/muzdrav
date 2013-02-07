@@ -72,6 +72,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	public ViewPolpTreeForm polpFrm;
 	public ViewMrabTreeForm mrabFrm;
 	public PatientInfoForm infFrm;
+	public ClientDiary diaryFrm;
 	public ClientLab labFrm;
 	public ClientOperation operationFrm;
 	public ru.nkz.ivcgzo.clientReception.MainForm recFrm;
@@ -269,7 +270,8 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		mrabFrm = new ViewMrabTreeForm();
 		infFrm = new PatientInfoForm();
 		labFrm = new ClientLab(conMan, authInfo, 0);
-		medFrm = new ClientMedication(conMan, authInfo, 0);
+		medFrm = new ClientMedication(conMan, authInfo, 0);		
+		diaryFrm = new ClientDiary(conMan, authInfo, 0);
 		operationFrm = new ClientOperation(conMan, authInfo, 0);
 		recFrm = new ru.nkz.ivcgzo.clientReception.MainForm(conMan, authInfo, 0);
 		paspFrm = new PaspErrorsForm();
@@ -542,6 +544,10 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					}
 					
                 }
+				
+				case 28:
+	                diaryFrm.showModal(parent, params[1], params[2], params[3], params[4], params[5]);
+	                break;
 			}
 				
 		return null;

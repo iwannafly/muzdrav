@@ -73,6 +73,7 @@ public class ServerViewSelect extends Server implements Iface {
 	private Server recServ;
 	private Server medServ;
 	private Server operationServ;
+	private Server diaryServ;
 	private final ClassifierManager ccm;
 	private final TResultSetMapper<PatientBriefInfo, PatientBriefInfo._Fields> rsmPatBrief;
 	private final TResultSetMapper<PatientCommonInfo, PatientCommonInfo._Fields> rsmPatComInfo;
@@ -197,6 +198,19 @@ public class ServerViewSelect extends Server implements Iface {
                 }
             }
         }).start();
+		
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					diaryServ = new ServerDiary(sse, tse);
+					diaryServ.start();
+				} catch (Exception e) {
+					System.err.println("Error starting diary server.");
+					e.printStackTrace();
+				}
+			}
+        }).start();
     	
         ThriftViewSelect.Processor<Iface> proc = new ThriftViewSelect.Processor<Iface>(this);
         thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
@@ -213,6 +227,8 @@ public class ServerViewSelect extends Server implements Iface {
         	recServ.stop();
         if (operationServ != null)
             operationServ.stop();
+		sif (diaryServ != null)
+            diaryServ.stop();
     }
 
 	@Override
