@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.List;
 import java.util.Random;
 
@@ -31,6 +32,7 @@ import ru.nkz.ivcgzo.thriftServerAdmin.MestoRabExistsException;
 import ru.nkz.ivcgzo.thriftServerAdmin.MestoRabNotFoundException;
 import ru.nkz.ivcgzo.thriftServerAdmin.ShablonDop;
 import ru.nkz.ivcgzo.thriftServerAdmin.ShablonLds;
+import ru.nkz.ivcgzo.thriftServerAdmin.ShablonOper;
 import ru.nkz.ivcgzo.thriftServerAdmin.ShablonOsm;
 import ru.nkz.ivcgzo.thriftServerAdmin.TemplateExistsException;
 import ru.nkz.ivcgzo.thriftServerAdmin.ThriftServerAdmin;
@@ -50,6 +52,7 @@ public class serverAdmin extends Server implements Iface {
 	private TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClas;
 	private TResultSetMapper<ShablonDop, ShablonDop._Fields> rsmShDopClas;
 	private TResultSetMapper<ShablonLds, ShablonLds._Fields> rsmShLdsClas;
+	private TResultSetMapper<ShablonOper, ShablonOper._Fields> rsmShOperClas;
 	
 	@Override
 	public void start() throws Exception {
@@ -74,6 +77,7 @@ public class serverAdmin extends Server implements Iface {
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
 		rsmShDopClas = new TResultSetMapper<>(ShablonDop.class, "id", "id_n_shablon", "name", "text");
 		rsmShLdsClas = new TResultSetMapper<>(ShablonLds.class, "id", "c_p0e1", "c_ldi", "name", "opis", "zakl");
+		rsmShOperClas = new TResultSetMapper<>(ShablonOper.class);
 	}
 
 	@Override
@@ -99,24 +103,41 @@ public class serverAdmin extends Server implements Iface {
 
 	@Override
 	public int AddVrach(VrachInfo vr) throws TException {
-		try (SqlModifyExecutor sme = tse.startTransaction();
-				AutoCloseableResultSet acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5)) {
-			if (!acrs.getResultSet().next()) {
+		AutoCloseableResultSet acrs = null;
+		boolean found = false;
+		int pcod;
+		
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			if (vr.isSetSnils()) {
+				acrs = sme.execPreparedQuery("SELECT pcod FROM s_vrach WHERE (snils = ?) ", vr.snils);
+				found = acrs.getResultSet().next();
+			}
+			if (!found) {
+				acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5);
+				found = acrs.getResultSet().next();
+			}
+			if (!found) {
 				sme.execPreparedT("INSERT INTO s_vrach (fam, im, ot, pol, datar, obr, snils, idv) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8);
-				int pcod = sme.getGeneratedKeys().getInt("pcod");
-				sme.setCommit();
-				return pcod;
-			} else
-				return acrs.getResultSet().getInt(1);
+				pcod = sme.getGeneratedKeys().getInt("pcod");
+			} else {
+				pcod = acrs.getResultSet().getInt(1);
+				vr.setPcod(pcod);
+				sme.execPreparedT("UPDATE s_vrach SET fam = ?, im = ?, ot = ?, pol = ?, datar = ?, obr = ?, snils = ?, idv = ? WHERE pcod = ? ", false, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8, 0);
+			}
+			sme.setCommit();
+			return pcod;
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
+		} finally {
+			if (acrs != null)
+				acrs.close();
 		}
 	}
 
 	@Override
 	public void UpdVrach(VrachInfo vr) throws VrachExistsException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction();
-				AutoCloseableResultSet acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5)) {
+				AutoCloseableResultSet acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) AND (obr = ?) AND (snils = ?) AND (idv = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8)) {
 			if (!acrs.getResultSet().next()) {
 				sme.execPreparedT("UPDATE s_vrach SET fam = ?, im = ?, ot = ?, pol = ?, datar = ?, obr = ?, snils = ?, idv = ? WHERE pcod = ? ", false, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8, 0);
 				sme.setCommit();
@@ -204,8 +225,8 @@ public class serverAdmin extends Server implements Iface {
 	
 	
 	@Override
-	public String getLogin(int vrachPcod, int lpuPcod, int podrPcod) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT login FROM s_users WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", vrachPcod, lpuPcod, podrPcod)) {
+	public String getLogin(int userId) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT login FROM s_users WHERE id = ? ", userId)) {
 			if (acrs.getResultSet().next())
 				return acrs.getResultSet().getString(1);
 			else
@@ -216,21 +237,21 @@ public class serverAdmin extends Server implements Iface {
 	}
 	
 	@Override
-	public UserIdPassword setPassword(int vrachPcod, int lpuPcod, int podrPcod, String login) throws TException {
-		try (SqlModifyExecutor sme = tse.startTransaction(); AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id FROM s_users WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", vrachPcod, lpuPcod, podrPcod)) {
+	public UserIdPassword setPassword(int mrId, String login) throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT u.id FROM s_users u JOIN s_mrab r ON (r.user_id = u.id) WHERE r.id = ? ", mrId)) {
 			while (true) {
 				try {
 					String pass = generatePassword(login);
 					UserIdPassword idPass;
 					if (acrs.getResultSet().next()) {
-						sme.execPrepared("UPDATE s_users SET login = ?, password = ? WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, login, pass, vrachPcod, lpuPcod, podrPcod);
 						idPass = new UserIdPassword(acrs.getResultSet().getInt(1), pass);
-						sme.execPrepared("UPDATE s_mrab SET user_id = ? WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, idPass.getUser_id(), vrachPcod, lpuPcod, podrPcod);
+						sme.execPrepared("UPDATE s_users SET login = ?, password = ? WHERE id = ? ", false, login, pass, idPass.user_id);
 					} else {
-						sme.execPrepared("INSERT INTO s_users (pcod, login, password, clpu, cpodr) VALUES (?, ?, ?, ?, ?) ", true, vrachPcod, login, pass, lpuPcod, podrPcod);
+						sme.execPrepared("INSERT INTO s_users (pcod, clpu, cpodr, login, password) (SELECT pcod, clpu, cpodr, ?, ? FROM s_mrab WHERE id = ?) ", true, login, pass, mrId);
 						idPass = new UserIdPassword(sme.getGeneratedKeys().getInt("id"), pass);
-						sme.execPrepared("UPDATE s_mrab SET user_id = ? WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, idPass.getUser_id(), vrachPcod, lpuPcod, podrPcod);
 					}
+					sme.execPrepared("UPDATE s_mrab SET user_id = ? WHERE id = ? ", false, idPass.user_id, mrId);
 					sme.setCommit();
 					return idPass;
 				} catch (SQLException e) {
@@ -247,9 +268,10 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public void remPassword(int vrachPcod, int lpuPcod, int podrPcod) throws TException {
+	public void remPassword(int userId) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM s_users WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, vrachPcod, lpuPcod, podrPcod);
+			sme.execPrepared("UPDATE s_mrab SET user_id = NULL WHERE user_id = ? ", false, userId);
+			sme.execPrepared("DELETE FROM s_users WHERE id = ? ", false, userId);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
@@ -257,8 +279,8 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public String getPermissions(int vrachPcod, int lpuPcod, int podrPcod) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pdost FROM s_users WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", vrachPcod, lpuPcod, podrPcod)) {
+	public String getPermissions(int userId) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pdost FROM s_users WHERE id = ? ", userId)) {
 			if (acrs.getResultSet().next())
 				return acrs.getResultSet().getString(1);
 			else
@@ -269,9 +291,9 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public void setPermissions(int vrachPcod, int lpuPcod, int podrPcod, String pdost) throws TException {
+	public void setPermissions(int userId, String pdost) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("UPDATE s_users SET pdost = ? WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, pdost, vrachPcod, lpuPcod, podrPcod);
+			sme.execPrepared("UPDATE s_users SET pdost = ? WHERE id = ? ", false, pdost, userId);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
@@ -314,7 +336,7 @@ public class serverAdmin extends Server implements Iface {
 					pass1[i] = (byte) (passBytes[i] - 97 + 224); //a=а, b=б..., z=щ
 				}
 			}
-			return new String(pass1, Charset.forName("cp1251"));
+			return new String(pass1, Charset.forName("cp1251")).replace('б', 'э').replace('з', 'ю').replace('о', 'я');
 		}
 	}
 
@@ -639,6 +661,80 @@ public class serverAdmin extends Server implements Iface {
 		} catch (SQLException | InterruptedException e) {
 			System.err.println(e.getCause());
 			throw new KmiacServerException("Error deleting template lds");
+		}
+	}
+	
+	@Override
+	public List<IntegerClassifier> getShOperStatList() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_tip WHERE (pcod = 1) OR (pcod = 3) ORDER BY pcod ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting templates oper stat type list");
+		}
+	}
+	
+	@Override
+	public List<IntegerClassifier> getShOperList(int statTip, String srcStr) throws KmiacServerException, TException {
+		String sql = "SELECT id AS pcod, oper_pcod || ' ' || name AS name FROM sh_oper WHERE (stat_tip = ?) ";
+		if (srcStr != null)
+			sql += "AND (src_text LIKE ?) ";
+		sql += "ORDER BY oper_pcod ";
+		
+		try (AutoCloseableResultSet acrs = (srcStr == null) ? sse.execPreparedQuery(sql, statTip) :  sse.execPreparedQuery(sql, statTip, srcStr)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting templates oper list");
+		}
+	}
+	
+	@Override
+	public ShablonOper getShOper(int id) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM sh_oper WHERE id = ? ", id)) {
+			if (acrs.getResultSet().next())
+				return rsmShOperClas.map(acrs.getResultSet());
+			else
+				throw new KmiacServerException("No template oper found with this id");
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting template oper");
+		}
+	}
+	
+	@Override
+	public int saveShOper(ShablonOper shOper) throws KmiacServerException, TemplateExistsException, TException {
+		int shId = shOper.id;
+		String srcStr = String.format("%s %s %s %s %s %s %s %s", shOper.oper_pcod.toLowerCase(), shOper.oper_name.toLowerCase(), shOper.diag_pcod.toLowerCase(), shOper.diag_name.toLowerCase(), shOper.name.toLowerCase(), new Time(shOper.oper_dlit), shOper.mat.toLowerCase(), shOper.text.toLowerCase());
+		
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sme.execPreparedQuery("SELECT id FROM sh_oper WHERE id = ? ", shId)) {
+			if (acrs.getResultSet().next()) {
+				sme.execPrepared("UPDATE sh_oper SET name = ?, oper_pcod = ?, diag_pcod = ?, oper_dlit = ?, mat = ?, text = ?, src_text = ? WHERE id = ? ", false, shOper.name, shOper.oper_pcod, shOper.diag_pcod, new Time(shOper.oper_dlit), shOper.mat, shOper.text, srcStr, shId);
+			} else {
+				sme.execPrepared("INSERT INTO sh_oper (stat_tip, name, oper_pcod, diag_pcod, oper_dlit, mat, text, src_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, shOper.stat_tip, shOper.name, shOper.oper_pcod, shOper.diag_pcod, new Time(shOper.oper_dlit), shOper.mat, shOper.text, srcStr);
+				shId = sme.getGeneratedKeys().getInt("id");
+			}
+			sme.setCommit();
+			
+			return shId;
+		} catch (SQLException | InterruptedException e) {
+			if (e instanceof SQLException)
+				if (((SQLException) e.getCause()).getSQLState().equals("23505"))
+					throw new TemplateExistsException();
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error saving template oper");
+		}
+	}
+	
+	@Override
+	public void deleteShOper(int id) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM sh_oper WHERE id = ? ", false, id);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error deleting template oper");
 		}
 	}
 }

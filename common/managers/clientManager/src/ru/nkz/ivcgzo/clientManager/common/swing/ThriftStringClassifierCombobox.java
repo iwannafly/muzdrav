@@ -217,7 +217,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 			}
 		
 		if (selItem == null)
-			throw new RuntimeException(String.format("Unknown pcod '%d'.", pcod));
+			throw new RuntimeException(String.format("Unknown pcod '%s'.", pcod));
 	}
 	
 	/**

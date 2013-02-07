@@ -1,6 +1,4 @@
-*
-.*~
-!.gitignore
-!*.thrift
-!*.bat
-!*.sh
+bin/
+*_lib/
+plugin/*
+lib/

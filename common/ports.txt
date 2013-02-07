@@ -18,5 +18,8 @@ base port + 0	auth
 15	lab
 16	disp
 17	medication
+18	autoProc
+20	operation
+21	print
 
 55201	libUpd

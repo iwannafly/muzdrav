@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.clientVgr;
 
 import java.awt.EventQueue;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
@@ -37,8 +38,10 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 //	protected static final JFrame Per = null;
 	private JFrame frame;
 	private Period per;
+	private DopClas dopCl;
 	public static MainForm instance;
 	public static ThriftVgr.Client tcl;
+	String titleString ="", stForm = "";
 	/**
 	 * Launch the application.
 	 */
@@ -118,8 +121,8 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		});
 		mnNewMenu.add(menuItem);
 		
-		JMenuItem menuItem_1 = new JMenuItem("Диспансеризация подростков");
-		menuItem.addActionListener(new ActionListener() {
+		JMenuItem menuItem_1 = new JMenuItem("Диспансеризация детей");
+		menuItem_1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				per = new Period();
@@ -129,19 +132,29 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		});
 		mnNewMenu.add(menuItem_1);
 		
-		JMenuItem menuItem_2 = new JMenuItem("Диспансеризация детей-сирот");
-		mnNewMenu.add(menuItem_2);
-		
 		JMenuItem menuItem_3 = new JMenuItem("Родовой сертификат");
 		mnNewMenu.add(menuItem_3);
 		
 		JMenuItem menuItem_4 = new JMenuItem("Регистр женщин фертильного возраста");
+		menuItem_4.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				per = new Period();
+				per.Cslu = 4;
+				per.showPeriod();
+			}
+		});
 		mnNewMenu.add(menuItem_4);
 		
-		JMenuItem menuItem_5 = new JMenuItem("Регистр больных с орфанными заб-ями");
-		mnNewMenu.add(menuItem_5);
-		
 		JMenuItem menuItem_6 = new JMenuItem("Экспорт карт детей-инвалидов");
+		menuItem_6.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				per = new Period();
+				per.Cslu = 6;
+				per.showPeriod();
+			}
+		});
 		mnNewMenu.add(menuItem_6);
 		
 		JMenuItem menuItem_7 = new JMenuItem("Экспорт данных о флюоороосмотрах");
@@ -169,7 +182,7 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		});
 		mnNewMenu.add(menuItem_8);
 		
-		JMenu menu = new JMenu("Подгрузка данных");
+		JMenu menu = new JMenu("Выгрузка информации в АСУ \"Горздрав\"");
 		menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
@@ -177,11 +190,57 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		});
 		menuBar.add(menu);
 		
-		JMenuItem mntmNewMenuItem = new JMenuItem("Подгрузка информации из ПФ");
+		JMenuItem mntmNewMenuItem = new JMenuItem("1. Статистический талон (форма 025)");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e1) {
+			titleString = "1. Статистический талон (форма 025)";
+			stForm = "F25";
+			dopCl = new DopClas();	
+			dopCl.setTitle(titleString);
+			dopCl.DopClas(titleString,stForm); 
+			}
+		});
 		menu.add(mntmNewMenuItem);
 		
-		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Подгрузка информации об областных льготниках");
+		JMenuItem mntmNewMenuItem_1 = new JMenuItem("2. Учет работы врача (форма 039)");
+		mntmNewMenuItem_1.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e1){
+			titleString = "2. Учет работы врача (форма 039)";
+			stForm = "F39";
+			System.out.println(stForm);
+			dopCl = new DopClas();
+			dopCl.setTitle(titleString);
+			dopCl.DopClas(titleString, stForm);
+			}
+		});
 		menu.add(mntmNewMenuItem_1);
+		
+		JMenuItem mntmNewMenuItem_2 = new JMenuItem("3. Диспансеризация (форма 030)");
+		menu.add(mntmNewMenuItem_2);
+		
+		JMenuItem mntmNewMenuItem_3 = new JMenuItem("4. Дневной стационар (форма 003)");
+		mntmNewMenuItem_3.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				titleString = "4. Дневной стационар (форма 003)";
+				stForm = "F03";
+				System.out.println(stForm);
+				dopCl = new DopClas();
+				dopCl.setTitle(titleString);
+				dopCl.DopClas(titleString, stForm);
+				
+			}
+		});
+		menu.add(mntmNewMenuItem_3);
+		
+		JMenuItem mntmNewMenuItem_4 = new JMenuItem("5. Стационар круглосуточного пребывания (форма 066)");
+		menu.add(mntmNewMenuItem_4);
+		
+		JMenuItem mntmNewMenuItem_5 = new JMenuItem("6. Свидетельство о смерти (форма 028)");
+		menu.add(mntmNewMenuItem_5);
 		
 //		JMenuBar menuBar_1 = new JMenuBar();
 //		menuBar.add(menuBar_1);

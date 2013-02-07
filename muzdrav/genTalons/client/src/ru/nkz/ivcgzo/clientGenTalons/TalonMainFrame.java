@@ -43,10 +43,6 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
-import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
-import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
-import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftGenTalon.AztNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
@@ -1115,19 +1111,19 @@ public class TalonMainFrame extends JFrame {
 						.addGroup(gl_panel_5.createSequentialGroup()
 							.addComponent(lblNewLabel)
 							.addGap(20)
-							.addComponent(tf_datn, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tf_datn, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(lblNewLabel_1)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tf_datk, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE))
+							.addComponent(tf_datk, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE))
 						.addComponent(pBar, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addGap(32)
+					.addGap(18)
 					.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnNewButton)
 						.addComponent(tal_3)
 						.addComponent(tal_2)
 						.addComponent(tal_1))
-					.addContainerGap(89, Short.MAX_VALUE))
+					.addContainerGap(230, Short.MAX_VALUE))
 		);
 		gl_panel_5.setVerticalGroup(
 			gl_panel_5.createParallelGroup(Alignment.LEADING)
@@ -1135,10 +1131,10 @@ public class TalonMainFrame extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
 						.addComponent(tf_datn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tf_datk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblNewLabel)
-						.addComponent(lblNewLabel_1)
-						.addComponent(tal_1))
+						.addComponent(tal_1)
+						.addComponent(tf_datk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_1))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_5.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_panel_5.createSequentialGroup()
@@ -1148,7 +1144,7 @@ public class TalonMainFrame extends JFrame {
 							.addGap(18)
 							.addComponent(btnNewButton))
 						.addComponent(pBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(15, Short.MAX_VALUE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panel_5.setLayout(gl_panel_5);
 		tbTalon.setLayout(gl_tbTalon);
@@ -1221,16 +1217,16 @@ public class TalonMainFrame extends JFrame {
 						.addGroup(gl_panel_9.createSequentialGroup()
 							.addComponent(lblNewLabel_8)
 							.addGap(18)
-							.addComponent(cmb_sv, 0, 478, Short.MAX_VALUE))
+							.addComponent(cmb_sv, 0, 470, Short.MAX_VALUE))
 						.addGroup(gl_panel_9.createSequentialGroup()
 							.addComponent(lblNewLabel_9)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(tf_sv1, GroupLayout.PREFERRED_SIZE, 79, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tf_sv1, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(lblNewLabel_10)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tf_sv2, GroupLayout.PREFERRED_SIZE, 78, GroupLayout.PREFERRED_SIZE)
-							.addGap(46)
+							.addComponent(tf_sv2, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
 							.addComponent(btnSvod, GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
@@ -1245,10 +1241,10 @@ public class TalonMainFrame extends JFrame {
 					.addGroup(gl_panel_9.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel_9)
 						.addComponent(tf_sv1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnSvod)
 						.addComponent(lblNewLabel_10)
-						.addComponent(tf_sv2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnSvod))
-					.addContainerGap(26, Short.MAX_VALUE))
+						.addComponent(tf_sv2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(17, Short.MAX_VALUE))
 		);
 		panel_9.setLayout(gl_panel_9);
 		tbSvodki.setLayout(gl_tbSvodki);

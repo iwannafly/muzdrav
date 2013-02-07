@@ -25,3 +25,6 @@ generateJavaSource muzdrav/hospital/thrift
 generateJavaSource muzdrav/Vgr/thrift
 generateJavaSource muzdrav/kartaRInv/thrift
 generateJavaSource muzdrav/disp/thrift
+generateJavaSource muzdrav/autoProc/thrift
+generateJavaSource muzdrav/infomat/thrift
+generateJavaSource muzdrav/print/thrift

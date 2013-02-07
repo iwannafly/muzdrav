@@ -148,8 +148,8 @@ public class ServerLab extends Server implements Iface {
     private static final Class<?>[] GOSP_TYPES = {
     //  id_gosp        npasp          cotd           cotd_name
         Integer.class, Integer.class, Integer.class, String.class,
-    //  datap       datav       ishod         result
-        Date.class, Date.class, String.class, String.class,
+    //  datap       datav       ishod          result
+        Date.class, Date.class, Integer.class, Integer.class,
     //  vrach          vrach_fio 
         Integer.class, String.class
     };
@@ -384,7 +384,7 @@ public class ServerLab extends Server implements Iface {
             return rsmIntClass.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
-            ((SQLException) e.getCause()).printStackTrace();
+            e.getCause().printStackTrace();
             throw new KmiacServerException();
         }
     }
@@ -402,7 +402,7 @@ public class ServerLab extends Server implements Iface {
             return id;
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
-            ((SQLException) e.getCause()).printStackTrace();
+            e.getCause().printStackTrace();
             throw new KmiacServerException();
         } catch (InterruptedException e1) {
             log.log(Level.ERROR, "Exception: ", e1);
@@ -427,7 +427,7 @@ public class ServerLab extends Server implements Iface {
             return rsmGosp.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
-            ((SQLException) e.getCause()).printStackTrace();
+            e.getCause().printStackTrace();
             throw new KmiacServerException();
         }
     }
@@ -449,13 +449,15 @@ public class ServerLab extends Server implements Iface {
        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, gospId, gospId)) {
            return rsmIsl.mapToList(acrs.getResultSet());
        } catch (SQLException e) {
+           log.log(Level.ERROR, "Exception: ", e);
            throw new KmiacServerException(e.getMessage());
        }
     }
 
     @Override
     public String printIssl(int patId, String cabinet, String labName,
-            String lpuNaprName, String vrachName, List<String> issledItems) throws KmiacServerException {
+            String lpuNaprName, String vrachName, List<String> issledItems, String diag)
+            throws KmiacServerException {
         final String path;
         final AutoCloseableResultSet acrs;
         String address;
@@ -490,10 +492,10 @@ public class ServerLab extends Server implements Iface {
                 fio, // фио
                 datar, // дата рождения
                 address, // адрес
-                " ", // диагноз
+                diag, // диагноз
                 vrachName, 
                 "~issledItems", // исследования
-                dateFormat.format(new Date(System.currentTimeMillis())) // дата навправления
+                dateFormat.format(new Date(System.currentTimeMillis())) // дата направления
             );
             htmTemplate.refindLabels();
             for (String isslItem: issledItems) {
@@ -504,7 +506,20 @@ public class ServerLab extends Server implements Iface {
             osw.write(htmTemplate.getTemplateText());
             return path;
         } catch (Exception e) {
-            throw new  KmiacServerException(); // тут должен быть кмиац сервер иксепшн
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new  KmiacServerException();
+        }
+    }
+
+    @Override
+    public List<IntegerClassifier> getParaotdLpu() throws KmiacServerException {
+        final String sqlQuery = "SELECT DISTINCT n_m00.pcod, n_m00.name_s as name "
+            + "FROM n_m00 JOIN n_lds ON (n_m00.pcod = n_lds.clpu);";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery)) {
+            return rsmIntClass.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 }

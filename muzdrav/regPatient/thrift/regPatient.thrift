@@ -33,12 +33,12 @@ struct Polis{
 /*p_nambk*/
 struct Nambk{
 	1:i32 npasp,
-	2:string nambk,
-	3:i32 nuch,
-	4:i32 cpol,
+	2:optional string nambk,
+	3:optional i32 nuch,
+	4:optional i32 cpol,
 	5:optional i64 datapr,
 	6:optional i64 dataot,
-	7:i32 ishod
+	7:optional i32 ishod
 }
 
 /*patient*/
@@ -69,29 +69,32 @@ struct PatientFullInfo{
 	24:optional i32 prizn,
 	25:optional i32 ter_liv,
 	26:optional i32 region_liv,
-	27:optional Address adpAddress,
-	28:optional Address admAddress,
-	29:optional Polis polis_oms,
-	30:optional Polis polis_dms,
+	27:optional string birthplace,
+	28:optional string ogrn_smo,
+	29:optional i32 obraz,
+	30:optional Address adpAddress,
+	31:optional Address admAddress,
+	32:optional Polis polis_oms,
+	33:optional Polis polis_dms
 }
 
 /*сведени о представителе табл. p_preds*/
 struct Agent{
 	1:i32 npasp,
-	2:string fam,
-	3:string im,
-	4:string ot,
+	2:optional string fam,
+	3:optional string im,
+	4:optional string ot,
 	5:optional i64 datar,
-	6:i32 pol,
-	7:string name_str,
-	8:string ogrn_str,
-	9:i32 vpolis,
-	10:string spolis,
-	11:string npolis,
-	12:optional i32 tdoc,
-	13:optional string docser,
-	14:optional string docnum,
-	15:string birthplace
+	6:optional i32 pol,
+	7:optional string name_str,
+	8:optional string ogrn_str,
+	9:optional i32 vpolis,
+	10:optional string spolis,
+	11:optional string npolis,
+	12:optional string birthplace,
+	13:optional i32 tdoc,
+	14:optional string docser,
+	15:optional string docnum
 }
 
 /*pkov*/
@@ -197,7 +200,8 @@ struct Gosp{
 	35:optional i64 vremosm,
 	36:optional i64 dataz,
 	37:optional string jalob,
-	38:optional i32 vid
+	38:optional i32 vid,
+	39:optional bool pr_ber
 }
 
 /**
@@ -298,9 +302,76 @@ exception SmocodNotFoundException {
 }
 exception NambkNotFoundException{
 }
+exception PatientGospYesOrNoNotFoundException{
+}
+
+/*----------shablon----------------------------*/
+struct ShablonText {
+	1: i32 grupId,
+	2: string grupName,
+	3: string text
+}
+
+struct Shablon {
+	1: i32 id,
+	2: string diag,
+	3: string din,
+	4: string name,
+	5: list<ShablonText> textList
+}
+/*----------shablon end----------------------------*/
+
+
+/*-----anamnez begin-----------------------------------------------------------*/
+/*panamnez*/
+struct Anam{
+	1:i32 npasp,
+	2:optional i64 datap,
+	3:i32 numstr,
+	4:bool vybor,
+	5:optional string comment,
+	6:string name,
+	7:string pranz
+}
+
+struct Pokaz{
+	1:i32 pcod,
+	2:string name
+}
+	exception TipPodrNotFoundException {
+	}
+
+	exception PokazNotFoundException {
+	}
 
 service ThriftRegPatient extends kmiacServer.KmiacServer {
-    
+	
+	/**
+	Возвращает показатели анамнеза
+	*/
+	list<Anam> getAnamnez(1:i32 npasp, 2:i32 cslu, 3:i32 cpodr) throws (1: TipPodrNotFoundException tpfe,
+		2:kmiacServer.KmiacServerException kse);
+
+	void deleteAnam(1:i32 npasp, 2:i32 cslu, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
+	void updateAnam(1: list<Anam> anam) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Печать анамнеза
+	 */
+	string printAnamnez(1: PatientFullInfo pat, 2: list<Anam> anam, 3: kmiacServer.UserAuthInfo uai)
+		throws (1:kmiacServer.KmiacServerException kse);
+
+	list<classifier.IntegerClassifier> getPokaz() throws (1: kmiacServer.KmiacServerException kse, 2: PokazNotFoundException pnfe);
+/*-----anamnez end-----------------------------------------------------------*/
+
+/*Shablon*/
+	list<classifier.StringClassifier> getShOsmPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShOsmPoiskName(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShOsmByDiag(1: i32 cspec, 2: i32 cslu, 3: string diag, 4: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	Shablon getShOsm(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShDopNames(1: i32 idRazd) throws (1: kmiacServer.KmiacServerException kse);
+	classifier.IntegerClassifier getShDop(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
+
     /**
      * Возвращает краткие сведения
      * о всех пациентах, удовлетворяющих введенным данным.
@@ -514,6 +585,12 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	i32 getTerLive(1:i32 pcod) throws (1:TerLiveNotFoundException tlnfe,
 		2:kmiacServer.KmiacServerException kse);
 
+	/**
+	* Возвращает отделение если пациент госпитализирован
+     	*/
+	string getNameOtdGosp(1:i32 id) throws (1:PatientGospYesOrNoNotFoundException pgnfe,
+		2:kmiacServer.KmiacServerException kse);
+
 /*Классификаторы*/
 	
 	/**
@@ -623,6 +700,5 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	i32 addToOtd(1:i32 idGosp, 2:i32 nist, 3:i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
 	void updateOtd(1:i32 id, 2:i32 idGosp, 3:i32 nist, 4:i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
 	void addOrUpdateOtd(1:i32 idGosp, 2:i32 nist, 3:i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
-
 
 }

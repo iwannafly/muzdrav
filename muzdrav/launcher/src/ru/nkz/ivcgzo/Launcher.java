@@ -13,7 +13,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamSource;
@@ -23,7 +26,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class Launcher {
-	private static final String clientAuthType = "unspecified";
+	private static String clientAuthType = "unspecified";
+	private static String appServerIp = "localhost";
+	private static boolean hasLoginParams;
+	private static String paramLogin;
+	private static String paramPassword;
+	private static int paramModuleIndex;
 	private static final String libDir = "lib";
 	private final String rootPath;
 	private class LibraryInfo {
@@ -34,14 +42,67 @@ public class Launcher {
 	}
 	
 	public static void main(String[] args) {
+		Pattern ipPattern = Pattern.compile("(^[2][5][0-5].|^[2][0-4][0-9].|^[1][0-9][0-9].|^[0-9][0-9].|^[0-9].)([2][0-5][0-5].|[2][0-4][0-9].|[1][0-9][0-9].|[0-9][0-9].|[0-9].)([2][0-5][0-5].|[2][0-4][0-9].|[1][0-9][0-9].|[0-9][0-9].|[0-9].)([2][0-5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[0-9][0-9]|[0-9])$");
+		int prmStart;
+		
+		if (clientAuthType.equals("unspecified")) {
+			prmStart = 1;
+			if (args.length == 0) {
+				System.out.println("No application server alias (tst, int, ext) specified. Using dev server.");
+				appServerIp = "localhost";
+			} else {
+				if (args[0].equals("tst")) {
+					System.out.println("Using test application server.");
+					clientAuthType = "unspecified";
+					appServerIp = "10.0.0.248";
+				} else if (args[0].equals("int")) {
+					System.out.println("Using internal application server.");
+					clientAuthType = "unspecified";
+					appServerIp = "10.0.0.243";
+				} else if (args[0].equals("ext")) {
+					System.out.println("Using external application server.");
+					clientAuthType = "unspecified";
+					appServerIp = "10.1.1.8";
+				} else if (ipPattern.matcher(args[0]).matches()) {
+					appServerIp = args[0];
+					clientAuthType = appServerIp;
+					System.out.println(String.format("Using %s application server.", appServerIp));
+				} else {
+					System.out.println("No valid application server alias (tst, int, ext) or ip address specified. Using dev server.");
+					appServerIp = "localhost";
+				}
+			}
+		} else {
+			prmStart = 0;
+		}
+		if (args.length > prmStart)
+			if (args.length > prmStart + 2) {
+				paramLogin = args[prmStart];
+				paramPassword = args[prmStart + 1];
+				try {
+					paramModuleIndex = Integer.parseInt(args[prmStart + 2]);
+				} catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Неверно задан индекс запускаемого модуля. Программа будет закрыта.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+					System.exit(2);
+				}
+				hasLoginParams = true;
+			} else {
+				JOptionPane.showMessageDialog(null, "Недостаточное количество параметров для задания логина, пароля и индекса запускаемого модуля. Программа будет закрыта.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+				System.exit(2);
+			}
+
+		
 		Launcher lnc;
 		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			lnc = new Launcher();
 			lnc.checkAndUpdate();
 			
-			Runtime.getRuntime().exec("java -jar auth.jar " + clientAuthType);
-		} catch (IOException e) {
+			Runtime.getRuntime().exec("java -jar auth.jar " + clientAuthType + (hasLoginParams ? String.format(" \"%s\" \"%s\" \"%d\"", paramLogin, paramPassword, paramModuleIndex) : ""));
+		} catch (Exception e) {
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Не удалось обновить системные модули. Программа будет закрыта.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			System.exit(1);
 		}
 	}
 	
@@ -49,33 +110,51 @@ public class Launcher {
 		rootPath = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath();
 	}
 	
-	public void checkAndUpdate() {
-		String ip;
-		
+	public void checkAndUpdate() throws Exception {
 		switch (clientAuthType) {
 		case "tst":
-			ip = "10.0.0.248";
+			appServerIp = "10.0.0.248";
 			break;
 		case "int":
-			ip = "10.0.0.243";
+			appServerIp = "10.0.0.243";
 			break;
 		case "ext":
-			ip = "10.1.1.8";
-			break;
-		default:
-			ip = "localhost";
+			appServerIp = "10.1.1.8";
 			break;
 		}
-		try (Socket servSct = new Socket(ip, 55201)) {
+//		checkForJavaFx();
+		try (Socket servSct = new Socket(appServerIp, 55201)) {
 			handShake(servSct);
 			Document domLibList = getLibrariesList(servSct);
 			List<LibraryInfo> updList = getUpdateList(domLibList);
 			updateLibs(servSct, updList);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 	
+//	private void checkForJavaFx() throws Exception {
+//		String javaHome;
+//		Path jfxLibFile, jfxMuzFile;
+//		
+//		javaHome = System.getProperty("java.home");
+//		if (javaHome == null) {
+//			JOptionPane.showMessageDialog(null, "Исполняемая среда Java установлена некорректно.\nПереустановите ее, скачав последний дистрибутив с официального сайта http://www.oracle.com/technetwork/java/javase/downloads/index.html.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+//			throw new Exception("Jre not set up correctly.");
+//		}
+//		
+//		jfxLibFile = Paths.get(javaHome, "lib", "jfxrt.jar");
+//		if (!jfxLibFile.toFile().exists()) {
+//			JOptionPane.showMessageDialog(null, "Библиотека JavaFX не установлена.\nУстановите ее, скачав последний дистрибутив с официального сайта http://www.oracle.com/technetwork/java/javase/downloads/index.html.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+//			throw new Exception("Jfx not set up.");
+//		}
+//		
+//		jfxMuzFile = Paths.get(new File(Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath(), "lib", "jfxrt.jar");
+//		if (!jfxMuzFile.toFile().exists()) {
+//			Files.copy(jfxLibFile, jfxMuzFile);
+//		} else if (jfxLibFile.toFile().length() != jfxMuzFile.toFile().length()) {
+//			Files.copy(jfxLibFile, jfxMuzFile, StandardCopyOption.REPLACE_EXISTING);
+//		}
+//	}
+
 	private void handShake(Socket servSct) throws Exception {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(servSct.getInputStream()));
@@ -164,36 +243,65 @@ public class Launcher {
 		return true;
 	}
 	
-	private void updateLibs(Socket servSct, List<LibraryInfo> updList) throws Exception {
-		String path = checkAndCreateLibFolder(rootPath);
-		byte[] buf = new byte[65536];
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(servSct.getInputStream()));
-				PrintWriter writer = new PrintWriter(servSct.getOutputStream())) {
-			for (LibraryInfo libInfo : updList) {
-				writer.println(libInfo.id);
-				writer.flush();
-				try (FileOutputStream fos = new FileOutputStream(new File(libInfo.id == 0 ? rootPath : path, libInfo.name))) {
-					fos.getChannel().lock();
-					int read = servSct.getInputStream().read(buf);
-					int readFile = read;
-					while (readFile < libInfo.size) {
-						fos.write(buf, 0, read);
-						read = servSct.getInputStream().read(buf);
-						readFile += read;
+	private void updateLibs(final Socket servSct, final List<LibraryInfo> updList) throws Exception {
+		int overallSize = 0;
+		final ModulesUpdaterDialog mud = new ModulesUpdaterDialog();
+		for (LibraryInfo libraryInfo : updList) {
+			overallSize += libraryInfo.size;
+		}
+		mud.setLocationRelativeTo(null);
+		mud.setTitle("МИС \"Инфо МуЗдрав\" - Обновление системных модулей");
+		mud.setOverallMessage("Всего загружено");
+		mud.setOverallMaximum(overallSize);
+		
+		new Thread(new Runnable() {
+			@SuppressWarnings("resource")
+			@Override
+			public void run() {
+				String path = checkAndCreateLibFolder(rootPath);
+				byte[] buf = new byte[65536];
+				try (BufferedReader reader = new BufferedReader(new InputStreamReader(servSct.getInputStream()));
+						PrintWriter writer = new PrintWriter(servSct.getOutputStream())) {
+					for (LibraryInfo libInfo : updList) {
+						writer.println(libInfo.id);
+						writer.flush();
+						try (FileOutputStream fos = new FileOutputStream(new File(libInfo.id == 0 ? rootPath : path, libInfo.name))) {
+							mud.setCurrentMessage(String.format("Загрузка модуля %s", libInfo.name));
+							mud.setCurrentMaximum(libInfo.size);
+							mud.setCurrentValue(0);
+							
+							fos.getChannel().lock();
+							int read = servSct.getInputStream().read(buf);
+							int readFile = read;
+							while (readFile < libInfo.size) {
+								fos.write(buf, 0, read);
+								mud.addToProgress(read);
+								read = servSct.getInputStream().read(buf);
+								readFile += read;
+							}
+							fos.write(buf, 0, read);
+							mud.addToProgress(read);
+							writer.println("Got it.");
+							writer.flush();
+						} catch (Exception e) {
+							throw new Exception(String.format("Transferring '%s' failed.", libInfo.name), e);
+						}
 					}
-					fos.write(buf, 0, read);
-					writer.println("Got it.");
+					writer.println("");
 					writer.flush();
+					if (!reader.readLine().equals("Good bye."))
+						throw new Exception("Farewell failed.");
 				} catch (Exception e) {
-					throw new Exception(String.format("Transferring '%s' failed.", libInfo.name), e);
+					e = new Exception("Error transferring files from server.", e);
+					mud.setException(e);
+				} finally {
+					mud.dispose();
 				}
 			}
-			writer.println("");
-			writer.flush();
-			if (!reader.readLine().equals("Good bye."))
-				throw new Exception("Farewell failed.");
-		} catch (Exception e) {
-			throw new Exception("Error transferring files from server.", e);
-		}
+		}).start();
+		if (updList.size() > 0)
+			mud.setVisible(true);
+		if (mud.getException() != null)
+			throw mud.getException();
 	}
 }

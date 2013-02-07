@@ -25,8 +25,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 
 public class SvodVed extends JPanel {
-	private CustomDateEditor tfDateB;
-	private CustomDateEditor tfDateF;
+	public CustomDateEditor tfDateB;
+	public CustomDateEditor tfDateF;
 	private JLabel lblNewLabel;
 	//public InputInfo inputInfo;
 	private final ButtonGroup buttonGroup = new ButtonGroup();

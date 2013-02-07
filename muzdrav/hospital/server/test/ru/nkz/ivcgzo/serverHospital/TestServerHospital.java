@@ -3,11 +3,13 @@ package ru.nkz.ivcgzo.serverHospital;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 
+import ru.nkz.ivcgzo.serverManager.common.IServer;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
@@ -28,6 +30,55 @@ public class TestServerHospital {
     private ITransactedSqlExecutor tse;
     private ServerHospital testServer;
     private static final int COUNT_CONNECTIONS = 1;
+    /**
+     * Класс для запуска плагинов-серверов отдельными потоками.
+     * Если в плагине-сервере возникнет необработанное исключение,
+     * он остановится.
+     * @author bsv798
+     */
+    private class ThreadedServer implements Runnable, IServer {
+    	private Thread thread;
+    	private IServer server;
+    	private boolean isRunning;
+    	
+    	public ThreadedServer(IServer server) {
+    		this.server = server;
+    		CreateThread();
+    	}
+    	
+    	@Override
+    	public void run() {
+    		try {
+    			isRunning = true;
+    			server.start();
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    			stop();
+    		}
+    	}
+
+    	@Override
+    	public void start() throws Exception {
+    		if (!isRunning)
+    			thread.start();
+    		else
+    			throw new Exception("Server is already running.");
+    	}
+
+    	@Override
+    	public void stop() {
+    		synchronized (thread) {
+    			server.stop();
+    			CreateThread();
+    		}
+    	}
+    	
+    	private void CreateThread() {
+    		thread = new Thread(this);
+    		isRunning = false;
+    	}
+    	
+    }
 
     @Before
     public final void setUp() throws Exception {
@@ -36,13 +87,33 @@ public class TestServerHospital {
         testServer = new ServerHospital(sse, tse);
     }
 
+    /**
+     * Тест запуска сервера
+     * @author Балабаев Никита Дмитриевич
+     */
     @Test
     public void testStart() {
+    	ThreadedServer ts = new ThreadedServer(testServer);
+    	try {
+			ts.start();
+		} catch (Exception e) {
+			//Исключение выбрасывается только в случае попытки повторного запуска сервера
+		}
+    	//Ожидание запуска потока:
+    	for(int i = 0; (i < Integer.MAX_VALUE) && !ts.isRunning; i++) ;
+    	assertEquals("is server running", true, ts.isRunning);
+    	ts.stop();
     }
 
+    /**
+     * Тест остановки сервера
+     * @author Балабаев Никита Дмитриевич
+     */
     @Test
     public void testStop() {
-        //fail("Not yet implemented"); // TODO
+    	ThreadedServer ts = new ThreadedServer(testServer);
+    	ts.stop();
+    	assertEquals("is server stop serving", true, !ts.isRunning);
     }
 
     @Test
@@ -67,17 +138,16 @@ public class TestServerHospital {
         assertEquals("list size", expectedListSize, patientList.size());
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     public final void getPatientPersonalInfo_isInfoCorrect()
             throws KmiacServerException, TException, PatientNotFoundException {
         final int patientId = 450; //10001;
         final int idGosp = 25;
         TPatient patient =
-                testServer.getPatientPersonalInfo(patientId, idGosp);
+                testServer.getPatientPersonalInfo(idGosp);
         System.out.print(patient);
         final int cGosp = 4;
-        final Date birthdate = new Date(104, 4, 1); // 2004-05-01
+        final Date birthdate = new GregorianCalendar(2004, 4, 1).getTime(); // 2004-05-01
         final String fam = "РЫМАНОВ";
         final String im = "СЕРГЕЙ";
         final String ot = "АЛЕКСАНДРОВИЧ";
@@ -97,7 +167,9 @@ public class TestServerHospital {
     public final void updatePatientChamberNumber_isActuallyUpdated() throws TException {
         final int gospId = 4;
         final int chamberNum = 108;
-        testServer.updatePatientChamberNumber(gospId, chamberNum);
+        final int profPcod = 123;
+        final int nist = 1;
+        testServer.updatePatientChamberNumber(gospId, chamberNum, profPcod, nist);
     }
 
     @Test

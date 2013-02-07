@@ -2,10 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/adminManager"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/libthrift-0.9.0.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/log4j-1.2.17.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-api-1.7.2.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-log4j12-1.7.2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/adminManager"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -15,9 +15,13 @@
 		<table srcName="ABY" dstName="n_aby" />
 		<table srcName="AF0" dstName="n_af0" />
 		<table srcName="AI0" dstName="n_ai0" />
+		<table srcName="AJ0" dstName="n_aj0" />
+		<table srcName="AK2" dstName="n_ak2" />
+		<table srcName="AKD" dstName="n_akd" />
 		<table srcName="AL0" dstName="n_al0" />
 		<table srcName="ALK" dstName="n_alk" />
 		<table srcName="AM0" dstName="n_am0" />
+		<table srcName="ANZ" dstName="n_anz" />
 		<table srcName="AO0" dstName="n_ao0" />
 		<table srcName="AP0" dstName="n_ap0" />
 		<table srcName="AQ0" dstName="n_aq0" />
@@ -27,6 +31,7 @@
 		<table srcName="AZ51" dstName="n_az51" />
 		<table srcName="AZT" dstName="n_azt" />
 		<table srcName="B00" dstName="n_b00" />
+		<table srcName="BL1" dstName="n_bl1" />
 		<table srcName="BZ5" dstName="n_bz5" />
 		<table srcName="C00" dstName="n_c00" />
 		<table srcName="D0S" dstName="n_dos" />
@@ -47,6 +52,7 @@
 		<table srcName="GRUP" dstName="n_grup" />
 		<table srcName="K02" dstName="n_k02" />
 		<table srcName="KAS" dstName="n_kas" />
+		<table srcName="KDERR" dstName="n_kderr" />
 		<table srcName="L00" dstName="n_l00" />
 		<table srcName="L01" dstName="n_l01" />
 		<table srcName="L02" dstName="n_l02" />
@@ -62,6 +68,7 @@
 		<table srcName="N45" dstName="n_n45" />
 		<table srcName="N63" dstName="n_n63" />
 		<table srcName="NSI_OBST" dstName="n_nsi_obst" />
+		<table srcName="NSIKODREZ" dstName="n_nsikodrez" />
 		<table srcName="NSILPU" dstName="n_nsilpu" />
 		<table srcName="NSIPOL" dstName="n_nsipol" />
 		<table srcName="NZ1" dstName="n_nz1" />
@@ -69,8 +76,10 @@
 		<table srcName="OBST" dstName="n_obst" />
 		<table srcName="O00" dstName="n_o00" />
 		<table srcName="OPL" dstName="n_opl" />
+		<table srcName="OT_STR" dstName="n_ot_str" />
 		<table srcName="OT9" dstName="n_ot9" />
 		<table srcName="OT63" dstName="n_ot63" />
+		<table srcName="OT100" dstName="n_ot100" />
 		<table srcName="P07" dstName="n_p07" />
 		<table srcName="P0C" dstName="n_p0c" />
 		<table srcName="P0E1" dstName="n_p0e1" />
@@ -85,6 +94,7 @@
 		<table srcName="SMORF" dstName="n_smorf" />
 		<table srcName="SPEC" dstName="n_spec" />
 		<table srcName="STOIM" dstName="n_stoim" />
+		<table srcName="STRLPU" dstName="n_strlpu" />
 		<table srcName="SVL" dstName="n_svl" />
 		<table srcName="T00" dstName="n_t00" />
 		<table srcName="U00" dstName="n_u00" />

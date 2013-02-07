@@ -14,6 +14,9 @@ IF NOT %errorlevel% == 0 GOTO :end
 "..\..\..\..\bin\thrift.exe" --gen java "medication.thrift"
 IF NOT %errorlevel% == 0 GOTO :end
 
+"..\..\..\..\bin\thrift.exe" --gen java "operation.thrift"
+IF NOT %errorlevel% == 0 GOTO :end
+
 "..\..\..\..\bin\thrift.exe" --gen java "..\..\..\common\thrift\kmiacServer.thrift"
 IF NOT %errorlevel% == 0 GOTO :end
 

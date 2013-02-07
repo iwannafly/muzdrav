@@ -116,6 +116,13 @@ public class ConnectionManager {
 		return client;
 	}
 	
+	/**
+	 * Получение главной формы клиента.
+	 */
+	public JFrame getMainForm() {
+		return mainForm;
+	}
+	
 	private void addToCommon(int port) {
 		commonTransports.put(port, transports.get(port));
 		commonConnections.put(port, connections.get(port));
@@ -712,7 +719,19 @@ public class ConnectionManager {
     public void showMedicationForm(int npasp, String fam, String im, String ot, int idGosp) {
         viewClient.showModal(client, 20, npasp, fam, im, ot, idGosp);
     }
-	
+
+    /**
+     * Вызов формы записи пациента на исследование.
+     * @param npasp - уникальный номер пациента
+     * @param fam - фамилия
+     * @param im - имя
+     * @param ot - отчество
+     * @param idGosp - идентификатор госпитализации
+     */
+    public void showOperationForm(int npasp, String fam, String im, String ot, int idGosp) {
+        viewClient.showModal(client, 25, npasp, fam, im, ot, idGosp);
+    }
+
 	/**
 	 * Вызов формы записи пациента на прием к врачу.
 	 * @param npasp - уникальный номер пациента.
@@ -723,6 +742,60 @@ public class ConnectionManager {
 	 */
 	public void showReceptionRecordForm(int npasp, String fam, String im, String ot, int idPvizit) {
 		viewClient.showModal(client, 19, npasp, fam, im, ot, idPvizit);
+	}
+	
+	/**
+	 * Вызов формы со списком ошибок в паспортной части пациентов.
+	 * @return код выбранного пациента или <code>null</code>, 
+	 * если пользователь закрыл форму
+	 */
+	public Integer showPaspErrorsForm() {
+		return (Integer) viewClient.showModal(client, 21);
+	}
+	
+	/**
+	 * Вызов формы со списком ошибок в медицинской части поликлиники.
+	 * @return код выбранного пациента, код обращения и код посещения 
+	 * или <code>null</code>, если пользователь закрыл форму
+	 */
+	public int[] showMedPolErrorsForm() {
+		return (int[]) viewClient.showModal(client, 22);
+	}
+	
+	/**
+	 * Вызов формы со списком ошибок в медицинской части приемного отделения.
+	 * @return код выбранного посещения 
+	 * или <code>null</code>, если пользователь закрыл форму
+	 */
+	public Integer showMedPriemErrorsForm() {
+		return (Integer) viewClient.showModal(client, 27, true);
+	}
+	
+	/**
+	 * Вызов формы со списком ошибок в медицинской части стационара.
+	 * @return код выбранной госпитализации 
+	 * или <code>null</code>, если пользователь закрыл форму
+	 */
+	public Integer showMedStaErrorsForm() {
+		return (Integer) viewClient.showModal(client, 27, false);
+	}
+	
+	/**
+	 * Вызов формы с редактором анамнеза пациента
+	 * @param npasp - уникальный номер пациента.
+	 */
+	public void showPatientAnamnezForm(int npasp) {
+		viewClient.showModal(client, 24, npasp);
+	}
+	
+	/**
+	 * Вызов формы с редактором больничного листа пациента.
+	 * @param npasp - уникальный номер пациента.
+	 * @param idObr - уникальный номер обращения.
+	 * @param idGosp - уникальный номер госпитализации.
+	 */
+	public void showBolListForm(int npasp, int idObr, int idGosp) {
+		viewClient.showModal(client, 26, npasp, idObr, idGosp);
 	}
 	
 	/**

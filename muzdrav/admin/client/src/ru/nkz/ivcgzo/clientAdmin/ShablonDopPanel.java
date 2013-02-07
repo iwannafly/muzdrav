@@ -52,7 +52,6 @@ public class ShablonDopPanel extends JPanel {
 	private JButton btSave;
 	private ShablonDop shDop;
 	private boolean fillingUI;
-	private Font defFont;
 	
 	public ShablonDopPanel() {
 		textListener = new DocumentListener() {
@@ -92,7 +91,6 @@ public class ShablonDopPanel extends JPanel {
 		
 		tbSearch = new CustomTextField(true, true, false);
 		tbSearch.setVisible(false);
-		defFont = tbSearch.getFont();
 		tbSearch.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -209,7 +207,7 @@ public class ShablonDopPanel extends JPanel {
 		
 		tbText = new JTextArea();
 		tbText.getDocument().addDocumentListener(textListener);
-		tbText.setFont(defFont);
+		tbText.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		new CustomTextComponentWrapper(tbText).setPopupMenu();
 		spText.setViewportView(tbText);
 		gbText.setLayout(gl_gbText);
@@ -241,7 +239,7 @@ public class ShablonDopPanel extends JPanel {
 		} catch (TemplateExistsException e) {
 			JOptionPane.showMessageDialog(ShablonDopPanel.this, "Шаблон с таким именем уже существует для данного раздела.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 			tbName.requestFocusInWindow();
-		} catch (KmiacServerException e) { //FIXME исключение не пробрасывается из-за ошибки в трифте. Если функция возвращает простой тип, то проверка на успешность выполнения проходится раньше, чем на исключение.
+		} catch (KmiacServerException e) {
 			JOptionPane.showMessageDialog(ShablonDopPanel.this, "Ошибка сохранения шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
 			MainForm.conMan.reconnect(e);

@@ -53,6 +53,19 @@ struct VrachTabel {
 	12: i32 id;
 }
 
+struct UchastokInfo {
+	1: optional string fam;
+	2: optional string im;
+	3: optional string ot;
+	4: optional i32 pcod;	
+}
+
+struct UchastokNum {
+	1: optional i32 pcod;	
+	2: optional i32 cpol;
+	3: optional i32 uch;
+	4: optional i32 id; 
+}
 
 struct InputPlanDisp {
     1: i32 kpolik;
@@ -63,23 +76,40 @@ struct InputPlanDisp {
     6: i32 clpu;
 }
 
+struct InputStructPosAuth {
+	1: optional i32 userId;
+	2: optional string cpodr_name;
+	3: optional string clpu_name;
+}
+
+struct InputStructPos {
+    1: string date1;
+    2: string date2;
+}
+
 
 /**
- * Информация отстутствует
+ * No information
  */
 exception VINotFoundException {
 }
 
 /**
- * Такая уже запись существует
+ * Already exists
  */
 exception VTDuplException {
 }
 
 /*
- * Информация отсутствует
+ * No information
  */
 exception VTException {
+}
+
+/**
+ * No information
+ */
+exception UchException {
 }
 
 service ThriftOutputInfo extends kmiacServer.KmiacServer {
@@ -115,12 +145,24 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
      * Удаляет информацию о враче
      */
 	void deleteVT(1:i32 vt);
+		
+	list<UchastokInfo> getUch(1:i32 cpol) throws (1: UchException uche, 2:kmiacServer.KmiacServerException kse);
+	
+	list<UchastokNum> getUchNum(1:i32 pcod) throws (1: UchException uche, 2:kmiacServer.KmiacServerException kse);
 
+	i32 addUchNum(1:UchastokNum uchNum) throws (1: kmiacServer.KmiacServerException kse);
+		
+	void updateUchNum(1:UchastokNum uchNum) throws (1:kmiacServer.KmiacServerException kse);
+	
+	void deleteUchNum(1:i32 uchNum);
+	
     string printPlanDisp(1:InputPlanDisp ipd) throws (1: kmiacServer.KmiacServerException kse);
 
     string printNoVipPlanDisp(1:InputPlanDisp ipd) throws (1: kmiacServer.KmiacServerException kse);
 
     string printSvedDispObs(1:InputPlanDisp ipd) throws (1: kmiacServer.KmiacServerException kse);
+
+    string printOtDetPol(1:InputPlanDisp ipd) throws (1: kmiacServer.KmiacServerException kse);
 
     string printSvodVed(1: InputAuthInfo iaf 2: InputSvodVed isv) throws (1: kmiacServer.KmiacServerException kse);
 
@@ -131,5 +173,9 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
     * Сводки по форме 39
     */
     string printDnevVr() throws (1: kmiacServer.KmiacServerException kse);
+
+	string printStructPos(1: InputStructPosAuth ispa 2: InputStructPos isp) throws (1: kmiacServer.KmiacServerException kse);
+
+    string nagrvr(1:i32 cpol)  throws (1: kmiacServer.KmiacServerException kse); 
 }
 

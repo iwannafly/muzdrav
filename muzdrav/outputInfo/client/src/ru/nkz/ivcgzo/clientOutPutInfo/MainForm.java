@@ -53,20 +53,25 @@ import java.awt.BorderLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
+import javax.xml.crypto.Data;
 
 import org.apache.thrift.TException;
 
 public class MainForm extends Client<ThriftOutputInfo.Client> {
 
 	private JFrame frame;
+    private String oslname;
 	
 	public static ThriftOutputInfo.Client tcl;
 	//public Input_info inputInfo;
 	public SvodVed pSvodVed;
+	public StructPos pStructPos;
 	public FacZd pFacZd;
 	public tableVrach pTableVrach;
 	public PlanDisp pPlanDisp;
 	public PasUch pPasUch;
+	public Uchastok pUchastok;
+
 	static int disp; 
 
 	/**
@@ -141,13 +146,35 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		menu_2.add(menu_4);
 		menu_3.add(menuItem);
 		
+		final JMenuItem StructPos = new JMenuItem("Сведения о структуре посещений");
+		StructPos.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pStructPos = new StructPos();
+				panel.removeAll();
+				panel.add(pStructPos);
+				panel.revalidate();
+			}
+		});
+		menu_4.add(StructPos);
+		
+		JMenuItem OtDPol = new JMenuItem("Отчет о деятельности поликлиники");
+		menu_4.add(OtDPol);
+		
+		JMenuItem RaspVr = new JMenuItem("Распределение рабочего времени");
+		menu_4.add(RaspVr);
+		
 		JMenuItem menuItem_4 = new JMenuItem("Посещения врачей поликлиники");
 		menuItem_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				Integer cpol = 200;
+//				CustomDateEditor datan = 
+//				CustomDateEditor datak = SvodVed.tfDateF;
 				try{
-					String servPath = MainForm.tcl.printDnevVr();
+					System.out.println("Посещения врачей поликлиники");		
+//					String servPath = MainForm.tcl.printDnevVr();
+					String servPath = MainForm.tcl.nagrvr(cpol);
 					String cliPath;
-					String oslname = "kartl";
+					oslname = "posvr";
 					cliPath = File.createTempFile(oslname, ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
 					MainForm.conMan.openFileInEditor(cliPath, false);
@@ -225,20 +252,37 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		});
 		mnNewMenu.add(menuItem_2);
 		
+		JMenuItem menuUch = new JMenuItem("Справочник участков");
+		menuUch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pUchastok = new Uchastok();
+				panel.removeAll();
+				panel.add(pUchastok);
+				panel.revalidate();
+			}
+		});
+		mnNewMenu.add(menuUch);
+		
 		JMenu menu = new JMenu("Стационар");
 		menuBar.add(menu);
 		
 		JMenu menu_1 = new JMenu("Параотделение");
 		menuBar.add(menu_1);
 		
-		
+		/**
 		scrollPane.setViewportView(panel);
 		panel.setLayout(new BorderLayout(0, 0));
 		pSvodVed = new SvodVed();
 		panel.add(pSvodVed);
 		panel.revalidate();
+		*/
 		
-	
+		scrollPane.setViewportView(panel);
+		panel.setLayout(new BorderLayout(0, 0));
+		pStructPos = new StructPos();
+		panel.add(pStructPos);
+		panel.revalidate();
+		
 		//tpReg.addTab("Паспорт участка", pFacZd);
 	}
 
@@ -252,7 +296,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setTitle("Статистика");
+		frame.setTitle("Сводная ведомость");
 		frame.setBounds(100, 100, 821, 651);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
