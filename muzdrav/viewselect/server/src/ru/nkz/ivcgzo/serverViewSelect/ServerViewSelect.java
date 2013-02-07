@@ -17,6 +17,7 @@ import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.serverDiary.ServerDiary;
 import ru.nkz.ivcgzo.serverLab.ServerLab;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
@@ -227,7 +228,7 @@ public class ServerViewSelect extends Server implements Iface {
         	recServ.stop();
         if (operationServ != null)
             operationServ.stop();
-		sif (diaryServ != null)
+		if (diaryServ != null)
             diaryServ.stop();
     }
 

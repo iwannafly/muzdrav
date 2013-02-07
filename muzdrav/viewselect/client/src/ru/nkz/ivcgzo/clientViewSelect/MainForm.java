@@ -29,6 +29,7 @@ import javax.swing.table.TableRowSorter;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.clientDiary.ClientDiary;
 import ru.nkz.ivcgzo.clientLab.ClientLab;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
@@ -543,11 +544,11 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 						disposeModal();
 					}
 					
-                }
-				
 				case 28:
 	                diaryFrm.showModal(parent, params[1], params[2], params[3], params[4], params[5]);
 	                break;
+                }
+				
 			}
 				
 		return null;
