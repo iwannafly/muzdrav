@@ -255,20 +255,20 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		JMenu menu_1 = new JMenu("Параотделение");
 		menuBar.add(menu_1);
 		
-		
+		/**
 		scrollPane.setViewportView(panel);
 		panel.setLayout(new BorderLayout(0, 0));
 		pSvodVed = new SvodVed();
 		panel.add(pSvodVed);
 		panel.revalidate();
+		*/
 		
-		/**
 		scrollPane.setViewportView(panel);
 		panel.setLayout(new BorderLayout(0, 0));
 		pStructPos = new StructPos();
 		panel.add(pStructPos);
 		panel.revalidate();
-		*/
+		
 		//tpReg.addTab("Паспорт участка", pFacZd);
 	}
 

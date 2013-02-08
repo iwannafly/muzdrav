@@ -121,7 +121,7 @@
 		<replace file="${client_auth.dir}/src/ru/nkz/ivcgzo/clientAuth/MainForm.java" failOnNoReplacements="true">
 			  <replacefilter token="//private ModulesUpdater modUpd;" value="private ModulesUpdater modUpd;" />
 			  <replacefilter token="//modUpd = new ModulesUpdater(conMan);" value="modUpd = new ModulesUpdater(conMan);" />
-			  <replacefilter token="//modUpd.checkAndUpdate(authInfo.pdost);" value="modUpd.checkAndUpdate(authInfo.pdost);" />
+			  <replacefilter token="//modUpd.checkAndUpdate(CustomFrame.authInfo.pdost);" value="modUpd.checkAndUpdate(CustomFrame.authInfo.pdost);" />
 		</replace>
 		
 		<replace file="${client_manager.dir}/src/ru/nkz/ivcgzo/clientManager/common/Client.java" token="//frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);" value="frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);" failOnNoReplacements="true" />

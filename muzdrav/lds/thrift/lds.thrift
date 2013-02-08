@@ -24,6 +24,7 @@ struct ObInfIsl {
 	18: i32 cuser;
 	19: i32 id_gosp;	
 	20: i32 id_pos;
+	21: string talon;
 }
 
 struct DiagIsl {
@@ -127,6 +128,12 @@ struct Sh_lds{
 	5: string zakl;
 }
 
+struct InputLG{
+    1: i32 kotd;
+    2: i64 daten;
+    3: i64 datek;
+    4: optional string c_nz1;
+}
 
 
 /*
@@ -278,8 +285,11 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	list <classifier.IntegerClassifier> GetKlasPopl();
 	list <classifier.IntegerClassifier> GetKlasNapr();
 	list <classifier.IntegerClassifier> GetKlasO00(1: i32 clpu);
+	list <classifier.IntegerClassifier> GetKlasPrvO00(1: i32 clpu, 2: i32 pcod);
 	list <classifier.IntegerClassifier> GetKlasN00();
+	list <classifier.IntegerClassifier> GetKlasPrvN00(1: i32 pcod);
 	list <classifier.IntegerClassifier> GetKlasM00();
+	list <classifier.IntegerClassifier> GetKlasPrvM00(1: i32 pcod);
 	list <classifier.IntegerClassifier> GetKlasOpl();
 	list <classifier.IntegerClassifier> GetKlasArez();
 	list <classifier.IntegerClassifier> GetKlasP0e1(1: i32 grupp);
@@ -288,4 +298,6 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	list <classifier.IntegerClassifier> GetKlasAllSvrach(1: i32 cpodr);
 	list <classifier.StringClassifier>  GetKlasNz1();
 	list <classifier.StringClassifier>  GetShab_lds(1: string c_lds);
+
+	string printLabGur(1:InputLG ilg) throws (1: kmiacServer.KmiacServerException kse); 
 }

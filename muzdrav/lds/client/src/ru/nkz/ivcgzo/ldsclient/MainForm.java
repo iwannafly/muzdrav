@@ -7,6 +7,7 @@ import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -29,6 +30,7 @@ import sun.awt.WindowClosingListener;
 public class MainForm extends Client<LDSThrift.Client> {
 	Option winOpt;
 	PIslForm winPat;
+	LabGur winGur;
 
 	
 	public static LDSThrift.Client ltc;
@@ -42,7 +44,10 @@ public class MainForm extends Client<LDSThrift.Client> {
 	}
 
 	private JFrame frame;
-
+	private JMenu mnNewMenu_2;
+	private JMenuItem mntmNewMenuItem_4;
+	
+	
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -53,6 +58,7 @@ public class MainForm extends Client<LDSThrift.Client> {
 
 		winOpt = new Option();		
 		winPat = new PIslForm();
+		winGur = new LabGur();
 		
 		
 		JMenuBar menuBar = new JMenuBar();
@@ -98,6 +104,30 @@ public class MainForm extends Client<LDSThrift.Client> {
 		JMenuItem mntmNewMenuItem_3 = new JMenuItem("Исправление ошибок");
 		mnNewMenu_1.add(mntmNewMenuItem_3);
 		mntmNewMenuItem_3.setVisible(false);
+		
+		
+		mnNewMenu_2 = new JMenu("Сводки");
+		mnNewMenu_2.setVisible(false);
+		menuBar.add(mnNewMenu_2);
+		
+		mntmNewMenuItem_4 = new JMenuItem("Лабораторный журнал");
+		mntmNewMenuItem_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				try {
+					winGur.cBpcislLG.setData(ltc.GetKlasS_ot01(authInfo.cpodr));
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				winGur.setVisible(true);
+				
+				
+				
+			}
+		});
+		mnNewMenu_2.add(mntmNewMenuItem_4);
+		
 	}
 
 	@Override
@@ -127,11 +157,15 @@ public class MainForm extends Client<LDSThrift.Client> {
 						PostPer.clpu = nlds.get(0).clpu;
 					
 					
-					
-					
 						if (!nlds.get(0).tip.equals("Л")){
 							winPat.tabbedPane.remove(1);
-						}else {winPat.tabbedPane.remove(0);}
+							winPat.btnNewButton_9.setVisible(true);
+						}else {
+							winPat.tabbedPane.remove(0);
+							mnNewMenu_2.setVisible(true);
+							mntmNewMenuItem_4.setVisible(true);
+							
+						}
 					
 
 					} catch (TException e) {
@@ -173,7 +207,7 @@ public class MainForm extends Client<LDSThrift.Client> {
 				}
 
 			}else{
-				JOptionPane.showMessageDialog(frame, "Нет настроек на лобароторно-диагностическую службу");
+				JOptionPane.showMessageDialog(frame, "Нет настроек на лабораторно-диагностическую службу");
 				
 				//frame.getDefaultCloseOperation();
 				System.exit(0); 

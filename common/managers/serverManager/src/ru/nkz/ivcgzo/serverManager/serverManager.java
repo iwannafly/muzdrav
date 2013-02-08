@@ -21,6 +21,7 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
+import ru.nkz.ivcgzo.serverManager.common.ThreadedServer;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 
 public class serverManager extends AdminController {
@@ -64,56 +65,6 @@ public class serverManager extends AdminController {
 			}
 		}
 
-	}
-
-	/**
-	 * Класс для запуска плагинов-серверов отдельными потоками.
-	 * Если в плагине-сервере возникнет необработанное исключение,
-	 * он остановится.
-	 * @author bsv798
-	 */
-	private class ThreadedServer implements Runnable, IServer {
-		private Thread thread;
-		private IServer server;
-		private boolean isRunning;
-		
-		public ThreadedServer(IServer server) {
-			this.server = server;
-			CreateThread();
-		}
-		
-		@Override
-		public void run() {
-			try {
-				isRunning = true;
-				server.start();
-			} catch (Exception e) {
-				e.printStackTrace();
-				stop();
-			}
-		}
-
-		@Override
-		public void start() throws Exception {
-			if (!isRunning)
-				thread.start();
-			else
-				throw new Exception("Server is already running.");
-		}
-
-		@Override
-		public void stop() {
-			synchronized (thread) {
-				server.stop();
-				CreateThread();
-			}
-		}
-		
-		private void CreateThread() {
-			thread = new Thread(this);
-			isRunning = false;
-		}
-		
 	}
 	
 	public void ConnectToDatabase(DatabaseDriver type, String host, String port, String name, String params, int count, String user, String pass) throws Exception {
