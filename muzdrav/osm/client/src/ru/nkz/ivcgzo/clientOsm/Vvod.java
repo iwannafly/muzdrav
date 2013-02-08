@@ -496,25 +496,25 @@ public class Vvod extends JFrame {
 				});
 				menu.add(mi6);
 				
-//				JMenuItem mi7 = new JMenuItem("Справка в бассейн");
-//				mi7.addActionListener(new ActionListener() {
-//					@Override
-//					public void actionPerformed(ActionEvent arg0) {
-//						try{
-//								String servPath = MainForm.tcl.printMSK(zapVr.getNpasp());
-//								String cliPath = File.createTempFile("msk", ".htm").getAbsolutePath();
-//								MainForm.conMan.transferFileFromServer(servPath, cliPath);
-//	       						MainForm.conMan.openFileInEditor(cliPath, false);
-//						}
-//						catch (TException e1) {
-//							e1.printStackTrace();
-//							MainForm.conMan.reconnect(e1);
-//						} catch (Exception e1) {
-//							e1.printStackTrace();
-//						}
-//					}
-//				});
-//				menu.add(mi7);
+				JMenuItem mi7 = new JMenuItem("Справка в бассейн");
+				mi7.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						try{
+								String servPath = MainForm.tcl.printSprBass(zapVr.getNpasp(), zapVr.getPol());
+								String cliPath = File.createTempFile("spravBass", ".htm").getAbsolutePath();
+								MainForm.conMan.transferFileFromServer(servPath, cliPath);
+	       						MainForm.conMan.openFileInEditor(cliPath, false);
+						}
+						catch (TException e1) {
+							e1.printStackTrace();
+							MainForm.conMan.reconnect(e1);
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+				menu.add(mi7);
 				
 				menu.show(btnPrint, 0, btnPrint.getHeight());
 			}
