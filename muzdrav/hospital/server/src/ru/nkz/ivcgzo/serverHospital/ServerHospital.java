@@ -140,7 +140,8 @@ public class ServerHospital extends Server implements Iface {
    };
     private static final String[] COMMON_PATIENT_FIELD_NAMES = {
         "npasp", "full_name", "datar", "pol", "jitel",
-        "adp_obl", "adp_gorod", "adp_ul", "adp_dom", "adp_kv"
+        "adp_obl", "adp_gorod", "adp_ul", "adp_dom", "adp_kv",
+        "obraz", "status"
     };
     private static final String[] LPU_FIELD_NAMES = {
         "name", "adres", "okpo", "zaved"
@@ -2175,13 +2176,13 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 	@Override
 	public TPatientCommonInfo getPatientCommonInfo(final int npasp)
 			throws KmiacServerException, PatientNotFoundException {
-        String sqlQuery = "SELECT npasp, fam||' '||im||' '||ot as full_name, datar, "
-        		+ "n_z30.name as pol, n_am0.name as jitel, adp_obl, adp_gorod, adp_ul, "
-        		+ "adp_dom, adp_kv, obraz, status "
-                + "FROM patient "
-                + "LEFT JOIN n_z30 ON (n_z30.pcod = patient.pol) "
-                + "LEFT JOIN n_am0 ON (n_am0.pcod = patient.jitel) "
-                + "WHERE patient.npasp = ?;";
+        String sqlQuery = "SELECT p.npasp, p.fam || ' ' || p.im || ' ' || p.ot as full_name, p.datar, "
+        		+ "n_z30.name as pol, n_am0.name as jitel, p.adp_obl, p.adp_gorod, p.adp_ul, "
+        		+ "p.adp_dom, p.adp_kv, p.obraz, p.status "
+                + "FROM patient p "
+                + "LEFT JOIN n_z30 ON (n_z30.pcod = p.pol) "
+                + "LEFT JOIN n_am0 ON (n_am0.pcod = p.jitel) "
+                + "WHERE (p.npasp = ?);";
         ResultSet rs = null;
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             rs = acrs.getResultSet();
