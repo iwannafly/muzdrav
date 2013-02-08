@@ -14,7 +14,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
-import javax.swing.ComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -66,8 +65,6 @@ import javax.swing.SpinnerNumberModel;
 
 import org.apache.thrift.TException;
 import javax.swing.DefaultComboBoxModel;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 
 public class TalonMainFrame extends JFrame {
 
@@ -1203,9 +1200,8 @@ public class TalonMainFrame extends JFrame {
 		JButton btnSvod = new JButton("Создать сводку");
 		btnSvod.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println(cmb_sv.getSelectedIndex()+1);
-//				SvodkiUnit.Svodki(+cmb_sv.getSelectedIndex()+1, tf_sv1.getDate().getTime(), tf_sv2.getDate().getTime(), curVrach, curSpec);
-				//cmb_sv
+				System.out.println(cmb_sv.getSelectedIndex());
+				SvodkiUnit.Svodki(cmb_sv.getSelectedIndex(), tf_sv1.getDate().getTime(), tf_sv2.getDate().getTime(), curVrach, curSpec);
 			}
 		});
 		GroupLayout gl_panel_9 = new GroupLayout(panel_9);
