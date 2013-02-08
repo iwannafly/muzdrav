@@ -110,7 +110,7 @@ public class GenReestr extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction();
 			AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_errors_pasp_pol(?, ?, ?) ", cpodr, new Date(dn), new Date(dk));
 			AutoCloseableResultSet acrsm = sme.execPreparedQuery("SELECT check_reestr_med_pol_errors(?, ?, ?) ", cpodr, new Date(dn), new Date(dk));
-			AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.sl_id, e.id_med, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm, n.pasp_med FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE (e.cpodr = ?) AND (e.dataz = ?) ORDER BY p.npasp, n.kderr ", cpodr, new Date(System.currentTimeMillis()) )) {
+			AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.sl_id, e.id_med, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm, n.pasp_med FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE (e.cslu=2) AND (e.cpodr = ?) AND (e.dataz = ?) ORDER BY p.npasp, n.kderr ", cpodr, new Date(System.currentTimeMillis()) )) {
 			sme.setCommit();
 			ResultSet rs = acrsq.getResultSet();
 			
@@ -692,7 +692,7 @@ public class GenReestr extends Server implements Iface {
    	   								if (acr.getResultSet().next()){
    	   									sb.append(String.format("%s %s ; %s ; ДИАГНОЗ: %s ; ", rs.getInt("kderr"), rs.getString("err_name"), rs.getString("err_comm"), acr.getResultSet().getString("diag") ));
    	   									if (acr.getResultSet().getDate("datap") != null) sb.append(String.format("Дата госпитализации: </b> %1$td.%1$tm.%1$tY <br>", new Date(acr.getResultSet().getDate("datap").getTime())));
-   	   							}
+   	   								}
    	   							} catch (SQLException e1) {
    	   								e1.printStackTrace();
    	   							}

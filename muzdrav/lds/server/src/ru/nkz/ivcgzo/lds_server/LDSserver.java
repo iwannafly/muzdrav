@@ -1,9 +1,11 @@
 	package ru.nkz.ivcgzo.lds_server;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
@@ -17,6 +19,7 @@ import org.apache.thrift.transport.TNonblockingServerSocket;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.ldsThrift.DIslNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.DiagIsl;
+import ru.nkz.ivcgzo.ldsThrift.InputLG;
 import ru.nkz.ivcgzo.ldsThrift.LDSThrift;
 import ru.nkz.ivcgzo.ldsThrift.LDSThrift.Iface;
 import ru.nkz.ivcgzo.ldsThrift.LabIsl;
@@ -52,7 +55,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 public class LDSserver extends Server implements Iface { 
 	private TServer	thrServ;
 	private TResultSetMapper<ObInfIsl, ObInfIsl._Fields> rsmObInIs;
-	private static final Class<?>[] islTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class };	
+	private static final Class<?>[] islTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, String.class};	
 	private TResultSetMapper<DiagIsl, DiagIsl._Fields> rsmDiIs;
 	private static final Class<?>[] dislTypes = new Class<?>[] {Integer.class, Integer.class, String.class, Integer.class, String.class, String.class, String.class, Integer.class, String.class, String.class, Double.class, String.class, Integer.class};
 	private TResultSetMapper<LabIsl, LabIsl._Fields> rsmLabIs;	
@@ -77,7 +80,7 @@ public class LDSserver extends Server implements Iface {
 	public LDSserver(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 				
-		rsmObInIs = new TResultSetMapper<>(ObInfIsl.class, "npasp", "nisl", "kodotd", "nprob", "pcisl", "cisl", "datap", "datav", "prichina", "popl", "napravl", "naprotd", "vrach", "vopl", "diag", "kodvr", "dataz", "cuser", "id_gosp", "id_pos");
+		rsmObInIs = new TResultSetMapper<>(ObInfIsl.class, "npasp", "nisl", "kodotd", "nprob", "pcisl", "cisl", "datap", "datav", "prichina", "popl", "napravl", "naprotd", "vrach", "vopl", "diag", "kodvr", "dataz", "cuser", "id_gosp", "id_pos", "talon");
 		rsmDiIs = new TResultSetMapper<>(DiagIsl.class, "npasp", "nisl", "kodisl", "rez", "anamnez", "anastezi", "model", "kol", "op_name", "rez_name", "stoim", "pcod_m", "id");
 		rsmLabIs = new TResultSetMapper<>(LabIsl.class, "npasp", "nisl", "cpok", "name", "zpok", "norma", "stoim", "pcod_m", "nameobst");	
 		rmsPatient = new TResultSetMapper<>(Patient.class, "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom", "adp_gorod", "adp_ul", "adp_dom", "adp_kv", "adm_gorod", "adm_ul", "adm_dom", "adm_kv", "ter_liv");
@@ -109,7 +112,7 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public List<ObInfIsl> GetObInfIslt(int npasp, int kodotd) throws TException {
 		
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT npasp, nisl, kodotd, nprob, pcisl, cisl, datap, datav, prichina, popl, napravl, naprotd, vrach, vopl, diag, kodvr, dataz, cuser, id_gosp, id_pos FROM p_isl_ld where (npasp = ?) and (kodotd = ?) ", npasp, kodotd)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT npasp, nisl, kodotd, nprob, pcisl, cisl, datap, datav, prichina, popl, napravl, naprotd, vrach, vopl, diag, kodvr, dataz, cuser, id_gosp, id_pos, talon FROM p_isl_ld where (npasp = ?) and (kodotd = ?) ", npasp, kodotd)) {
 			return rsmObInIs.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -120,7 +123,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public ObInfIsl GetIsl(int npasp) throws TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT npasp, nisl, kodotd, nprob, pcisl, cisl, datap, datav, prichina, popl, napravl, naprotd, vrach, vopl, diag, kodvr, dataz, cuser, id_gosp, id_pos FROM p_isl_ld WHERE npasp = ? ", npasp)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT npasp, nisl, kodotd, nprob, pcisl, cisl, datap, datav, prichina, popl, napravl, naprotd, vrach, vopl, diag, kodvr, dataz, cuser, id_gosp, id_pos, talon FROM p_isl_ld WHERE npasp = ? ", npasp)) {
 			if (acrs.getResultSet().next())
 				return rsmObInIs.map(acrs.getResultSet());
 			else
@@ -135,7 +138,7 @@ public class LDSserver extends Server implements Iface {
 
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 //			if (!isIslExists(info)) {
-				sme.execPreparedT("INSERT INTO p_isl_ld (npasp, kodotd, nprob, pcisl, cisl, datap, datav, prichina, popl, napravl, naprotd, vrach, vopl, diag, kodvr, dataz, cuser) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, info, islTypes, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+				sme.execPreparedT("INSERT INTO p_isl_ld (npasp, kodotd, nprob, pcisl, cisl, datap, datav, prichina, popl, napravl, naprotd, vrach, vopl, diag, kodvr, dataz, cuser, talon) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, info, islTypes, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20);
 				int nisl = sme.getGeneratedKeys().getInt("nisl");
 				sme.setCommit();
 				return nisl;
@@ -150,7 +153,7 @@ public class LDSserver extends Server implements Iface {
 	public void UpdIsl(ObInfIsl info) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 //			if (!isIslExists(info)) {
-				sme.execPreparedT("UPDATE p_isl_ld SET nprob = ?, pcisl = ?, datap = ?, datav = ?, prichina = ?, popl = ?, napravl = ?, naprotd = ?, vrach = ?, vopl = ?, diag = ?, kodvr = ?, cuser = ? WHERE nisl = ? ", false, info, islTypes, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 1 );
+				sme.execPreparedT("UPDATE p_isl_ld SET nprob = ?, pcisl = ?, datap = ?, datav = ?, prichina = ?, popl = ?, napravl = ?, naprotd = ?, vrach = ?, vopl = ?, diag = ?, kodvr = ?, cuser = ?, talon = ? WHERE nisl = ? ", false, info, islTypes, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 20, 1 );
 				sme.setCommit();
 //			} else
 //				throw new IslExistsException();
@@ -355,6 +358,19 @@ public class LDSserver extends Server implements Iface {
 		}
 	}
 
+	
+	@Override
+	public List<IntegerClassifier> GetKlasPrvM00(int pcod) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod,name FROM n_m00 where (pr = 'Л') and(pcod = ?) ", pcod)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+		
+	
+	
 	@Override
 	public List<IntegerClassifier> GetKlasCpos2() throws TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_p0c ")) {
@@ -392,6 +408,17 @@ public class LDSserver extends Server implements Iface {
 		}
 	}
 
+
+	@Override
+	public List<IntegerClassifier> GetKlasPrvO00(int clpu, int pcod)
+			throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_o00.pcod, n_o00.name FROM n_o00 JOIN n_ot9 ON (n_ot9.cotd = n_o00.pcod) where (n_ot9.clpu = ?)and(n_o00.pcod = ?) ", clpu, pcod)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+	
 	@Override
 	public List<IntegerClassifier> GetKlasN00() throws TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_n00 ")) {
@@ -401,6 +428,18 @@ public class LDSserver extends Server implements Iface {
 		}
 	}
 
+	
+
+	@Override
+	public List<IntegerClassifier> GetKlasPrvN00(int pcod) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_n00 where pcod = ?", pcod)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	
 	@Override
 	public List<IntegerClassifier> GetKlasOpl() throws TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_opl ")) {
@@ -774,6 +813,214 @@ public class LDSserver extends Server implements Iface {
 		}
 	}
 
+	@Override
+	public String printLabGur(InputLG ilg) throws KmiacServerException,
+			TException {
+		String svod = null;
+		
+		// Дата от ...
+		Date dn;
+		// Дата до ...
+		Date dk;
+		/*try {*/
+		dn = Date.valueOf(String.valueOf(ilg.getDaten()));
+		dk = Date.valueOf(String.valueOf(ilg.getDatek()));
+
+
+			// Код полеклиники
+			int kotd = ilg.getKotd();
+			
+			// Код ЛПУ
+			String cnz1 = ilg.getC_nz1();
+			// Вид больницы (Д/В)
+			
+			int kpol = 0;
+			int kzap = 0;
+			String [][] labgur = null;  
+			String sqlKolPol = "select distinct so.PCOD,nl.NAME "+
+										"from p_isl_ld pil join p_rez_l prl on(pil.nisl = prl.nisl) "+
+										"join s_ot01 so on(prl.cpok = so.pcod) "+
+										"join n_ldi nl on(nl.pcod= so.pcod) "+
+										"where (prl.pcod_m = so.c_obst)and(so.c_nz1=nl.c_nz1)and(pil.kodotd= "+kotd+")and(pil.pcisl ="+ cnz1 +") "+
+										"(pil.datav between "+dn+" and "+dk+")"+
+										"group by so.PCOD,nl.NAME";	
+			
+			String sqlKolZap = "select count(distinct pil.nisl) "+
+										"from patient p join p_isl_ld pil on (p.npasp = pil.npasp) "+
+										"join p_rez_l prl on (pil.nisl = prl.nisl) "+
+										"join s_ot01 so on(prl.cpok = so.pcod) "+
+										"join n_ldi nl on (so.pcod = nl.pcod) "+
+										"where (prl.pcod_m = so.c_obst)and(so.c_nz1=nl.c_nz1)and(pil.kodotd= "+kotd+")and(pil.pcisl ="+ cnz1 +") "+
+										"(pil.datav between "+dn+" and "+dk+")";
+
+			
+			try (AutoCloseableResultSet bisl = sse.execPreparedQuery(sqlKolZap)) {
+				
+				
+				kzap = bisl.getResultSet().getInt(0)+1; // кол-во пациентов
+				
+						
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			
+			
+			try (AutoCloseableResultSet bisl = sse.execPreparedQuery(sqlKolPol)) {
+				
+				bisl.getResultSet().last();
+				kpol = bisl.getResultSet().getRow()+3; // кол-во исследований
+				bisl.getResultSet().first();
+				
+				labgur = new String [kzap][kpol];
+				int i = 3;
+				labgur[0][i] = bisl.getResultSet().getString("name");
+				
+				while(bisl.getResultSet().next()){
+					i++;
+					labgur[0][i] = bisl.getResultSet().getString("name");
+				
+				}
+				
+						
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			
+			String sqlPatLG = "select distinct pil.nprob, pil.datav, pil.nisl, (p.fam || ' ' || p.im || ' ' || p.ot) fio, nl.NAME Pokaz, prl.ZPOK, p.NPASP "+
+					"from patient p join p_isl_ld pil on (p.npasp = pil.npasp) "+
+					"join p_rez_l prl on (pil.nisl = prl.nisl) "+
+					"join s_ot01 so on(prl.cpok = so.pcod) "+
+					"join n_ldi nl on (so.pcod = nl.pcod) "+
+					"where (prl.pcod_m = so.c_obst)and(so.c_nz1=nl.c_nz1)and(pil.pcisl = so.c_nz1)and(pil.kodotd= "+kotd+")and(pil.pcisl ="+ cnz1 +") "+
+					"(pil.datav between "+dn+" and "+dk+") "+
+					"order by pil.nisl, nl.name";
+
+			
+			try (AutoCloseableResultSet bisl = sse.execPreparedQuery(sqlPatLG)) {
+				
+				int i = 1; 
+				
+				while (bisl.getResultSet().next()){
+					
+					if(bisl.getResultSet().first()){
+						labgur[0][0] = "№ п/п";
+						labgur[0][1] = "№ пробы";
+						labgur[0][2] = "Ф.И.О.";
+						
+						labgur[i][0] = String.valueOf(i);
+						labgur[i][1] = bisl.getResultSet().getString("nprob");
+						labgur[i][2] = bisl.getResultSet().getString("fio");
+								
+					}
+
+					// Сравнение равна ли текущая запись таблицы записи в массиве
+					if (labgur[i][2].equals(bisl.getResultSet().getString("fio"))){
+						//поиск поля в массиве соответствующее записи таблицы
+						for (int j = 3; j<kpol-4; j++){
+							
+							if(labgur[0][j].equals(bisl.getResultSet().getString("Pokaz"))){
+								labgur[i][j] = bisl.getResultSet().getString("zpok");
+								break;
+							}						
+							
+						}
+						
+						
+					}else{
+						
+						i++;
+						labgur[i][0] = String.valueOf(i);
+						labgur[i][1] = bisl.getResultSet().getString("nprob");
+						labgur[i][2] = bisl.getResultSet().getString("fio");	
+						for (int j = 3; j<kpol-4; j++){
+							
+							if(labgur[0][j].equals(bisl.getResultSet().getString("Pokaz"))){
+								labgur[i][j] = bisl.getResultSet().getString("zpok");
+								break;
+							}						
+							
+						}
+						
+					}
+				
+				}
+				
+				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(svod = File.createTempFile("test", ".htm").getAbsolutePath()), "utf-8")) {
+					
+					
+					StringBuilder sb = new StringBuilder(0x10000);
+
+				  sb.append(String.format("!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">"));
+				  sb.append(String.format("<HTML>"));
+				  sb.append(String.format("<HEAD>"));
+				  sb.append(String.format("	<META HTTP-EQUIV=\"CONTENT-TYPE\" CONTENT=\"text/html; charset=windows-1251\">"));
+				  sb.append(String.format("	<TITLE>Сведения о диспансерном обслуживании населения</TITLE>"));
+				  sb.append(String.format("	<META NAME=\"GENERATOR\" CONTENT=\"LibreOffice 3.5  (Windows)\">"));
+				  sb.append(String.format("	<META NAME=\"CREATED\" CONTENT=\"20121017;13540000\">"));
+				  sb.append(String.format("	<META NAME=\"CHANGED\" CONTENT=\"20121102;14361071\">"));
+
+				  sb.append(String.format("	<STYLE TYPE=\"text/css\">"));
+				  sb.append(String.format("	<!--"));
+				  sb.append(String.format("		@page { size: 29.7cm 21cm; margin-right: 0.35cm; margin-top: 3cm; margin-bottom: 1.5cm }"));
+				  sb.append(String.format("		P { margin-bottom: 0.21cm; direction: ltr; color: #000000; widows: 2; orphans: 2 }"));
+				  sb.append(String.format("		P.western { font-family: \"Times New Roman\", serif; font-size: 12pt; so-language: ru-RU }"));
+				  sb.append(String.format("		P.cjk { font-family: \"Times New Roman\", serif; font-size: 12pt }"));
+				  sb.append(String.format("		P.ctl { font-family: \"Times New Roman\", serif; font-size: 12pt; so-language: ar-SA }"));
+				  sb.append(String.format("	-->"));
+				  sb.append(String.format("	</STYLE>"));
+				  sb.append(String.format("</HEAD>"));
+				  sb.append(String.format("<BODY LANG=\"ru-RU\" TEXT=\"#000000\" LINK=\"#000080\" VLINK=\"#800000\" DIR=\"LTR\">"));
+				  sb.append(String.format("<P STYLE=\"margin-bottom: 0cm\"><BR></P>"));
+				  sb.append(String.format("<P ALIGN=CENTER STYLE=\"margin-bottom: 0cm\"><FONT SIZE=2 STYLE=\"font-size: 9pt\"><B>Лабораторный журнал</B></FONT></P>"));
+				  sb.append(String.format("<P></P>"));
+				  sb.append(String.format("<P ALIGN=CENTER STYLE=\"margin-bottom: 0cm\"><FONT SIZE=2 STYLE=\"font-size: 9pt\"><B>за период с %s по %s</B></FONT></P>",dn,dk));
+				  //sb.append(String.format("<P ALIGN=CENTER STYLE=\"margin-bottom: 0cm\"><FONT SIZE=2 STYLE=\"font-size: 9pt\"><B>Поликлиника прикрепления:  %s</B></FONT></P>",namepol));
+				  sb.append(String.format("<P></P>"));
+				  sb.append(String.format("<P></P>"));
+				  sb.append(String.format("<TABLE WIDTH=1120 CELLPADDING=7 CELLSPACING=0>"));
+			
+				 for (int n = 0; n<kzap-1; n++ ){
+					 sb.append(String.format("	<TR VALIGN=TOP>"));
+					 for (int m = 0; m<kpol-1; m++){
+							sb.append(String.format("		<TD WIDTH=52 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+							sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",labgur[n][m]));
+							sb.append(String.format("		</TD>"));
+						 
+					 }
+					 sb.append(String.format("	</TR>"));
+				 }
+				 
+					sb.append(String.format("</TABLE>"));
+					sb.append(String.format("<P ALIGN=CENTER STYLE=\"margin-bottom: 0cm\"><BR>"));
+					sb.append(String.format("</P>"));
+					sb.append(String.format("<P ALIGN=CENTER STYLE=\"margin-bottom: 0cm\"><BR>"));
+					sb.append(String.format("</P>"));
+					sb.append(String.format("</BODY>"));
+					sb.append(String.format("</HTML>"));
+					
+					osw.write(sb.toString());
+
+				 svod = sb.toString();
+				 
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw new KmiacServerException();
+				}
+				
+				
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}			
+			
+		 return svod;
+			
+			
+	}
 	
 
 }
