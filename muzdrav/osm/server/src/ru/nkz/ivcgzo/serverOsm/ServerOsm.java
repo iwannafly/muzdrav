@@ -185,8 +185,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
 		strClasTypes = new Class<?>[] {                              String.class, String.class};
 		
-		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id",   "prichina",    "kodotd",      "datav",    "vopl",        "id_pos");
-		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class};
+		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id",   "prichina",    "kodotd",      "datav",    "vopl",        "id_pos",     "datap");
+		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class};
 		
 		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "id",          "npasp",       "nisl",        "kodisl",     "rez");
 		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class, String.class};
@@ -830,11 +830,11 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public int AddPisl(P_isl_ld npisl) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction();
-				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_isl_ld WHERE (npasp = ?) AND (pvizit_id = ?) AND (id_pos = ?) AND (naprotd = ?) AND (pcisl = ?) AND (diag = ?) ", npisl.npasp, npisl.pvizit_id, npisl.id_pos, npisl.naprotd, npisl.pcisl, npisl.diag)) {
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_isl_ld WHERE (npasp = ?) AND (pvizit_id = ?) AND (id_pos = ?) AND (naprotd = ?) AND (pcisl = ?) AND (diag = ?) AND (kodotd = ?) ", npisl.npasp, npisl.pvizit_id, npisl.id_pos, npisl.naprotd, npisl.pcisl, npisl.diag, npisl.kodotd)) {
 			if (acrs.getResultSet().next()) {
 				return acrs.getResultSet().getInt("nisl");
 			} else {
-				sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz, pvizit_id, prichina, kodotd, vopl, id_pos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15);
+				sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz, pvizit_id, prichina, kodotd, vopl, id_pos, datap) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16);
 				sme.setCommit();
 				return sme.getGeneratedKeys().getInt("nisl");
 			}
@@ -3438,5 +3438,56 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException(); 
 		}
+	}
+
+	@Override
+	public String printSprBass(int npasp, int pol) throws KmiacServerException,
+			TException {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("spravBass", ".htm").getAbsolutePath()), "utf-8")) {
+			AutoCloseableResultSet acrs;
+			
+			StringBuilder sb = new StringBuilder(0x10000);
+			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+			sb.append("<head>");
+			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+
+		sb.append("<title>Справка в бассейн</title></head>");
+		sb.append("<body>");
+		sb.append("<h4 align=center>Справка </h4>");
+		acrs = sse.execPreparedQuery("select fam, im, ot from patient where npasp = ? ", npasp);
+							if (acrs.getResultSet().next())
+		sb.append(String.format("Дана: %s %s %s<br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2),acrs.getResultSet().getString(3)));
+		if (pol==1)	sb.append("в том, что он \"___\" ___________ 20___ г. прошел медицинское <br>");
+		if (pol==2)	sb.append("в том, что она \"___\" ___________ 20___ г. прошла медицинское <br>");
+		sb.append("обследование в __________________________________________________, <br />");
+		sb.append("необходимое для посещения бассейна<br />");
+		if (pol==1) sb.append("<b>Заключение терапевта: </b> <i>Практически здоров<br>");
+		if (pol==2)	sb.append("<b>Заключение терапевта: </b> <i>Практически здоров(а)<br>");
+		sb.append(" - анализ кала на яйца глист от \"___\" _______ 20___ г. - отрицательный<br>");
+		sb.append(" - соскоб на энтеробиоз от \"___\" _______ 20___ г. - отрицательный</i><br><br>");
+		sb.append("<center><b>Заниматься плаванием не противопоказано</b></center><br>");
+		sb.append("Справка дана для предъявления в бассейн<br>");
+		sb.append("<p align=\"left\"></p><br>МП &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp_____________");
+		sb.append("<br><font size=1 color=black>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp");
+		sb.append("&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp");
+		sb.append("Подпись врача</font>");
+		sb.append("<br>");
+		sb.append("Справка действительна до \"___\" _______ 20___ г.");
+		
+		osw.write(sb.toString());
+		return path;
+		}
+	catch (SQLException e) {
+		 ((SQLException) e.getCause()).printStackTrace();
+		throw new KmiacServerException();
+	}
+	 catch (IOException e) {
+		e.printStackTrace();
+		throw new KmiacServerException();
+	}
+
 	}
 }

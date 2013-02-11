@@ -404,6 +404,7 @@ struct P_isl_ld {
 	14: optional i64 datav;
 	15: optional i32 vopl;
 	16: optional i32 id_pos;
+	17: optional i64 datap;
 }
 
 struct Prez_d {
@@ -752,6 +753,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printMSK(1: i32 npasp)  throws (1: kmiacServer.KmiacServerException kse);
 	string printAnamZab(1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
 	string printSpravNetrud(1: SpravNetrud sn) throws (1: kmiacServer.KmiacServerException kse);
+	string printSprBass(1: i32 npasp, 2: i32 pol) throws (1: kmiacServer.KmiacServerException kse);
 
 
 //classifiers

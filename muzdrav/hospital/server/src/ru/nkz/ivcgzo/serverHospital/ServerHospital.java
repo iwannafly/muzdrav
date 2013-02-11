@@ -140,7 +140,8 @@ public class ServerHospital extends Server implements Iface {
    };
     private static final String[] COMMON_PATIENT_FIELD_NAMES = {
         "npasp", "full_name", "datar", "pol", "jitel",
-        "adp_obl", "adp_gorod", "adp_ul", "adp_dom", "adp_kv"
+        "adp_obl", "adp_gorod", "adp_ul", "adp_dom", "adp_korp",
+        "adp_kv", "obraz", "status"
     };
     private static final String[] LPU_FIELD_NAMES = {
         "name", "adres", "okpo", "zaved"
@@ -2175,13 +2176,13 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 	@Override
 	public TPatientCommonInfo getPatientCommonInfo(final int npasp)
 			throws KmiacServerException, PatientNotFoundException {
-        String sqlQuery = "SELECT npasp, fam||' '||im||' '||ot as full_name, datar, "
-        		+ "n_z30.name as pol, n_am0.name as jitel, adp_obl, adp_gorod, adp_ul, "
-        		+ "adp_dom, adp_kv, obraz, status "
-                + "FROM patient "
-                + "LEFT JOIN n_z30 ON (n_z30.pcod = patient.pol) "
-                + "LEFT JOIN n_am0 ON (n_am0.pcod = patient.jitel) "
-                + "WHERE patient.npasp = ?;";
+        String sqlQuery = "SELECT p.npasp, p.fam || ' ' || p.im || ' ' || p.ot as full_name, p.datar, "
+        		+ "n_z30.name as pol, n_am0.name as jitel, p.adp_obl, p.adp_gorod, p.adp_ul, "
+        		+ "p.adp_dom, p.adp_korp, p.adp_kv, p.obraz, p.status "
+                + "FROM patient p "
+                + "LEFT JOIN n_z30 ON (n_z30.pcod = p.pol) "
+                + "LEFT JOIN n_am0 ON (n_am0.pcod = p.jitel) "
+                + "WHERE (p.npasp = ?);";
         ResultSet rs = null;
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             rs = acrs.getResultSet();
@@ -2197,6 +2198,14 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 			((SQLException) e.getCause()).printStackTrace();
             throw new KmiacServerException();
         }
+	}
+	
+	private String setNormalName(final String sourceStr) {
+		if (sourceStr == null)
+			return null;
+		if (sourceStr.length() == 1)
+			return sourceStr.toUpperCase();
+		return (sourceStr.substring(0, 1).toUpperCase()).concat(sourceStr.substring(1).toLowerCase());
 	}
 
 	@Override
@@ -2288,12 +2297,10 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
                 	}
             }
             //Полное имя матери:
-            String motherFullName = motherInfo.getFull_name();
-            //Фамилия матери:
-            int firstSpace = motherFullName.indexOf(' ');
-            final String motherSurname = motherFullName.substring(0, firstSpace);
-            //Имя и отчество матери:
-            final String motherFirstName = motherFullName.substring(firstSpace + 1, motherFullName.length());
+            String[] motherNameArr = motherInfo.getFull_name().split(" ");
+            for(int i = 0; i < motherNameArr.length; i++)
+            	motherNameArr[i] = setNormalName(motherNameArr[i]);
+            final String motherMiddleName = motherNameArr[1].concat(" ".concat(motherNameArr[2]));
             //Время рождения:
             final String childBirthTime = (childBirthInfo.isSetTimeon()) ? childBirthInfo.getTimeon() : "";
             String childBirthHour = "", childBirthMinute = "";
@@ -2386,6 +2393,16 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
             	whoGetChild[4] = "<u>";
             	whoGetChild[5] = "</u>";
             }
+            //Место регистрации матери:
+            String[] motherRegPlace = new String[] {
+        		(motherInfo.isSetAdp_obl()) ? setNormalName(motherInfo.getAdp_obl()) : "",
+        		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
+        		(motherInfo.isSetAdp_gorod()) ? setNormalName(motherInfo.getAdp_gorod()) : "",
+				(motherInfo.isSetAdp_ul()) ? setNormalName(motherInfo.getAdp_ul()) : "",
+				(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
+				(motherInfo.isSetAdp_korp()) ? " ".concat(motherInfo.getAdp_korp()) : "",
+				(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
+            };
             //Запись данных в шаблон:
             htmTemplate.replaceLabels(false,
             	//Серия и номер свидетельства:
@@ -2398,17 +2415,17 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		sdfYear.format(childInfo.getDatar()),
         		childBirthHour, childBirthMinute,
         		//Фамилия, имя, отчество матери:
-        		motherFullName,
+        		motherNameArr[0].concat(" ".concat(motherMiddleName)),
         		//Дата рождения матери:
         		sdfDay.format(motherInfo.getDatar()), sdfMonth.format(motherInfo.getDatar()).toUpperCase(),
         		sdfYear.format(motherInfo.getDatar()),
         		//Место регистрации матери:
-        		(motherInfo.isSetAdp_obl()) ? motherInfo.getAdp_obl() : "",
-        		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
-        		(motherInfo.isSetAdp_gorod()) ? motherInfo.getAdp_gorod() : "",
-        		(motherInfo.isSetAdp_ul()) ? motherInfo.getAdp_ul() : "",
-        		(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
-        		(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
+        		motherRegPlace[0],
+        		motherRegPlace[1],	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
+        		motherRegPlace[2],
+        		motherRegPlace[3],
+        		motherRegPlace[4].concat(motherRegPlace[5]),
+        		motherRegPlace[6],
 				//Местность регистрации:
         		city1, city2, country1, country2,
         		//Пол ребёнка:
@@ -2429,9 +2446,9 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		sdfYear.format(childInfo.getDatar()),
         		childBirthHour, childBirthMinute,
         		//Фамилия, имя, отчество матери:
-        		motherSurname, motherFirstName,
+        		motherNameArr[0], motherMiddleName,
         		//Фамилия ребёнка:
-        		childDoc.getFamreb().toUpperCase(),
+        		setNormalName(childDoc.getFamreb()),
         		//Дата рождения матери:
         		sdfDay.format(motherInfo.getDatar()).substring(0, 1),
         		sdfDay.format(motherInfo.getDatar()).substring(1, 2),
@@ -2442,12 +2459,12 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		sdfYear.format(motherInfo.getDatar()).substring(2, 3),
         		sdfYear.format(motherInfo.getDatar()).substring(3, 4),
         		//Место регистрации матери:
-        		(motherInfo.isSetAdp_obl()) ? motherInfo.getAdp_obl() : "",
-        		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
-        		(motherInfo.isSetAdp_gorod()) ? motherInfo.getAdp_gorod() : "",
-        		(motherInfo.isSetAdp_ul()) ? motherInfo.getAdp_ul() : "",
-        		(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
-        		(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
+        		motherRegPlace[0],
+        		motherRegPlace[1],	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
+        		motherRegPlace[2],
+        		motherRegPlace[3],
+        		motherRegPlace[4].concat(motherRegPlace[5]),
+        		motherRegPlace[6],
         		//Местность регистрации:
         		city1, city2, country1, country2,
         		//Семейное положение матери:
@@ -2455,9 +2472,9 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		motherStatus[2], motherStatus[3],
         		motherStatus[4], motherStatus[5],
         		//Место рождения:
-        		birthPlaceRegion,
+        		setNormalName(birthPlaceRegion),
         		"",	//РАЙОН РОЖДЕНИЯ
-        		birthPlaceTown,
+        		setNormalName(birthPlaceTown),
         		//Местность рождения:
     			cityChild1, cityChild2,
     			countryChild1, countryChild2,
@@ -2474,7 +2491,7 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
     			birthHappen[4], birthHappen[5],
     			birthHappen[6], birthHappen[7],
         		//Должность и имя врача, выдавшего свидетельство:
-        		(doctorGiveDoc != null) ? doctorWriteDoc.get(1) : "",
+        		(doctorGiveDoc != null) ? setNormalName(doctorWriteDoc.get(1)) : "",
         		(doctorGiveDoc != null) ? doctorWriteDoc.get(0) : "",
         		//Образование матери:
         		motherEduc[0], motherEduc[1],
@@ -2514,7 +2531,7 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		whoGetChild[2], whoGetChild[3],
         		whoGetChild[4], whoGetChild[5],
         		//Должность и имя врача, заполнившего свидетельство:
-        		(doctorWriteDoc != null) ? doctorWriteDoc.get(1) : "",
+        		(doctorWriteDoc != null) ? setNormalName(doctorWriteDoc.get(1)) : "",
         		(doctorWriteDoc != null) ? doctorWriteDoc.get(0) : "",
         		//Имя руководителя организации:
         		(infoLPU.isSetZaved()) ? infoLPU.getZaved() : ""
