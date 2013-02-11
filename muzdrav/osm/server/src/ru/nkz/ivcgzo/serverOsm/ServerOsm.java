@@ -185,8 +185,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
 		strClasTypes = new Class<?>[] {                              String.class, String.class};
 		
-		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id",   "prichina",    "kodotd",      "datav",    "vopl",        "id_pos");
-		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class};
+		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id",   "prichina",    "kodotd",      "datav",    "vopl",        "id_pos",     "datap");
+		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class};
 		
 		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "id",          "npasp",       "nisl",        "kodisl",     "rez");
 		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class, String.class};
@@ -830,11 +830,11 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public int AddPisl(P_isl_ld npisl) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction();
-				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_isl_ld WHERE (npasp = ?) AND (pvizit_id = ?) AND (id_pos = ?) AND (naprotd = ?) AND (pcisl = ?) AND (diag = ?) ", npisl.npasp, npisl.pvizit_id, npisl.id_pos, npisl.naprotd, npisl.pcisl, npisl.diag)) {
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_isl_ld WHERE (npasp = ?) AND (pvizit_id = ?) AND (id_pos = ?) AND (naprotd = ?) AND (pcisl = ?) AND (diag = ?) AND (kodotd = ?) ", npisl.npasp, npisl.pvizit_id, npisl.id_pos, npisl.naprotd, npisl.pcisl, npisl.diag, npisl.kodotd)) {
 			if (acrs.getResultSet().next()) {
 				return acrs.getResultSet().getInt("nisl");
 			} else {
-				sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz, pvizit_id, prichina, kodotd, vopl, id_pos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15);
+				sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz, pvizit_id, prichina, kodotd, vopl, id_pos, datap) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16);
 				sme.setCommit();
 				return sme.getGeneratedKeys().getInt("nisl");
 			}
