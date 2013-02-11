@@ -8,6 +8,7 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -851,6 +852,8 @@ public class ServerGenTalons extends Server implements Iface {
 	public String printReport(RepStruct rep) throws KmiacServerException,
 			TException {
 		String path = null;
+		int kol_int = 0;
+		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("napr", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
@@ -877,13 +880,13 @@ public class ServerGenTalons extends Server implements Iface {
 					throw new KmiacServerException();
 				}
 				sb.append("</p>");
-				sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 12px times new roman;\">№ п/п</th><th>ФИО пациента</th><th>Дата рождения</th><th>№ амб.карты, № уч.</th><th>Адрес, тел.</th><th>Время приема</th><th>Прием</th><th>Записан</th></tr>");
-				sb.append("<p align=\"left\"></p>");
+				sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">№ п/п</th><th>ФИО пациента, Д.р.</th><th>№ амб.карты, № уч.</th><th>Адрес, тел.</th><th>Время приема</th><th>Прием</th><th>Записан</th></tr>");
+//				sb.append("<p align=\"left\"></p>");
 				try {
 					AutoCloseableResultSet acr = sse.execPreparedQuery(
 							"SELECT (CASE p.npasp<>-1 WHEN TRUE THEN p.fam ||' '|| p.im ||' '|| p.ot ELSE e.fed_fio END) as fio, "+ 
 							"p.datar, p.adm_ul ||' '|| p.adm_dom ||' - '|| p.adm_kv as adres, "+
-							"p.tel, e.timep::char(10), v.name as priem, n.nambk, n.nuch::char(10), "+
+							"p.tel, e.timep::char(10), v.name as priem, n.nambk, n.nuch, "+
 							"(CASE e.prv=0 OR e.prv=1 WHEN TRUE THEN 'интернет' ELSE (CASE e.prv=2 WHEN TRUE THEN 'регистратура' ELSE (CASE e.prv=3 WHEN TRUE THEN 'инфомат' ELSE (CASE e.prv=4 WHEN TRUE THEN 'нет приема' ELSE NULL END) END) END) END)as zap " +
 							"FROM e_talon e LEFT JOIN patient p ON (e.npasp = p.npasp) " +
 							"LEFT JOIN e_vidp v ON (e.vidp = v.pcod) " +
@@ -891,19 +894,29 @@ public class ServerGenTalons extends Server implements Iface {
 							"WHERE e.npasp<>0 AND e.cpol=? AND pcod_sp=? AND e.cdol=? AND e.datap=?" +
 							"ORDER BY e.timep",
 						    rep.getCpol(), rep.getPcod(), rep.getCdol(), new Date(rep.getDatan()));
-					while (acr.getResultSet().next()){
+					if (acr.getResultSet().next()){
 						do {
-//							sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 12px times new roman;\"> %s </th><th style=\"font: 12px times new roman;\"> %s </th><th style=\"font: 12px times new roman;\"> %1$td.%1$tm.%1$tY  </th></tr>", acr.getResultSet().getRow(), acr.getResultSet().getString("fio"), new Date(acr.getResultSet().getDate("datar").getTime()) )); //, acr.getResultSet().getString("nambk")+", "+acr.getResultSet().getString("nuch"), acr.getResultSet().getString("adres")+", "+acr.getResultSet().getString("tel") )); //, acr.getResultSet().getString("timep"), acr.getResultSet().getString("priem"), acr.getResultSet().getString("zap")));
-							sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 12px times new roman;\">"));
-							sb.append(String.format("<td align=\"left\"> %s </td>", acr.getResultSet().getRow()));
-							sb.append(String.format("<th> %s </th>", acr.getResultSet().getString("fio")));
-							sb.append(String.format("<th> %1$td.%1$tm.%1$tY </th>", new Date(acr.getResultSet().getDate("datar").getTime()) ));
-							sb.append(String.format("<th> %s </th>", acr.getResultSet().getString("nambk")+", "+acr.getResultSet().getString("nuch")));
-							sb.append(String.format("<th> %s </th>", acr.getResultSet().getString("adres")+", "+acr.getResultSet().getString("tel") ));
-							sb.append(String.format("<th> %s </th>", acr.getResultSet().getString("timep")));
-							sb.append(String.format("<th> %s </th>", acr.getResultSet().getString("priem")));
-							sb.append(String.format("<th> %s </th>", acr.getResultSet().getString("zap")));
-							sb.append(String.format("</tr>"));
+							String date_birthay = "";
+							String nambk = "";
+							String nuch = "";
+							String adres = "";
+							String telefon = "";
+							if (acr.getResultSet().getDate("datar") != null) date_birthay = ", Д.р. "+sdf.format(new Date(acr.getResultSet().getDate("datar").getTime()));
+							if (acr.getResultSet().getString("nambk") != null) nambk = "№ амб. "+acr.getResultSet().getString("nambk");
+							if (acr.getResultSet().getInt("nuch") != 0) nuch = ", № уч. "+acr.getResultSet().getString("nuch");
+							if (acr.getResultSet().getString("adres") != null) adres = acr.getResultSet().getString("adres");
+							if (acr.getResultSet().getString("tel") != null) telefon = ", тел. "+acr.getResultSet().getString("tel");
+							sb.append("<tr bgcolor=\"white\">");
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getRow()));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("fio")+date_birthay));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", nambk+nuch ));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", adres+telefon ));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("timep") ));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("priem") ));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("zap"))); 
+							sb.append("</tr>");
+							
+							//sb.append(String.format("<tr bgcolor=\"white\"><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td></tr>", acr.getResultSet().getRow(), acr.getResultSet().getString("fio"), acr.getResultSet().getString("nambk")+", "+acr.getResultSet().getString("nuch"), acr.getResultSet().getString("adres")+", "+acr.getResultSet().getString("tel"), acr.getResultSet().getString("timep"), acr.getResultSet().getString("priem"), acr.getResultSet().getString("zap")));
 						}
 						while (acr.getResultSet().next());
 					}
@@ -913,14 +926,180 @@ public class ServerGenTalons extends Server implements Iface {
 				}
 				sb.append("</table><br>");
 				break;        
+
 	        case 1: 
+				sb.append("<p align=\"center\" >Количество занятых и свободных талонов");
+				sb.append(String.format(" %1$td.%1$tm.%1$tY <br>", new Date(rep.getDatan())));
+				try {
+					AutoCloseableResultSet acr = sse.execPreparedQuery("select v.fam ||' '|| v.im ||' '|| v.ot as fio, s.name as cdol from s_vrach v JOIN s_mrab m ON (v.pcod = m.pcod) LEFT JOIN n_s00 s ON (s.pcod = m.cdol) where v.pcod = ? AND s.pcod = ?", rep.getPcod(), rep.getCdol());
+					if (acr.getResultSet().next()){
+						sb.append(String.format("%s, %s <br>", acr.getResultSet().getString("fio"), acr.getResultSet().getString("cdol")));
+					}
+				} catch (SQLException e) {
+					((SQLException) e.getCause()).printStackTrace();
+					throw new KmiacServerException();
+				}
+				sb.append("</p>");
+				sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">№ п/п</th><th>ФИО пациента, Д.р.</th><th>№ амб.карты, № уч.</th><th>Адрес, тел.</th><th>Время приема</th><th>Прием</th><th>Записан</th></tr>");
+//				sb.append("<p align=\"left\"></p>");
+				try {
+					AutoCloseableResultSet acr = sse.execPreparedQuery(
+							"SELECT (CASE p.npasp<>-1 WHEN TRUE THEN p.fam ||' '|| p.im ||' '|| p.ot ELSE e.fed_fio END) as fio, "+ 
+							"p.datar, p.adm_ul ||' '|| p.adm_dom ||' - '|| p.adm_kv as adres, "+
+							"p.tel, e.timep::char(10), v.name as priem, n.nambk, n.nuch, "+
+							"(CASE e.prv=0 OR e.prv=1 WHEN TRUE THEN 'интернет' ELSE (CASE e.prv=2 WHEN TRUE THEN 'регистратура' ELSE (CASE e.prv=3 WHEN TRUE THEN 'инфомат' ELSE (CASE e.prv=4 WHEN TRUE THEN 'нет приема' ELSE NULL END) END) END) END)as zap " +
+							"FROM e_talon e LEFT JOIN patient p ON (e.npasp = p.npasp) " +
+							"LEFT JOIN e_vidp v ON (e.vidp = v.pcod) " +
+							"LEFT JOIN p_nambk n ON (n.npasp = p.npasp and n.cpol = e.cpol) " +
+							"WHERE e.npasp<>0 AND e.cpol=? AND pcod_sp=? AND e.cdol=? AND e.datap=?" +
+							"ORDER BY e.timep",
+						    rep.getCpol(), rep.getPcod(), rep.getCdol(), new Date(rep.getDatan()));
+					if (acr.getResultSet().next()){
+						do {
+							String date_birthay = "";
+							String nambk = "";
+							String nuch = "";
+							String adres = "";
+							String telefon = "";
+							if (acr.getResultSet().getDate("datar") != null) date_birthay = ", Д.р. "+sdf.format(new Date(acr.getResultSet().getDate("datar").getTime()));
+							if (acr.getResultSet().getString("nambk") != null) nambk = "№ амб. "+acr.getResultSet().getString("nambk");
+							if (acr.getResultSet().getInt("nuch") != 0) nuch = ", № уч. "+acr.getResultSet().getString("nuch");
+							if (acr.getResultSet().getString("adres") != null) adres = acr.getResultSet().getString("adres");
+							if (acr.getResultSet().getString("tel") != null) telefon = ", тел. "+acr.getResultSet().getString("tel");
+							sb.append("<tr bgcolor=\"white\">");
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getRow()));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("fio")+date_birthay));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", nambk+nuch ));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", adres+telefon ));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("timep") ));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("priem") ));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("zap"))); 
+							sb.append("</tr>");
+							
+							//sb.append(String.format("<tr bgcolor=\"white\"><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td></tr>", acr.getResultSet().getRow(), acr.getResultSet().getString("fio"), acr.getResultSet().getString("nambk")+", "+acr.getResultSet().getString("nuch"), acr.getResultSet().getString("adres")+", "+acr.getResultSet().getString("tel"), acr.getResultSet().getString("timep"), acr.getResultSet().getString("priem"), acr.getResultSet().getString("zap")));
+						}
+						while (acr.getResultSet().next());
+					}
+				} catch (SQLException e) {
+					((SQLException) e.getCause()).printStackTrace();
+					throw new KmiacServerException();
+				}
+				sb.append("</table><br>");
 	        	break;        
+
+	        case 2:
+				sb.append("<p align=\"center\" >Списки пациентов, отмененного приема за период ");
+				sb.append(String.format("с  %1$td.%1$tm.%1$tY ", new Date(rep.getDatan())));
+				sb.append(String.format(" по  %1$td.%1$tm.%1$tY <br>", new Date(rep.getDatak())));
+				try {
+					AutoCloseableResultSet acr = sse.execPreparedQuery("select v.fam ||' '|| v.im ||' '|| v.ot as fio, s.name as cdol from s_vrach v JOIN s_mrab m ON (v.pcod = m.pcod) LEFT JOIN n_s00 s ON (s.pcod = m.cdol) where v.pcod = ? AND s.pcod = ?", rep.getPcod(), rep.getCdol());
+					if (acr.getResultSet().next()){
+						sb.append(String.format("%s, %s <br>", acr.getResultSet().getString("fio"), acr.getResultSet().getString("cdol")));
+					}
+				} catch (SQLException e) {
+					((SQLException) e.getCause()).printStackTrace();
+					throw new KmiacServerException();
+				}
+				sb.append("</p>");
+				sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">№ п/п</th><th>ФИО пациента, Д.р.</th><th>№ амб.карты, № уч.</th><th>Адрес, тел.</th><th>Время приема</th><th>Прием</th><th>Дата</th></tr>");
+				try {
+					AutoCloseableResultSet acr = sse.execPreparedQuery(
+							"SELECT (CASE p.npasp<>-1 WHEN TRUE THEN p.fam ||' '|| p.im ||' '|| p.ot ELSE e.fed_fio END) as fio, "+ 
+							"p.datar, p.adm_ul ||' '|| p.adm_dom ||' - '|| p.adm_kv as adres, "+
+							"p.tel, e.timep::char(10), e.datap, v.name as priem, n.nambk, n.nuch "+
+							"FROM e_talon e LEFT JOIN patient p ON (e.npasp = p.npasp) " +
+							"LEFT JOIN e_vidp v ON (e.vidp = v.pcod) " +
+							"LEFT JOIN p_nambk n ON (n.npasp = p.npasp and n.cpol = e.cpol) " +
+							"WHERE e.npasp<>0 AND e.prv=4 AND e.cpol=? AND pcod_sp=? AND e.cdol=? AND e.datap between ? AND ?" +
+							"ORDER BY e.datap, e.timep",
+						    rep.getCpol(), rep.getPcod(), rep.getCdol(), new Date(rep.getDatan()), new Date(rep.getDatak()));
+					if (acr.getResultSet().next()){
+						do {
+							String date_birthay = "";
+							String nambk = "";
+							String nuch = "";
+							String adres = "";
+							String telefon = "";
+							if (acr.getResultSet().getDate("datar") != null) date_birthay = ", Д.р. "+sdf.format(new Date(acr.getResultSet().getDate("datar").getTime()));
+							if (acr.getResultSet().getString("nambk") != null) nambk = "№ амб. "+acr.getResultSet().getString("nambk");
+							if (acr.getResultSet().getInt("nuch") != 0) nuch = ", № уч. "+acr.getResultSet().getString("nuch");
+							if (acr.getResultSet().getString("adres") != null) adres = acr.getResultSet().getString("adres");
+							if (acr.getResultSet().getString("tel") != null) telefon = ", тел. "+acr.getResultSet().getString("tel");
+							sb.append("<tr bgcolor=\"white\">");
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getRow()));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("fio")+date_birthay));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", nambk+nuch ));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", adres+telefon ));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("timep") ));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("priem") ));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", sdf.format(new Date(acr.getResultSet().getDate("datap").getTime())))); 
+							sb.append("</tr>");
+							
+							//sb.append(String.format("<tr bgcolor=\"white\"><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td></tr>", acr.getResultSet().getRow(), acr.getResultSet().getString("fio"), acr.getResultSet().getString("nambk")+", "+acr.getResultSet().getString("nuch"), acr.getResultSet().getString("adres")+", "+acr.getResultSet().getString("tel"), acr.getResultSet().getString("timep"), acr.getResultSet().getString("priem"), acr.getResultSet().getString("zap")));
+						}
+						while (acr.getResultSet().next());
+					}
+				} catch (SQLException e) {
+					((SQLException) e.getCause()).printStackTrace();
+					throw new KmiacServerException();
+				}
+				sb.append("</table><br>");
+				break;        
+
+	        case 3:
+				sb.append("<p align=\"center\" >Количество выданных талонов за период ");
+				sb.append(String.format("с  %1$td.%1$tm.%1$tY ", new Date(rep.getDatan())));
+				sb.append(String.format(" по  %1$td.%1$tm.%1$tY <br>", new Date(rep.getDatak())));
+				sb.append("</p>");
+				sb.append("<table width=\"75%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 12px times new roman;\">Запись</th><th>Количество</th></tr>");
+				try {
+					AutoCloseableResultSet acr = sse.execPreparedQuery(
+							"SELECT (CASE e.prv=0 OR e.prv=1 WHEN TRUE THEN 'Через интернет' ELSE (CASE e.prv=2 WHEN TRUE THEN 'Через регистратуру' ELSE (CASE e.prv=3 WHEN TRUE THEN 'Через инфомат' ELSE NULL END) END) END)as zap," +
+							"(CASE e.prv=2 WHEN TRUE THEN count(*) ELSE 0 END)as kol_reg,"+
+							"(CASE e.prv=3 WHEN TRUE THEN count(*) ELSE 0 END)as kol_inf, "+
+							"(CASE e.prv=1 OR e.prv=0 WHEN TRUE THEN count(*) ELSE 0 END)as kol_int, e.prv "+
+							"FROM e_talon e " +
+							"WHERE e.npasp<>0 AND e.prv<>4 AND e.cpol=? AND e.datap between ? AND ?" +
+							"GROUP BY e.prv " +
+							"ORDER BY e.prv",
+						    rep.getCpol(), new Date(rep.getDatan()), new Date(rep.getDatak()));
+					if (acr.getResultSet().next()){
+						do {
+							sb.append("<tr bgcolor=\"white\">");
+					        switch (acr.getResultSet().getInt("prv")) {
+					        	case 0:
+//					        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getInt("kol_int")));
+					        		kol_int += acr.getResultSet().getInt("kol_int");
+					        		break;
+					        	case 1:
+									sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("zap")));
+					        		kol_int += acr.getResultSet().getInt("kol_int");
+					        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", kol_int));
+					        		break;
+					        	case 2:
+									sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("zap")));
+					        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getInt("kol_reg"))); 
+					        		break;
+					        	case 3:
+									sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("zap")));
+					        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getInt("kol_inf"))); 
+					        		break;
+					        }
+					        sb.append("</tr>");
+						}
+						while (acr.getResultSet().next());
+					}
+				} catch (SQLException e) {
+					((SQLException) e.getCause()).printStackTrace();
+					throw new KmiacServerException();
+				}
+				sb.append("</table><br>");
+				break;        
 	        default: 
 	        	break;
 	        }
 			
 			osw.write(sb.toString());
-//			return path;
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new KmiacServerException();
