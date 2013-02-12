@@ -69,7 +69,6 @@
 	</target>
 	
 	<target name="copyJarsToSharedPath" unless="${debug.build}" description="Копирование скомпилированных jar-файлов на общий ресурс для последующего обновления клиента и сервера">
-		<echo message="${muzdrav.public.dir}" />
 		<copy todir="${muzdrav.public.dir}/plugin" overwrite="true" force="true">
 		    <fileset dir="${basedir}/plugin"/>
 		</copy>
@@ -86,6 +85,7 @@
 	</target>
 
 	<target name="main" description="Компиляция всех серверных модулей для тестового сервера">
+		<antcall target="jar" />
 		<antcall target="copyJarsToSharedPath" />
 	</target>
 

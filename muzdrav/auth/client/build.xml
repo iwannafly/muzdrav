@@ -77,7 +77,7 @@
 		</pathconvert>
 		
 		<jar destfile="${export.file}" basedir="${build.dir}" >
-			<fileset dir="${bin_client_manager.dir}" excludes="**/thriftCommon/" />
+			<fileset dir="${bin_client_manager.dir}" />
 			<manifest>
 				<attribute name="Main-Class" value="${main.class}" />
 				<attribute name="Class-Path" value=". ${jar.classpath}"/>
