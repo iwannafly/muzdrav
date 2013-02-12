@@ -1,18 +1,20 @@
 package ru.nkz.ivcgzo.serverHospital;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.apache.thrift.TException;
-import org.junit.Before;
-import org.junit.Test;
 
-import ru.nkz.ivcgzo.serverManager.common.IServer;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
+import ru.nkz.ivcgzo.serverManager.common.ThreadedServer;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
@@ -30,55 +32,6 @@ public class TestServerHospital {
     private ITransactedSqlExecutor tse;
     private ServerHospital testServer;
     private static final int COUNT_CONNECTIONS = 1;
-    /**
-     * Класс для запуска плагинов-серверов отдельными потоками.
-     * Если в плагине-сервере возникнет необработанное исключение,
-     * он остановится.
-     * @author bsv798
-     */
-    private class ThreadedServer implements Runnable, IServer {
-    	private Thread thread;
-    	private IServer server;
-    	private boolean isRunning;
-    	
-    	public ThreadedServer(IServer server) {
-    		this.server = server;
-    		CreateThread();
-    	}
-    	
-    	@Override
-    	public void run() {
-    		try {
-    			isRunning = true;
-    			server.start();
-    		} catch (Exception e) {
-    			e.printStackTrace();
-    			stop();
-    		}
-    	}
-
-    	@Override
-    	public void start() throws Exception {
-    		if (!isRunning)
-    			thread.start();
-    		else
-    			throw new Exception("Server is already running.");
-    	}
-
-    	@Override
-    	public void stop() {
-    		synchronized (thread) {
-    			server.stop();
-    			CreateThread();
-    		}
-    	}
-    	
-    	private void CreateThread() {
-    		thread = new Thread(this);
-    		isRunning = false;
-    	}
-    	
-    }
 
     @Before
     public final void setUp() throws Exception {
@@ -100,8 +53,8 @@ public class TestServerHospital {
 			//Исключение выбрасывается только в случае попытки повторного запуска сервера
 		}
     	//Ожидание запуска потока:
-    	for(int i = 0; (i < Integer.MAX_VALUE) && !ts.isRunning; i++) ;
-    	assertEquals("is server running", true, ts.isRunning);
+    	for(int i = 0; (i < Integer.MAX_VALUE) && !ts.isRunning(); i++) ;
+    	assertTrue("is server running", ts.isRunning());
     	ts.stop();
     }
 
@@ -113,7 +66,7 @@ public class TestServerHospital {
     public void testStop() {
     	ThreadedServer ts = new ThreadedServer(testServer);
     	ts.stop();
-    	assertEquals("is server stop serving", true, !ts.isRunning);
+    	assertFalse("is server stop serving", ts.isRunning());
     }
 
     @Test

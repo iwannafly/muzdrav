@@ -732,6 +732,18 @@ public class ConnectionManager {
         viewClient.showModal(client, 25, npasp, fam, im, ot, idGosp);
     }
 
+    /**
+     * Вызов формы дневника осмотров стационара
+     * @param npasp - уникальный номер пациента
+     * @param fam - фамилия
+     * @param im - имя
+     * @param ot - отчество
+     * @param idGosp - идентификатор госпитализации
+     */
+    public void showDiaryForm(int npasp, String fam, String im, String ot, int idGosp) {
+        viewClient.showModal(client, 28, npasp, fam, im, ot, idGosp);
+    }
+
 	/**
 	 * Вызов формы записи пациента на прием к врачу.
 	 * @param npasp - уникальный номер пациента.

@@ -321,9 +321,10 @@ struct TPatientCommonInfo {
 	7: optional string adp_gorod;
 	8: optional string adp_ul;
 	9: optional string adp_dom;
-	10: optional string adp_kv;
-	11: optional i32 obraz;
-	12: optional i32 status;
+	10: optional string adp_korp;
+	11: optional string adp_kv;
+	12: optional i32 obraz;
+	13: optional i32 status;
 }
 
 struct TRd_SMPK {

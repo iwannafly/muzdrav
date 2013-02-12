@@ -98,16 +98,16 @@ struct Talon{
 	12:optional i64 timep,
 	13:i32 cpol
 }
-/*
-struct Report1{
+
+struct RepStruct{
 	1:i32 cpol,
 	2:optional i32 pcod,
 	3:optional string cdol,
 	4:i64 datan,
 	5:i64 datak,
-	6:i32 npp
+	6:i32 nsv
 }
-*/
+
 
 /**
  * 
@@ -279,6 +279,7 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	/**
         */
 	void addRasp(1: list<Rasp> rasp) throws (1: kmiacServer.KmiacServerException kse);
+	i32 addRaspReturnId(1: Rasp rasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
         */
@@ -322,6 +323,6 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
         */
 	void addTalons(1: list<Talon> talon) throws (1: kmiacServer.KmiacServerException kse);
 
-/*	string printReport(1: Report1 rep1) throws (1: kmiacServer.KmiacServerException kse);
-*/
+	string printReport(1: RepStruct rep) throws (1: kmiacServer.KmiacServerException kse);
+
 }
