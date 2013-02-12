@@ -5,9 +5,9 @@ package ru.nkz.ivcgzo.serverManager.common;
  * @author bsv798
  */
 public abstract class Server implements IServer {
-	public ISqlSelectExecutor sse;
-	public ITransactedSqlExecutor tse;
-
+	protected ISqlSelectExecutor sse;
+	protected ITransactedSqlExecutor tse;
+	
 	public Server(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		this.sse = sse;
 		this.tse = tse;
@@ -15,7 +15,7 @@ public abstract class Server implements IServer {
 	
 	@Override
 	public abstract void start() throws Exception;
-
+	
 	@Override
 	public abstract void stop();
 	
