@@ -11,7 +11,7 @@ thrift --gen java lab.thrift \
 && thrift --gen java reception.thrift \
 && thrift --gen java operation.thrift \
 && thrift --gen java medication.thrift \
-&& thrift --gen java operation.thrift \
+&& thrift --gen java lab.thrift \
 && thrift --gen java diary.thrift \
 && thrift --gen java ../../../common/thrift/classifier.thrift \
 && thrift --gen java ../../../common/thrift/kmiacServer.thrift \
