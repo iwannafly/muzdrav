@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
+import ru.nkz.ivcgzo.thriftOutputInfo.InputPasUch;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
 
 import javax.swing.JRadioButton;
@@ -23,14 +24,15 @@ import java.awt.event.ActionEvent;
 //import ru.nkz.ivcgzo.thriftOsm.InputSvodVed;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import javax.swing.JComboBox;
 
-public class SvodVed extends JPanel {
-	public CustomDateEditor tfDateB;
-	public CustomDateEditor tfDateF;
+public class PasUch extends JPanel {
+	private CustomDateEditor tfDateB;
+	private CustomDateEditor tfDateF;
 	private JLabel lblNewLabel;
 	//public InputInfo inputInfo;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
-	public SvodVed() {
+	public PasUch() {
 		
 		final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		
@@ -42,13 +44,17 @@ public class SvodVed extends JPanel {
 		
 		lblNewLabel = new JLabel("по");
 		
-		final JRadioButton rdbtnDet = new JRadioButton("Дети до 14 лет");
-		final JRadioButton rdbtnPod = new JRadioButton("Подростки 15-18 лет");
-		final JRadioButton rdbtnVzr = new JRadioButton("Взрослые");
-		buttonGroup.add(rdbtnVzr);
-		buttonGroup.add(rdbtnDet);
-		buttonGroup.add(rdbtnPod);
-		rdbtnDet.setSelected(true);
+		JLabel label_1 = new JLabel("Паспорт врачебного участка");
+		
+		String[] items = {
+				"1",
+				"2",
+				"3"
+			};
+		
+		
+		final JComboBox comboBox = new JComboBox(items);
+		comboBox.setEditable(true);
 		
 		JButton btnNewButton = new JButton("Выполнить");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -60,21 +66,22 @@ public class SvodVed extends JPanel {
 				//inputSvodVed.setKpolik(MainForm.authInfo.getCpodr());
 				//inputSvodVed.setNamepol(MainForm.authInfo.getCpodr_name());
 					
-				InputSvodVed isv = new InputSvodVed();	
-				if (rdbtnDet.isSelected()) isv.setVozcat(1);
-				else if (rdbtnPod.isSelected()) isv.setVozcat(2);
-				else if (rdbtnVzr.isSelected()) isv.setVozcat(3);
+				InputPasUch ipu = new InputPasUch();	
 				
-				isv.setDateb(sdf.format(tfDateB.getDate()));
-				isv.setDatef(sdf.format(tfDateF.getDate()));
+				int uchnum = Integer.parseInt(comboBox.getSelectedItem().toString());
+				
+				ipu.setDateb(sdf.format(tfDateB.getDate()));
+				ipu.setDatef(sdf.format(tfDateF.getDate()));
+				ipu.setUchnum(uchnum);
 				InputAuthInfo iaf = new InputAuthInfo();
 				iaf.setUserId(MainForm.authInfo.getUser_id());
 				iaf.setCpodr_name(MainForm.authInfo.getCpodr_name());
 				iaf.setClpu_name(MainForm.authInfo.getClpu_name());
+				iaf.setCpodr(MainForm.authInfo.getCpodr());
 								
 				
 				//OutputTest ot = new OutputTest();
-				String servPath = MainForm.tcl.printSvodVed(iaf,isv);
+				String servPath = MainForm.tcl.printPasUch(iaf,ipu);
 				String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
 				MainForm.conMan.transferFileFromServer(servPath, cliPath);
 				MainForm.conMan.openFileInEditor(cliPath, false);
@@ -89,34 +96,30 @@ public class SvodVed extends JPanel {
 		
 		
 		
-		JLabel lblNewLabel_1 = new JLabel("Возрастная категория");
-		
-		JLabel label_1 = new JLabel("Сводная ведомость зарегестрированных заболеваний");
+		JLabel label_2 = new JLabel("Номер участка:  ");
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
 				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(138)
+					.addComponent(label_1)
+					.addContainerGap(150, Short.MAX_VALUE))
+				.addGroup(groupLayout.createSequentialGroup()
 					.addGap(20)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(label)
-						.addComponent(lblNewLabel_1))
-					.addGap(4)
+						.addComponent(label_2, GroupLayout.PREFERRED_SIZE, 149, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(tfDateB, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(lblNewLabel)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(tfDateF, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE))
-						.addComponent(rdbtnVzr)
-						.addComponent(rdbtnPod)
-						.addComponent(rdbtnDet))
+							.addComponent(tfDateF, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)))
 					.addGap(53))
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(57)
-					.addComponent(label_1)
-					.addContainerGap(83, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -129,19 +132,11 @@ public class SvodVed extends JPanel {
 						.addComponent(tfDateB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tfDateF, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblNewLabel))
-					.addGap(59)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(lblNewLabel_1)
-							.addGap(87))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(rdbtnDet)
-							.addGap(18)
-							.addComponent(rdbtnPod)
-							.addGap(18)
-							.addComponent(rdbtnVzr)
-							.addGap(40)))
-					.addGap(0, 0, Short.MAX_VALUE)
+					.addGap(28)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label_2))
+					.addPreferredGap(ComponentPlacement.RELATED, 152, Short.MAX_VALUE)
 					.addComponent(btnNewButton))
 		);
 		setLayout(groupLayout);
