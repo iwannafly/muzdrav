@@ -185,8 +185,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
 		strClasTypes = new Class<?>[] {                              String.class, String.class};
 		
-		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id",   "prichina",    "kodotd",      "datav",    "vopl",        "id_pos",     "datap");
-		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class};
+		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id",   "prichina",    "kodotd",      "datav",    "vopl",        "id_pos",     "datap",     "name_pcisl", "clpu");
+		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, String.class, Integer.class};
 		
 		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "id",          "npasp",       "nisl",        "kodisl",     "rez");
 		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class, String.class};
@@ -206,8 +206,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmAnamZab = new TResultSetMapper<>(AnamZab.class, "id_pvizit",   "npasp",       "t_ist_zab");
 		anamZabTypes = new Class<?>[] {                    Integer.class, Integer.class, String.class};
 		
-		rsmIsslInfo = new TResultSetMapper<>(IsslInfo.class, "nisl",        "cisl",        "name_cisl",  "pokaz",      "pokaz_name", "rez",        "datav",    "datan",    "id",          "op_name",    "rez_name",   "gruppa");
-		isslInfoTypes = new Class<?>[] {                     Integer.class, Integer.class, String.class, String.class, String.class, String.class, Date.class, Date.class, Integer.class, String.class, String.class, Integer.class};
+		rsmIsslInfo = new TResultSetMapper<>(IsslInfo.class, "nisl",        "cisl",        "name_cisl",  "pokaz",      "pokaz_name", "rez",        "datav",    "datan",    "id",          "op_name",    "rez_name",   "gruppa",      "kodotd",      "datap",    "diag");
+		isslInfoTypes = new Class<?>[] {                     Integer.class, Integer.class, String.class, String.class, String.class, String.class, Date.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Date.class, String.class};
 																																
 		rsmPdisp = new TResultSetMapper<>(Pdisp.class, "npasp",       "id",          "diag",       "pcod",        "d_vz",     "d_grup",      "ishod",       "dataish",  "datag",    "datad",    "diag_s",     "d_grup_s",    "cod_sp",      "cdol_ot",    "d_uch",       "diag_n");
 		pdispTypes = new Class<?>[] {                  Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, Integer.class, Integer.class, String.class, Integer.class, String.class};
@@ -2974,13 +2974,13 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public List<IsslInfo> getIsslInfoPokaz(int nisl)
 			throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod as pokaz, n_ldi.name_n as pokaz_name, p_rez_l.zpok as rez, p_isl_ld.datav, p_rez_l.pcod_m as op_name,n_nsikodrez.name as rez_name, n_p0e1.gruppa as gruppa " +
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod as pokaz, n_ldi.name_n as pokaz_name, p_rez_l.zpok as rez, p_isl_ld.datav, p_rez_l.pcod_m as op_name,n_nsikodrez.name as rez_name, n_p0e1.gruppa as gruppa, p_isl_ld.kodotd, p_isl_ld.datap, p_isl_ld.diag " +
 				"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) left join n_ldi  on (n_ldi.pcod = p_rez_l.cpok) " +
 				"join n_nsikodrez on (n_nsikodrez.kod_rez=p_rez_l.kod_rez) "+
 				"join n_p0e1 on (n_ldi.c_p0e1=n_p0e1.pcod) "+
 				"where p_isl_ld.nisl = ? " +
 				"union		" +
-				"select p_isl_ld.nisl,n_ldi.pcod as pokaz, n_ldi.name_n as pokaz_name, n_arez.name as rez, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name, n_p0e1.gruppa as gruppa " +
+				"select p_isl_ld.nisl,n_ldi.pcod as pokaz, n_ldi.name_n as pokaz_name, n_arez.name as rez, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name, n_p0e1.gruppa as gruppa, p_isl_ld.kodotd, p_isl_ld.datap, p_isl_ld.diag " +
 				"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl)  join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)	" +
 				"join n_p0e1 on (n_ldi.c_p0e1=n_p0e1.pcod) "+
 				"where p_isl_ld.nisl = ?", nisl, nisl))
@@ -3017,7 +3017,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public List<P_isl_ld> getIsslInfoDate(int id_pvizit)
 			throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_isl_ld where pvizit_id = ? ", id_pvizit)) 
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_isl_ld.*, n_nz1.name as name_pcisl from p_isl_ld inner join n_nz1 on (p_isl_ld.pcisl=n_nz1.pcod) where p_isl_ld.pvizit_id = ? ", id_pvizit)) 
 		{
 			return rsmPislld.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
