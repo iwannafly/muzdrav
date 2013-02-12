@@ -19,12 +19,9 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputPasUch;
 
-public class serverPaspUch {
+public class serverPaspUch extends serverTemplate {
 	private ISqlSelectExecutor sse;
 	ITransactedSqlExecutor tse;
-	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	SimpleDateFormat sdfo = new SimpleDateFormat("dd.MM.yyyy");
-	SimpleDateFormat sdfy = new SimpleDateFormat("yyyy");
 	
 	public serverPaspUch(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		this.sse = sse;
