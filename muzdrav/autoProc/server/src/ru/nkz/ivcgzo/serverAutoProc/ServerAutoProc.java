@@ -5,38 +5,17 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Properties;
 
-import org.apache.thrift.TException;
-import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TThreadedSelectorServer;
-import org.apache.thrift.server.TThreadedSelectorServer.Args;
-import org.apache.thrift.transport.TNonblockingServerSocket;
-
-import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
-import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftServerAutoProc.LgkatNotFoundException;
-import ru.nkz.ivcgzo.thriftServerAutoProc.Lgota;
-import ru.nkz.ivcgzo.thriftServerAutoProc.Patient;
-import ru.nkz.ivcgzo.thriftServerAutoProc.PatientNotFoundException;
-import ru.nkz.ivcgzo.thriftServerAutoProc.ThriftServerAutoProc;
-import ru.nkz.ivcgzo.thriftServerAutoProc.ThriftServerAutoProc.Iface;
 
-public class ServerAutoProc extends Server implements Iface {
-	private TServer thrServ;
+public class ServerAutoProc extends Server {
 	private Properties prop;
-	SimpleDateFormat sdfData = new SimpleDateFormat("dd.MM.yyyy");
-//	private final TResultSetMapper<Patient, Patient._Fields> rsmpat;
 	
 	public ServerAutoProc(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -44,70 +23,16 @@ public class ServerAutoProc extends Server implements Iface {
 
 	@Override
 	public void start() throws Exception {
-		try {
-			prop = new Properties();
-			prop.put("charSet","Cp866");
-			Class.forName("com.hxtt.sql.dbf.DBFDriver");
-			ThriftServerAutoProc.Processor<Iface> proc = new ThriftServerAutoProc.Processor<Iface>(this);
-			thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
-			thrServ.serve();
-		} catch (TException e) {
-			throw new Exception(e);
-		}
+		prop = new Properties();
+		prop.put("charSet","Cp866");
+		Class.forName("com.hxtt.sql.dbf.DBFDriver");
 	}
 
 	@Override
 	public void stop() {
-		if (thrServ != null)
-			thrServ.stop();
 	}
 
-	@Override
-	public void testConnection() throws TException {
-	}
-
-	@Override
-	public void saveUserConfig(int id, String config) throws TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("UPDATE s_users SET config = ? WHERE id = ? ", false, config, id);
-			sme.setCommit();
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new TException();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-			throw new TException();
-		}
-	}
-
-	@Override
-	public Patient getPatientInfo(int npasp) throws PatientNotFoundException,
-			TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int setPatientInfo(Patient npasp) throws TException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public List<Lgota> getLgotaInfo(int npasp) throws LgkatNotFoundException,
-			TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int addLgotaInfo(Lgota npasp) throws TException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public String getPL(String pl) throws KmiacServerException, TException {
+	public String getPL(String pl) {
 		String sqlpl;
 		String pathname;
 		String fname;
