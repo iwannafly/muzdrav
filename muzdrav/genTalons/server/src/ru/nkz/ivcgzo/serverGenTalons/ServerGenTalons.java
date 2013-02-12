@@ -854,6 +854,7 @@ public class ServerGenTalons extends Server implements Iface {
 		String path = null;
 		int kol_int = 0;
 		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+		SimpleDateFormat stf = new SimpleDateFormat("HH:mm");
 		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("napr", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
@@ -1095,6 +1096,77 @@ public class ServerGenTalons extends Server implements Iface {
 				}
 				sb.append("</table><br>");
 				break;        
+
+	        case 4:
+				sb.append("<p align=\"center\" >Расписание работы врачей ");
+//				sb.append(String.format("с  %1$td.%1$tm.%1$tY ", new Date(rep.getDatan())));
+//				sb.append(String.format(" по  %1$td.%1$tm.%1$tY <br>", new Date(rep.getDatak())));
+				sb.append("</p>");
+				sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 12px times new roman;\">ФИО врача</th><th>Пн.</th><th>Вт.</th><th>Ср.</th><th>Чт.</th><th>Птн.</th></tr>");
+				try {
+					AutoCloseableResultSet acr = sse.execPreparedQuery(
+							"SELECT get_short_fio(v.fam, v.im, v.ot) as fio, s.name as cdol, e.denn, min(time_n) as min_time, max(time_k) as max_time " +
+							"FROM e_nrasp e LEFT JOIN s_vrach v ON (e.pcod = v.pcod) " +
+							"LEFT JOIN n_s00 s ON (s.pcod = e.cdol) " +
+							"WHERE e.cpol=? AND e.cxema = 0 AND e.time_n <> '00:00:00' " +
+							"GROUP BY e.cdol, s.name, fio, e.denn " +
+							"ORDER BY e.cdol, fio, e.denn", rep.getCpol());
+					while (acr.getResultSet().next()){
+//lab1:
+						sb.append("<tr bgcolor=\"white\">");
+						sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("fio")));
+//						String vrach = acr.getResultSet().getString("fio"); 
+
+						for(int i=1; i<6; i++){
+							String mint= "";
+							String maxt= "";
+							if(i == acr.getResultSet().getInt("denn")){
+								mint= stf.format(new Time(acr.getResultSet().getTime("min_time").getTime()));
+								maxt= stf.format(new Time(acr.getResultSet().getTime("max_time").getTime()));
+								acr.getResultSet().next();
+							}
+			        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", mint+"-"+maxt));
+//							if (vrach != acr.getResultSet().getString("fio")) acr.getResultSet().previous();
+//			        		continue;
+						}
+						acr.getResultSet().previous();
+						sb.append("</tr>");
+					}
+//					if (acr.getResultSet().next()){
+//						do {
+//							sb.append("<tr bgcolor=\"white\">");
+//							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("fio")));
+//							String mint= "";
+//							String maxt= "";
+//					        switch (acr.getResultSet().getInt("denn")) {
+//					        	case 1:
+//									mint= stf.format(new Date(acr.getResultSet().getDate("min_time").getTime()));
+//									maxt= stf.format(new Date(acr.getResultSet().getDate("max_time").getTime()));
+//					        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", mint+"-"+maxt));
+//					        		break;
+//					        	case 2:
+//					        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", kol_int));
+//					        		break;
+//					        	case 3:
+//									sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("zap")));
+//					        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getInt("kol_reg"))); 
+//					        		break;
+//					        	case 4:
+//									sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("zap")));
+//					        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getInt("kol_inf"))); 
+//					        		break;
+//					        }
+//					        sb.append("</tr>");
+//						}
+//						while (acr.getResultSet().next());
+//					}
+				} catch (SQLException e) {
+					((SQLException) e.getCause()).printStackTrace();
+					throw new KmiacServerException();
+				}
+				sb.append("</table><br>");
+				break;        
+	        
 	        default: 
 	        	break;
 	        }
