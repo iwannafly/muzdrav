@@ -24,12 +24,8 @@ import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
 
 
 public class serverSvodVed extends serverTemplate {
-	private ISqlSelectExecutor sse;
-	ITransactedSqlExecutor tse;
-	
 	public serverSvodVed(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
-		this.sse = sse;
-		this.tse = tse;
+		super(sse, tse);
 	}
 	
 	public String printSvodVed(InputAuthInfo iaf, InputSvodVed isv) throws KmiacServerException, TException {

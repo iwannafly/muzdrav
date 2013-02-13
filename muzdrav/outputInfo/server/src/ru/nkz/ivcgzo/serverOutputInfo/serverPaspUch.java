@@ -20,14 +20,9 @@ import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputPasUch;
 
 public class serverPaspUch extends serverTemplate {
-	private ISqlSelectExecutor sse;
-	ITransactedSqlExecutor tse;
 	
 	public serverPaspUch(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
-		this.sse = sse;
-		this.tse = tse;
-		
-	
+		super(sse, tse);
 	}
 	
 	public String printPasUch(InputAuthInfo iaf, InputPasUch ipu) throws KmiacServerException, TException {
