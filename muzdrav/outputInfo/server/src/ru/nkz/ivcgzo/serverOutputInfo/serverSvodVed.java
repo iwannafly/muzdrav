@@ -44,11 +44,6 @@ public class serverSvodVed extends serverTemplate {
 		//AutoCloseableResultSet spat = null;
 		List<IntegerClassifier> patList = new ArrayList<IntegerClassifier>();
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat sdfo = new SimpleDateFormat("dd.MM.yyyy");
-		SimpleDateFormat sdfy = new SimpleDateFormat("yyyy");
-		String curDat = sdfo.format(java.util.Calendar.getInstance().getTime());
-		
 		// Первичность
 		int perv = 0;
 		// Предыдущий год

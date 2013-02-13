@@ -82,7 +82,7 @@ public class PasUch extends JPanel {
 				
 				//OutputTest ot = new OutputTest();
 				String servPath = MainForm.tcl.printPasUch(iaf,ipu);
-				String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
+				String cliPath = new File("C://Outputtest", ".htm").getAbsolutePath();
 				MainForm.conMan.transferFileFromServer(servPath, cliPath);
 				MainForm.conMan.openFileInEditor(cliPath, false);
 				//catch (TException e1) {
