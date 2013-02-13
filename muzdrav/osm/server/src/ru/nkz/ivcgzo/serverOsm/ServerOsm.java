@@ -960,6 +960,7 @@ public class ServerOsm extends Server implements Iface {
 				}
 				sb.append("</ol>");
 				sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
+				sb.append(String.format("<b>Планируемая дата выполнения:</b> %1$td.%1$tm.%1$tY<br />", im.getDatap()));
 				sb.append("<b>Подпись врача:</b><br />");
 				sb.append("</td>");
 			sb.append("</tr>");
