@@ -7,6 +7,8 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 
 public class serverTemplate {
+	protected ISqlSelectExecutor sse;
+	protected ITransactedSqlExecutor tse;
 
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	SimpleDateFormat sdfo = new SimpleDateFormat("dd.MM.yyyy");
@@ -14,6 +16,10 @@ public class serverTemplate {
 	// Текущая дата в формате 12.12.2012
 	String curDat = sdfo.format(java.util.Calendar.getInstance().getTime()); 
 	
+	public serverTemplate(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
+		this.sse = sse;
+		this.tse = tse;
+	}
 	/**
 	 * Метод, возвращающий количество полных лет
 	 */

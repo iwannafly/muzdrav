@@ -15,12 +15,8 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 
 public class serverDnevVr extends serverTemplate {
-	private ISqlSelectExecutor sse;
-	ITransactedSqlExecutor tse;
-	
 	public serverDnevVr (ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
-		this.sse = sse;
-		this.tse = tse;
+		super(sse, tse);
 	}
 	
 

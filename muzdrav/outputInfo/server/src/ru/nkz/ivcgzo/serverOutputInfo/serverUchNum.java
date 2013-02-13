@@ -21,8 +21,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 public class serverUchNum extends serverTemplate {
-	private ISqlSelectExecutor sse;
-	ITransactedSqlExecutor tse;
 	private TResultSetMapper<UchastokInfo, UchastokInfo._Fields> tableUchastok;
 	private static Class<?>[] UchastokTypes;
 	private TResultSetMapper<UchastokNum, UchastokNum._Fields> tableUchNum;
@@ -30,8 +28,8 @@ public class serverUchNum extends serverTemplate {
 	private static Logger log = Logger.getLogger(serverUchNum.class.getName());
 
 	public serverUchNum(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
-		this.sse = sse;
-		this.tse = tse;
+		super(sse, tse);
+		
 		//Таблица справочник участков 1
 		tableUchastok = new TResultSetMapper<>(UchastokInfo.class, "fam","im","ot","pcod");
 		UchastokTypes = new Class<?>[]{String.class,String.class,String.class,Integer.class};
