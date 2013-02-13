@@ -1944,7 +1944,11 @@ public class Vvod extends JFrame {
 				  			JOptionPane.showMessageDialog(Vvod.this, "Выберите хотя бы одно исследование.");
 				  			return;
 						}
-
+						if (tfPlanDatIssl.getDate() == null){
+							JOptionPane.showMessageDialog(Vvod.this, "Планируемая дата выполнения исследования не заполнена.");
+							return;
+						}
+						
 						pisl.setNpasp(Vvod.zapVr.getNpasp());
 						pisl.setPcisl(cmbOrgan.getSelectedPcod());
 						pisl.setNapravl(2);
@@ -1997,6 +2001,7 @@ public class Vvod extends JFrame {
 							isslmet.setClpu_name(cmbLpu.getSelectedItem().getName());
 							isslmet.setCpodr_name(MainForm.authInfo.getCpodr_name());
 							isslmet.setCpodr(MainForm.authInfo.getCpodr());
+							isslmet.setDatap(tfPlanDatIssl.getDate().getTime());
 							
 							String servPath = MainForm.tcl.printIsslMetod(isslmet);
 							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();

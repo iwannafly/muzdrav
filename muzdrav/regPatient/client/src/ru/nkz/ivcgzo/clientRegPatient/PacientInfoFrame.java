@@ -85,7 +85,6 @@ import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmorfNotFoundException;
-import javax.swing.JTextField;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -99,7 +98,7 @@ public class PacientInfoFrame extends JFrame {
     private JTabbedPane tpPriem;
     public static int curPatientId = 0;
     private int curNgosp = 0;
-    private int curId = 0;
+    private int curGospId = 0;
     private int curId_otd = 0;
     private int curId_lgt = 0;
     private int Terp = 0;
@@ -2002,8 +2001,8 @@ public class PacientInfoFrame extends JFrame {
             @Override
             public boolean doAction(CustomTableItemChangeEvent<Kontingent> event) {
                 try {
-                    curId = tbl_kateg.getSelectedItem().id;
-                    MainForm.tcl.deleteKont(curId);
+                	curGospId = tbl_kateg.getSelectedItem().id;
+                    MainForm.tcl.deleteKont(curGospId);
                 } catch (TException e) {
                     e.printStackTrace();
                     MainForm.conMan.reconnect(e);
@@ -2025,7 +2024,7 @@ public class PacientInfoFrame extends JFrame {
 //				    item.setName(tbl_kateg.getSelectedItem().name);
                     Info pInfo = MainForm.tcl.addKont(event.getItem());
                     tbl_kateg.getSelectedItem().setName(pInfo.getName());
-                    curId = pInfo.getId();
+                    curGospId = pInfo.getId();
                 } catch (KontingentAlreadyExistException kaee) {
                     kaee.printStackTrace();
                     return false;
@@ -2460,7 +2459,7 @@ public class PacientInfoFrame extends JFrame {
                 btnNew_priem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         if (curPatientId != 0){
-                            curId = 0;
+                        	curGospId = 0;
                             curNgosp = 0;
                             curId_otd = 0;
                             newPriem = tbl_priem.addExternalItem();
@@ -2484,8 +2483,8 @@ public class PacientInfoFrame extends JFrame {
         JButton btnOsm = new JButton("Первичный осмотр");
         btnOsm.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		if(curPatientId !=0 && curId !=0)
-        			MainForm.conMan.showDiaryForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curId);
+        		if(curPatientId != 0 && curGospId != 0)
+        			MainForm.conMan.showDiaryForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId);
         		else
         			JOptionPane.showMessageDialog(tbl_priem, "Отсутствуют обращения пациента.");
         	}
@@ -2502,7 +2501,7 @@ public class PacientInfoFrame extends JFrame {
                     public void actionPerformed(ActionEvent arg0) {
                       try{
                           if (curPatientId != 0 && tbl_priem.getSelectedItem().id != 0){
-                              curId = tbl_priem.getSelectedItem().id;
+                        	  curGospId = tbl_priem.getSelectedItem().id;
                               tbl_priem.requestFocus();
                               tbl_priem.deleteSelectedRow();
                           }else
@@ -3099,8 +3098,8 @@ public class PacientInfoFrame extends JFrame {
         @Override
         public boolean doAction(CustomTableItemChangeEvent<AllGosp> event) {
             try {
-            	System.out.println(curId);
-                MainForm.tcl.deleteGosp(curId);
+            	System.out.println(curGospId);
+                MainForm.tcl.deleteGosp(curGospId);
                 NewPriemInfo();
             } catch (TException e) {
                 MainForm.conMan.reconnect(e);
@@ -3237,8 +3236,7 @@ public class PacientInfoFrame extends JFrame {
             tbMain.remove(tpPriem);
             btnPrint_istb.setVisible(false);
             btnShowTalonSelectModule.setVisible(true);
-        }
-        if (MainForm.authInfo.getCslu() == 1) {
+        } else {
             btnPrint_ambk.setVisible(false);
             btnPrint_istb.setVisible(true);
             btnShowTalonSelectModule.setVisible(false);
@@ -3310,7 +3308,7 @@ public class PacientInfoFrame extends JFrame {
     };
 
     // слушатель главного таб контрола
-    final ChangeListener  mainChangeListener= new ChangeListener() {
+    final ChangeListener mainChangeListener = new ChangeListener() {
 
         public void stateChanged(ChangeEvent changeEvent) {
                 if (tbMain.getSelectedIndex() == 0){
@@ -3675,9 +3673,9 @@ public class PacientInfoFrame extends JFrame {
             return;
         }
            try {
-            curId = tbl_priem.getSelectedItem().id;
+        	   curGospId = tbl_priem.getSelectedItem().id;
             curNgosp = tbl_priem.getSelectedItem().ngosp;
-            Id_gosp = MainForm.tcl.getGosp(curId);
+            Id_gosp = MainForm.tcl.getGosp(curGospId);
 //			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy hh:mm");
 //            if (Id_gosp.getJalob() != null){
 //                ta_jal_pr.setText(Id_gosp.getJalob());
@@ -3874,7 +3872,7 @@ public class PacientInfoFrame extends JFrame {
             Id_gosp = new Gosp();
             Id_gosp.setNpasp(curPatientId);
             Id_gosp.setNgosp(curNgosp);
-            Id_gosp.setId(curId);
+            Id_gosp.setId(curGospId);
             Id_gosp.setDataz(new Date().getTime());
 
             Id_gosp.setCotd_p(MainForm.authInfo.cpodr);
@@ -3930,9 +3928,9 @@ public class PacientInfoFrame extends JFrame {
 
             //System.out.println(Id_gosp.getPr_out());
             CheckNotNullTableCgosp();
-            if (curId == 0){
-                curId = MainForm.tcl.addGosp(Id_gosp);
-                newPriem.setId(curId);
+            if (curGospId == 0){
+            	curGospId = MainForm.tcl.addGosp(Id_gosp);
+                newPriem.setId(curGospId);
                 newPriem.setNist(Id_gosp.getNist());
                 newPriem.setDatap(Id_gosp.getDatap());
                 newPriem.setCotd(Id_gosp.getCotd());
@@ -3952,7 +3950,7 @@ public class PacientInfoFrame extends JFrame {
                 	//MainForm.tcl.updateOtd(curId_otd, curId, Id_gosp.getNist(), Id_gosp.getCotd());
             }
             if (Id_gosp.getCotd() != 0)
-               	MainForm.tcl.addOrUpdateOtd(curId, Id_gosp.getNist(), Id_gosp.getCotd());
+               	MainForm.tcl.addOrUpdateOtd(curGospId, Id_gosp.getNist(), Id_gosp.getCotd());
             tbl_priem.updateChangedSelectedItem();
         } catch (Exception e) {
             e.printStackTrace();

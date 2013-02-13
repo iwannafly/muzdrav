@@ -441,6 +441,7 @@ struct IsslMet {
 	12: optional i32 pvizitambId;
 	13: optional i32 cpodr;
 	14: optional i32 kod_lab;
+	15: optional i64 datap;
 }
 
 struct IsslPokaz {

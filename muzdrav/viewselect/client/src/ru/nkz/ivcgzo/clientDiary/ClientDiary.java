@@ -11,7 +11,7 @@ import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftDiary.ThriftDiary;
 
-public class ClientDiary  extends Client<ThriftDiary.Client> {
+public class ClientDiary extends Client<ThriftDiary.Client> {
     public static ThriftDiary.Client tcl;
     public static Client<ThriftDiary.Client> instance;
     private MainFrame diaryFrame;

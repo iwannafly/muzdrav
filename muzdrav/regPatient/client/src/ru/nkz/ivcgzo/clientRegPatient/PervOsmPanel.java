@@ -24,7 +24,6 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftRegPatient.ShablonText;
 import ru.nkz.ivcgzo.thriftRegPatient.Shablon;
@@ -440,7 +439,7 @@ public class PervOsmPanel extends JPanel{
 	
 	public void onConnect() {
 		try {
-			lbShabSrc.setData(MainForm.tcl.getShOsmPoiskName(MainForm.authInfo.cspec, MainForm.authInfo.cslu,  null));
+			lbShabSrc.setData(MainForm.tcl.getShOsmPoiskName(MainForm.authInfo.cspec, MainForm.authInfo.cslu, null));
 
 		} catch (KmiacServerException e) {
 			JOptionPane.showMessageDialog(this, "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -472,13 +471,14 @@ public class PervOsmPanel extends JPanel{
 		}
 	}
 
+	/*
 	private String getTextOrNull(String str) {
 		if (str != null)
 			if (str.length() > 0)
 				return str;
-		
 		return null;
 	}
+	*/
 	
 	private void pasteShablon(Shablon sh) {
 		if (sh == null)

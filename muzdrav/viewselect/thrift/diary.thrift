@@ -4,16 +4,17 @@ include "../../../common/thrift/classifier.thrift"
 include "../../../common/thrift/kmiacServer.thrift"
 
 struct TMedicalHistory{
-    1:optional i32 id;
-	2:optional i32 idGosp;
-	3:optional string jalob;
-	4:optional string morbi;
-	5:optional string statusPraesense;
-	6:optional string statusLocalis;
-	7:optional string fisicalObs;
-	8:optional i32 pcodVrach;
-	9:optional i64 dataz;
-	10:optional i64 timez;
+    1: optional i32 id;
+	2: optional i32 idGosp;
+	3: optional string jalob;
+	4: optional string morbi;
+	5: optional string statusPraesense;
+	6: optional string statusLocalis;
+	7: optional string fisicalObs;
+	8: optional i32 pcodVrach;
+	9: optional i64 dataz;
+	10: optional i64 timez;
+	11: optional i32 cpodr;
 }
 
 struct Patient {
@@ -38,7 +39,7 @@ struct Shablon {
 }
 
 /**
- * Медицинская история с такими данными не найдена.
+ * Медицинская история с такими данными не найдена
  */
 exception MedicalHistoryNotFoundException {
 }
@@ -53,5 +54,25 @@ service ThriftDiary extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getShablonNames(1:i32 cspec, 2:i32 cslu, 3:string srcText)
 		throws (1:kmiacServer.KmiacServerException kse);
 	Shablon getShablon(1:i32 idSh) throws (1:kmiacServer.KmiacServerException kse);
+	
+    /**
+	 * Получение списка подразделений заданного ЛПУ
+	 * @param clpu Идентификатор ЛПУ
+	 * @return Возвращает список ЛПУ, классифицируемых целым числом - идентификатором ЛПУ
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	list<classifier.IntegerClassifier> getOtdFromLPU(1:i32 clpu)
+		throws (1:kmiacServer.KmiacServerException kse);
+    /**
+	 * Получение списка врачей заданных ЛПУ и подразделения
+	 * @param clpu Идентификатор ЛПУ
+	 * @param cpodr Идентификатор подразделения ЛПУ
+	 * @return Возвращает список врачей, классифицируемых целым числом - идентификатором врача
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	list<classifier.IntegerClassifier> getDoctorsFromOtd(1:i32 clpu, 2:i32 cpodr)
+		throws (1:kmiacServer.KmiacServerException kse);
 }
 
