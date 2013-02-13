@@ -2411,13 +2411,13 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		sdfDay.format(childDoc.getDateoff()), months[dateOff.get(GregorianCalendar.MONTH)],
         		sdfYear.format(childDoc.getDateoff()),
         		//Ребенок родился:
-        		sdfDay.format(childInfo.getDatar()), sdfMonth.format(childInfo.getDatar()).toUpperCase(),
+        		sdfDay.format(childInfo.getDatar()), sdfMonth.format(childInfo.getDatar()),
         		sdfYear.format(childInfo.getDatar()),
         		childBirthHour, childBirthMinute,
         		//Фамилия, имя, отчество матери:
         		motherNameArr[0].concat(" ".concat(motherMiddleName)),
         		//Дата рождения матери:
-        		sdfDay.format(motherInfo.getDatar()), sdfMonth.format(motherInfo.getDatar()).toUpperCase(),
+        		sdfDay.format(motherInfo.getDatar()), sdfMonth.format(motherInfo.getDatar()),
         		sdfYear.format(motherInfo.getDatar()),
         		//Место регистрации матери:
         		motherRegPlace[0],
@@ -2442,7 +2442,7 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		sdfYear.format(childDoc.getDateoff()),
         		//Ребенок родился:
         		sdfDay.format(childInfo.getDatar()),
-        		sdfMonth.format(childInfo.getDatar()).toUpperCase(),
+        		sdfMonth.format(childInfo.getDatar()),
         		sdfYear.format(childInfo.getDatar()),
         		childBirthHour, childBirthMinute,
         		//Фамилия, имя, отчество матери:
