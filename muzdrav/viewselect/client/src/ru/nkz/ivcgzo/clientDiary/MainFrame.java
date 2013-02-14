@@ -487,7 +487,7 @@ public class MainFrame extends JFrame {
         	fillMedHistoryTable();
         } catch (TException e) {
             ClientDiary.conMan.reconnect(e);
-        } catch (Exception e) { }
+        } catch (NullPointerException e) { }
     }
 
     private void addMedHistoryToTable() {
@@ -522,7 +522,7 @@ public class MainFrame extends JFrame {
             tblMedHist.setData(new ArrayList<TMedicalHistory>());
         } catch (TException e) {
             ClientDiary.conMan.reconnect(e);
-        } catch (Exception e) {
+        } catch (NullPointerException e) {
         	//Ошибка создания нового объекта медицинской истории
 			e.printStackTrace();
 		}
@@ -535,7 +535,6 @@ public class MainFrame extends JFrame {
      * @author Балабаев Никита Дмитриевич
      */
     private void ticcbOtdItemStateChanged(ItemEvent ie) {
-		//TODO: тестировать:
 		int newIndex = ticcbOtd.getSelectedIndex();
 		if ((ie != null) && (ticcbOtd != null) &&
 			(ie.getStateChange() == ItemEvent.SELECTED) &&
@@ -557,11 +556,12 @@ public class MainFrame extends JFrame {
      * @param medHist Объект медицинской истории, в который будет
      * загружена информация
      * @author Балабаев Никита Дмитриевич
-     * @throws Exception переданный объект был null-объектом
+     * @throws NullPointerException переданный объект был null-объектом
      */
-    private void getMedicalMedicalHistoryText(TMedicalHistory medHist) throws Exception {
+    private void getMedicalMedicalHistoryText(TMedicalHistory medHist)
+    		throws NullPointerException {
     	if (medHist == null)
-    		throw new Exception("Argument is null");
+    		throw new NullPointerException();
         if (taJalob != null)
         	medHist.setJalob(taJalob.getText());
         if (taDesiaseHistory != null)
@@ -579,7 +579,6 @@ public class MainFrame extends JFrame {
     	if (curMedHist == null)
     		return;
     	ticcbOtd.setSelectedPcod(curMedHist.getCpodr());
-    	//TODO: проследить вызов загрузки данных в ticcbPcodOsm:
     	ticcbPcodOsm.setSelectedPcod(curMedHist.getPcodVrach());
         if (taJalob != null)
             taJalob.setText(curMedHist.getJalob());
