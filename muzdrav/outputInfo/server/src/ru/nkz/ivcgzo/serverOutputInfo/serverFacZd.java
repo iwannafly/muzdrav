@@ -22,12 +22,9 @@ import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputFacZd;
 
 public class serverFacZd extends serverTemplate {
-	private ISqlSelectExecutor sse;
-	ITransactedSqlExecutor tse;
 	
 	public serverFacZd(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
-		this.sse = sse;
-		this.tse = tse;
+		super(sse, tse);
 	}
 	
 	public String printFacZd(InputAuthInfo iaf, InputFacZd ifz) throws KmiacServerException,

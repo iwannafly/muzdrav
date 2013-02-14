@@ -25,7 +25,6 @@ import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftDiary.MedicalHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftDiary.Shablon;
@@ -39,23 +38,19 @@ public class ServerDiary extends Server implements Iface {
     private TServer tServer;
     private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmMedicalHistory;
     private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
-    private TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClas;
     
     private static final String[] MEDICAL_HISTORY_FIELD_NAMES = {
         "id", "id_gosp", "jalob", "morbi", "status_praesense", "status_localis",
-        "fisical_obs", "pcod_vrach", "dataz", "timez"
+        "fisical_obs", "pcod_vrach", "dataz", "timez", "cpodr", "pcod_added"
     };
     private static final String[] INT_CLAS_FIELD_NAMES = {
-        "pcod", "name"
-    };
-    private static final String[] STR_CLAS_FIELD_NAMES = {
         "pcod", "name"
     };
     private static final Class<?>[] MEDICAL_HISTORY_TYPES = {
     //  id             id_gosp       jalob         morbi          st_praesense  status_localis
         Integer.class, Integer.class, String.class, String.class, String.class, String.class,
-    //  fisical_obs   pcod_vrach    dataz       timez
-        String.class, Integer.class, Date.class, Time.class
+    //  fisical_obs   pcod_vrach		dataz		timez		cpodr			pcod_added
+        String.class, Integer.class,	Date.class,	Time.class,	Integer.class,	Integer.class
     };
 
     public ServerDiary(final ISqlSelectExecutor sse, final ITransactedSqlExecutor tse) {
@@ -69,7 +64,6 @@ public class ServerDiary extends Server implements Iface {
         rsmMedicalHistory = new TResultSetMapper<>(TMedicalHistory.class,
                 MEDICAL_HISTORY_FIELD_NAMES);
         rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, INT_CLAS_FIELD_NAMES);
-        rsmStrClas = new TResultSetMapper<>(StringClassifier.class, STR_CLAS_FIELD_NAMES);
     }
 
     @Override
@@ -84,17 +78,39 @@ public class ServerDiary extends Server implements Iface {
         
     }
 
+	/**
+	 * Проверка существования записи осмотра
+	 * @param idMedHist Уникальный номер записи осмотра
+	 * @return Возвращает <code>true</code>, если информация об осмотре существует;
+	 * иначе - <code>false</code>
+	 * @author Балабаев Никита Дмитриевич
+	 */
+    private boolean isMedicalHistoryExist(final int idMedHist) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+                "SELECT * " +
+                "FROM c_osmotr " +
+                "WHERE (id = ?);", idMedHist)) {
+            return acrs.getResultSet().next();
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQLException (isMedicalHistoryExist): ", e);
+			((SQLException) e.getCause()).printStackTrace();
+            return false;
+        }
+    }
+
     @Override
     public final List<TMedicalHistory> getMedicalHistory(final int idGosp)
             throws KmiacServerException, MedicalHistoryNotFoundException {
-        final String sqlQuery = "SELECT * FROM c_osmotr WHERE id_gosp = ? ORDER BY dataz, timez;";
+        final String sqlQuery = "SELECT * FROM c_osmotr " +
+        		"WHERE (id_gosp = ?) " +
+        		"ORDER BY dataz, timez;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
             List<TMedicalHistory> tmpMedHistories =
                 rsmMedicalHistory.mapToList(acrs.getResultSet());
             if (tmpMedHistories.size() > 0) {
                 return tmpMedHistories;
             } else {
-                log.log(Level.INFO,  "MedicalHistoryNotFoundException, idGosp = " + idGosp);
+                log.log(Level.INFO, "MedicalHistoryNotFoundException, idGosp = " + idGosp);
                 throw new MedicalHistoryNotFoundException();
             }
         } catch (SQLException e) {
@@ -106,11 +122,11 @@ public class ServerDiary extends Server implements Iface {
     @Override
     public final int addMedicalHistory(final TMedicalHistory medHist)
             throws KmiacServerException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
         final String sqlQuery = "INSERT INTO c_osmotr (id_gosp, jalob, "
-            + "morbi, status_praesense, "
-            + "status_localis, fisical_obs, pcod_vrach, dataz, timez) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            + "morbi, status_praesense, status_localis, "
+            + "fisical_obs, pcod_vrach, dataz, timez, cpodr, pcod_added) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, true, medHist, MEDICAL_HISTORY_TYPES, indexes);
             int id = sme.getGeneratedKeys().getInt("id");
@@ -118,37 +134,44 @@ public class ServerDiary extends Server implements Iface {
             return id;
         } catch (InterruptedException | SQLException e) {
             e.printStackTrace();
-            log.log(Level.ERROR, "SqlException", e);
-            throw new KmiacServerException();
-        }
-    }
-
-    @Override
-    public final void deleteMedicalHistory(final int id) throws KmiacServerException {
-        final String sqlQuery = "DELETE FROM c_osmotr WHERE id = ?;";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, id);
-            sme.setCommit();
-        } catch (SqlExecutorException | InterruptedException e) {
-            log.log(Level.ERROR, "SqlException", e);
+            log.log(Level.ERROR, "SqlException (addMedicalHistory)", e);
             throw new KmiacServerException();
         }
     }
 
     @Override
     public final void updateMedicalHistory(final TMedicalHistory medHist)
-            throws KmiacServerException {
+            throws KmiacServerException, MedicalHistoryNotFoundException {
+    	if (!isMedicalHistoryExist(medHist.getId()))
+    		throw new MedicalHistoryNotFoundException();
         final int[] indexes = {2, 3, 4, 5, 6, 8, 9, 0};
+        //Изменить номер номер истории болезни, отделения и врачей (проводившего осмотр
+        // и добавившего запись) нельзя (в списке параметров не присутствуют):
         final String sqlQuery = "UPDATE c_osmotr SET jalob = ?, "
             + "morbi = ?, status_praesense = ?, "
             + "status_localis = ?, fisical_obs = ?, dataz = ?, timez = ? "
-            + "WHERE id = ?;";
+            + "WHERE (id = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, false, medHist, MEDICAL_HISTORY_TYPES, indexes);
             sme.setCommit();
         } catch (InterruptedException | SQLException e) {
             e.printStackTrace();
-            log.log(Level.ERROR, "SqlException", e);
+            log.log(Level.ERROR, "SqlException (updateMedicalHistory)", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void deleteMedicalHistory(final int id)
+    		throws KmiacServerException, MedicalHistoryNotFoundException {
+    	if (!isMedicalHistoryExist(id))
+    		throw new MedicalHistoryNotFoundException();
+        final String sqlQuery = "DELETE FROM c_osmotr WHERE (id = ?);";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, id);
+            sme.setCommit();
+        } catch (SqlExecutorException | InterruptedException e) {
+            log.log(Level.ERROR, "SqlException (deleteMedicalHistory)", e);
             throw new KmiacServerException();
         }
     }
@@ -161,8 +184,8 @@ public class ServerDiary extends Server implements Iface {
             + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
             + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
             + "JOIN n_c00 c00 ON (c00.pcod = sho.diag) "
-            + "JOIN n_t00 t00 ON t00.spec = shp.cspec  "
-            + "JOIN n_n45 n45 ON n45.codprof = t00.pcod "
+            + "JOIN n_t00 t00 ON (t00.spec = shp.cspec) "
+            + "JOIN n_n45 n45 ON (n45.codprof = t00.pcod) "
             + "WHERE (n45.codotd = ?) AND ((sho.cslu = 1) OR (sho.cslu =3)) ";
 
         if (srcText != null) {
@@ -170,7 +193,7 @@ public class ServerDiary extends Server implements Iface {
                     + "OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
         }
 
-        sql += "ORDER BY sho.name ";
+        sql += "ORDER BY sho.name;";
         try (AutoCloseableResultSet acrs = (srcText == null)
                 ? sse.execPreparedQuery(sql, cspec)
                 : sse.execPreparedQuery(sql, cspec,
@@ -185,10 +208,11 @@ public class ServerDiary extends Server implements Iface {
     @Override
     public final Shablon getShablon(final int idSh) throws KmiacServerException {
         final String sqlQuery = "SELECT sho.id, nd.name, sho.next, nsh.pcod,nsh.name, sht.sh_text "
-            + "FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) "
+            + "FROM sh_osm sho "
+            + "JOIN n_din nd ON (nd.pcod = sho.cdin) "
             + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
             + "JOIN n_shablon nsh ON (nsh.pcod = sht.id_n_shablon) "
-            + "WHERE sho.id = ? ORDER BY nsh.pcod;";
+            + "WHERE (sho.id = ?) ORDER BY nsh.pcod;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idSh)) {
             if (acrs.getResultSet().next()) {
                 Shablon sho = new Shablon(acrs.getResultSet().getString(2),
@@ -207,6 +231,37 @@ public class ServerDiary extends Server implements Iface {
             throw new KmiacServerException("Error loading template by its id");
         }
     }
+
+	@Override
+	public List<IntegerClassifier> getOtdFromLPU(final int clpu)
+			throws KmiacServerException {
+		final String SQLQuery = "SELECT pcod, name " +
+				"FROM n_o00 " +
+				"WHERE (clpu = ?);";
+	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(SQLQuery, clpu)) {
+    		return rsmIntClas.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQLException (getOtdFromLPU): ", e);
+        	((SQLException) e.getCause()).printStackTrace();
+        	throw new KmiacServerException();
+        }
+	}
+
+	@Override
+	public List<IntegerClassifier> getDoctorsFromOtd(final int clpu, final int cpodr)
+			throws KmiacServerException {
+		final String SQLQuery = "SELECT v.pcod, (v.fam || ' ' || v.im || ' ' || v.ot) AS name " +
+				"FROM s_vrach v " +
+				"JOIN s_mrab mr ON (mr.pcod = v.pcod) " +
+				"WHERE (mr.clpu = ?) AND (mr.cpodr = ?) AND (mr.datau IS NULL);";
+	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(SQLQuery, clpu, cpodr)) {
+    		return rsmIntClas.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQLException (getDoctorsFromOtd): ", e);
+        	((SQLException) e.getCause()).printStackTrace();
+        	throw new KmiacServerException();
+        }
+	}
 
     @Override
     public void start() throws Exception {

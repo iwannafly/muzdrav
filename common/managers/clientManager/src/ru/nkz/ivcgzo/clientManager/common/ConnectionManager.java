@@ -25,6 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -307,9 +308,7 @@ public class ConnectionManager {
 							while (!checkAll()) {
 								try {
 									if (!connecting) {
-										notify();
-										mainForm.dispatchEvent(new WindowEvent(mainForm, WindowEvent.WINDOW_CLOSING));
-										break;
+										System.exit(3);
 									}
 									Thread.sleep(500);
 								} catch (InterruptedException e) {
@@ -341,7 +340,7 @@ public class ConnectionManager {
 		JButton btnClose = new JButton("Закрыть");
 		btnClose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				reconnectForm.dispatchEvent(new WindowEvent(reconnectForm, WindowEvent.WINDOW_CLOSING));
+				closeReconnectForm();
 			}
 		});
 		GroupLayout groupLayout = new GroupLayout(reconnectForm.getContentPane());
@@ -368,16 +367,8 @@ public class ConnectionManager {
 		reconnectForm.addWindowListener(new WindowAdapter() {
 			@Override
 			public synchronized void windowClosing(WindowEvent e) {
-				try {
-					synchronized (reconnectThread) {
-						if (connecting) {
-							super.windowClosing(e);
-							connecting = false;
-							wait();
-						}
-					}
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
+				if (connecting) {
+					connecting = false;
 				}
 			}
 		});

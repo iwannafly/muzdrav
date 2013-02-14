@@ -2200,12 +2200,55 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         }
 	}
 	
-	private String setNormalName(final String sourceStr) {
+	/**
+	 * Получение строки в заданном регистре (только первый символ заглавный)
+	 * @param sourceStr Строка для преобразования
+	 * @return Возвращает преобразованную строку, либо
+	 * <code>null</code> в случае пустой строки
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	private String setNormalNameReg(final String sourceStr) {
 		if (sourceStr == null)
 			return null;
+		if (sourceStr.length() == 0)
+			return sourceStr;
 		if (sourceStr.length() == 1)
 			return sourceStr.toUpperCase();
 		return (sourceStr.substring(0, 1).toUpperCase()).concat(sourceStr.substring(1).toLowerCase());
+	}
+	
+	/**
+	 * Получение из строки содержащихся в ней слов в установленном регистре
+	 * (только первый символ каждого слова заглавный)
+	 * @param sourceStr Исходная строка
+	 * @return Возвращает слова в виде массива строк, либо
+	 * <code>null</code> в случае пустой строки
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	private String[] getNormalRegWords(final String sourceStr) {
+		if ((sourceStr == null) || (sourceStr.length() == 0))
+			return null;
+		String[] retArr = sourceStr.split(" ");
+        for(int i = 0; i < retArr.length; i++)
+        	retArr[i] = setNormalNameReg(retArr[i]);
+        return retArr;
+	}
+
+	/**
+	 * Получение из массива строк одной строки с заданным разделителем
+	 * @param sourceStrArr Исходный массив строк
+	 * @param sepStr Разделитель
+	 * @return Возвращает полученную строку
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	private String getConcatStrFromAray(final String[] sourceStrArr, final String sepStr) {
+		if ((sourceStrArr == null) || (sourceStrArr.length == 0))
+			return "";
+		String retStr = "";
+        for(int i = 0; i < sourceStrArr.length - 1; i++)
+        	retStr += sourceStrArr[i] + sepStr;
+        retStr += sourceStrArr[sourceStrArr.length - 1];
+        return retStr;
 	}
 
 	@Override
@@ -2297,9 +2340,7 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
                 	}
             }
             //Полное имя матери:
-            String[] motherNameArr = motherInfo.getFull_name().split(" ");
-            for(int i = 0; i < motherNameArr.length; i++)
-            	motherNameArr[i] = setNormalName(motherNameArr[i]);
+            String[] motherNameArr = getNormalRegWords(motherInfo.getFull_name());
             final String motherMiddleName = motherNameArr[1].concat(" ".concat(motherNameArr[2]));
             //Время рождения:
             final String childBirthTime = (childBirthInfo.isSetTimeon()) ? childBirthInfo.getTimeon() : "";
@@ -2395,10 +2436,10 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
             }
             //Место регистрации матери:
             String[] motherRegPlace = new String[] {
-        		(motherInfo.isSetAdp_obl()) ? setNormalName(motherInfo.getAdp_obl()) : "",
+        		(motherInfo.isSetAdp_obl()) ? setNormalNameReg(motherInfo.getAdp_obl()) : "",
         		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
-        		(motherInfo.isSetAdp_gorod()) ? setNormalName(motherInfo.getAdp_gorod()) : "",
-				(motherInfo.isSetAdp_ul()) ? setNormalName(motherInfo.getAdp_ul()) : "",
+        		(motherInfo.isSetAdp_gorod()) ? setNormalNameReg(motherInfo.getAdp_gorod()) : "",
+				(motherInfo.isSetAdp_ul()) ? setNormalNameReg(motherInfo.getAdp_ul()) : "",
 				(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
 				(motherInfo.isSetAdp_korp()) ? " ".concat(motherInfo.getAdp_korp()) : "",
 				(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
@@ -2411,13 +2452,13 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		sdfDay.format(childDoc.getDateoff()), months[dateOff.get(GregorianCalendar.MONTH)],
         		sdfYear.format(childDoc.getDateoff()),
         		//Ребенок родился:
-        		sdfDay.format(childInfo.getDatar()), sdfMonth.format(childInfo.getDatar()).toUpperCase(),
+        		sdfDay.format(childInfo.getDatar()), sdfMonth.format(childInfo.getDatar()),
         		sdfYear.format(childInfo.getDatar()),
         		childBirthHour, childBirthMinute,
         		//Фамилия, имя, отчество матери:
         		motherNameArr[0].concat(" ".concat(motherMiddleName)),
         		//Дата рождения матери:
-        		sdfDay.format(motherInfo.getDatar()), sdfMonth.format(motherInfo.getDatar()).toUpperCase(),
+        		sdfDay.format(motherInfo.getDatar()), sdfMonth.format(motherInfo.getDatar()),
         		sdfYear.format(motherInfo.getDatar()),
         		//Место регистрации матери:
         		motherRegPlace[0],
@@ -2442,13 +2483,13 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		sdfYear.format(childDoc.getDateoff()),
         		//Ребенок родился:
         		sdfDay.format(childInfo.getDatar()),
-        		sdfMonth.format(childInfo.getDatar()).toUpperCase(),
+        		sdfMonth.format(childInfo.getDatar()),
         		sdfYear.format(childInfo.getDatar()),
         		childBirthHour, childBirthMinute,
         		//Фамилия, имя, отчество матери:
         		motherNameArr[0], motherMiddleName,
         		//Фамилия ребёнка:
-        		setNormalName(childDoc.getFamreb()),
+        		setNormalNameReg(childDoc.getFamreb()),
         		//Дата рождения матери:
         		sdfDay.format(motherInfo.getDatar()).substring(0, 1),
         		sdfDay.format(motherInfo.getDatar()).substring(1, 2),
@@ -2472,9 +2513,9 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		motherStatus[2], motherStatus[3],
         		motherStatus[4], motherStatus[5],
         		//Место рождения:
-        		setNormalName(birthPlaceRegion),
+        		setNormalNameReg(birthPlaceRegion),
         		"",	//РАЙОН РОЖДЕНИЯ
-        		setNormalName(birthPlaceTown),
+        		setNormalNameReg(birthPlaceTown),
         		//Местность рождения:
     			cityChild1, cityChild2,
     			countryChild1, countryChild2,
@@ -2491,8 +2532,8 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
     			birthHappen[4], birthHappen[5],
     			birthHappen[6], birthHappen[7],
         		//Должность и имя врача, выдавшего свидетельство:
-        		(doctorGiveDoc != null) ? setNormalName(doctorWriteDoc.get(1)) : "",
-        		(doctorGiveDoc != null) ? doctorWriteDoc.get(0) : "",
+        		(doctorGiveDoc != null) ? setNormalNameReg(doctorGiveDoc.get(1)) : "",
+        		(doctorGiveDoc != null) ? getConcatStrFromAray(getNormalRegWords(doctorGiveDoc.get(0)), " ") : "",
         		//Образование матери:
         		motherEduc[0], motherEduc[1],
         		motherEduc[2], motherEduc[3],
@@ -2531,8 +2572,8 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		whoGetChild[2], whoGetChild[3],
         		whoGetChild[4], whoGetChild[5],
         		//Должность и имя врача, заполнившего свидетельство:
-        		(doctorWriteDoc != null) ? setNormalName(doctorWriteDoc.get(1)) : "",
-        		(doctorWriteDoc != null) ? doctorWriteDoc.get(0) : "",
+        		(doctorWriteDoc != null) ? setNormalNameReg(doctorWriteDoc.get(1)) : "",
+        		(doctorWriteDoc != null) ? getConcatStrFromAray(getNormalRegWords(doctorWriteDoc.get(0)), " ") : "",
         		//Имя руководителя организации:
         		(infoLPU.isSetZaved()) ? infoLPU.getZaved() : ""
         		);

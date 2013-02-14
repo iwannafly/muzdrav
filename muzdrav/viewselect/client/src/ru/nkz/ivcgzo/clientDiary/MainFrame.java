@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -42,12 +41,14 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftDiary.MedicalHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftDiary.Patient;
 import ru.nkz.ivcgzo.thriftDiary.Shablon;
 import ru.nkz.ivcgzo.thriftDiary.ShablonText;
 import ru.nkz.ivcgzo.thriftDiary.TMedicalHistory;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 public class MainFrame extends JFrame {
 
@@ -59,7 +60,7 @@ public class MainFrame extends JFrame {
     private Box vbMedicalHistoryTextFields;
     private Box hbMedicalHistoryTableControls;
     private JScrollPane spMedHist;
-    private CustomTable<TMedicalHistory, TMedicalHistory._Fields> tbMedHist;
+    private CustomTable<TMedicalHistory, TMedicalHistory._Fields> tblMedHist;
     private Box vbMedicalHistoryTableButtons;
     private JButton btnMedHistAdd;
     private JButton btnMedHistDel;
@@ -85,6 +86,9 @@ public class MainFrame extends JFrame {
     private JPanel pnlStatusLocalis;
     private JPanel pnlFisicalObs;
     private Patient patient;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbOtd;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbPcodOsm;
+    private int ticcbOtdSelIndex = -1;
     
     public MainFrame() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -138,26 +142,26 @@ public class MainFrame extends JFrame {
     private void setMedicalHistoryTableScrollPane() {
         spMedHist = new JScrollPane();
         spMedHist.setBorder(new MatteBorder(0, 0, 0, 1, (Color) new Color(0, 0, 0)));
-        spMedHist.setPreferredSize(new Dimension(300, 250));
+        spMedHist.setPreferredSize(new Dimension(200, 150));
         hbMedicalHistoryTableControls.add(spMedHist);
 
         addMedicalHistoryTable();
     }
 
     private void addMedicalHistoryTable() {
-        tbMedHist = new CustomTable<TMedicalHistory, TMedicalHistory._Fields>(
-            true, true, TMedicalHistory.class, 8, "Дата", 9, "Время");
-        spMedHist.setViewportView(tbMedHist);
-        tbMedHist.addMouseListener(new MouseAdapter() {
+        tblMedHist = new CustomTable<TMedicalHistory, TMedicalHistory._Fields>(
+            true, true, TMedicalHistory.class, 8, "Дата осмотра", 9, "Время осмотра");
+        spMedHist.setViewportView(tblMedHist);
+        tblMedHist.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                if (tbMedHist.getSelectedItem() != null) {
+                if (tblMedHist.getSelectedItem() != null) {
                     setMedicalHistoryText();
                 }
             }
         });
-        tbMedHist.setDateField(0);
-        tbMedHist.setTimeField(1);
+        tblMedHist.setDateField(0);
+        tblMedHist.setTimeField(1);
     }
 
     private void setMedicalHistoryTableButtonsPanel() {
@@ -246,42 +250,70 @@ public class MainFrame extends JFrame {
         addStatusPraenceComponents();
         addStatusLocalis();
         addFisicalObs();
+        
+        ticcbOtd = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        ticcbOtd.addItemListener(new ItemListener() {
+        	public void itemStateChanged(ItemEvent ie) {
+        		ticcbOtdItemStateChanged(ie);
+        	}
+        });
+        
+        ticcbPcodOsm = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        
+        JLabel lblOtd = new JLabel("Отделение:");
+        lblOtd.setLabelFor(ticcbOtd);
+        
+        JLabel lblOsm = new JLabel("Кто осматривал:");
+        lblOsm.setLabelFor(ticcbPcodOsm);
 
         GroupLayout glPnlOsmOsm = new GroupLayout(pnlOsmOsm);
         glPnlOsmOsm.setHorizontalGroup(
-            glPnlOsmOsm.createParallelGroup(Alignment.LEADING)
-                .addGroup(Alignment.TRAILING, glPnlOsmOsm.createSequentialGroup().addContainerGap()
-                    .addGroup(glPnlOsmOsm.createParallelGroup(Alignment.TRAILING)
-                        .addComponent(pnlJal, Alignment.LEADING,
-                                GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
-                        .addComponent(pnlMedicalHist, Alignment.LEADING,
-                                GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
-                        .addComponent(pnlStatusPraence, Alignment.LEADING,
-                                GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
-                        .addComponent(pnlStatusLocalis, Alignment.LEADING,
-                                GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
-                        .addComponent(pnlFisicalObs, Alignment.LEADING,
-                                GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE))
-                    .addContainerGap())
+        	glPnlOsmOsm.createParallelGroup(Alignment.LEADING)
+        		.addGroup(glPnlOsmOsm.createSequentialGroup()
+        			.addContainerGap()
+        			.addGroup(glPnlOsmOsm.createParallelGroup(Alignment.LEADING)
+        				.addGroup(glPnlOsmOsm.createSequentialGroup()
+        					.addGroup(glPnlOsmOsm.createParallelGroup(Alignment.TRAILING)
+        						.addComponent(pnlJal, GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
+        						.addComponent(pnlMedicalHist, GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
+        						.addComponent(pnlStatusPraence, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        						.addComponent(pnlStatusLocalis, GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
+        						.addComponent(pnlFisicalObs, GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
+        						.addGroup(glPnlOsmOsm.createSequentialGroup()
+        							.addComponent(lblOtd)
+        							.addPreferredGap(ComponentPlacement.RELATED, 484, Short.MAX_VALUE))
+        						.addGroup(Alignment.LEADING, glPnlOsmOsm.createSequentialGroup()
+        							.addGroup(glPnlOsmOsm.createParallelGroup(Alignment.TRAILING, false)
+        								.addComponent(ticcbPcodOsm, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 519, GroupLayout.PREFERRED_SIZE)
+        								.addComponent(ticcbOtd, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 519, GroupLayout.PREFERRED_SIZE))
+        							.addGap(26)))
+        					.addGap(0))
+        				.addGroup(glPnlOsmOsm.createSequentialGroup()
+        					.addComponent(lblOsm)
+        					.addContainerGap(460, Short.MAX_VALUE))))
         );
         glPnlOsmOsm.setVerticalGroup(
-            glPnlOsmOsm.createParallelGroup(Alignment.LEADING)
-                .addGroup(glPnlOsmOsm.createSequentialGroup().addContainerGap()
-                    .addComponent(pnlJal, GroupLayout.PREFERRED_SIZE,
-                            125, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(pnlMedicalHist, GroupLayout.PREFERRED_SIZE,
-                            125, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(pnlStatusPraence, GroupLayout.PREFERRED_SIZE,
-                            155, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(pnlStatusLocalis, GroupLayout.PREFERRED_SIZE,
-                            125, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(pnlFisicalObs, GroupLayout.PREFERRED_SIZE,
-                            125, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED))
+        	glPnlOsmOsm.createParallelGroup(Alignment.LEADING)
+        		.addGroup(glPnlOsmOsm.createSequentialGroup()
+        			.addContainerGap()
+        			.addComponent(lblOtd)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(ticcbOtd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(lblOsm)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(ticcbPcodOsm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(pnlJal, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(pnlMedicalHist, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(pnlStatusPraence, GroupLayout.PREFERRED_SIZE, 155, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(pnlStatusLocalis, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(pnlFisicalObs, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
+        			.addContainerGap())
         );
         pnlOsmOsm.setLayout(glPnlOsmOsm);
         pnlOsm.setLayout(glPnlOsm);
@@ -404,27 +436,29 @@ public class MainFrame extends JFrame {
 
     private void deleteMedHistoryFormTable() {
         try {
-            if (tbMedHist.getSelectedItem() != null) {
+            if (tblMedHist.getSelectedItem() != null) {
                 int opResult = JOptionPane.showConfirmDialog(
                     btnMedHistDel, "Удалить запись?",
                     "Удаление записи", JOptionPane.YES_NO_OPTION);
                 if (opResult == JOptionPane.YES_OPTION) {
                     ClientDiary.tcl.deleteMedicalHistory(
-                        tbMedHist.getSelectedItem().getId());
-                    tbMedHist.setData(
-                        ClientDiary.tcl.getMedicalHistory((
-                                patient.getIdGosp())));
+                        tblMedHist.getSelectedItem().getId());
+                    //Заполнение таблицы:
+                    fillMedHistoryTable();
+                    //Очистка текстовых полей:
+                    clearMedicalHistoryTextAreas();
                 }
-                if (tbMedHist.getRowCount() > 0) {
-                    tbMedHist.setRowSelectionInterval(tbMedHist.getRowCount() - 1,
-                        tbMedHist.getRowCount() - 1);
+                if (tblMedHist.getRowCount() > 0) {
+                    tblMedHist.setRowSelectionInterval(tblMedHist.getRowCount() - 1,
+                        tblMedHist.getRowCount() - 1);
                 }
-                clearMedicalHistoryTextAreas();
             }
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
-        } catch (MedicalHistoryNotFoundException e1) {
-            tbMedHist.setData(new ArrayList<TMedicalHistory>());
+        } catch (KmiacServerException e) {
+            e.printStackTrace();
+        } catch (MedicalHistoryNotFoundException e) {
+        	//Повторная загрузка данных, если запись осмотра не найдена:
+        	clearMedicalHistory();
+        	fillMedHistoryTable();
         } catch (TException e1) {
             ClientDiary.conMan.reconnect(e1);
         }
@@ -433,68 +467,133 @@ public class MainFrame extends JFrame {
 
     private void updateMedHistoryToTable() {
         try {
-            if (tbMedHist.getSelectedItem() != null) {
+        	TMedicalHistory curHist = tblMedHist.getSelectedItem();
+            if (curHist != null) {
                 int opResult = JOptionPane.showConfirmDialog(
                     btnMedHistUpd, "Обновить информацию о диагнозе?",
                     "Изменение диагноза", JOptionPane.YES_NO_OPTION);
                 if (opResult == JOptionPane.YES_OPTION) {
-                    tbMedHist.getSelectedItem().setFisicalObs(taFisicalObs.getText());
-                    tbMedHist.getSelectedItem().setJalob(taJalob.getText());
-                    tbMedHist.getSelectedItem().setMorbi(taDesiaseHistory.getText());
-                    tbMedHist.getSelectedItem().setStatusLocalis(taStatusLocalis.getText());
-                    tbMedHist.getSelectedItem().setStatusPraesense(taStatusPraence.getText());
-                    ClientDiary.tcl.updateMedicalHistory(tbMedHist.getSelectedItem());
+                	//При обновлении записи нельзя изменять номер
+                	//отделения и врачей, проводившего осмотр и добавившего запись:
+                	getMedicalMedicalHistoryText(curHist);
+                    ClientDiary.tcl.updateMedicalHistory(curHist);
                 }
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
-        } catch (TException e1) {
-            ClientDiary.conMan.reconnect(e1);
-        }
+        } catch (MedicalHistoryNotFoundException e) {
+        	//Повторная загрузка данных, если запись осмотра не найдена:
+        	clearMedicalHistory();
+        	fillMedHistoryTable();
+        } catch (TException e) {
+            ClientDiary.conMan.reconnect(e);
+        } catch (NullPointerException e) { }
     }
 
     private void addMedHistoryToTable() {
         try {
             if (patient != null) {
-                TMedicalHistory medHist = new TMedicalHistory();
-                medHist.setDataz(System.currentTimeMillis());
-                medHist.setTimez(System.currentTimeMillis());
-                medHist.setPcodVrach(ClientDiary.authInfo.getPcod());
-                medHist.setIdGosp(patient.getIdGosp());
-                medHist.setId(ClientDiary.tcl.addMedicalHistory(medHist));
-                tbMedHist.addItem(medHist);
-                tbMedHist.setData(
-                        ClientDiary.tcl.getMedicalHistory(patient.getIdGosp()));
+            	if ((ticcbOtd.getSelectedItem() == null) ||
+            		(ticcbPcodOsm.getSelectedItem() == null)) {
+					JOptionPane.showMessageDialog(this, "Не выбрано отделение или врач",
+							"Ошибка", JOptionPane.ERROR_MESSAGE);
+					return;
+            	}
+            	//Загрузка данных осмотра из текстовых полей:
+                TMedicalHistory newMedHist = new TMedicalHistory(); 
+                getMedicalMedicalHistoryText(newMedHist);
+                //Установка "скрытых значений":
+                newMedHist.setDataz(System.currentTimeMillis());
+                newMedHist.setTimez(System.currentTimeMillis());
+                newMedHist.setPcodVrach(ticcbPcodOsm.getSelectedPcod());
+                newMedHist.setCpodr(ticcbOtd.getSelectedPcod());
+                newMedHist.setPcodAdded(ClientDiary.authInfo.getPcod());
+                newMedHist.setIdGosp(patient.getIdGosp());
+                //Добавление информации об осмотре в БД:
+                newMedHist.setId(ClientDiary.tcl.addMedicalHistory(newMedHist));
+                //Заполнение таблицы:
+                fillMedHistoryTable();
+                //Очистка текстовых полей:
+                clearMedicalHistoryTextAreas();
             }
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
+        } catch (KmiacServerException e) {
+            e.printStackTrace();
         } catch (MedicalHistoryNotFoundException e) {
-            tbMedHist.setData(new ArrayList<TMedicalHistory>());
-        } catch (TException e1) {
-            ClientDiary.conMan.reconnect(e1);
-        }
+            tblMedHist.setData(new ArrayList<TMedicalHistory>());
+        } catch (TException e) {
+            ClientDiary.conMan.reconnect(e);
+        } catch (NullPointerException e) {
+        	//Ошибка создания нового объекта медицинской истории
+			e.printStackTrace();
+		}
+    }
+    
+    /**
+     * Событие, вызываемое при смене состояния элемента
+     * списка отделений
+     * @param ie Информация о произошедшем событии смены элемента
+     * @author Балабаев Никита Дмитриевич
+     */
+    private void ticcbOtdItemStateChanged(ItemEvent ie) {
+		int newIndex = ticcbOtd.getSelectedIndex();
+		if ((ie != null) && (ticcbOtd != null) &&
+			(ie.getStateChange() == ItemEvent.SELECTED) &&
+			(ticcbOtd.getSelectedItem() != null) &&
+			(newIndex != ticcbOtdSelIndex))
+	    	try {
+	    		ticcbOtdSelIndex = newIndex;
+				ticcbPcodOsm.setData(
+					ClientDiary.tcl.getDoctorsFromOtd(
+						ClientDiary.authInfo.getClpu(), ticcbOtd.getSelectedPcod()));
+			} catch (TException e) {
+				ticcbPcodOsm.setData(null);
+			}
+    }
+    
+    /**
+     * Получение текстовой информации о текущем осмотре
+     * из текстовых полей
+     * @param medHist Объект медицинской истории, в который будет
+     * загружена информация
+     * @author Балабаев Никита Дмитриевич
+     * @throws NullPointerException переданный объект был null-объектом
+     */
+    private void getMedicalMedicalHistoryText(TMedicalHistory medHist)
+    		throws NullPointerException {
+    	if (medHist == null)
+    		throw new NullPointerException();
+        if (taJalob != null)
+        	medHist.setJalob(taJalob.getText());
+        if (taDesiaseHistory != null)
+        	medHist.setMorbi(taDesiaseHistory.getText());
+        if (taFisicalObs != null)
+        	medHist.setFisicalObs(taFisicalObs.getText());
+        if (taStatusLocalis != null)
+        	medHist.setStatusLocalis(taStatusLocalis.getText());
+        if (taStatusPraence != null)
+        	medHist.setStatusPraesense(taStatusPraence.getText());
     }
 
     private void setMedicalHistoryText() {
-        if (taJalob != null) {
-            taJalob.setText(tbMedHist.getSelectedItem().getJalob());
-        }
-        if (taDesiaseHistory != null) {
-            taDesiaseHistory.setText(tbMedHist.getSelectedItem().getMorbi());
-        }
-        if (taFisicalObs != null) {
-            taFisicalObs.setText(tbMedHist.getSelectedItem().getFisicalObs());
-        }
-        if (taStatusLocalis != null) {
-            taStatusLocalis.setText(tbMedHist.getSelectedItem().getStatusLocalis());
-        }
-        if (taStatusPraence != null) {
-            taStatusPraence.setText(tbMedHist.getSelectedItem().getStatusPraesense());
-        }
+    	TMedicalHistory curMedHist = tblMedHist.getSelectedItem();
+    	if (curMedHist == null)
+    		return;
+    	ticcbOtd.setSelectedPcod(curMedHist.getCpodr());
+    	ticcbPcodOsm.setSelectedPcod(curMedHist.getPcodVrach());
+        if (taJalob != null)
+            taJalob.setText(curMedHist.getJalob());
+        if (taDesiaseHistory != null)
+            taDesiaseHistory.setText(curMedHist.getMorbi());
+        if (taFisicalObs != null)
+            taFisicalObs.setText(curMedHist.getFisicalObs());
+        if (taStatusLocalis != null)
+            taStatusLocalis.setText(curMedHist.getStatusLocalis());
+        if (taStatusPraence != null)
+            taStatusPraence.setText(curMedHist.getStatusPraesense());
     }
 
     private void clearMedicalHistory() {
-        tbMedHist.setData(Collections.<TMedicalHistory>emptyList());
+        tblMedHist.setData(Collections.<TMedicalHistory>emptyList());
         clearMedicalHistoryTextAreas();
     }
 
@@ -514,6 +613,8 @@ public class MainFrame extends JFrame {
         if (taStatusPraence != null) {
             taStatusPraence.setText("");
         }
+        ticcbOtd.setSelectedItem(null);
+        ticcbPcodOsm.setSelectedItem(null);
     }
 
     private void setMedicalHistoryVerticalShablonPanel() {
@@ -639,15 +740,20 @@ public class MainFrame extends JFrame {
         }
     }
 
+    /**
+     * Заполнение таблицы осмотров данными из БД и
+     * очистка выделения в таблице
+     */
     private void fillMedHistoryTable() {
         if (patient != null) {
             try {
-                tbMedHist.setData(
+                tblMedHist.setData(
                     ClientDiary.tcl.getMedicalHistory(patient.getIdGosp()));
-            } catch (MedicalHistoryNotFoundException e) {
-                tbMedHist.setData(Collections.<TMedicalHistory>emptyList());
+                tblMedHist.clearSelection();
             } catch (KmiacServerException e) {
                 e.printStackTrace();
+            } catch (MedicalHistoryNotFoundException e) {
+            	clearMedicalHistory();
             } catch (TException e) {
                 ClientDiary.conMan.reconnect(e);
             }
@@ -747,13 +853,11 @@ public class MainFrame extends JFrame {
         patient.setMiddlename(middlename);
         patient.setIdGosp(idGosp);
         
-
         clearMedicalHistory();
         fillMedHistoryTable();
         try {
             setMedicalHistoryShablons(ClientDiary.tcl.getShablonNames(ClientDiary.authInfo.getCpodr(), 3, null));
         } catch (KmiacServerException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (TException e) {
             e.printStackTrace();
@@ -762,8 +866,10 @@ public class MainFrame extends JFrame {
     }
 
     public void onConnect() {
-        // TODO Auto-generated method stub
-        
+    	try {
+			ticcbOtd.setData(ClientDiary.tcl.getOtdFromLPU(ClientDiary.authInfo.getClpu()));
+		} catch (TException e) {
+			ticcbOtd.setData(null);
+		}
     }
-
 }

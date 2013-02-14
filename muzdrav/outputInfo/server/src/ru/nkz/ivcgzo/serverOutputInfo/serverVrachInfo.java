@@ -23,8 +23,6 @@ import ru.nkz.ivcgzo.thriftOutputInfo.VrachInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.VrachTabel;
 
 public class serverVrachInfo extends serverTemplate {
-	private ISqlSelectExecutor sse;
-	ITransactedSqlExecutor tse;
 	private static Logger log = Logger.getLogger(serverVrachInfo.class.getName());
 	private TResultSetMapper<VrachInfo, VrachInfo._Fields> tableVrachInfo;
 	private static Class<?>[] VrachInfoTypes;
@@ -32,8 +30,8 @@ public class serverVrachInfo extends serverTemplate {
 	private static Class<?>[] VrachTabelTypes;
 	
 	public serverVrachInfo (ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
-		this.sse = sse;
-		this.tse = tse;
+		super(sse, tse);
+
 		//Таблица VrachInfo
 				tableVrachInfo = new TResultSetMapper<>(VrachInfo.class, "pcod","fam","im","ot","cdol");
 				VrachInfoTypes = new Class<?>[]{Integer.class,String.class,String.class,String.class,String.class};
