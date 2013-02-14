@@ -85,6 +85,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmorfNotFoundException;
+import javax.swing.JTextField;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -140,6 +141,7 @@ public class PacientInfoFrame extends JFrame {
     private CustomTextField tf_smpn;
     private CustomTextField tf_nist;
     private CustomTextField tf_srok_ber;
+    private CustomTextField tf_komm;
     private JRadioButton rbtn_pol_m;
     private JRadioButton rbtn_pol_j;
     private JRadioButton rbtn_pol_pr_m;
@@ -2549,6 +2551,10 @@ public class PacientInfoFrame extends JFrame {
 
         cbx_messr = new JCheckBox("сообщение родственникам");
         cbx_messr.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        
+        tf_komm = new CustomTextField();
+        tf_komm.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        tf_komm.setColumns(10);
         GroupLayout gl_panel_34 = new GroupLayout(panel_34);
         gl_panel_34.setHorizontalGroup(
         	gl_panel_34.createParallelGroup(Alignment.LEADING)
@@ -2557,15 +2563,16 @@ public class PacientInfoFrame extends JFrame {
         				.addGroup(gl_panel_34.createSequentialGroup()
         					.addComponent(lblNewLabel_62)
         					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addComponent(cmb_cotd, GroupLayout.DEFAULT_SIZE, 690, Short.MAX_VALUE))
+        					.addComponent(cmb_cotd, GroupLayout.DEFAULT_SIZE, 752, Short.MAX_VALUE))
         				.addGroup(gl_panel_34.createSequentialGroup()
         					.addComponent(panel_35, GroupLayout.PREFERRED_SIZE, 198, GroupLayout.PREFERRED_SIZE)
         					.addPreferredGap(ComponentPlacement.UNRELATED)
         					.addComponent(panel_36, GroupLayout.PREFERRED_SIZE, 312, GroupLayout.PREFERRED_SIZE)
         					.addGap(57)
         					.addComponent(cbx_messr)
-        					.addGap(0, 0, Short.MAX_VALUE)))
-        			.addGap(143))
+        					.addPreferredGap(ComponentPlacement.RELATED)
+        					.addComponent(tf_komm, GroupLayout.PREFERRED_SIZE, 164, GroupLayout.PREFERRED_SIZE)))
+        			.addGap(65))
         );
         gl_panel_34.setVerticalGroup(
         	gl_panel_34.createParallelGroup(Alignment.LEADING)
@@ -2577,7 +2584,9 @@ public class PacientInfoFrame extends JFrame {
         						.addComponent(panel_36, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
         					.addGap(9))
         				.addGroup(gl_panel_34.createSequentialGroup()
-        					.addComponent(cbx_messr)
+        					.addGroup(gl_panel_34.createParallelGroup(Alignment.BASELINE)
+        						.addComponent(cbx_messr)
+        						.addComponent(tf_komm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         					.addGap(18)))
         			.addGroup(gl_panel_34.createParallelGroup(Alignment.BASELINE)
         				.addComponent(lblNewLabel_62)
@@ -3780,6 +3789,9 @@ public class PacientInfoFrame extends JFrame {
             if (Id_gosp.getSrok_ber() != null){
                 tf_srok_ber.setText(Id_gosp.getSrok_ber());
             }
+            if (Id_gosp.getKomm() != null) {
+                tf_komm.setText(Id_gosp.getKomm());
+            }
         } catch (GospNotFoundException gnfe) {
             System.out.println("Информации нет.");
         } catch (Exception e) {
@@ -3841,6 +3853,7 @@ public class PacientInfoFrame extends JFrame {
             tf_timesmp.setValue(null);
             tf_ntalon.setText(null);
             tf_nist.setText(null);
+            tf_komm.setText(null);
             tf_srok_ber.setText(null);
             tf_diag_n.setText(null);
             tf_diag_p.setText(null);
@@ -3908,6 +3921,7 @@ public class PacientInfoFrame extends JFrame {
             if (!tf_smpn.getText().isEmpty()) Id_gosp.setSmp_num(Integer.valueOf(tf_smpn.getText()));
             if (!tf_ntalon.getText().isEmpty()) Id_gosp.setNtalon(Integer.valueOf(tf_ntalon.getText()));
             if (!tf_srok_ber.getText().isEmpty()) Id_gosp.setSrok_ber(tf_srok_ber.getText()); 
+            if (!tf_komm.getText().isEmpty()) Id_gosp.setKomm(tf_komm.getText()); 
 
             if (rbtn_plan.isSelected()) Id_gosp.setPl_extr(2);
             if (rbtn_extr.isSelected()) Id_gosp.setPl_extr(1);
