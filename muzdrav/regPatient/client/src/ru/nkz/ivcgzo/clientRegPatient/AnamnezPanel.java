@@ -3,6 +3,8 @@ package ru.nkz.ivcgzo.clientRegPatient;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,21 +81,20 @@ public class AnamnezPanel extends JPanel{
 		});
 		
 		JButton btn_PrintAn = new JButton("Печать");
-		btn_PrintAn.setVisible(false);
 		btn_PrintAn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//                String servPath;
-//                try {
-//                    servPath = MainForm.tcl.printAnamnez(PacientInfoFrame.PersonalInfo, tbl_ane.getData(), MainForm.authInfo);
-//                    String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
-//                    MainForm.conMan.transferFileFromServer(servPath, cliPath);
-//                    MainForm.conMan.openFileInEditor(cliPath, false);
-//                } catch (TException e1) {
-//                    MainForm.conMan.reconnect((TException) e1);
-//                    e1.printStackTrace();
-//                } catch (IOException e1) {
-//                    e1.printStackTrace();
-//                }
+                String servPath;
+                try {
+                    servPath = MainForm.tcl.printAnamnez(PacientInfoFrame.PersonalInfo, AnamnezEpidInfo, MainForm.authInfo);
+                    String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+                    MainForm.conMan.transferFileFromServer(servPath, cliPath);
+                    MainForm.conMan.openFileInEditor(cliPath, false);
+                } catch (TException e1) {
+                    MainForm.conMan.reconnect((TException) e1);
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
 			}
 		});
 		GroupLayout gl_pl_btn = new GroupLayout(pl_btn);

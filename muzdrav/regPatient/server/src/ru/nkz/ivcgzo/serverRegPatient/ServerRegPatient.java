@@ -1921,11 +1921,12 @@ public class ServerRegPatient extends Server implements Iface {
 	            	try (AutoCloseableResultSet acr = sse.execPreparedQuery(sqlQuery, uai.getCpodr())) {
 						if (acr.getResultSet().next()){
 		      				prlpu = acr.getResultSet().getInt("prlpu");
-							if (acr.getResultSet().getInt("prlpu") == 5){
-		          				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
-		      				}else{
-		          				sb.append("<h4 align=center> <b>ПЕРВИЧНЫЙ ОСМОТР В ПРИЕМНО-ДИАГНОСТИЧЕСКОМ ОТДЕЛЕНИИ</b> </h4>");
-		      				}
+	          				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
+//							if (acr.getResultSet().getInt("prlpu") == 5){
+//		          				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
+//		      				}else{
+//		          				sb.append("<h4 align=center> <b>ПЕРВИЧНЫЙ ОСМОТР В ПРИЕМНО-ДИАГНОСТИЧЕСКОМ ОТДЕЛЕНИИ</b> </h4>");
+//		      				}
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -1958,9 +1959,10 @@ public class ServerRegPatient extends Server implements Iface {
 		      					if (acr.getResultSet().getString("numline") != null)
  			      						sb.append(String.format("%s %s ", acr.getResultSet().getString("numline"), acr.getResultSet().getString("name")));
 		      					else sb.append(String.format("%s ", acr.getResultSet().getString("name")));
-		      					if (acr.getResultSet().getString("yn").equals("T"))
+		      					System.out.println(acr.getResultSet().getString("yn"));
+		      					if (acr.getResultSet().getString("yn").equalsIgnoreCase("T"))
 		      						if(elemAnam.isVybor())sb.append("<b>да </b>"); else sb.append("<b>нет </b>");
-		      					if (elemAnam.getComment() != null) sb.append(String.format("%s ", elemAnam.getComment().toLowerCase()));
+		      					if (elemAnam.getComment() != null) sb.append(String.format("<b>%s</b> ", elemAnam.getComment().toLowerCase()));
    		      					numline = acr.getResultSet().getInt("numstr");
    							}
    						} catch (Exception e) {
@@ -1971,10 +1973,10 @@ public class ServerRegPatient extends Server implements Iface {
    	   		            sb.append(String.format("<br><br>Подпись  _______________________________________________    %1$td.%1$tm.%1$tY г. <br><br>", new Date(System.currentTimeMillis())));
    	   					sb.append(String.format("Подпись врача __________________________________________    %1$td.%1$tm.%1$tY г.<br>", new Date(System.currentTimeMillis())));
    					}else{
-   	   					sb.append("Согласие на госпитализацию:   Я, __________________________________________________,<br>");
+   	   					sb.append("<br>Согласие на госпитализацию:   Я, __________________________________________________,<br>");
    	   					sb.append("как родитель/законный представитель __________________________________________________,<br>");
    	   		            sb.append(String.format("<br><br>Подпись врача _______________________________________________    %1$td.%1$tm.%1$tY г. <br><br>", new Date(System.currentTimeMillis())));
-   	   					sb.append(String.format("Подпись медицинской сестры __________________________________________    %1$td.%1$tm.%1$tY г.<br>", new Date(System.currentTimeMillis())));
+   	   					sb.append(String.format("Подпись медицинской сестры ________________________________________    %1$td.%1$tm.%1$tY г.<br>", new Date(System.currentTimeMillis())));
    					}
 
 					osw.write(sb.toString());
