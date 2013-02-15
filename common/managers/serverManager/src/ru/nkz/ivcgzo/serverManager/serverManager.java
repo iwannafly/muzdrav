@@ -19,12 +19,14 @@ import ru.nkz.ivcgzo.adminManager.AdminController;
 import ru.nkz.ivcgzo.serverManager.common.IServer;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
+import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ThreadedServer;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 
 public class serverManager extends AdminController {
+	public static serverManager instance;
 	public enum DatabaseDriver {
 		firebird,
 		postgre,
@@ -35,9 +37,10 @@ public class serverManager extends AdminController {
 	public static final int ERR_CONN_TO_DB = 2;
 	public static final int ERR_LOAD_SERVER = 3;
 	public static DatabaseDriver driver = DatabaseDriver.postgre;
-	public static final String pluginsDirectory = "plugin";
+	private static final String pluginsDirectory = "plugin";
 	
-	private static Map<String, IServer> plugins;
+	private static Map<String, ThreadedServer> pluginsStr;
+	private static Map<Integer, ThreadedServer> pluginsId;
 	private static ISqlSelectExecutor sse;
 	private static ITransactedSqlExecutor tse;
 
@@ -67,9 +70,14 @@ public class serverManager extends AdminController {
 
 	}
 	
+	public serverManager() {
+		instance = this;
+	}
+	
 	public void ConnectToDatabase(DatabaseDriver type, String host, String port, String name, String params, int count, String user, String pass) throws Exception {
 		String conn;
 		
+		driver = type;
 		switch (type) {
 		case firebird:
 			Class.forName("org.firebirdsql.jdbc.FBDriver");
@@ -101,7 +109,8 @@ public class serverManager extends AdminController {
 	 * Загружает все плагины из директории <code>pluginsDirectory</code>.
 	 */
 	public void loadPlugins(){
-		plugins = new HashMap<>();
+		pluginsStr = new HashMap<>();
+		pluginsId = new HashMap<>();
 		String corePath = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath();
 		File[] files = new File(corePath, pluginsDirectory).listFiles(new FileFilter() {
 			
@@ -146,16 +155,23 @@ public class serverManager extends AdminController {
 			URLClassLoader clLdr = new URLClassLoader(new URL[] {file.toURI().toURL()});
 			Class<?> plug = clLdr.loadClass(clName);
 			Constructor<?> cntr = plug.getConstructor(ISqlSelectExecutor.class, ITransactedSqlExecutor.class);
-			plugins.put(fileName.substring(0, fileName.length() - 4), new ThreadedServer((IServer) cntr.newInstance(sse, tse)));
+			IServer isrv = (IServer) cntr.newInstance(sse, tse);
+			ThreadedServer tsrv = new ThreadedServer(isrv);
+			pluginsStr.put(fileName.substring(0, fileName.length() - 4), tsrv);
+			pluginsId.put(isrv.getId(), tsrv);
 		} catch (Exception e) {
 			throw new Exception(e);
 		}
 	}
 	
+	public Server getServerById(int id) {
+		return (Server) pluginsId.get(id).getServer();
+	}
+	
 	@Override
 	public void startServers() throws Exception {
 		try {
-			if (plugins.isEmpty())
+			if (pluginsStr.isEmpty())
 				loadPlugins();
 			doServerAction(this.getClass().getMethod("startServer" , String.class));
 		} catch (Exception e) {
@@ -165,15 +181,15 @@ public class serverManager extends AdminController {
 	
 	@Override
 	public void startServer(String name) throws Exception {
-		IServer plug;
+		ThreadedServer plug;
 		
 		try {
-			plug = plugins.get(name);
+			plug = pluginsStr.get(name);
 			if (plug != null)
 				plug.start();
 			else {
 				loadPlugin(name.concat(".jar"));
-				plugins.get(name).start();
+				pluginsStr.get(name).start();
 			}
 		} catch (Exception e) {
 			throw new Exception(String.format("Error starting server '%s': %s", name, e.getMessage()), e);
@@ -191,10 +207,10 @@ public class serverManager extends AdminController {
 	
 	@Override
 	public void pauseServer(String name) throws Exception {
-		IServer plug;
+		ThreadedServer plug;
 		
 		try {
-			plug = plugins.get(name);
+			plug = pluginsStr.get(name);
 			if (plug != null)
 				plug.stop();
 			else
@@ -217,14 +233,14 @@ public class serverManager extends AdminController {
 	public void stopServer(String name) throws Exception {
 		try {
 			pauseServer(name);
-			plugins.remove(name);
+			pluginsStr.remove(name);
 		} catch (Exception e) {
 			throw new Exception(String.format("Error stopping server '%s': %s", name, e.getMessage()), e);
 		}
 	}
 	
 	private void doServerAction(Method act) throws Exception {
-		String[] servNames = plugins.keySet().toArray(new String[] {});
+		String[] servNames = pluginsStr.keySet().toArray(new String[] {});
 		try {
 			for (String name : servNames) {
 				act.invoke(this, name);
@@ -241,7 +257,7 @@ public class serverManager extends AdminController {
 
 	@Override
 	public List<String> getServerList() throws Exception {
-		return new ArrayList<>(plugins.keySet());
+		return new ArrayList<>(pluginsStr.keySet());
 	}
 	
 }

@@ -13,10 +13,13 @@ public abstract class Server implements IServer {
 		this.tse = tse;
 	}
 	
-	@Override
-	public abstract void start() throws Exception;
-	
-	@Override
-	public abstract void stop();
+	/**
+	 * Выполняет указанный метод плагина-сервера.
+	 * @param id - идентификатор метода
+	 * @param params - параметры для передачи в метод
+	 */
+	public Object executeServerMethod(int id, Object... params) throws Exception {
+		throw new Exception("Not implemented. You must override this method in child class.");
+	}
 	
 }

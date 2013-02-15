@@ -233,6 +233,21 @@ public class ServerViewSelect extends Server implements Iface {
     }
 
 	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
+	@Override
 	public List<IntegerClassifier> getVSIntegerClassifierView(String className) throws TException {
 		final String sqlQuery = "SELECT pcod, name FROM " + className;
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIVS =

@@ -283,6 +283,21 @@ public class ServerHospital extends Server implements Iface {
         // TODO Тест соединения. ХЗ что тут должно быть
     }
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
     @Override
     public void saveUserConfig(final int id, final String config) throws TException {
         // TODO Сохранение конфигурации пользователя. ХЗ что тут должно быть.
