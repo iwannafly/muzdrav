@@ -900,11 +900,18 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
 			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
 			sb.append("<head>");
-				sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-				sb.append("<title>Направление на…</title>");
+			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+			sb.append("<title>Направление на…</title>");
+			sb.append("<style type=\"text/css\" media=\"print\">");
+			sb.append("div.page	{ ");
+			sb.append("writing-mode: tb-rl;");
+			sb.append("height: 80%;");
+			sb.append("margin: 10% 0%;");
+			sb.append("}");
+			sb.append("</style>");
 			sb.append("</head>");
 			sb.append("<body>");
-			sb.append("<div>");
+			sb.append("<div class='page'>");
 			
 			sb.append("<table cellpadding=\"5\" cellspacing=\"0\">");
 			sb.append("<tr valign=\"top\">");
@@ -1543,9 +1550,13 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append("<title>Вкладыш в амб.карту</title>");
 			sb.append("</head>");
 			sb.append("<body>");
+			sb.append("<div>");
+			sb.append("<table cellpadding=\"5\" cellspacing=\"0\">");
+			sb.append("<tr valign=\"top\" style=\"height:normal;\">");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px; font: 10px times new roman;\" width=\"60%\">");
 				acrs = sse.execPreparedQuery("select datap,cpos,n_p0c.name,n_opl.name,n_abs.name FROM p_vizit_amb left join n_p0c on(p_vizit_amb.cpos=n_p0c.pcod) left join n_opl on(p_vizit_amb.opl=n_opl.pcod) left join n_abs on(p_vizit_amb.mobs=n_abs.pcod) where id=?", pk.getPvizit_ambId());
 				if (acrs.getResultSet().next()) {
-					sb.append(String.format("<b>Дата</b> %1$td.%1$tm.%1$tY", acrs.getResultSet().getDate(1)));
+					sb.append(String.format("<b>Дата посещения </b> %1$td.%1$tm.%1$tY", acrs.getResultSet().getDate(1)));
 					if (acrs.getResultSet().getString(3)!=null) sb.append(String.format("<br><b>Цель посещения </b>%s", acrs.getResultSet().getString(3)));
 					if (acrs.getResultSet().getString(4)!=null) sb.append(String.format("<br><b>Вид оплаты </b>%s", acrs.getResultSet().getString(4)));
 					if (acrs.getResultSet().getString(5)!=null) sb.append(String.format("<br><b>Место обслуживания </b>%s", acrs.getResultSet().getString(5)));
@@ -1631,35 +1642,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 //						}
 //					acrs.close();
 					
-					acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav, p_vizit_amb.datap " +
-						"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) join n_ldi  on (n_ldi.pcod = p_rez_l.cpok)  " +
-						"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
-						"where p_isl_ld.id_pos = ? " +
-						"union " +
-						"select p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, p_isl_ld.datav, p_vizit_amb.datap " +
-						"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl) join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)  " +
-						"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
-						"where p_isl_ld.id_pos = ? ", pk.getPvizit_ambId(), pk.getPvizit_ambId());
-					if (acrs.getResultSet().isBeforeFirst()) {
-						sb.append("<br><br><b>Назначенные исследования </b><br>");
-						while (acrs.getResultSet().next()) {
-							if (acrs.getResultSet().getString(4) != null) {
-								sb.append("<table width=\"65%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 12px times new roman;\">Код</th><th>Наименование показателя</th><th>Результат</th></tr>");
-								do {
-									sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 12px times new roman;\"> %s </th><th style=\"font: 12px times new roman;\"> %s </th><th style=\"font: 12px times new roman;\"> %s </th></tr>", acrs.getResultSet().getString(2), acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
-								} 
-								while (acrs.getResultSet().next());
-							}
-							else {
-								sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 12px times new roman;\">Код</th><th>Наименование показателя</th><th>Результат</th></tr>");
-								do {
-									sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 12px times new roman;\"> %s </th><th style=\"font: 12px times new roman;\"> %s </th><th style=\"font: 12px times new roman;\">  </th></tr>", acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-								} 
-								while (acrs.getResultSet().next());
-							}
-						}		sb.append("</table><br>");		
-					}
-					acrs.close();
 					
 					acrs = sse.execPreparedQuery("select p_vizit.recomend,p_vizit.zakl,p_vizit.lech, n_ap0.name from p_vizit left join n_ap0 on (p_vizit.ishod=n_ap0.pcod) where id=?", pk.getPvizit_id()); 
 					if (acrs.getResultSet().next()) {
@@ -1685,7 +1667,40 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				if (acrs.getResultSet().next())
 					sb.append(String.format("%s %s %s",acrs.getResultSet().getString(1),acrs.getResultSet().getString(2),acrs.getResultSet().getString(3)));
 				sb.append("<br>Подпись ____________");
-			sb.append("<body>");
+				sb.append("<td style=\"border: 1px solid black; padding: 5px; font: 10px times new roman;\" width=\"40%\">");
+				acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav, p_vizit_amb.datap " +
+						"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) join n_ldi  on (n_ldi.pcod = p_rez_l.cpok)  " +
+						"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
+						"where p_isl_ld.id_pos = ? " +
+						"union " +
+						"select p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, p_isl_ld.datav, p_vizit_amb.datap " +
+						"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl) join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)  " +
+						"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
+						"where p_isl_ld.id_pos = ? ", pk.getPvizit_ambId(), pk.getPvizit_ambId());
+					if (acrs.getResultSet().isBeforeFirst()) {
+						sb.append("<b>Назначенные исследования </b><br>");
+						while (acrs.getResultSet().next()) {
+							if (acrs.getResultSet().getString(4) != null) {
+								sb.append("<table border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">Код</th><th style=\"font: 10px times new roman;\">Наименование показателя</th><th style=\"font: 10px times new roman;\">Результат</th></tr>");
+								do {
+									sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\"> %s </th></tr>", acrs.getResultSet().getString(2), acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
+								} 
+								while (acrs.getResultSet().next());
+							}
+							else {
+								sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">Код</th><th>Наименование показателя</th><th>Результат</th></tr>");
+								do {
+									sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\">  </th></tr>", acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+								} 
+								while (acrs.getResultSet().next());
+							}
+						}		sb.append("</table><br>");		
+					}
+					acrs.close();
+					
+				sb.append("</td></tr></table></div>");
+				sb.append("</body>");
+				sb.append("</html>");
 			
 			osw.write(sb.toString());
 			return path;}
