@@ -15,6 +15,7 @@ struct TMedicalHistory{
 	9: optional i64 dataz;
 	10: optional i64 timez;
 	11: optional i32 cpodr;
+	12: optional i32 pcodAdded;
 }
 
 struct Patient {
@@ -48,8 +49,10 @@ service ThriftDiary extends kmiacServer.KmiacServer {
 	list<TMedicalHistory> getMedicalHistory(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse,
 		2: MedicalHistoryNotFoundException mhnfe);
 	i32 addMedicalHistory(1:TMedicalHistory medHist) throws (1:kmiacServer.KmiacServerException kse);
-	void updateMedicalHistory(1:TMedicalHistory medHist) throws (1:kmiacServer.KmiacServerException kse);
-	void deleteMedicalHistory(1:i32 id) throws (1:kmiacServer.KmiacServerException kse);
+	void updateMedicalHistory(1:TMedicalHistory medHist)
+		throws (1:kmiacServer.KmiacServerException kse, 2:MedicalHistoryNotFoundException mhnfe);
+	void deleteMedicalHistory(1:i32 id)
+		throws (1:kmiacServer.KmiacServerException kse, 2:MedicalHistoryNotFoundException mhnfe);
 
 	list<classifier.IntegerClassifier> getShablonNames(1:i32 cspec, 2:i32 cslu, 3:string srcText)
 		throws (1:kmiacServer.KmiacServerException kse);

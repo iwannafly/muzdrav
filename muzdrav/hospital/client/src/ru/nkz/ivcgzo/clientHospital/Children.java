@@ -40,13 +40,13 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.ChildDocNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.ChildbirthNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Svid_Rojd;
 
 //TODO: ЮНИТ-ТЕСТИРОВАНИЕ
-//TODO: РЕГИСТР ИМЁН СОБСТВЕННЫХ В СВИДЕТЕЛЬСТВЕ О РОЖДЕНИИ (имена врачей, заведующего)
 //TODO: НАЙТИ КАРТИНКУ ДЛЯ ВКЛАДКИ
 /**
  * Панель ввода\редактирования\отображения информации о новорождённом,
@@ -490,7 +490,7 @@ public final class Children extends JPanel {
 	 */
 	private void printChildDocument()
 			throws KmiacServerException, ChildDocNotFoundException,
-			FileNotFoundException, IOException, TException {
+			ChildbirthNotFoundException, FileNotFoundException, IOException, TException {
 		if ((this.childInfo != null) && (this.childDoc != null)) {
 			String clientPath;
 			final int ndoc = this.childDoc.getNdoc();
@@ -530,11 +530,16 @@ public final class Children extends JPanel {
 			}
 		} catch (PatientNotFoundException e) {
 			JOptionPane.showMessageDialog(this, "Информация о новорождённом " +
-					"отсутствует", "Ошибка", JOptionPane.ERROR_MESSAGE);
+					"или матери отсутствует", "Ошибка", JOptionPane.ERROR_MESSAGE);
 			this.childInfo = null;
 		} catch (ChildDocNotFoundException e) {
 			JOptionPane.showMessageDialog(this, "Свидетельство не найдено",
 					"Ошибка", JOptionPane.ERROR_MESSAGE);
+			this.childDoc = null;
+		} catch (ChildbirthNotFoundException e) {
+			JOptionPane.showMessageDialog(this, "Информация о родах не найдена",
+					"Ошибка", JOptionPane.ERROR_MESSAGE);
+			this.childInfo = null;
 			this.childDoc = null;
 		} catch (TException e) {		//Поглощает KmiacServerException
 			e.printStackTrace();

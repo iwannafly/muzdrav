@@ -41,7 +41,7 @@ public class ServerDiary extends Server implements Iface {
     
     private static final String[] MEDICAL_HISTORY_FIELD_NAMES = {
         "id", "id_gosp", "jalob", "morbi", "status_praesense", "status_localis",
-        "fisical_obs", "pcod_vrach", "dataz", "timez", "cpodr"
+        "fisical_obs", "pcod_vrach", "dataz", "timez", "cpodr", "pcod_added"
     };
     private static final String[] INT_CLAS_FIELD_NAMES = {
         "pcod", "name"
@@ -49,8 +49,8 @@ public class ServerDiary extends Server implements Iface {
     private static final Class<?>[] MEDICAL_HISTORY_TYPES = {
     //  id             id_gosp       jalob         morbi          st_praesense  status_localis
         Integer.class, Integer.class, String.class, String.class, String.class, String.class,
-    //  fisical_obs   pcod_vrach		dataz		timez		cpodr
-        String.class, Integer.class,	Date.class,	Time.class,	Integer.class
+    //  fisical_obs   pcod_vrach		dataz		timez		cpodr			pcod_added
+        String.class, Integer.class,	Date.class,	Time.class,	Integer.class,	Integer.class
     };
 
     public ServerDiary(final ISqlSelectExecutor sse, final ITransactedSqlExecutor tse) {
@@ -93,6 +93,26 @@ public class ServerDiary extends Server implements Iface {
 		return configuration.appName;
 	}
 	
+	/**
+	 * Проверка существования записи осмотра
+	 * @param idMedHist Уникальный номер записи осмотра
+	 * @return Возвращает <code>true</code>, если информация об осмотре существует;
+	 * иначе - <code>false</code>
+	 * @author Балабаев Никита Дмитриевич
+	 */
+    private boolean isMedicalHistoryExist(final int idMedHist) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+                "SELECT * " +
+                "FROM c_osmotr " +
+                "WHERE (id = ?);", idMedHist)) {
+            return acrs.getResultSet().next();
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQLException (isMedicalHistoryExist): ", e);
+			((SQLException) e.getCause()).printStackTrace();
+            return false;
+        }
+    }
+
     @Override
     public final List<TMedicalHistory> getMedicalHistory(final int idGosp)
             throws KmiacServerException, MedicalHistoryNotFoundException {
@@ -105,7 +125,7 @@ public class ServerDiary extends Server implements Iface {
             if (tmpMedHistories.size() > 0) {
                 return tmpMedHistories;
             } else {
-                log.log(Level.INFO,  "MedicalHistoryNotFoundException, idGosp = " + idGosp);
+                log.log(Level.INFO, "MedicalHistoryNotFoundException, idGosp = " + idGosp);
                 throw new MedicalHistoryNotFoundException();
             }
         } catch (SQLException e) {
@@ -117,11 +137,11 @@ public class ServerDiary extends Server implements Iface {
     @Override
     public final int addMedicalHistory(final TMedicalHistory medHist)
             throws KmiacServerException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
         final String sqlQuery = "INSERT INTO c_osmotr (id_gosp, jalob, "
             + "morbi, status_praesense, status_localis, "
-            + "fisical_obs, pcod_vrach, dataz, timez, cpodr) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            + "fisical_obs, pcod_vrach, dataz, timez, cpodr, pcod_added) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, true, medHist, MEDICAL_HISTORY_TYPES, indexes);
             int id = sme.getGeneratedKeys().getInt("id");
@@ -129,16 +149,19 @@ public class ServerDiary extends Server implements Iface {
             return id;
         } catch (InterruptedException | SQLException e) {
             e.printStackTrace();
-            log.log(Level.ERROR, "SqlException", e);
+            log.log(Level.ERROR, "SqlException (addMedicalHistory)", e);
             throw new KmiacServerException();
         }
     }
 
     @Override
     public final void updateMedicalHistory(final TMedicalHistory medHist)
-            throws KmiacServerException {
+            throws KmiacServerException, MedicalHistoryNotFoundException {
+    	if (!isMedicalHistoryExist(medHist.getId()))
+    		throw new MedicalHistoryNotFoundException();
         final int[] indexes = {2, 3, 4, 5, 6, 8, 9, 0};
-        //Изменить номер отделения и врача нельзя (в списке параметров не присутствуют):
+        //Изменить номер номер истории болезни, отделения и врачей (проводившего осмотр
+        // и добавившего запись) нельзя (в списке параметров не присутствуют):
         final String sqlQuery = "UPDATE c_osmotr SET jalob = ?, "
             + "morbi = ?, status_praesense = ?, "
             + "status_localis = ?, fisical_obs = ?, dataz = ?, timez = ? "
@@ -154,7 +177,10 @@ public class ServerDiary extends Server implements Iface {
     }
 
     @Override
-    public final void deleteMedicalHistory(final int id) throws KmiacServerException {
+    public final void deleteMedicalHistory(final int id)
+    		throws KmiacServerException, MedicalHistoryNotFoundException {
+    	if (!isMedicalHistoryExist(id))
+    		throw new MedicalHistoryNotFoundException();
         final String sqlQuery = "DELETE FROM c_osmotr WHERE (id = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared(sqlQuery, false, id);

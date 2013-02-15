@@ -203,7 +203,8 @@ struct Gosp{
 	37:optional string jalob,
 	38:optional i32 vid,
 	39:optional bool pr_ber,
-	40:optional string srok_ber
+	40:optional string srok_ber,
+	41:optional string komm
 }
 
 /**
