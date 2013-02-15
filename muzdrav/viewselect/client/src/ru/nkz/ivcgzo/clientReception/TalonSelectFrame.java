@@ -257,7 +257,6 @@ public class TalonSelectFrame extends JFrame {
                     e1.printStackTrace();
                     MainForm.conMan.reconnect(e1);
                 } catch (RuntimeException re) {
-                    re.printStackTrace();
                     cbxSpeciality.setSelectedIndex(0);
                 }
             }
@@ -441,8 +440,9 @@ public class TalonSelectFrame extends JFrame {
             TalonTableModel tbtModel = new TalonTableModel(
                     cbxPoliclinic.getSelectedItem().getPcod(),
                     cbxSpeciality.getSelectedItem().getPcod(),
-                    cbxDoctor.getSelectedItem().getPcod()
-            );
+                    cbxDoctor.getSelectedItem().getPcod(),
+                    curPatient.getId(),
+            		curPatient.getIdPvizit() > 0);
             tbTalonSelect.setModel(tbtModel);
         } else {
             tbTalonSelect.setModel(new TalonTableModel());
@@ -456,37 +456,44 @@ public class TalonSelectFrame extends JFrame {
         tbTalonSelect.setRowHeight(50);
         tbTalonSelect.addMouseListener(new MouseAdapter() {
             public void mouseClicked(final MouseEvent e) { //TODO отрефакторить
-                JTable curTable = (JTable) e.getSource();
+            	if (curPatient == null) {
+                    JOptionPane.showMessageDialog(
+                        TalonSelectFrame.this.getContentPane(), "Пациент не выбран",
+                        "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+            	JTable curTable = (JTable) e.getSource();
                 final int curRow = curTable.getSelectedRow();
                 final int curColumn = curTable.getSelectedColumn();
-                final int indexOfSelectedOption = JOptionPane.showConfirmDialog(
+                final Talon curTalon = ((TalonTableModel) curTable.getModel()).getTalonList()
+                        .getTalonByDay(curRow, curColumn);
+                final int indexOfSelectedOption = (curTalon == null) ? -1 : 
+                		JOptionPane.showConfirmDialog(
                         TalonSelectFrame.this.getContentPane(),
                         String.format("Записать на приём %s?", curTable.getColumnName(curColumn)),
                         "Выбор талона", JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
                 if (indexOfSelectedOption  == 0) {
-                    Talon curTalon = ((TalonTableModel) curTable.getModel()).getTalonList()
-                        .getTalonByDay(curRow, curColumn);
                     try {
-                        if ((curTalon != null) && (curPatient != null)) {
-                            MainForm.tcl.reserveTalon(curPatient, curTalon);
-                            refreshTalonTableModel();
-                        } else if (curPatient == null) {
-                            JOptionPane.showMessageDialog(
-                                TalonSelectFrame.this.getContentPane(), "Пациент не выбран",
-                                "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
-                        }
+                        MainForm.tcl.reserveTalon(curPatient, curTalon);
+                        refreshTalonTableModel();
                     } catch (PatientHasSomeReservedTalonsOnThisDay e1) {
                         JOptionPane.showMessageDialog(
                                 TalonSelectFrame.this.getContentPane(),
                                 "Пациент уже записан на выбранную дату к выбранному врачу",
                                 "Ошибка!", JOptionPane.ERROR_MESSAGE);
-                    } catch (TException e1) {
-                        MainForm.conMan.reconnect(e1);
-                    }
+                    } catch (KmiacServerException e1) {
+                        JOptionPane.showMessageDialog(
+                                TalonSelectFrame.this.getContentPane(),
+                                "Запись на прием не удалась",
+                                "Ошибка!", JOptionPane.ERROR_MESSAGE);
+					} catch (TException e1) {
+						MainForm.conMan.reconnect(e1);
+					}
                 }
             }
         });
+        tbTalonSelect.getTableHeader().setReorderingAllowed(false);
         pnTalonSelect.setViewportView(tbTalonSelect);
     }
 
@@ -547,6 +554,7 @@ public class TalonSelectFrame extends JFrame {
                 }
             }
         });
+        tbTalonDelete.getTableHeader().setReorderingAllowed(false);
         pnTalonDelete.setViewportView(tbTalonDelete);
     }
 
@@ -556,9 +564,8 @@ public class TalonSelectFrame extends JFrame {
         lblSurname.setText(patientSurname);
         lblName.setText(patientName);
         lblMiddlename.setText(patientMiddlename);
-        curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename,
-                idPvizit);
-        tbpTalonOperations.setSelectedIndex(0);
+        curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename, idPvizit);
+        cbxPoliclinic.setSelectedPcod(curDoctorInfo.getCpodr());
     }
 
     public final void onConnect() {
@@ -568,7 +575,6 @@ public class TalonSelectFrame extends JFrame {
     private void fillTalonTypeComboboxes() {
         try {
             cbxPoliclinic.setData(MainForm.tcl.getPoliclinic());
-            cbxPoliclinic.setSelectedPcod(curDoctorInfo.getCpodr());
         } catch (PoliclinicNotFoundException e) {
             cbxPoliclinic.setData(Collections.<IntegerClassifier>emptyList());
         } catch (KmiacServerException e) {

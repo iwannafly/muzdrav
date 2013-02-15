@@ -266,19 +266,17 @@ public class ServerReception extends Server implements Iface {
     }
 
     @Override
-    public final List<Talon> getTalon(final int cpol, final String cdol, final int pcod)
+    public final List<Talon> getTalon(final int cpol, final String cdol, final int pcod, final int npasp, final boolean secOnly)
             throws KmiacServerException, TalonNotFoundException {
         final int prv = 0;
-        // java.sql.Date не имеет нулевого конструктора, а preparedQuery() не работает с
-        // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
-        final long todayMillisec = new java.util.Date().getTime();
-        final String sqlQuery = "SELECT id, ntalon, vidp, timep, datap, npasp, dataz, prv, pcod_sp "
-                + "FROM e_talon WHERE cpol = ? AND cdol = ? AND pcod_sp = ? "
-                + "AND ((datap > ?) OR (datap = ? AND timep >= ?)) AND prv = ? "
-                + "ORDER BY datap, timep;";
+        final String sqlQuery = String.format("WITH t AS (SELECT datap FROM e_talon WHERE npasp = ?) "
+        		+ "SELECT e.id, e.ntalon, e.vidp, e.timep, e.datap, e.npasp, e.dataz, e.prv, e.pcod_sp "
+        		+ "FROM e_talon e WHERE e.cpol = ? AND e.cdol = ? AND e.pcod_sp = ? "
+        		+ "AND ((e.datap > CURRENT_DATE) OR (e.datap = CURRENT_DATE AND e.timep >= CURRENT_TIME)) "
+        		+ "AND e.prv = ? AND e.datap NOT IN (SELECT datap FROM t) AND e.vidp %s 2 "
+        		+ "ORDER BY e.datap, e.timep ", (secOnly) ? "=" : "!=");
         try (AutoCloseableResultSet acrs =
-                sse.execPreparedQuery(sqlQuery, cpol, cdol, pcod, new Date(todayMillisec),
-                        new Date(todayMillisec), new Time(System.currentTimeMillis()), prv)) {
+                sse.execPreparedQuery(sqlQuery, npasp, cpol, cdol, pcod, prv)) {
             List<Talon> tmpList = rsmTalon.mapToList(acrs.getResultSet());
             if (tmpList.size() > 0) {
                 return tmpList;
