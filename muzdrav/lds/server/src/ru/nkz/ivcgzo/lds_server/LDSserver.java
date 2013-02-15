@@ -98,6 +98,21 @@ public class LDSserver extends Server implements Iface {
 		strClasTypes = new Class<?>[] {                              String.class, String.class};
 	}
 	
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
 	private static final Class<?>[] PATIENT_BRIEF_TYPES = new Class<?>[] {
 	    //  npasp          fam           im            ot
 	        Integer.class, String.class, String.class, String.class,

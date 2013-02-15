@@ -6,7 +6,7 @@ package ru.nkz.ivcgzo.serverManager.common;
  * он остановится.
  * @author bsv798
  */
-public class ThreadedServer implements Runnable, IServer {
+public class ThreadedServer implements Runnable {
 	private Thread thread;
 	private IServer server;
 	private boolean isRunning;
@@ -37,7 +37,6 @@ public class ThreadedServer implements Runnable, IServer {
 		}
 	}
 
-	@Override
 	public void start() throws Exception {
 		if (!isRunning)
 			thread.start();
@@ -45,7 +44,6 @@ public class ThreadedServer implements Runnable, IServer {
 			throw new Exception("Server is already running.");
 	}
 
-	@Override
 	public void stop() {
 		synchronized (thread) {
 			server.stop();
@@ -58,4 +56,7 @@ public class ThreadedServer implements Runnable, IServer {
 		isRunning = false;
 	}
 	
+	public IServer getServer() {
+		return server;
+	}
 }

@@ -78,6 +78,21 @@ public class ServerDiary extends Server implements Iface {
         
     }
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
 	/**
 	 * Проверка существования записи осмотра
 	 * @param idMedHist Уникальный номер записи осмотра

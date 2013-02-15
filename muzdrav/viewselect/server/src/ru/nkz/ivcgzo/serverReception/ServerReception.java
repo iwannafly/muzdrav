@@ -18,6 +18,7 @@ import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.serverManager.serverManager;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
@@ -146,6 +147,21 @@ public class ServerReception extends Server implements Iface {
         // TODO Auto-generated method stub
     }
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
 /////////////////////// Select Methods //////////////////////////////////
 
     @Override
@@ -328,7 +344,8 @@ public class ServerReception extends Server implements Iface {
                         false, pat.getId(), new Date(todayMillisec), prv, talon.getId());
                 }
                 if (numUpdated == 1) {
-                    sme.setCommit();
+                    sme.commitTransaction();
+                    serverManager.instance.getServerById(18).executeServerMethod(1801, talon.id);
                 } else {
                     sme.rollbackTransaction();
                     throw new ReserveTalonOperationFailedException();
@@ -338,6 +355,9 @@ public class ServerReception extends Server implements Iface {
             }
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
+        } catch (Exception e) {
+        	e.printStackTrace();
             throw new KmiacServerException();
         }
     }
@@ -366,12 +386,16 @@ public class ServerReception extends Server implements Iface {
                 sqlQuery, false, defaultNpasp, null, defaultPrv, defaultIdPVizit, talon.getId());
             if (numUpdated == 1) {
                 sme.setCommit();
+                serverManager.instance.getServerById(18).executeServerMethod(1802, talon.id);
             } else {
                 sme.rollbackTransaction();
                 throw new ReleaseTalonOperationFailedException();
             }
         } catch (SqlExecutorException | InterruptedException e) {
             log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
+        } catch (Exception e) {
+        	e.printStackTrace();
             throw new KmiacServerException();
         }
     }

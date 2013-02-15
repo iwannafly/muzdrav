@@ -242,6 +242,21 @@ public class ServerGenTalons extends Server implements Iface {
 //                       Public Methods                               //
 ////////////////////////////////////////////////////////////////////////
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
 //////////////////////// Start/Stop Methods ////////////////////////////////////
 
     @Override

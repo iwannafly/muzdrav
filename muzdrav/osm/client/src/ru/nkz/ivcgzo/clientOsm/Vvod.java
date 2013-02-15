@@ -1898,9 +1898,14 @@ public class Vvod extends JFrame {
 		cmbOrgan.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					if (cmbOrgan.getSelectedItem()!= null)
+					if (cmbOrgan.getSelectedItem()!= null){
 						tblNaprPokazMet.setData(MainForm.tcl.getPokazMet(cmbOrgan.getSelectedItem().pcod, cmbNaprMesto.getSelectedItem().pcod));
-				} catch (KmiacServerException e) {
+						if ((cmbOrgan.getSelectedPcod().equals("B03.016.02")) || (cmbOrgan.getSelectedPcod().equals("B03.016.03"))  || (cmbOrgan.getSelectedPcod().equals("B03.016.04")) || (cmbOrgan.getSelectedPcod().equals("B03.016.05")) || (cmbOrgan.getSelectedPcod().equals("B03.016.06")) || (cmbOrgan.getSelectedPcod().equals("B03.016.10")))
+						 	for (PokazMet pokazMet : tblNaprPokazMet.getData()) 
+									pokazMet.setVybor(true);
+						
+					}
+					} catch (KmiacServerException e) {
 					JOptionPane.showMessageDialog(Vvod.this, "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
 				} catch (TException e1) {
 					MainForm.conMan.reconnect(e1);
