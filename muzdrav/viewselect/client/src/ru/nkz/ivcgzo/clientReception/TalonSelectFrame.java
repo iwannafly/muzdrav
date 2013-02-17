@@ -8,6 +8,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
@@ -78,6 +80,7 @@ public class TalonSelectFrame extends JFrame {
     // Panes
     private JSplitPane splitPane;
     private JTabbedPane tbpTalonOperations;
+    private ChangeListener lstTalonOperations;
     private JScrollPane pnTalonSelect;
     private JScrollPane pnTalonDelete;
     // Layouts
@@ -120,22 +123,25 @@ public class TalonSelectFrame extends JFrame {
         tbpTalonOperations = new JTabbedPane(JTabbedPane.TOP);
         fillTalonTabbedPane();
         splitPane.setRightComponent(tbpTalonOperations);
-        tbpTalonOperations.addChangeListener(new ChangeListener() {
-
+        lstTalonOperations = new ChangeListener() {
             @Override
             public void stateChanged(final ChangeEvent e) {
                 switch (tbpTalonOperations.getSelectedIndex()) {
                     case 0:
                         refreshTalonTableModel();
+                        setPrevNextEnabled();
                         break;
                     case 1:
+                		btnBackward.setEnabled(false);
+                		btnForward.setEnabled(false);
                         refreshReservedTalonTableModel();
                         break;
                     default:
                         break;
                 }
             }
-        });
+        };
+        tbpTalonOperations.addChangeListener(lstTalonOperations);
     }
 
     private void fillInformationPanel() {
@@ -296,11 +302,8 @@ public class TalonSelectFrame extends JFrame {
         cbxDoctor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                if (cbxDoctor.getSelectedItem() != null) {
-                    refreshTalonTableModel();
-                }
                 if ((cbxDoctor.getSelectedItem() != null) && (curPatient != null))  {
-                    refreshReservedTalonTableModel();
+                	lstTalonOperations.stateChanged(new ChangeEvent(tbpTalonOperations));
                 }
             }
         });
@@ -312,6 +315,7 @@ public class TalonSelectFrame extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 ((TalonTableModel) tbTalonSelect.getModel()).setPrevWeek();
+                setPrevNextEnabled();
                 tbTalonSelect.repaint();
                 updateSelectTableHeaders();
             }
@@ -322,10 +326,25 @@ public class TalonSelectFrame extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 ((TalonTableModel) tbTalonSelect.getModel()).setNextWeek();
+                setPrevNextEnabled();
                 tbTalonSelect.repaint();
                 updateSelectTableHeaders();
             }
         });
+    }
+
+    private void setPrevNextEnabled() {
+    	TalonList tl = ((TalonTableModel) tbTalonSelect.getModel()).getTalonList();
+    	List<Talon> atl = tl.getAllTalonList();
+    	Date[] ds = tl.getWeekDays();
+    	
+    	if ((atl != null) && (atl.size() != 0)) {
+    		btnBackward.setEnabled(atl.get(0).datap < ds[0].getTime());
+    		btnForward.setEnabled(atl.get(atl.size() - 1).datap > ds[ds.length - 1].getTime());
+    	} else {
+    		btnBackward.setEnabled(false);
+    		btnForward.setEnabled(false);
+    	}
     }
 
     private void setAppointmentTypeLabels() {
@@ -447,7 +466,7 @@ public class TalonSelectFrame extends JFrame {
         } else {
             tbTalonSelect.setModel(new TalonTableModel());
         }
-        //updateSelectTableHeaders();
+        setPrevNextEnabled();
     }
 
     private void fillTalonSelectPane() {
