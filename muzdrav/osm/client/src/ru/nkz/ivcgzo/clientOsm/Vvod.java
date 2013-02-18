@@ -1166,7 +1166,7 @@ public class Vvod extends JFrame {
 		
 				  			pdisp.setCod_sp(diagamb.getCod_sp());
 				  			pdisp.setCdol_ot(diagamb.getCdol());
-				  			tfNuch.setText(pdisp.getCdol_ot()+zapVr.getNuch());
+				  			pdisp.setD_uch(Integer.valueOf(tfNuch.getText()));
 				  			pdisp.setD_uch(Integer.valueOf(tfNuch.getText()));
 				  			pdisp.setDiag_n(tfNewDs.getText());
 				  			MainForm.tcl.setPdisp(pdisp);
