@@ -39,10 +39,7 @@ struct VrachTabel {
 	6: double timeda;
 	7: double timeprf;
 	8: double timepr;
-	9: string nuch1;
-	10: string nuch2;
-	11: string nuch3;
-	12: i32 id;
+	9: i32 id;
 }
 
 struct UchastokInfo {

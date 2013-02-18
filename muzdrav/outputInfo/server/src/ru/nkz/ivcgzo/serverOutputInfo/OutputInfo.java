@@ -88,9 +88,13 @@ public class OutputInfo extends Server implements Iface {
 		VrachInfoTypes = new Class<?>[]{Integer.class,String.class,String.class,String.class,String.class};
 		
 		//Таблица VrachTabel
-		tableVrachTabel = new TResultSetMapper<>(VrachTabel.class, "pcod","cdol","datav","timep","timed","timeda","timeprf","timepr","nuch1","nuch2","nuch3","id");
+		tableVrachTabel = new TResultSetMapper<>(VrachTabel.class, "pcod","cdol","datav","timep","timed","timeda","timeprf","timepr","id");
+		VrachTabelTypes = new Class<?>[]{Integer.class,String.class,Date.class,Double.class,Double.class,Double.class, Double.class, Double.class, Integer.class};
+		/**
+		 * 		tableVrachTabel = new TResultSetMapper<>(VrachTabel.class, "pcod","cdol","datav","timep","timed","timeda","timeprf","timepr","nuch1","nuch2","nuch3","id");
 		VrachTabelTypes = new Class<?>[]{Integer.class,String.class,Date.class,Double.class,Double.class,Double.class, Double.class, Double.class, String.class, String.class,String.class,Integer.class};
-	
+		 */
+		
 		//Таблица справочник участков 1
 		tableUchastok = new TResultSetMapper<>(UchastokInfo.class, "fam","im","ot","pcod");
 		UchastokTypes = new Class<?>[]{String.class,String.class,String.class,Integer.class};
@@ -624,7 +628,7 @@ public class OutputInfo extends Server implements Iface {
 			KmiacServerException, TException {
 	
 		String sqlQuery = "SELECT a.pcod, a.fam, a.im, a.ot, b.cdol " 
-						+ "FROM s_vrach a, s_mrab b WHERE cpodr=?";
+						+ "FROM s_vrach a, s_mrab b WHERE a.pcod=b.pcod AND cpodr=?";
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr)) {
 			ResultSet rs = acrs.getResultSet();
 			List<VrachInfo> VrachInfo = tableVrachInfo.mapToList(rs);
@@ -644,7 +648,11 @@ public class OutputInfo extends Server implements Iface {
 			KmiacServerException, TException {
 		
 		String sqlQuery = "SELECT pcod, cdol, datav, timep, timed, timeda, timeprf, " 
+						+ "timepr, id FROM s_tabel WHERE pcod=?";
+		/**
+		 * 		String sqlQuery = "SELECT pcod, cdol, datav, timep, timed, timeda, timeprf, " 
 						+ "timepr, nuch1, nuch2, nuch3, id FROM s_tabel WHERE pcod=?;";
+		 */
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
 			ResultSet rs = acrs.getResultSet();
 			List<VrachTabel> VrachTabel = tableVrachTabel.mapToList(rs);
@@ -731,7 +739,7 @@ public class OutputInfo extends Server implements Iface {
 	public void deleteVT(int vt) throws TException {
 		System.out.println(vt);
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM s_tabel WHERE id = ?;", false, vt);
+			sme.execPrepared("DELETE FROM s_tabel WHERE id = ?", false, vt);
 			sme.setCommit();
 	    } catch (SqlExecutorException | InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -745,12 +753,19 @@ public class OutputInfo extends Server implements Iface {
 			KmiacServerException, TException {
 		int id = vt.getId();
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedQuery("SELECT id FROM s_tabel WHERE id=?", id).getResultSet().next(); 
-			int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+//			sme.execPreparedQuery("SELECT id FROM s_tabel WHERE id=?", id).getResultSet().next(); 
+					
+			int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7};
+			sme.execPreparedT("INSERT INTO s_tabel (pcod, cdol, datav, timep, timed, timeda, " 
+	        				+ "timeprf, timepr) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+	        				true, vt, VrachTabelTypes, indexes);
+			/**
+			 * 			int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 			sme.execPreparedT("INSERT INTO s_tabel (pcod, cdol, datav, timep, timed, timeda, " 
 	        				+ "timeprf, timepr, nuch1, nuch2, nuch3) " 
 	        				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
 	        				true, vt, VrachTabelTypes, indexes);
+			 */
 			id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;			
@@ -764,11 +779,18 @@ public class OutputInfo extends Server implements Iface {
 	
 	//Изменить
 	public void updateVT(VrachTabel vt) throws KmiacServerException, TException {
-		int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0};
+		int[] indexes = {1, 2, 3, 4, 5, 6, 7, 0};
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("UPDATE s_tabel SET cdol = ?, datav = ?, timep = ?, timed = ?, "
+	        				+ "timeda = ?, timeprf = ?, timepr = ? " 
+	        				+ "WHERE id = ?", true, vt, VrachTabelTypes, indexes);
+			/**
+			 * 		int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0};
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("UPDATE s_tabel SET cdol = ?, datav = ?, timep = ?, timed = ?, "
 	        				+ "timeda = ?, timeprf = ?, timepr = ?, nuch1 = ?, nuch2 = ?, " 
 	        				+ "nuch3 = ? WHERE pcod = ?;", true, vt, VrachTabelTypes, indexes);
+			 */
 			sme.setCommit();
 		} catch (SqlExecutorException | InterruptedException e) {
 			e.printStackTrace();
