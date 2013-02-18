@@ -55,6 +55,21 @@ public class serverAdmin extends Server implements Iface {
 	private TResultSetMapper<ShablonOper, ShablonOper._Fields> rsmShOperClas;
 	
 	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
+	@Override
 	public void start() throws Exception {
 		ThriftServerAdmin.Processor<Iface> proc = new ThriftServerAdmin.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));

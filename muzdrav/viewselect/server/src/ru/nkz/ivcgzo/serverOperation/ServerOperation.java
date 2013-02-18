@@ -150,7 +150,22 @@ public class ServerOperation extends Server implements Iface {
         // TODO Auto-generated method stub
     }
 
-    /**
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
+   /**
      * Возвращает список всех операций для данной записи госпитализации
      *
      * @param idGosp - номер госпитализации

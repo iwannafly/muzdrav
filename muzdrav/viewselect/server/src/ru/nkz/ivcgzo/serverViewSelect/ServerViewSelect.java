@@ -17,6 +17,7 @@ import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.serverDiary.ServerDiary;
 import ru.nkz.ivcgzo.serverLab.ServerLab;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
@@ -73,6 +74,7 @@ public class ServerViewSelect extends Server implements Iface {
 	private Server recServ;
 	private Server medServ;
 	private Server operationServ;
+	private Server diaryServ;
 	private final ClassifierManager ccm;
 	private final TResultSetMapper<PatientBriefInfo, PatientBriefInfo._Fields> rsmPatBrief;
 	private final TResultSetMapper<PatientCommonInfo, PatientCommonInfo._Fields> rsmPatComInfo;
@@ -197,6 +199,19 @@ public class ServerViewSelect extends Server implements Iface {
                 }
             }
         }).start();
+		
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					diaryServ = new ServerDiary(sse, tse);
+					diaryServ.start();
+				} catch (Exception e) {
+					System.err.println("Error starting diary server.");
+					e.printStackTrace();
+				}
+			}
+        }).start();
     	
         ThriftViewSelect.Processor<Iface> proc = new ThriftViewSelect.Processor<Iface>(this);
         thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
@@ -213,8 +228,25 @@ public class ServerViewSelect extends Server implements Iface {
         	recServ.stop();
         if (operationServ != null)
             operationServ.stop();
+		if (diaryServ != null)
+            diaryServ.stop();
     }
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
 	@Override
 	public List<IntegerClassifier> getVSIntegerClassifierView(String className) throws TException {
 		final String sqlQuery = "SELECT pcod, name FROM " + className;

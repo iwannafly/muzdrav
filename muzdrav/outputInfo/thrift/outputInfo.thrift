@@ -7,6 +7,8 @@ struct InputAuthInfo {
 	1: optional i32 userId;
 	2: optional string cpodr_name;
 	3: optional string clpu_name;
+    4: optional i32 cpodr;
+    5: optional i32 clpu;
 }
 
 struct InputSvodVed {
@@ -20,6 +22,12 @@ struct InputFacZd {
     2: string datef;
     3: i32 vozcat;
     4: i32 kvar;
+}
+
+struct InputPasUch {
+    1: string dateb;
+    2: string datef;
+    3: i32 uchnum;
 }
 
 struct VrachInfo {
@@ -39,7 +47,10 @@ struct VrachTabel {
 	6: double timeda;
 	7: double timeprf;
 	8: double timepr;
-	9: i32 id;
+	9: string nuch1;
+	10: string nuch2;
+	11: string nuch3;
+	12: i32 id;
 }
 
 struct UchastokInfo {
@@ -156,7 +167,8 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
     string printSvodVed(1: InputAuthInfo iaf 2: InputSvodVed isv) throws (1: kmiacServer.KmiacServerException kse);
 
     string printFacZd(1: InputAuthInfo iaf 2: InputFacZd ifz) throws (1: kmiacServer.KmiacServerException kse);
-	
+
+    string printPasUch(1: InputAuthInfo iaf 2: InputPasUch ipu) throws (1: kmiacServer.KmiacServerException kse);
    /**
     * Сводки по форме 39
     */
@@ -166,4 +178,3 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
 
     string nagrvr(1:i32 cpol)  throws (1: kmiacServer.KmiacServerException kse); 
 }
-

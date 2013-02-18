@@ -72,10 +72,11 @@ struct PatientFullInfo{
 	27:optional string birthplace,
 	28:optional string ogrn_smo,
 	29:optional i32 obraz,
-	30:optional Address adpAddress,
-	31:optional Address admAddress,
-	32:optional Polis polis_oms,
-	33:optional Polis polis_dms
+	30:optional i32 status,
+	31:optional Address adpAddress,
+	32:optional Address admAddress,
+	33:optional Polis polis_oms,
+	34:optional Polis polis_dms
 }
 
 /*сведени о представителе табл. p_preds*/
@@ -201,7 +202,9 @@ struct Gosp{
 	36:optional i64 dataz,
 	37:optional string jalob,
 	38:optional i32 vid,
-	39:optional bool pr_ber
+	39:optional bool pr_ber,
+	40:optional string srok_ber,
+	41:optional string komm
 }
 
 /**

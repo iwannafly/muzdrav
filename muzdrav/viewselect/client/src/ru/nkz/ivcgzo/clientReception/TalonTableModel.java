@@ -24,13 +24,13 @@ public final class TalonTableModel implements TableModel {
         talonList = new TalonList();
     }
 
-    public TalonTableModel(final int cpol, final String cdol, final int pcod) {
-        setTalonList(cpol, cdol, pcod);
+    public TalonTableModel(final int cpol, final String cdol, final int pcod, final int npasp, final boolean secOnly) {
+        setTalonList(cpol, cdol, pcod, npasp, secOnly);
     }
 
-    private void setTalonList(final int cpol, final String cdol, final int pcod) {
+    private void setTalonList(final int cpol, final String cdol, final int pcod, final int npasp, final boolean secOnly) {
         try {
-            talonList = new TalonList(MainForm.tcl.getTalon(cpol, cdol, pcod));
+            talonList = new TalonList(MainForm.tcl.getTalon(cpol, cdol, pcod, npasp, secOnly));
         } catch (TalonNotFoundException e) {
             talonList = new TalonList();
         } catch (TException e) {

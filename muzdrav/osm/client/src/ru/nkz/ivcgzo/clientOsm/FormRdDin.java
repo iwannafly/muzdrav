@@ -274,34 +274,195 @@ public class FormRdDin extends JFrame {
 		    			.addGap(3))
 		    );
 		    panel_3.setLayout(gl_panel_3);
+		
+		JButton Nbutton = new JButton("");
+		Nbutton.setIcon(new ImageIcon(FormRdDin.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
+		Nbutton.setToolTipText("Новое посещение");
+		Nbutton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+				RdDinStruct rddin = new RdDinStruct();
+				rddin.setDatap(Vvod.zapVr.datap);
+				rddin.setNpasp(Vvod.pvizitAmb.npasp);
+				rddin.setId_pos(Vvod.pvizitAmb.id);
+				rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
+				rddin.setGrr(0);
+				rddin.setBall(0);
+				rddin.setOteki(oslrod);
+				rddin.setArt1((int) SPdad.getModel().getValue());
+				if ( (int) SPdad.getModel().getValue() == 0) rddin.setArt1(120);
+				rddin.setArt2((int) SPsad.getModel().getValue());
+				if ( (int) SLdad.getModel().getValue() == 0) rddin.setArt2(80);
+				rddin.setArt3((int) SLdad.getModel().getValue());
+				if ( (int) SLdad.getModel().getValue() == 0) rddin.setArt3(120);
+				rddin.setArt4((int) SLsad.getModel().getValue());
+				if ( (int) SLdad.getModel().getValue() == 0) rddin.setArt4(80);
+				rddin.setChcc((int) SChcc.getModel().getValue());
+				if ( (int) SChcc.getModel().getValue() == 0) rddin.setChcc(0);
+				rddin.setHdm((int) SVdm.getModel().getValue());
+				if ( (int) SVdm.getModel().getValue() == 0) rddin.setHdm(20);
+				rddin.setOj((int) SOkrj.getModel().getValue());
+				if ( (int) SOkrj.getModel().getValue() == 0) rddin.setOj(100);
+  		        rddin.setSpl((int) STolP.getModel().getValue());
+				if ( (int) STolP.getModel().getValue() == 0) rddin.setSpl(2);
+			    rddin.setSrok((int) SSrok.getModel().getValue());
+				if ( (int) SSrok.getModel().getValue() == 0) rddin.setSrok(4);
+				rddin.setVes((double) SVes.getModel().getValue());
+				if ( (double) SVes.getModel().getValue() == 0) rddin.setVes(60);
+				if (CBPredPl.getSelectedPcod() != null)
+					rddin.setPredpl(CBPredPl.getSelectedPcod());
+					else rddin.unsetPredpl();
+				if (CBPolPl.getSelectedPcod() != null)
+					rddin.setPolpl(CBPolPl.getSelectedPcod());
+					else rddin.unsetPolpl();
+				if (CBSerd1.getSelectedPcod() != null)
+					rddin.setSerd1(CBSerd1.getSelectedPcod());
+					else rddin.unsetSerd1();
+				if (CBCerd.getSelectedPcod() != null)
+					rddin.setSerd(CBCerd.getSelectedPcod());
+					else rddin.unsetSerd();
+//				if (CBOteki.getSelectedPcod() != null)
+//					rddin.setOteki(CBOteki.getSelectedPcod());
+//					else rddin.unsetOteki();
+//				if (CBDiag.getSelectedPcod() != null)
+//					rddin.setDspos(CBDiag.getSelectedPcod());
+//					else rddin.setDspos("");
+			System.out.println(rddin);		
+				MainForm.tcl.AddRdDin(rddin);
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+try {
+	tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+	if (tablePos.getRowCount() > 0)
+		tablePos.setRowSelectionInterval(tablePos.getRowCount() - 1, tablePos.getRowCount() - 1);
+} catch (TException e1) {
+	// TODO Auto-generated catch block
+	e1.printStackTrace();
+}
+			}
+
+			private void showMessage(RdDinStruct rddin) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		
+		JButton SButton = new JButton("");
+		SButton.setToolTipText("Сохранить");
+		SButton.setIcon(new ImageIcon(FormRdDin.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
+		SButton.addActionListener(new ActionListener() {
+            private void calcOteci(){
+    			 oslrod = 0;
+            if (ChBot1.isSelected()){oslrod=oslrod+1;}
+            if (ChBot2.isSelected()){oslrod=oslrod+2;}
+            if (ChBot3.isSelected()){oslrod=oslrod+4;}
+            if (ChBot4.isSelected()){oslrod=oslrod+8;}
+            };
+	public void actionPerformed(ActionEvent e) {
+		try {
+			SimpleDateFormat frm = new SimpleDateFormat("MM");
+			int mes = Integer.parseInt(frm.format(Vvod.zapVr.getDatar()));
+			if (mes == 1) br = br+1;
+			if (mes == 2) br = br+1;
+			if (mes == 12) br = br+1;
+			rddin.setArt1((int) SPdad.getModel().getValue());
+			rddin.setArt2((int) SPsad.getModel().getValue());
+			rddin.setArt3((int) SLdad.getModel().getValue());
+			rddin.setArt4((int) SLsad.getModel().getValue());
+			rddin.setChcc((int) SChcc.getModel().getValue());
+			rddin.setHdm((int) SVdm.getModel().getValue());
+			rddin.setOj((int) SOkrj.getModel().getValue());
+			rddin.setSpl((int) STolP.getModel().getValue());
+			rddin.setSrok((int) SSrok.getModel().getValue());
+			rddin.setVes((double) SVes.getModel().getValue());
+			ves = (double) SVes.getModel().getValue();
+			rddin.setGrr(0);
+		if (CBPredPl.getSelectedPcod() != null)
+			rddin.setPredpl(CBPredPl.getSelectedPcod());
+			else rddin.unsetPredpl();
+		if (CBPolPl.getSelectedPcod() != null)
+			rddin.setPolpl(CBPolPl.getSelectedPcod());
+			else rddin.unsetPolpl();
+		if (CBSerd1.getSelectedPcod() != null)
+			rddin.setSerd1(CBSerd1.getSelectedPcod());
+			else rddin.unsetSerd1();
+		if (CBCerd.getSelectedPcod() != null)
+			rddin.setSerd(CBCerd.getSelectedPcod());
+			else rddin.unsetSerd();
+//		if (CBOteki.getSelectedPcod() != null)
+//			rddin.setOteki(CBOteki.getSelectedPcod());
+//			else rddin.unsetOteki();
+		calcOteci();
+		rddin.setOteki(oslrod);
+//		if (CBDiag.getSelectedPcod() != null)
+//		{	rddin.setDspos(CBDiag.getSelectedPcod());
+//		rddin.setGrr(1);}
+//		    else rddin.setDspos("");
+//		rost = FormPostBer.rdSlStruct.getRost();	
+//		System.out.println(rost);
+//		if (rost<=154) br = br+1;
+//		if (FormRdInf.RdInfStruct.getObr() == 3)  br = br+1; 
+//		if (FormRdInf.RdInfStruct.getObr() == 5)  br = br+1; 
+//		if (FormRdInf.RdInfStruct.getSem() == 3)  br = br+1; 
+//		if (FormRdInf.RdInfStruct.getOsoco() >=1) br = br+1;
+//		if (rost != 0) 
+//		{ves = ves/rost/rost*10000;
+//		if (ves<17) br = br+1;
+//		if (ves>=32) br = br+1;}
+		rddin.setBall(br); 
+			MainForm.tcl.UpdateRdDin(rddin);
+		} catch (TException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+	}
+		try {
+			tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+		} catch (TException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+			}
+		});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 404, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 404, GroupLayout.PREFERRED_SIZE)
 							.addGap(51)
-							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 314, GroupLayout.PREFERRED_SIZE)
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 314, GroupLayout.PREFERRED_SIZE)
+								.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 182, GroupLayout.PREFERRED_SIZE))
 							.addGap(11))
 						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 182, GroupLayout.PREFERRED_SIZE)
-							.addGap(84))))
+							.addComponent(Nbutton)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(SButton)
+							.addGap(334))))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 316, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_panel.createSequentialGroup()
 							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE)))
-					.addGap(117))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE))
+						.addComponent(panel_1, 0, 0, Short.MAX_VALUE))
+					.addGap(45)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(Nbutton)
+						.addComponent(SButton))
+					.addGap(99))
 		);
 		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
@@ -402,229 +563,63 @@ public class FormRdDin extends JFrame {
 		
 		JLabel LtolPlac = new JLabel("Толщина плаценты");
 		LtolPlac.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		
-		
-		JButton SButton = new JButton("");
-		SButton.setToolTipText("Сохранить");
-		SButton.setIcon(new ImageIcon(FormRdDin.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
-		SButton.addActionListener(new ActionListener() {
-            private void calcOteci(){
-    			 oslrod = 0;
-            if (ChBot1.isSelected()){oslrod=oslrod+1;}
-            if (ChBot2.isSelected()){oslrod=oslrod+2;}
-            if (ChBot3.isSelected()){oslrod=oslrod+4;}
-            if (ChBot4.isSelected()){oslrod=oslrod+8;}
-            };
-	public void actionPerformed(ActionEvent e) {
-		try {
-			SimpleDateFormat frm = new SimpleDateFormat("MM");
-			int mes = Integer.parseInt(frm.format(Vvod.zapVr.getDatar()));
-			if (mes == 1) br = br+1;
-			if (mes == 2) br = br+1;
-			if (mes == 12) br = br+1;
-			rddin.setArt1((int) SPdad.getModel().getValue());
-			rddin.setArt2((int) SPsad.getModel().getValue());
-			rddin.setArt3((int) SLdad.getModel().getValue());
-			rddin.setArt4((int) SLsad.getModel().getValue());
-			rddin.setChcc((int) SChcc.getModel().getValue());
-			rddin.setHdm((int) SVdm.getModel().getValue());
-			rddin.setOj((int) SOkrj.getModel().getValue());
-			rddin.setSpl((int) STolP.getModel().getValue());
-			rddin.setSrok((int) SSrok.getModel().getValue());
-			rddin.setVes((double) SVes.getModel().getValue());
-			ves = (double) SVes.getModel().getValue();
-			rddin.setGrr(0);
-		if (CBPredPl.getSelectedPcod() != null)
-			rddin.setPredpl(CBPredPl.getSelectedPcod());
-			else rddin.unsetPredpl();
-		if (CBPolPl.getSelectedPcod() != null)
-			rddin.setPolpl(CBPolPl.getSelectedPcod());
-			else rddin.unsetPolpl();
-		if (CBSerd1.getSelectedPcod() != null)
-			rddin.setSerd1(CBSerd1.getSelectedPcod());
-			else rddin.unsetSerd1();
-		if (CBCerd.getSelectedPcod() != null)
-			rddin.setSerd(CBCerd.getSelectedPcod());
-			else rddin.unsetSerd();
-//		if (CBOteki.getSelectedPcod() != null)
-//			rddin.setOteki(CBOteki.getSelectedPcod());
-//			else rddin.unsetOteki();
-		calcOteci();
-		rddin.setOteki(oslrod);
-//		if (CBDiag.getSelectedPcod() != null)
-//		{	rddin.setDspos(CBDiag.getSelectedPcod());
-//		rddin.setGrr(1);}
-//		    else rddin.setDspos("");
-//		rost = FormPostBer.rdSlStruct.getRost();	
-//		System.out.println(rost);
-//		if (rost<=154) br = br+1;
-//		if (FormRdInf.RdInfStruct.getObr() == 3)  br = br+1; 
-//		if (FormRdInf.RdInfStruct.getObr() == 5)  br = br+1; 
-//		if (FormRdInf.RdInfStruct.getSem() == 3)  br = br+1; 
-//		if (FormRdInf.RdInfStruct.getOsoco() >=1) br = br+1;
-//		if (rost != 0) 
-//		{ves = ves/rost/rost*10000;
-//		if (ves<17) br = br+1;
-//		if (ves>=32) br = br+1;}
-		rddin.setBall(br); 
-			MainForm.tcl.UpdateRdDin(rddin);
-		} catch (TException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-	}
-		try {
-			tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
-		} catch (TException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-			}
-		});
-		
-		JButton Nbutton = new JButton("");
-		Nbutton.setIcon(new ImageIcon(FormRdDin.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
-		Nbutton.setToolTipText("Новое посещение");
-		Nbutton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-				RdDinStruct rddin = new RdDinStruct();
-				rddin.setDatap(Vvod.zapVr.datap);
-				rddin.setNpasp(Vvod.pvizitAmb.npasp);
-				rddin.setId_pos(Vvod.pvizitAmb.id);
-				rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
-				rddin.setGrr(0);
-				rddin.setBall(0);
-				rddin.setOteki(oslrod);
-				rddin.setArt1((int) SPdad.getModel().getValue());
-				if ( (int) SPdad.getModel().getValue() == 0) rddin.setArt1(120);
-				rddin.setArt2((int) SPsad.getModel().getValue());
-				if ( (int) SLdad.getModel().getValue() == 0) rddin.setArt2(80);
-				rddin.setArt3((int) SLdad.getModel().getValue());
-				if ( (int) SLdad.getModel().getValue() == 0) rddin.setArt3(120);
-				rddin.setArt4((int) SLsad.getModel().getValue());
-				if ( (int) SLdad.getModel().getValue() == 0) rddin.setArt4(80);
-				rddin.setChcc((int) SChcc.getModel().getValue());
-				if ( (int) SChcc.getModel().getValue() == 0) rddin.setChcc(0);
-				rddin.setHdm((int) SVdm.getModel().getValue());
-				if ( (int) SVdm.getModel().getValue() == 0) rddin.setHdm(20);
-				rddin.setOj((int) SOkrj.getModel().getValue());
-				if ( (int) SOkrj.getModel().getValue() == 0) rddin.setOj(100);
-  		        rddin.setSpl((int) STolP.getModel().getValue());
-				if ( (int) STolP.getModel().getValue() == 0) rddin.setSpl(2);
-			    rddin.setSrok((int) SSrok.getModel().getValue());
-				if ( (int) SSrok.getModel().getValue() == 0) rddin.setSrok(4);
-				rddin.setVes((double) SVes.getModel().getValue());
-				if ( (double) SVes.getModel().getValue() == 0) rddin.setVes(60);
-				if (CBPredPl.getSelectedPcod() != null)
-					rddin.setPredpl(CBPredPl.getSelectedPcod());
-					else rddin.unsetPredpl();
-				if (CBPolPl.getSelectedPcod() != null)
-					rddin.setPolpl(CBPolPl.getSelectedPcod());
-					else rddin.unsetPolpl();
-				if (CBSerd1.getSelectedPcod() != null)
-					rddin.setSerd1(CBSerd1.getSelectedPcod());
-					else rddin.unsetSerd1();
-				if (CBCerd.getSelectedPcod() != null)
-					rddin.setSerd(CBCerd.getSelectedPcod());
-					else rddin.unsetSerd();
-//				if (CBOteki.getSelectedPcod() != null)
-//					rddin.setOteki(CBOteki.getSelectedPcod());
-//					else rddin.unsetOteki();
-//				if (CBDiag.getSelectedPcod() != null)
-//					rddin.setDspos(CBDiag.getSelectedPcod());
-//					else rddin.setDspos("");
-			System.out.println(rddin);		
-				MainForm.tcl.AddRdDin(rddin);
-				} catch (KmiacServerException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (TException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-try {
-	tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
-	if (tablePos.getRowCount() > 0)
-		tablePos.setRowSelectionInterval(tablePos.getRowCount() - 1, tablePos.getRowCount() - 1);
-} catch (TException e1) {
-	// TODO Auto-generated catch block
-	e1.printStackTrace();
-}
-			}
-
-			private void showMessage(RdDinStruct rddin) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
 //		ot.setText(Vvod.zapVr.oth);
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
+					.addContainerGap()
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_1.createSequentialGroup()
-							.addGap(142)
-							.addComponent(Nbutton)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(SButton))
+							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
+								.addGroup(gl_panel_1.createSequentialGroup()
+									.addComponent(LPdad)
+									.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+									.addComponent(SPdad, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
+									.addGap(7))
+								.addGroup(gl_panel_1.createSequentialGroup()
+									.addComponent(LLdad)
+									.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+									.addComponent(SLdad, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
+									.addGap(5)))
+							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
+								.addGroup(gl_panel_1.createSequentialGroup()
+									.addComponent(LLsad)
+									.addGap(18)
+									.addComponent(SLsad, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel_1.createSequentialGroup()
+									.addComponent(LPsad)
+									.addGap(18)
+									.addComponent(SPsad, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE))))
+						.addComponent(LVes)
+						.addComponent(LSrok)
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
+							.addGroup(gl_panel_1.createSequentialGroup()
+								.addComponent(LVdm)
+								.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(SVdm, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
+								.addGap(9))
+							.addGroup(gl_panel_1.createSequentialGroup()
+								.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+									.addComponent(LOkrJ)
+									.addComponent(LDataPos))
+								.addGap(18)
+								.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+									.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE)
+									.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+										.addComponent(SVes, GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+										.addComponent(SSrok, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
+										.addComponent(SOkrj, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)))))
 						.addGroup(gl_panel_1.createSequentialGroup()
-							.addContainerGap()
-							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel_1.createSequentialGroup()
-									.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
-										.addGroup(gl_panel_1.createSequentialGroup()
-											.addComponent(LPdad)
-											.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-											.addComponent(SPdad, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
-											.addGap(7))
-										.addGroup(gl_panel_1.createSequentialGroup()
-											.addComponent(LLdad)
-											.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-											.addComponent(SLdad, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
-											.addGap(5)))
-									.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
-										.addGroup(gl_panel_1.createSequentialGroup()
-											.addComponent(LLsad)
-											.addGap(18)
-											.addComponent(SLsad, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE))
-										.addGroup(gl_panel_1.createSequentialGroup()
-											.addComponent(LPsad)
-											.addGap(18)
-											.addComponent(SPsad, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE))))
-								.addComponent(LVes)
-								.addComponent(LSrok)
-								.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
-									.addGroup(gl_panel_1.createSequentialGroup()
-										.addComponent(LVdm)
-										.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(SVdm, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
-										.addGap(9))
-									.addGroup(gl_panel_1.createSequentialGroup()
-										.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-											.addComponent(LOkrJ)
-											.addComponent(LDataPos))
-										.addGap(18)
-										.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-											.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE)
-											.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-												.addComponent(SVes, GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
-												.addComponent(SSrok, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
-												.addComponent(SOkrj, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)))))
-								.addGroup(gl_panel_1.createSequentialGroup()
-									.addComponent(LtolPlac)
-									.addGap(29)
-									.addComponent(STolP, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)))))
-					.addContainerGap(28, Short.MAX_VALUE))
+							.addComponent(LtolPlac)
+							.addGap(29)
+							.addComponent(STolP, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(118, Short.MAX_VALUE))
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panel_1.createSequentialGroup()
+				.addGroup(Alignment.LEADING, gl_panel_1.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-						.addComponent(Nbutton)
-						.addComponent(SButton))
-					.addGap(18)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addComponent(LDataPos)
 						.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -668,7 +663,7 @@ try {
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addGap(15)
 							.addComponent(LtolPlac)))
-					.addGap(133))
+					.addGap(184))
 		);
 		panel_1.setLayout(gl_panel_1);
 		panel.setLayout(gl_panel);

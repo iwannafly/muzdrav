@@ -182,7 +182,9 @@ public class RaspisanieUnit {
 				}
 			}
 			if (rasp.size() != 0) {
-				MainForm.tcl.addRasp(rasp);
+//				MainForm.tcl.addRasp(rasp);
+				for (int i=0; i <= rasp.size()-1; i++)
+					rasp.get(i).setId(MainForm.tcl.addRaspReturnId(rasp.get(i)));
 		        CreateTableTalon(rasp, pauselist);
 			}else {
 				System.out.println("Неприемный день. Расписание не сформировано.");
@@ -240,7 +242,7 @@ public class RaspisanieUnit {
 							tmpTalon.setTimepk(new Time(rasp.get(i).getTime_k()).getTime());
 							tmpTalon.setDatap(rasp.get(i).getDatap());
 							tmpTalon.setTimep(timelist.get(j).getTimep());
-//							tmpTalon.setDatapt(tmpTalon.getDatap()+tmpTalon.getTimep());
+							tmpTalon.setNrasp(rasp.get(i).getId());
 							String d = dtf.format(dtf.parse((sdf.format(tmpTalon.getDatap())+' '+stf.format(tmpTalon.getTimep()) ) ) );
 							tmpTalon.setDatapt(dtf.parse(d).getTime());
 							talonlist.add(tmpTalon);

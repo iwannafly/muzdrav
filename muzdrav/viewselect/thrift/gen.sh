@@ -9,6 +9,10 @@ rm -rf gen-java
 thrift --gen java lab.thrift \
 && thrift --gen java viewselect.thrift \
 && thrift --gen java reception.thrift \
+&& thrift --gen java operation.thrift \
+&& thrift --gen java medication.thrift \
+&& thrift --gen java lab.thrift \
+&& thrift --gen java diary.thrift \
 && thrift --gen java ../../../common/thrift/classifier.thrift \
 && thrift --gen java ../../../common/thrift/kmiacServer.thrift \
 && echo "${GREEN}$CUR_THRIFT_FILE sources successfully generated" \

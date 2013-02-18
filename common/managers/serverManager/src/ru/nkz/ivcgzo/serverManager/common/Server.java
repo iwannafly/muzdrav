@@ -5,18 +5,21 @@ package ru.nkz.ivcgzo.serverManager.common;
  * @author bsv798
  */
 public abstract class Server implements IServer {
-	public ISqlSelectExecutor sse;
-	public ITransactedSqlExecutor tse;
-
+	protected ISqlSelectExecutor sse;
+	protected ITransactedSqlExecutor tse;
+	
 	public Server(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		this.sse = sse;
 		this.tse = tse;
 	}
 	
-	@Override
-	public abstract void start() throws Exception;
-
-	@Override
-	public abstract void stop();
+	/**
+	 * Выполняет указанный метод плагина-сервера.
+	 * @param id - идентификатор метода
+	 * @param params - параметры для передачи в метод
+	 */
+	public Object executeServerMethod(int id, Object... params) throws Exception {
+		throw new Exception("Not implemented. You must override this method in child class.");
+	}
 	
 }

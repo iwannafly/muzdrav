@@ -14,7 +14,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
-import javax.swing.ComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -66,8 +65,6 @@ import javax.swing.SpinnerNumberModel;
 
 import org.apache.thrift.TException;
 import javax.swing.DefaultComboBoxModel;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 
 public class TalonMainFrame extends JFrame {
 
@@ -1176,12 +1173,11 @@ public class TalonMainFrame extends JFrame {
 		
         String[] items1 = {
        		"1. Списки пациентов, записанных на прием",
-       		"2. Информация о выданных и неиспользованных талонах (по одному врачу)",
-       		"3. Информация о выданных и неиспользованных талонах (по всем врачам)",
-       		"4. Списки пациентов, которым необходимо перенести время приема",
-       		"5. Журнал пациентов, записанных на прием",
-       		"6. Списки пациентов, записанных через инфомат",
-       		"7. Количество использованных талонов"
+       		"2. Количество неиспользованных талонов",
+       		"3. Списки пациентов, отмененного приема",
+       		"4. Количество выданных талонов",
+       		"5. Расписание работы врачей",
+       		"6. Печать талонов на прием к врачу"
         };
 
 		cmb_sv = new JComboBox<String>();
@@ -1203,9 +1199,8 @@ public class TalonMainFrame extends JFrame {
 		JButton btnSvod = new JButton("Создать сводку");
 		btnSvod.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println(cmb_sv.getSelectedIndex()+1);
-//				SvodkiUnit.Svodki(+cmb_sv.getSelectedIndex()+1, tf_sv1.getDate().getTime(), tf_sv2.getDate().getTime(), curVrach, curSpec);
-				//cmb_sv
+				System.out.println(cmb_sv.getSelectedIndex());
+				SvodkiUnit.Svodki(cmb_sv.getSelectedIndex(), tf_sv1.getDate().getTime(), tf_sv2.getDate().getTime(), curVrach, curSpec);
 			}
 		});
 		GroupLayout gl_panel_9 = new GroupLayout(panel_9);

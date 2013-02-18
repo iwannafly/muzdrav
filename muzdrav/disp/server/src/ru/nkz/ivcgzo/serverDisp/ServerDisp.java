@@ -82,6 +82,21 @@ public class ServerDisp extends Server implements Iface {
 	}
 
 	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
+	@Override
 	public void testConnection() throws TException {
 
 	}
