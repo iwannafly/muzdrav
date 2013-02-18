@@ -178,4 +178,3 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
 
     string nagrvr(1:i32 cpol)  throws (1: kmiacServer.KmiacServerException kse); 
 }
-

@@ -33,20 +33,20 @@ public class serverVrachInfo extends serverTemplate {
 		super(sse, tse);
 
 		//Таблица VrachInfo
-				tableVrachInfo = new TResultSetMapper<>(VrachInfo.class, "pcod","fam","im","ot","cdol");
-				VrachInfoTypes = new Class<?>[]{Integer.class,String.class,String.class,String.class,String.class};
-				
-				//Таблица VrachTabel
-				tableVrachTabel = new TResultSetMapper<>(VrachTabel.class, "pcod","cdol","datav","timep","timed","timeda","timeprf","timepr","nuch1","nuch2","nuch3","id");
-				VrachTabelTypes = new Class<?>[]{Integer.class,String.class,Date.class,Double.class,Double.class,Double.class, Double.class, Double.class, String.class, String.class,String.class,Integer.class};
-				//private static Logger log = Logger.getLogger(serverVrachInfo.class.getName());
+		tableVrachInfo = new TResultSetMapper<>(VrachInfo.class, "pcod","fam","im","ot","cdol");
+		VrachInfoTypes = new Class<?>[]{Integer.class,String.class,String.class,String.class,String.class};
+		
+		//Таблица VrachTabel
+		tableVrachTabel = new TResultSetMapper<>(VrachTabel.class, "pcod","cdol","datav","timep","timed","timeda","timeprf","timepr","id");
+		VrachTabelTypes = new Class<?>[]{Integer.class,String.class,Date.class,Double.class,Double.class,Double.class, Double.class, Double.class, Integer.class};
+
 			
 	}
 	public List<VrachInfo> getVrachTableInfo(int cpodr) throws VINotFoundException,
 			KmiacServerException, TException {
 	
-		String sqlQuery = "SELECT a.pcod, a.fam, a.im, a.ot, b.cdol " 
-						+ "FROM s_vrach a, s_mrab b WHERE cpodr=?";
+				String sqlQuery = "SELECT a.pcod, a.fam, a.im, a.ot, b.cdol " 
+				+ "FROM s_vrach a, s_mrab b WHERE a.pcod=b.pcod AND cpodr=?";
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr)) {
 			ResultSet rs = acrs.getResultSet();
 			List<VrachInfo> VrachInfo = tableVrachInfo.mapToList(rs);
@@ -64,8 +64,8 @@ public class serverVrachInfo extends serverTemplate {
 	public List<VrachTabel> getVrachTabel(int pcod) throws VTDuplException,
 			KmiacServerException, TException {
 		
-		String sqlQuery = "SELECT pcod, cdol, datav, timep, timed, timeda, timeprf, " 
-						+ "timepr, nuch1, nuch2, nuch3, id FROM s_tabel WHERE pcod=?;";
+				String sqlQuery = "SELECT pcod, cdol, datav, timep, timed, timeda, timeprf, " 
+				+ "timepr, id FROM s_tabel WHERE pcod=?";
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
 			ResultSet rs = acrs.getResultSet();
 			List<VrachTabel> VrachTabel = tableVrachTabel.mapToList(rs);
@@ -98,11 +98,10 @@ public class serverVrachInfo extends serverTemplate {
 				KmiacServerException, TException {
 			int id = vt.getId();
 			try (SqlModifyExecutor sme = tse.startTransaction()) {
-				sme.execPreparedQuery("SELECT id FROM s_tabel WHERE id=?", id).getResultSet().next(); 
-				int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+//				sme.execPreparedQuery("SELECT id FROM s_tabel WHERE id=?", id).getResultSet().next(); 
+				int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7};
 				sme.execPreparedT("INSERT INTO s_tabel (pcod, cdol, datav, timep, timed, timeda, " 
-		        				+ "timeprf, timepr, nuch1, nuch2, nuch3) " 
-		        				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+		        				+ "timeprf, timepr) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
 		        				true, vt, VrachTabelTypes, indexes);
 				id = sme.getGeneratedKeys().getInt("id");
 				sme.setCommit();
@@ -117,11 +116,11 @@ public class serverVrachInfo extends serverTemplate {
 		
 		//Изменить
 		public void updateVT(VrachTabel vt) throws KmiacServerException, TException {
-			int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0};
+			int[] indexes = {1, 2, 3, 4, 5, 6, 7, 0};
 			try (SqlModifyExecutor sme = tse.startTransaction()) {
 				sme.execPreparedT("UPDATE s_tabel SET cdol = ?, datav = ?, timep = ?, timed = ?, "
-		        				+ "timeda = ?, timeprf = ?, timepr = ?, nuch1 = ?, nuch2 = ?, " 
-		        				+ "nuch3 = ? WHERE pcod = ?;", true, vt, VrachTabelTypes, indexes);
+		        				+ "timeda = ?, timeprf = ?, timepr = ? " 
+		        				+ "WHERE id = ?", true, vt, VrachTabelTypes, indexes);
 				sme.setCommit();
 			} catch (SqlExecutorException | InterruptedException e) {
 				e.printStackTrace();
