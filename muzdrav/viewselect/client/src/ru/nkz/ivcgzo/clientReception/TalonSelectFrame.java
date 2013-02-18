@@ -95,7 +95,6 @@ public class TalonSelectFrame extends JFrame {
     private JLabel lblPerv;
     private JLabel lblPovt;
     private JLabel lblHome;
-    private JLabel lblConsult;
     private JLabel lblAppointmentTypeHeader;
 
     public TalonSelectFrame(final UserAuthInfo authInfo) {
@@ -364,11 +363,6 @@ public class TalonSelectFrame extends JFrame {
         lblHome.setBackground(Color.pink);
         lblHome.setHorizontalAlignment(SwingConstants.CENTER);
         lblHome.setOpaque(true);
-
-        lblConsult = new JLabel("Консультация");
-        lblConsult.setBackground(Color.magenta);
-        lblConsult.setHorizontalAlignment(SwingConstants.CENTER);
-        lblConsult.setOpaque(true);
     }
 
     private void fillTalonTypeGroupLayout() {
@@ -399,10 +393,6 @@ public class TalonSelectFrame extends JFrame {
                             .addGroup(glPnTalonType.createParallelGroup(Alignment.LEADING, false)
                                 .addGroup(glPnTalonType.createSequentialGroup()
                                     .addComponent(lblHome, GroupLayout.PREFERRED_SIZE,
-                                            84, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(ComponentPlacement.RELATED,
-                                            GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(lblConsult, GroupLayout.PREFERRED_SIZE,
                                             84, GroupLayout.PREFERRED_SIZE))
                                 .addComponent(btnForward, GroupLayout.PREFERRED_SIZE, 173,
                                         GroupLayout.PREFERRED_SIZE)))
@@ -438,8 +428,7 @@ public class TalonSelectFrame extends JFrame {
                     .addGroup(glPnTalonType.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblPerv)
                         .addComponent(lblPovt)
-                        .addComponent(lblHome)
-                        .addComponent(lblConsult))
+                        .addComponent(lblHome))
                     .addContainerGap())
         );
     }
