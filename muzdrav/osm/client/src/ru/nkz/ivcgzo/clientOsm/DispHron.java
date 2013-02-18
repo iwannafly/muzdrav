@@ -388,7 +388,7 @@ public class DispHron extends JFrame{
 			try {
 				pmer = new Pmer();
 				obostr = new Pobost();
-				cmbDiag.setData(MainForm.tcl.get_n_c00(Vvod.zapVr.getNpasp()));
+				cmbDiag.setData(MainForm.tcl.get_n_c00(Vvod.zapVr.getNpasp(), MainForm.authInfo.getCpodr()));
 			} catch (KmiacServerException e) {
 				e.printStackTrace();
 			} catch (TException e) {
