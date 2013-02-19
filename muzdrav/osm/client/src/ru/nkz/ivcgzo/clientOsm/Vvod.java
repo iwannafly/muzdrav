@@ -103,7 +103,6 @@ import ru.nkz.ivcgzo.thriftOsm.Prez_d;
 import ru.nkz.ivcgzo.thriftOsm.Prez_l;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
-import ru.nkz.ivcgzo.thriftOsm.Protokol;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
@@ -358,14 +357,7 @@ public class Vvod extends JFrame {
 	       			@Override
 	       			public void actionPerformed(ActionEvent arg0) {
 	       				try{
-       						Protokol protokol = new Protokol();
-       						protokol.setUserId(MainForm.authInfo.getUser_id());
-       						protokol.setNpasp(Vvod.zapVr.getNpasp());
-       						protokol.setPvizit_id(tblPos.getSelectedItem().id_obr);
-       						protokol.setPvizit_ambId(tblPos.getSelectedItem().id);
-       						protokol.setCpol(MainForm.authInfo.getCpodr());
-       						protokol.setNstr(tblPos.getSortedRowIndex());
-       						String servPath = MainForm.tcl.printProtokol(protokol);
+       						String servPath = MainForm.tcl.printProtokol(Vvod.zapVr.getNpasp(),MainForm.authInfo.getUser_id(),tblPos.getSelectedItem().id_obr,tblPos.getSelectedItem().id,MainForm.authInfo.getCpodr(),MainForm.authInfo.getClpu(),tblPos.getSortedRowIndex());
        						String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
        						MainForm.conMan.transferFileFromServer(servPath, cliPath);
        						MainForm.conMan.openFileInEditor(cliPath, false);

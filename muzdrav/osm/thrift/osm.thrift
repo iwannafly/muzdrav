@@ -519,17 +519,6 @@ struct Pdisp{
 	16: optional string diag_n;
 }
 
-struct Protokol{
-	1: optional i32 npasp;
-	2: optional i32 userId;
-	3: optional i32 pvizit_id;
-	4: optional i32 pvizit_ambId;
-	5: optional i32 cpol;
-	6: optional string cpodr_name;
-	7: optional string clpu_name;
-	8: optional i32 nstr;
-}
-
 struct Vypis {
 	1: optional i32 npasp;
 	2: optional i32 userId;
@@ -755,7 +744,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printNaprKons(1: NaprKons nk) throws (1: kmiacServer.KmiacServerException kse);//консультация
 	string printVypis(1: Vypis vp) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
 	string printKek(1: i32 npasp, 2: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
-	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
+	string printProtokol(1: i32 npasp, 2: i32 userId, 3: i32 pvizit_id, 4: i32 pvizit_ambId, 5: i32 cpol, 6: i32 clpu, 7: i32 nstr) throws (1: kmiacServer.KmiacServerException kse);
 	string printMSK(1: i32 npasp)  throws (1: kmiacServer.KmiacServerException kse);
 	string printAnamZab(1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
 	string printSpravNetrud(1: SpravNetrud sn) throws (1: kmiacServer.KmiacServerException kse);
