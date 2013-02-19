@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -17,7 +19,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import ru.nkz.ivcgzo.clientInfomat.TalonTableCellRenderer;
+import ru.nkz.ivcgzo.clientInfomat.model.TalonList;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.TalonTableModel;
+import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
 public class TalonSelectFrame extends InfomatFrame {
     private static final long serialVersionUID = -869834846316758484L;
@@ -108,6 +112,7 @@ public class TalonSelectFrame extends InfomatFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 ((TalonTableModel) tbTalons.getModel()).setPrevWeek();
+                setPrevNextVisible();
                 tbTalons.repaint();
                 updateSelectTableHeaders();
             }
@@ -129,7 +134,7 @@ public class TalonSelectFrame extends InfomatFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 ((TalonTableModel) tbTalons.getModel()).setNextWeek();
-                tbTalons.setModel(tbTalons.getModel());
+                setPrevNextVisible();
                 tbTalons.repaint();
                 updateSelectTableHeaders();
             }
@@ -138,6 +143,20 @@ public class TalonSelectFrame extends InfomatFrame {
         btnTalonForward.setBackground(Color.WHITE);
         btnTalonForward.setForeground(Color.BLACK);
         pTableButtons.add(btnTalonForward);
+    }
+
+    private void setPrevNextVisible() {
+    	TalonList tl = ((TalonTableModel) tbTalons.getModel()).getTalonList();
+    	List<TTalon> atl = tl.getAllTalonList();
+    	Date[] ds = tl.getWeekDays();
+    	
+    	if ((atl != null) && (atl.size() != 0)) {
+    		btnTalonBackward.setVisible(atl.get(0).datap < ds[0].getTime());
+    		btnTalonForward.setVisible(atl.get(atl.size() - 1).datap > ds[ds.length - 1].getTime());
+    	} else {
+    		btnTalonBackward.setVisible(false);
+    		btnTalonForward.setVisible(false);
+    	}
     }
 
     public final void addTalonTableMouseListener(final MouseListener listener) {
@@ -172,11 +191,13 @@ public class TalonSelectFrame extends InfomatFrame {
         tbTalons = new JTable();
         tbTalons.setDefaultRenderer(String.class, new TalonTableCellRenderer());
         tbTalons.setRowHeight(TABLE_ROW_HEIGHT);
+        tbTalons.getTableHeader().setReorderingAllowed(false);
         spTalon.setViewportView(tbTalons);
     }
 
     public final void refreshTalonTableModel(final TalonTableModel curTableModel) {
         tbTalons.setModel(curTableModel);
+        setPrevNextVisible();
     }
 
     public final void showModal(final TalonTableModel curTableModel) {
