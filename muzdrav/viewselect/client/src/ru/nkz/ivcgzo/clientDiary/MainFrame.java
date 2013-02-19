@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Box;
@@ -49,6 +48,8 @@ import ru.nkz.ivcgzo.thriftDiary.TMedicalHistory;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class MainFrame extends JFrame {
 
@@ -89,8 +90,14 @@ public class MainFrame extends JFrame {
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbOtd;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbPcodOsm;
     private int ticcbOtdSelIndex = -1;
+    private boolean isAsked, isAdding;
     
     public MainFrame() {
+    	addWindowListener(new WindowAdapter() {
+    		@Override
+    		public void windowOpened(WindowEvent e) {
+    		}
+    	});
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(980, 600));
         setSize(new Dimension(980, 600));
@@ -155,9 +162,7 @@ public class MainFrame extends JFrame {
         tblMedHist.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                if (tblMedHist.getSelectedItem() != null) {
-                    setMedicalHistoryText();
-                }
+                setMedicalHistoryText();
             }
         });
         tblMedHist.setDateField(0);
@@ -437,16 +442,11 @@ public class MainFrame extends JFrame {
     private void deleteMedHistoryFormTable() {
         try {
             if (tblMedHist.getSelectedItem() != null) {
-                int opResult = JOptionPane.showConfirmDialog(
-                    btnMedHistDel, "Удалить запись?",
-                    "Удаление записи", JOptionPane.YES_NO_OPTION);
-                if (opResult == JOptionPane.YES_OPTION) {
+                if (getUserAnswer("Удалить запись?")) {
                     ClientDiary.tcl.deleteMedicalHistory(
                         tblMedHist.getSelectedItem().getId());
                     //Заполнение таблицы:
                     fillMedHistoryTable();
-                    //Очистка текстовых полей:
-                    clearMedicalHistoryTextAreas();
                 }
                 if (tblMedHist.getRowCount() > 0) {
                     tblMedHist.setRowSelectionInterval(tblMedHist.getRowCount() - 1,
@@ -469,14 +469,13 @@ public class MainFrame extends JFrame {
         try {
         	TMedicalHistory curHist = tblMedHist.getSelectedItem();
             if (curHist != null) {
-                int opResult = JOptionPane.showConfirmDialog(
-                    btnMedHistUpd, "Обновить информацию о диагнозе?",
-                    "Изменение диагноза", JOptionPane.YES_NO_OPTION);
-                if (opResult == JOptionPane.YES_OPTION) {
+            	if (getUserAnswer("Обновить информацию о диагнозе?")) {
                 	//При обновлении записи нельзя изменять номер
                 	//отделения и врачей, проводившего осмотр и добавившего запись:
                 	getMedicalMedicalHistoryText(curHist);
                     ClientDiary.tcl.updateMedicalHistory(curHist);
+                    //Заполнение таблицы:
+                	fillMedHistoryTable();
                 }
             }
         } catch (KmiacServerException e1) {
@@ -491,41 +490,31 @@ public class MainFrame extends JFrame {
     }
 
     private void addMedHistoryToTable() {
-        try {
-            if (patient != null) {
-            	if ((ticcbOtd.getSelectedItem() == null) ||
-            		(ticcbPcodOsm.getSelectedItem() == null)) {
-					JOptionPane.showMessageDialog(this, "Не выбрано отделение или врач",
-							"Ошибка", JOptionPane.ERROR_MESSAGE);
-					return;
-            	}
-            	//Загрузка данных осмотра из текстовых полей:
-                TMedicalHistory newMedHist = new TMedicalHistory(); 
-                getMedicalMedicalHistoryText(newMedHist);
-                //Установка "скрытых значений":
-                newMedHist.setDataz(System.currentTimeMillis());
-                newMedHist.setTimez(System.currentTimeMillis());
-                newMedHist.setPcodVrach(ticcbPcodOsm.getSelectedPcod());
-                newMedHist.setCpodr(ticcbOtd.getSelectedPcod());
-                newMedHist.setPcodAdded(ClientDiary.authInfo.getPcod());
-                newMedHist.setIdGosp(patient.getIdGosp());
-                //Добавление информации об осмотре в БД:
-                newMedHist.setId(ClientDiary.tcl.addMedicalHistory(newMedHist));
-                //Заполнение таблицы:
-                fillMedHistoryTable();
-                //Очистка текстовых полей:
-                clearMedicalHistoryTextAreas();
-            }
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (MedicalHistoryNotFoundException e) {
-            tblMedHist.setData(new ArrayList<TMedicalHistory>());
-        } catch (TException e) {
-            ClientDiary.conMan.reconnect(e);
-        } catch (NullPointerException e) {
-        	//Ошибка создания нового объекта медицинской истории
-			e.printStackTrace();
-		}
+    	if (patient != null)
+	        try {
+	        	//Загрузка данных осмотра из текстовых полей:
+	            TMedicalHistory newMedHist = new TMedicalHistory(); 
+	            getMedicalMedicalHistoryText(newMedHist);
+	            //Установка "скрытых значений":
+	            newMedHist.setDataz(System.currentTimeMillis());
+	            newMedHist.setTimez(System.currentTimeMillis());
+	            newMedHist.setPcodAdded(ClientDiary.authInfo.getPcod());
+	            newMedHist.setIdGosp(patient.getIdGosp());
+	            //Добавление информации об осмотре в БД:
+	            newMedHist.setId(ClientDiary.tcl.addMedicalHistory(newMedHist));
+	            //Заполнение таблицы:
+	            fillMedHistoryTable();
+	        } catch (KmiacServerException e) {
+	            e.printStackTrace();
+	        } catch (MedicalHistoryNotFoundException e) {
+	        	clearMedicalHistory();
+	        	fillMedHistoryTable();
+	        } catch (TException e) {
+	            ClientDiary.conMan.reconnect(e);
+	        } catch (NullPointerException e) {
+	        	//Ошибка создания нового объекта медицинской истории
+				e.printStackTrace();
+			}
     }
     
     /**
@@ -562,24 +551,48 @@ public class MainFrame extends JFrame {
     		throws NullPointerException {
     	if (medHist == null)
     		throw new NullPointerException();
-        if (taJalob != null)
+        if (ticcbOtd.getSelectedItem() != null)
+        	medHist.setCpodr(ticcbOtd.getSelectedPcod());
+        else
+        	medHist.unsetCpodr();
+        if (ticcbPcodOsm.getSelectedItem() != null)
+        	medHist.setPcodVrach(ticcbPcodOsm.getSelectedPcod());
+        else
+        	medHist.unsetPcodVrach();
+        if ((taJalob != null) && !taJalob.getText().isEmpty())
         	medHist.setJalob(taJalob.getText());
-        if (taDesiaseHistory != null)
+        else
+        	medHist.unsetJalob();
+        if ((taDesiaseHistory != null) && !taDesiaseHistory.getText().isEmpty())
         	medHist.setMorbi(taDesiaseHistory.getText());
-        if (taFisicalObs != null)
+        else
+        	medHist.unsetMorbi();
+        if ((taFisicalObs != null) && !taFisicalObs.getText().isEmpty())
         	medHist.setFisicalObs(taFisicalObs.getText());
-        if (taStatusLocalis != null)
+        else
+        	medHist.unsetFisicalObs();
+        if ((taStatusLocalis != null) && !taStatusLocalis.getText().isEmpty())
         	medHist.setStatusLocalis(taStatusLocalis.getText());
-        if (taStatusPraence != null)
+        else
+        	medHist.unsetStatusLocalis();
+        if ((taStatusPraence != null) && !taStatusPraence.getText().isEmpty())
         	medHist.setStatusPraesense(taStatusPraence.getText());
+        else
+        	medHist.unsetStatusPraesense();
     }
 
     private void setMedicalHistoryText() {
     	TMedicalHistory curMedHist = tblMedHist.getSelectedItem();
     	if (curMedHist == null)
     		return;
-    	ticcbOtd.setSelectedPcod(curMedHist.getCpodr());
-    	ticcbPcodOsm.setSelectedPcod(curMedHist.getPcodVrach());
+    	if (curMedHist.isSetCpodr())
+    		ticcbOtd.setSelectedPcod(curMedHist.getCpodr());
+    	else
+    		ticcbOtd.setSelectedItem(null);
+    	if (curMedHist.isSetPcodVrach())
+    		ticcbPcodOsm.setSelectedPcod(curMedHist.getPcodVrach());
+    	else
+    		ticcbPcodOsm.setSelectedItem(null);
         if (taJalob != null)
             taJalob.setText(curMedHist.getJalob());
         if (taDesiaseHistory != null)
@@ -593,8 +606,14 @@ public class MainFrame extends JFrame {
     }
 
     private void clearMedicalHistory() {
-        tblMedHist.setData(Collections.<TMedicalHistory>emptyList());
+        tblMedHist.setData(new ArrayList<TMedicalHistory> (0));
         clearMedicalHistoryTextAreas();
+        clearMedicalHistoryComboBoxAreas();
+    }
+
+    private void clearMedicalHistoryComboBoxAreas() {
+        ticcbOtd.setSelectedItem(null);
+        ticcbPcodOsm.setSelectedItem(null);
     }
 
     private void clearMedicalHistoryTextAreas() {
@@ -613,8 +632,6 @@ public class MainFrame extends JFrame {
         if (taStatusPraence != null) {
             taStatusPraence.setText("");
         }
-        ticcbOtd.setSelectedItem(null);
-        ticcbPcodOsm.setSelectedItem(null);
     }
 
     private void setMedicalHistoryVerticalShablonPanel() {
@@ -709,47 +726,71 @@ public class MainFrame extends JFrame {
                 new ShablonSearchListener(tfMedHShablonFilter, lMedicalHistoryShablonNames);
         tfMedHShablonFilter.getDocument().addDocumentListener(medHiSearchListener);
     }
+    
+    /**
+     * Отображение пользователю диалога подтверждения
+     * с заданным текстом вопроса
+     * @param strQuestion Текст вопроса
+     * @return Возвращает <code>true</code>, если пользователь подтвердил;
+	 * иначе - <code>false</code>
+     * @author Балабаев Никита Дмитриевич
+     */
+    private boolean getUserAnswer(String strQuestion) {
+		int opResult = JOptionPane.showConfirmDialog(
+	            btnMedHistUpd, strQuestion,
+	            "Подтверждение", JOptionPane.YES_NO_OPTION);
+		return (opResult == JOptionPane.YES_OPTION);
+    }
+    
+    /**
+     * Заполнение заданного текстового поля текстом заданного шаблона
+     * с учётом возможного слияния
+     * @param curTextField Текстовое поле
+     * @param shText Текстовый шаблон
+     * @author Балабаев Никита Дмитриевич
+     */
+    private void pasteShablonInField(JTextArea curTextField, final ShablonText shText) {
+		String newText = shText.getText(), oldText = curTextField.getText();
+		if (!oldText.isEmpty() && !newText.isEmpty()) {
+    		if (!isAsked) {
+    			isAsked = true;
+    			isAdding = getUserAnswer("Дополнить текущие данные?");
+    		}
+    		if (isAdding)
+    			newText = oldText + "\n" + newText;
+		}
+		if (!newText.isEmpty())
+			curTextField.setText(newText);
+    }
 
     private void pasteSelectedShablon(final Shablon shablon) {
         if (shablon == null) {
             return;
         }
-
-        clearMedicalHistoryTextAreas();
+        JTextArea[] arrTextAreas = new JTextArea[]
+        		{taJalob, taDesiaseHistory, taStatusPraence, taFisicalObs, taStatusLocalis};
+        int[] arrIndexes = new int[] {-1, 0, 1, -1, -1, -1, 2, 3, 4};
+        isAsked = false;
+        isAdding = false;
 
         for (ShablonText shText : shablon.textList) {
-            switch (shText.grupId) {
-                case 1:
-                    taJalob.setText(shText.getText());
-                    break;
-                case 2:
-                    taDesiaseHistory.setText(shText.getText());
-                    break;
-                case 6:
-                    taStatusPraence.setText(shText.getText());
-                    break;
-                case 7:
-                    taFisicalObs.setText(shText.getText());
-                    break;
-                case 8:
-                    taStatusLocalis.setText(shText.getText());
-                    break;
-                default:
-                    break;
-            }
+        	int curFieldNum = shText.getGrupId();	//Номер текущего заполняемого поля
+        	if ((curFieldNum >= 0) && (curFieldNum < arrIndexes.length) && 
+        		(arrIndexes[curFieldNum] >= 0)) {
+        		pasteShablonInField(arrTextAreas[arrIndexes[curFieldNum]], shText);
+        	}
         }
     }
 
     /**
-     * Заполнение таблицы осмотров данными из БД и
-     * очистка выделения в таблице
+     * Заполнение таблицы осмотров данными из БД
      */
     private void fillMedHistoryTable() {
         if (patient != null) {
             try {
                 tblMedHist.setData(
                     ClientDiary.tcl.getMedicalHistory(patient.getIdGosp()));
-                tblMedHist.clearSelection();
+                setMedicalHistoryText();
             } catch (KmiacServerException e) {
                 e.printStackTrace();
             } catch (MedicalHistoryNotFoundException e) {

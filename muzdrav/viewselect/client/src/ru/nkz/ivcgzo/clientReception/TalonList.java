@@ -33,7 +33,25 @@ public class TalonList {
     public TalonList(final List<Talon> weekTalonList) {
         allTalonList = weekTalonList;
         dateChecker = new DateChecker();
-        partitionWeekTalonList(allTalonList);
+        setFirstNotEmptyWeek();
+    }
+
+    private void setFirstNotEmptyWeek() {
+    	if ((allTalonList != null) && (allTalonList.size() > 0)) {
+            partitionWeekTalonList(allTalonList);
+    		while (dateChecker.getCurrentWeek()[6].getTime() < allTalonList.get(allTalonList.size() - 1).datap) {
+    			if (dateChecker.getCurrentWeek()[6].getTime() > allTalonList.get(0).datap)
+    				break;
+    			else
+    				setNextWeek();
+			}
+    		
+    	}
+		
+	}
+
+	public final List<Talon> getAllTalonList() {
+    	return allTalonList;
     }
 
     public final List<Talon> getMondayTalonList() {

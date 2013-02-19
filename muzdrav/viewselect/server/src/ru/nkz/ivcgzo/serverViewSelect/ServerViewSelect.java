@@ -758,7 +758,7 @@ public class ServerViewSelect extends Server implements Iface {
    				    
 
    					try {
-  		            	AutoCloseableResultSet acr = sse.execPreparedQuery("select p_anamnez.npasp, p_anamnez.datap,p_anamnez.numstr,n_anz.name,p_anamnez.vybor,p_anamnez.comment,n_anz.yn,n_ot_str.prlpu,n_ot_str.numline from p_anamnez inner join n_anz on (n_anz.numstr=p_anamnez.numstr) inner join n_ot_str on (n_ot_str.nstr=n_anz.numstr) where n_ot_str.prlpu=? and npasp=? order by n_anz.numstr" , cslu, npasp); 
+  		            	AutoCloseableResultSet acr = sse.execPreparedQuery("select p_anamnez.npasp, p_anamnez.datap,p_anamnez.numstr,n_anz.name,p_anamnez.vybor,p_anamnez.comment,n_anz.yn,n_ot_str.prlpu,n_ot_str.numline from p_anamnez inner join n_anz on (n_anz.nstr=p_anamnez.numstr) inner join n_ot_str on (n_ot_str.nstr=n_anz.nstr) where n_ot_str.prlpu=? and npasp=? order by n_anz.numstr" , cslu, npasp); 
    							
 								if (acr.getResultSet().next()){
 									do {

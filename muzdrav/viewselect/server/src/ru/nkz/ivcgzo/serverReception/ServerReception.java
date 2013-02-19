@@ -1,11 +1,8 @@
 package ru.nkz.ivcgzo.serverReception;
 
 import java.io.File;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Date;
-import java.sql.Time;
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -56,6 +53,7 @@ public class ServerReception extends Server implements Iface {
 
 //////////////////////////////// Mappers /////////////////////////////////
 
+    private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmInt;
     private TResultSetMapper<Patient, Patient._Fields> rsmPatient;
     private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmPoliclinic;
     private TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmSpec;
@@ -97,6 +95,7 @@ public class ServerReception extends Server implements Iface {
                     .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath();
         DOMConfigurator.configure(new File(manPath, "log4j.xml").getAbsolutePath());
 
+        rsmInt = new TResultSetMapper<>(IntegerClassifier.class);
         rsmPatient = new TResultSetMapper<>(Patient.class, PATIENT_FIELD_NAMES);
         rsmPoliclinic = new TResultSetMapper<>(IntegerClassifier.class, POLICLINIC_FIELD_NAMES);
         rsmSpec = new TResultSetMapper<>(StringClassifier.class, SPEC_FIELD_NAMES);
@@ -187,7 +186,8 @@ public class ServerReception extends Server implements Iface {
         final String sqlQuery = "SELECT DISTINCT n_n00.pcod, "
                 + "(n_m00.name_s || ', ' || n_n00.name) as name "
                 + "FROM n_n00 INNER JOIN n_m00 ON n_m00.pcod = n_n00.clpu "
-                + "INNER JOIN e_talon ON n_n00.pcod = e_talon.cpol;";
+                + "INNER JOIN e_talon e ON n_n00.pcod = e.cpol "
+                + "WHERE ((e.datap > CURRENT_DATE) OR (e.datap = CURRENT_DATE AND e.timep > CURRENT_TIME));";
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             List<IntegerClassifier> tmpList = rsmPoliclinic.mapToList(acrs.getResultSet());
             if (tmpList.size() > 0) {
@@ -205,8 +205,9 @@ public class ServerReception extends Server implements Iface {
     public final List<StringClassifier> getSpec(final int cpol) throws KmiacServerException,
             SpecNotFoundException {
         final String sqlQuery = "SELECT DISTINCT n_s00.pcod, n_s00.name FROM n_s00 "
-                + "INNER JOIN e_talon ON n_s00.pcod = e_talon.cdol "
-                + "WHERE e_talon.cpol = ? AND e_talon.prv = ?;";
+                + "INNER JOIN e_talon e ON n_s00.pcod = e.cdol "
+                + "WHERE e.cpol = ? AND e.prv = ? "
+                + "AND ((e.datap > CURRENT_DATE) OR (e.datap = CURRENT_DATE AND e.timep > CURRENT_TIME));";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpol, 0)) {
             List<StringClassifier> tmpList = rsmSpec.mapToList(acrs.getResultSet());
             if (tmpList.size() > 0) {
@@ -223,20 +224,12 @@ public class ServerReception extends Server implements Iface {
     @Override
     public final List<IntegerClassifier> getVrach(final int cpol, final String cdol)
             throws KmiacServerException, VrachNotFoundException {
-        final String sqlQuery = "SELECT DISTINCT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot "
-                + "FROM s_vrach INNER JOIN e_talon ON s_vrach.pcod = e_talon.pcod_sp "
-                + "WHERE e_talon.cpol = ? AND e_talon.cdol = ?;";
+        final String sqlQuery = "SELECT DISTINCT s_vrach.pcod, s_vrach.fam || ' ' || s_vrach.im || ' ' || s_vrach.ot AS name "
+                + "FROM s_vrach INNER JOIN e_talon e ON s_vrach.pcod = e.pcod_sp "
+                + "WHERE e.cpol = ? AND e.cdol = ? "
+                + "AND ((e.datap > CURRENT_DATE) OR (e.datap = CURRENT_DATE AND e.timep > CURRENT_TIME));";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpol, cdol)) {
-            List<IntegerClassifier> tmpList = new ArrayList<IntegerClassifier>();
-            ResultSet rs = acrs.getResultSet();
-            while (rs.next()) {
-                tmpList.add(
-                    new IntegerClassifier(
-                        rs.getInt(1),
-                        String.format("%s %s %s", rs.getString(2), rs.getString(3), rs.getString(4))
-                    )
-                );
-            }
+            List<IntegerClassifier> tmpList = rsmInt.mapToList(acrs.getResultSet());
             if (tmpList.size() > 0) {
                 return tmpList;
             } else {
@@ -266,19 +259,17 @@ public class ServerReception extends Server implements Iface {
     }
 
     @Override
-    public final List<Talon> getTalon(final int cpol, final String cdol, final int pcod)
+    public final List<Talon> getTalon(final int cpol, final String cdol, final int pcod, final int npasp, final boolean secOnly)
             throws KmiacServerException, TalonNotFoundException {
         final int prv = 0;
-        // java.sql.Date не имеет нулевого конструктора, а preparedQuery() не работает с
-        // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
-        final long todayMillisec = new java.util.Date().getTime();
-        final String sqlQuery = "SELECT id, ntalon, vidp, timep, datap, npasp, dataz, prv, pcod_sp "
-                + "FROM e_talon WHERE cpol = ? AND cdol = ? AND pcod_sp = ? "
-                + "AND ((datap > ?) OR (datap = ? AND timep >= ?)) AND prv = ? "
-                + "ORDER BY datap, timep;";
+        final String sqlQuery = String.format("WITH t AS (SELECT datap FROM e_talon WHERE npasp = ?) "
+        		+ "SELECT e.id, e.ntalon, e.vidp, e.timep, e.datap, e.npasp, e.dataz, e.prv, e.pcod_sp "
+        		+ "FROM e_talon e WHERE e.cpol = ? AND e.cdol = ? AND e.pcod_sp = ? "
+        		+ "AND ((e.datap > CURRENT_DATE) OR (e.datap = CURRENT_DATE AND e.timep > CURRENT_TIME)) "
+        		+ "AND e.prv = ? AND e.datap NOT IN (SELECT datap FROM t) AND e.vidp %s 2 "
+        		+ "ORDER BY e.datap, e.timep ", (secOnly) ? "=" : "!=");
         try (AutoCloseableResultSet acrs =
-                sse.execPreparedQuery(sqlQuery, cpol, cdol, pcod, new Date(todayMillisec),
-                        new Date(todayMillisec), new Time(System.currentTimeMillis()), prv)) {
+                sse.execPreparedQuery(sqlQuery, npasp, cpol, cdol, pcod, prv)) {
             List<Talon> tmpList = rsmTalon.mapToList(acrs.getResultSet());
             if (tmpList.size() > 0) {
                 return tmpList;
