@@ -8,12 +8,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -24,7 +27,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
@@ -38,6 +40,7 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftDiary.MedicalHistoryNotFoundException;
@@ -45,62 +48,52 @@ import ru.nkz.ivcgzo.thriftDiary.Patient;
 import ru.nkz.ivcgzo.thriftDiary.Shablon;
 import ru.nkz.ivcgzo.thriftDiary.ShablonText;
 import ru.nkz.ivcgzo.thriftDiary.TMedicalHistory;
-import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class MainFrame extends JFrame {
 
     private static final long serialVersionUID = 2973952682216394132L;
 
-    private Component hsMedicalHistoryFirst;
-    private Component hsMedicalHistorySecond;
-    private Component hsMedicalHistoryThird;
-    private Box vbMedicalHistoryTextFields;
-    private Box hbMedicalHistoryTableControls;
-    private JScrollPane spMedHist;
-    private CustomTable<TMedicalHistory, TMedicalHistory._Fields> tblMedHist;
-    private Box vbMedicalHistoryTableButtons;
-    private JButton btnMedHistAdd;
-    private JButton btnMedHistDel;
-    private JButton btnMedHistUpd;
-    private Component vsMedicalHistoryControlsDelim;
-    private JTextArea taJalob;
-    private JTextArea taDesiaseHistory;
-    private JTextArea taStatusPraence;
-    private JTextArea taFisicalObs;
-    private JTextArea taStatusLocalis;
-    private Box vbMedicalHistoryShablonComponents;
-    private JLabel lblMedicalHistioryShablonHeader;
-    private Box hbMedicalHistoryShablonFind;
-    private CustomTextField tfMedHShablonFilter;
-    private JButton btnMedicalHistoryShablonFind;
-    private ShablonSearchListener medHiSearchListener;
-    private ThriftIntegerClassifierList lMedicalHistoryShablonNames;
-    private JScrollPane spMedicalHistoryShablonNames;
-//    private ShablonForm frmShablon;
     private JPanel pnlJal;
     private JPanel pnlMedicalHist;
     private JPanel pnlStatusPraence;
     private JPanel pnlStatusLocalis;
     private JPanel pnlFisicalObs;
-    private Patient patient;
+    private Component hsMedicalHistoryFirst;
+    private Component hsMedicalHistorySecond;
+    private Component hsMedicalHistoryThird;
+    private Component vsMedicalHistoryControlsDelim;
+    private Box vbMedicalHistoryTextFields;
+    private Box hbMedicalHistoryTableControls;
+    private Box vbMedicalHistoryShablonComponents;
+    private Box hbMedicalHistoryShablonFind;
+    private Box vbMedicalHistoryTableButtons;
+    private JScrollPane spMedHist;
+    private JScrollPane spMedicalHistoryShablonNames;
+    private JButton btnMedHistAdd;
+    private JButton btnMedHistDel;
+    private JButton btnMedHistUpd;
+    private JButton btnMedicalHistoryShablonFind;
+    private JTextArea taJalob;
+    private JTextArea taDesiaseHistory;
+    private JTextArea taStatusPraence;
+    private JTextArea taFisicalObs;
+    private JTextArea taStatusLocalis;
+    private JLabel lblMedicalHistioryShablonHeader;
+    private CustomTextField tfMedHShablonFilter;
+    private CustomTable<TMedicalHistory, TMedicalHistory._Fields> tblMedHist;
+    private ShablonSearchListener medHiSearchListener;
+    private ThriftIntegerClassifierList lMedicalHistoryShablonNames;
+//    private ShablonForm frmShablon;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbOtd;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbPcodOsm;
+    private Patient patient;
     private int ticcbOtdSelIndex = -1;
     private boolean isAsked, isAdding;
     
     public MainFrame() {
-    	addWindowListener(new WindowAdapter() {
-    		@Override
-    		public void windowOpened(WindowEvent e) {
-    		}
-    	});
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(980, 600));
-        setSize(new Dimension(980, 600));
+        setSize(new Dimension(980, 700));
 //        setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource(
 //                "/ru/nkz/ivcgzo/clientLab/resources/issled.png")));
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
@@ -138,6 +131,7 @@ public class MainFrame extends JFrame {
 
     private void setMedicalHistoryHorizontalTableComponents() {
         hbMedicalHistoryTableControls = Box.createHorizontalBox();
+        hbMedicalHistoryTableControls.setPreferredSize(new Dimension(200, 0));
         hbMedicalHistoryTableControls.setBorder(
             new MatteBorder(0, 0, 1, 0, (Color) new Color(0, 0, 0)));
         vbMedicalHistoryTextFields.add(hbMedicalHistoryTableControls);
@@ -149,7 +143,7 @@ public class MainFrame extends JFrame {
     private void setMedicalHistoryTableScrollPane() {
         spMedHist = new JScrollPane();
         spMedHist.setBorder(new MatteBorder(0, 0, 0, 1, (Color) new Color(0, 0, 0)));
-        spMedHist.setPreferredSize(new Dimension(200, 150));
+        spMedHist.setPreferredSize(new Dimension(200, 40));
         hbMedicalHistoryTableControls.add(spMedHist);
 
         addMedicalHistoryTable();
@@ -227,6 +221,7 @@ public class MainFrame extends JFrame {
 
     private void setMedicalHistoryTabPaneComponents() {
         vsMedicalHistoryControlsDelim = Box.createVerticalStrut(20);
+        vsMedicalHistoryControlsDelim.setPreferredSize(new Dimension(0, 10));
         vbMedicalHistoryTextFields.add(vsMedicalHistoryControlsDelim);
 
         addMedicalHistoryTabbedPane();
