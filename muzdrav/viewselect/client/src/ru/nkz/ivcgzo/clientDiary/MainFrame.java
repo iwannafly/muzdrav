@@ -104,8 +104,6 @@ public class MainFrame extends JFrame {
     }
 
     private void setDiaryPanel() {
-//        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-
         hsMedicalHistoryFirst = Box.createHorizontalStrut(5);
         getContentPane().add(hsMedicalHistoryFirst);
 
@@ -738,7 +736,7 @@ public class MainFrame extends JFrame {
      */
     private boolean getUserAnswer(String strQuestion) {
 		int opResult = JOptionPane.showConfirmDialog(
-	            btnMedHistUpd, strQuestion,
+	            this.getContentPane(), strQuestion,
 	            "Подтверждение", JOptionPane.YES_NO_OPTION);
 		return (opResult == JOptionPane.YES_OPTION);
     }

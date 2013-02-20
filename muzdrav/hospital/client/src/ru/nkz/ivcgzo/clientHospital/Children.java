@@ -90,8 +90,6 @@ public final class Children extends JPanel {
 		this.patient = patientInfo;
 		//Инициализация интерфейса:
 		this.setInterface();
-		this.setDefaultChildValues();
-		this.setDefaultDocValues();
 		this.updatePanel();	//Обновление панели
 	}
 	
@@ -157,7 +155,7 @@ public final class Children extends JPanel {
 		this.spinnerDocNum.setValue(0);
 		this.cbBirthHappen.setSelectedIndex(-1);
 		this.ticcbMotherWork.setSelectedItem(null);
-		try{
+		try {
 			this.ticcbBirthPlace.setSelectedPcod(42);	//По умолчанию выбран г. Новокузнецк
 		} catch(Exception e) {
 			this.ticcbBirthPlace.setSelectedItem(null);
@@ -423,11 +421,10 @@ public final class Children extends JPanel {
 					"Вы действительно хотите изменить данные свидетельства",
 					"Подтверждение изменений", JOptionPane.YES_NO_OPTION);
 			//Пользователь подтвердил изменение данных:
-			if (answer == JOptionPane.YES_OPTION) {
+			if (answer == JOptionPane.YES_OPTION)
 				ClientHospital.tcl.updateChildDocument(this.childDoc);
-			} else {	//Пользователь отменил изменение данных:
+			else	//Пользователь отменил изменение данных:
 				this.childDoc = oldDoc;	//Откат изменений (элементы интерфейса не будут затронуты)
-			}
 		} else {	//Данные не изменены
 			if (isGive && !this.childDoc.isSetSvid_give()) {
 				this.fillChildBirthGiveFields();	//Процесс выдачи заполненного свидетельства
@@ -454,8 +451,7 @@ public final class Children extends JPanel {
 	private boolean addChildDocument(boolean isGive)
 			throws KmiacServerException, PatientNotFoundException, TException {
 		this.childDoc = new TRd_Svid_Rojd();
-		if (!this.loadChildDocFromPanel())	//Не все данные введены
-		{
+		if (!this.loadChildDocFromPanel()) {	//Не все данные введены
 			this.childDoc = null;
 			return false;
 		}
@@ -514,8 +510,7 @@ public final class Children extends JPanel {
 	private boolean btnFillChildBirthDoc(boolean isGive) {
 		if (!this.checkPatient())
 			return false;
-		if (this.childInfo == null)
-		{
+		if (this.childInfo == null) {
 			JOptionPane.showMessageDialog(this, "Информация о новорождённом " +
 					"отсутствует", "Ошибка", JOptionPane.ERROR_MESSAGE);
 			return false;
@@ -626,8 +621,9 @@ public final class Children extends JPanel {
 	 * Обновление пользователського интерфейса панели
 	 */
 	private void updatePanel() {
-		if (this.patient != null)
-		{
+		this.setDefaultChildValues();
+		this.setDefaultDocValues();
+		if (this.patient != null) {
 			final int childId = this.patient.getPatientId();
 			this.childInfo = null;
 			this.childDoc = null;
@@ -639,12 +635,9 @@ public final class Children extends JPanel {
 			} catch (KmiacServerException kse) {
 				kse.printStackTrace();
 			} catch (PatientNotFoundException e) {
-				//Новорождённый не найден, его нужно добавить в таблицу:
-				this.setDefaultChildValues();
-				this.setDefaultDocValues();
+				//Новорождённый не найден
 			} catch (ChildDocNotFoundException e) {
-				//Свидетельство ещё не было выдано:
-				this.setDefaultDocValues();
+				//Свидетельство ещё не было выдано
 			} catch (TException e) {
 				e.printStackTrace();
 			}
@@ -657,9 +650,17 @@ public final class Children extends JPanel {
 	 */
 	private void setInterface() {
 		this.panelChildEdit = new JPanel();
-		this.panelChildEdit.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true), "Информация о новорождённом", TitledBorder.LEFT, TitledBorder.TOP, null, null));
+		this.panelChildEdit.setBorder(
+				new TitledBorder(
+						new LineBorder(
+								new Color(0, 0, 0), 1, true),
+								"Информация о новорождённом", TitledBorder.LEFT, TitledBorder.TOP, null, null));
 		this.panelDoc = new JPanel();
-		this.panelDoc.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true), "Медицинское свидетельство о рождении", TitledBorder.LEFT, TitledBorder.TOP, null, null));
+		this.panelDoc.setBorder(
+				new TitledBorder(
+						new LineBorder(
+								new Color(0, 0, 0), 1, true),
+								"Медицинское свидетельство о рождении", TitledBorder.LEFT, TitledBorder.TOP, null, null));
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)

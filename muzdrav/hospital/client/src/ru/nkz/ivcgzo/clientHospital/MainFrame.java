@@ -106,12 +106,16 @@ public class MainFrame extends JFrame {
     private static final long serialVersionUID = 3513837719265529744L;
     private static final String WINDOW_HEADER = "Врач стационара";
     private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy");
+    private UserAuthInfo doctorAuth;
+    private TPatient patient;
+    private TPriemInfo priemInfo;
+    private Children pChildren;
+    private Naznach pNaznach;
     private JMenuBar mbMain;
     private JMenu mnPatientOperation;
     private JMenuItem mntmSelectPatient;
     private JMenuItem mntmReception;
     private JTabbedPane tabbedPane;
-    private Children pChildren;
     private JSplitPane spPatientInfo;
     private JPanel pPersonalInfo;
     private JPanel pReceptionInfo;
@@ -143,9 +147,6 @@ public class MainFrame extends JFrame {
     private JLabel lblRealAddress;
     private JTextField tfRealAddress;
     private JTextPane textPane;
-    private UserAuthInfo doctorAuth;
-    private TPatient patient;
-    private TPriemInfo priemInfo;
     private JPanel pMedicalHistory;
     private JTabbedPane tbpMedicalHistory;
     private CustomTextField tfMedHShablonFilter;
@@ -419,6 +420,7 @@ public class MainFrame extends JFrame {
         } else {	//Скрытие вкладки "Роды":
             tabbedPane.removeTabAt(4);
         }
+        setNaznachPanel();
         setZaklPanel();
     }
 
@@ -460,6 +462,10 @@ public class MainFrame extends JFrame {
         clearMedicalHistory();
         clearDiagnosisText();
         clearZaklText();
+        if (pChildren != null)
+        	pChildren.setPatient(null);
+        if (pNaznach != null)
+        	pNaznach.setPatient(null);
     }
 
     private class ShablonSearchListener implements DocumentListener {
@@ -571,6 +577,8 @@ public class MainFrame extends JFrame {
                     fillStageTable();
                     if (pChildren != null)
                     	pChildren.setPatient(patient);
+                    if (pNaznach != null)
+                    	pNaznach.setPatient(patient);
 
         			try {
 						trdIshod = ClientHospital.tcl.getRdIshodInfo(
@@ -949,9 +957,10 @@ public class MainFrame extends JFrame {
                     fillMedHistoryTable();
                     fillDiagnosisTable();
                     fillStageTable();
-                    if (pChildren != null) {
+                    if (pChildren != null)
                         pChildren.setPatient(patient);
-                    }
+                    if (pNaznach != null)
+                    	pNaznach.setPatient(patient);
                 }
             }
         });
@@ -3896,9 +3905,24 @@ public class MainFrame extends JFrame {
 	*/
 	private void setChildrenPanel() {
 		this.pChildren = new Children(this.doctorAuth, this.patient);
-		tabbedPane.addTab("Новорождённый",
+		this.tabbedPane.addTab("Новорождённый",
 				new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/children.png")),
 				this.pChildren,
+				null);
+	}
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////Назначения//////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	* Установка панели учёта назначений
+	* @author Балабаев Никита Дмитриевич
+	*/
+	private void setNaznachPanel() {
+		this.pNaznach = new Naznach(this.doctorAuth, this.patient);
+		this.tabbedPane.addTab("Назначения",
+				new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/medication.png")),
+				this.pNaznach,
 				null);
 	}
     
