@@ -21,7 +21,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.UIManager;
-import javax.swing.event.ListDataListener;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -65,6 +64,7 @@ import javax.swing.SpinnerNumberModel;
 
 import org.apache.thrift.TException;
 import javax.swing.DefaultComboBoxModel;
+import java.awt.Font;
 
 public class TalonMainFrame extends JFrame {
 
@@ -195,6 +195,72 @@ public class TalonMainFrame extends JFrame {
 		
 		JPanel panel_8 = new JPanel();
 		panel_8.setBorder(new TitledBorder(null, "\u041F\u0435\u0440\u0435\u0440\u044B\u0432", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		GroupLayout gl_tbRasp = new GroupLayout(tbRasp);
+		gl_tbRasp.setHorizontalGroup(
+			gl_tbRasp.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_tbRasp.createSequentialGroup()
+					.addGap(23)
+					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
+						.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 369, Short.MAX_VALUE)
+						.addComponent(panel_1, 0, 0, Short.MAX_VALUE))
+					.addGap(54)
+					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panel_8, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE))
+					.addGap(160))
+		);
+		gl_tbRasp.setVerticalGroup(
+			gl_tbRasp.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_tbRasp.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_tbRasp.createSequentialGroup()
+							.addComponent(panel_8, GroupLayout.PREFERRED_SIZE, 192, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
+						.addGroup(gl_tbRasp.createSequentialGroup()
+							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(panel_6, GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)))
+					.addContainerGap())
+		);
+		
+		JLabel lblNewLabel_7 = new JLabel("Время");
+		lblNewLabel_7.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		JLabel lblNewLabel_2 = new JLabel("Понедельник");
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		JLabel lblNewLabel_3 = new JLabel("Вторник");
+		lblNewLabel_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		JLabel lblNewLabel_4 = new JLabel("Среда");
+		lblNewLabel_4.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		JLabel lblNewLabel_5 = new JLabel("Четверг");
+		lblNewLabel_5.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		JLabel lblNewLabel_6 = new JLabel("Пятница");
+		lblNewLabel_6.setFont(new Font("Tahoma", Font.PLAIN, 12));
+
+		tf_day1_p1 = new CustomTimeEditor();
+		tf_day1_p1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		tf_day1_p2 = new CustomTimeEditor();
+		tf_day1_p2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		tf_day2_p1 = new CustomTimeEditor();
+		tf_day2_p1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		tf_day2_p2 = new CustomTimeEditor();
+		tf_day2_p2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		tf_day3_p1 = new CustomTimeEditor();
+		tf_day3_p1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		tf_day3_p2 = new CustomTimeEditor();
+		tf_day3_p2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		tf_day4_p1 = new CustomTimeEditor();
+		tf_day4_p1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		tf_day4_p2 = new CustomTimeEditor();
+		tf_day4_p2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		tf_day5_p1 = new CustomTimeEditor();
+		tf_day5_p1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		tf_day5_p2 = new CustomTimeEditor();
+		tf_day5_p2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JButton btnNewButton_1 = new JButton("Сохранить");
 		btnNewButton_1.addActionListener(new ActionListener() {
@@ -233,69 +299,12 @@ public class TalonMainFrame extends JFrame {
 			}
 		});
 		btnNewButton_1.setToolTipText("Сохранить перерыв");
-		GroupLayout gl_tbRasp = new GroupLayout(tbRasp);
-		gl_tbRasp.setHorizontalGroup(
-			gl_tbRasp.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_tbRasp.createSequentialGroup()
-					.addGap(23)
-					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
-						.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 347, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 369, GroupLayout.PREFERRED_SIZE))
-					.addGap(54)
-					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_tbRasp.createSequentialGroup()
-							.addComponent(panel_8, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewButton_1)))
-					.addContainerGap())
-		);
-		gl_tbRasp.setVerticalGroup(
-			gl_tbRasp.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_tbRasp.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_tbRasp.createSequentialGroup()
-							.addGroup(gl_tbRasp.createParallelGroup(Alignment.TRAILING)
-								.addGroup(gl_tbRasp.createSequentialGroup()
-									.addComponent(panel_8, GroupLayout.PREFERRED_SIZE, 185, GroupLayout.PREFERRED_SIZE)
-									.addGap(18))
-								.addGroup(gl_tbRasp.createSequentialGroup()
-									.addComponent(btnNewButton_1)
-									.addGap(28)))
-							.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
-						.addGroup(gl_tbRasp.createSequentialGroup()
-							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(panel_6, GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)))
-					.addContainerGap())
-		);
-		
-		JLabel lblNewLabel_7 = new JLabel("Время");
-		JLabel lblNewLabel_2 = new JLabel("Понедельник");
-		JLabel lblNewLabel_3 = new JLabel("Вторник");
-		JLabel lblNewLabel_4 = new JLabel("Среда");
-		JLabel lblNewLabel_5 = new JLabel("Четверг");
-		JLabel lblNewLabel_6 = new JLabel("Пятница");
-
-		tf_day1_p1 = new CustomTimeEditor();
-		tf_day1_p2 = new CustomTimeEditor();
-		tf_day2_p1 = new CustomTimeEditor();
-		tf_day2_p2 = new CustomTimeEditor();
-		tf_day3_p1 = new CustomTimeEditor();
-		tf_day3_p2 = new CustomTimeEditor();
-		tf_day4_p1 = new CustomTimeEditor();
-		tf_day4_p2 = new CustomTimeEditor();
-		tf_day5_p1 = new CustomTimeEditor();
-		tf_day5_p2 = new CustomTimeEditor();
 		GroupLayout gl_panel_8 = new GroupLayout(panel_8);
 		gl_panel_8.setHorizontalGroup(
 			gl_panel_8.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_8.createSequentialGroup()
-					.addGap(113)
+					.addComponent(btnNewButton_1)
+					.addGap(26)
 					.addComponent(lblNewLabel_7, GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
 					.addGap(56))
 				.addGroup(gl_panel_8.createSequentialGroup()
@@ -327,7 +336,9 @@ public class TalonMainFrame extends JFrame {
 		gl_panel_8.setVerticalGroup(
 			gl_panel_8.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_8.createSequentialGroup()
-					.addComponent(lblNewLabel_7)
+					.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_7)
+						.addComponent(btnNewButton_1))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
 						.addComponent(tf_day1_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -369,6 +380,7 @@ public class TalonMainFrame extends JFrame {
 		JScrollPane sp_rasp = new JScrollPane();
 		
 		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По");
+		tbl_rasp.setFont(new Font("Tahoma", Font.PLAIN, 12));
 //		tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.get_intClass());
 		tbl_rasp.setPreferredWidths(130,100,60,60);
 		tbl_rasp.setEditableFields(false, 0,1);
@@ -524,6 +536,7 @@ public class TalonMainFrame extends JFrame {
 		);
 		
 		otm_day_1 = new JRadioButton("Понедельник");
+		otm_day_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		otm_day_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
@@ -541,6 +554,7 @@ public class TalonMainFrame extends JFrame {
 		});
 		
 		otm_day_2 = new JRadioButton("Вторник");
+		otm_day_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		otm_day_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
@@ -558,6 +572,7 @@ public class TalonMainFrame extends JFrame {
 		});
 		
 		otm_day_3 = new JRadioButton("Среда");
+		otm_day_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		otm_day_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
@@ -575,6 +590,7 @@ public class TalonMainFrame extends JFrame {
 		});
 		
 		otm_day_4 = new JRadioButton("Четверг");
+		otm_day_4.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		otm_day_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
@@ -595,6 +611,7 @@ public class TalonMainFrame extends JFrame {
 		});
 		
 		otm_day_5 = new JRadioButton("Пятница");
+		otm_day_5.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		otm_day_5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
@@ -640,6 +657,7 @@ public class TalonMainFrame extends JFrame {
 		panel_7.setLayout(gl_panel_7);
 		
 		tbl_ndv =new CustomTable<>(true, true, Ndv.class, 1,"Дата начала",2,"окончания");
+		tbl_ndv.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbl_ndv.setPreferredWidths(90,90);
 		tbl_ndv.setDateField(0);
 		tbl_ndv.setDateField(1);
@@ -700,6 +718,7 @@ public class TalonMainFrame extends JFrame {
 		});
 		
 		cbx_rasp = new JCheckBox("учитывать четные и нечетные дни ");
+		cbx_rasp.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		JButton btn_new = new JButton("Создать");
 		btn_new.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -738,6 +757,7 @@ public class TalonMainFrame extends JFrame {
 		panel_2.setLayout(gl_panel_2);
 
 		cxm_1 = new JRadioButton("на каждый день");
+		cxm_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		cxm_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				ClearOtmetka();
@@ -746,6 +766,7 @@ public class TalonMainFrame extends JFrame {
 		btnGroup_cxema.add(cxm_1);
 		
 		cxm_2 = new JRadioButton("четные дни");
+		cxm_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		cxm_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				ClearOtmetka();
@@ -754,6 +775,7 @@ public class TalonMainFrame extends JFrame {
 		btnGroup_cxema.add(cxm_2);
 		
 		cxm_3 = new JRadioButton("нечетные дни");
+		cxm_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		cxm_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				ClearOtmetka();
@@ -868,6 +890,7 @@ public class TalonMainFrame extends JFrame {
 		panel_3.setLayout(gl_panel_3);
 		
 		tbl_norm =new CustomTable<>(true, true, Norm.class, 1,"Вид приема",2,"Длительность");
+		tbl_norm.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbl_norm.setFillsViewportHeight(true);
 		tbl_norm.setPreferredWidths(90,90);
 		tbl_norm.setEditableFields(false, 0);
@@ -938,12 +961,14 @@ public class TalonMainFrame extends JFrame {
             };
 
         cmb_month = new JComboBox<String>();
+        cmb_month.setFont(new Font("Tahoma", Font.PLAIN, 12));
         cmb_month.setModel(new DefaultComboBoxModel<>(items));
         cmb_month.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
 			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
 				if (nmonth != 0 && nday != 0 && nyear != 0){
 	                nmonth = cmb_month.getSelectedIndex()+1;
+	                sp_day.setValue(1);
 	                ChangeDatap();
 				}
         	}
@@ -951,6 +976,7 @@ public class TalonMainFrame extends JFrame {
         cmb_month.setMaximumRowCount(12);
 
         sp_god = new JSpinner();
+        sp_god.setFont(new Font("Tahoma", Font.PLAIN, 12));
         sp_god.setModel(new SpinnerNumberModel(new Integer(2012), new Integer(2012), null, new Integer(1)));
         sp_god.addChangeListener(new ChangeListener() {
         	public void stateChanged(ChangeEvent arg0) {
@@ -962,6 +988,7 @@ public class TalonMainFrame extends JFrame {
         	}
         });
 		sp_day = new JSpinner();
+		sp_day.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		sp_day.setModel(new SpinnerNumberModel(2, 1, 31, 1));
 		sp_day.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
@@ -983,8 +1010,11 @@ public class TalonMainFrame extends JFrame {
         nmonth = cmb_month.getSelectedIndex()+1;
         
 		JLabel lblNewLabel_11 = new JLabel("Год");
+		lblNewLabel_11.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		JLabel lblNewLabel_12 = new JLabel("Месяц");
+		lblNewLabel_12.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		JLabel lblNewLabel_13 = new JLabel("День");
+		lblNewLabel_13.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		GroupLayout gl_panel_10 = new GroupLayout(panel_10);
@@ -1030,6 +1060,7 @@ public class TalonMainFrame extends JFrame {
 		);
 		
 		tbl_talon =new CustomTable<>(true, true, Talon.class, 11,"Время", 6,"Вид приема");
+		tbl_talon.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbl_talon.setPreferredWidths(70,90);
 		tbl_talon.setTimeField(0);
 		tbl_talon.setEditableFields(false, 0,1);
@@ -1038,11 +1069,14 @@ public class TalonMainFrame extends JFrame {
 		panel_10.setLayout(gl_panel_10);
 		
 		tf_datn = new CustomDateEditor();
+		tf_datn.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tf_datk = new CustomDateEditor();
+		tf_datk.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tf_datn.setDate(System.currentTimeMillis());
 		tf_datk.setDate(System.currentTimeMillis());
 
 		JButton btnNewButton = new JButton("Формировать");
+		btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				pBar.setMinimum(0);
@@ -1077,16 +1111,22 @@ public class TalonMainFrame extends JFrame {
 		});
 
 		JLabel lblNewLabel = new JLabel("Период: с");
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		JLabel lblNewLabel_1 = new JLabel("по");
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		tal_1 = new JRadioButton("все специалисты");
+		tal_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnGroup_talon.add(tal_1);
 		
 		tal_2 = new JRadioButton("для выбранной специальности");
+		tal_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnGroup_talon.add(tal_2);
 		
 		tal_3 = new JRadioButton("для выбранного врача");
+		tal_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnGroup_talon.add(tal_3);
+		tal_3.setSelected(true);
 		
 		pBar = new JProgressBar();
 		pBar.addChangeListener(new ChangeListener() {
@@ -1168,8 +1208,11 @@ public class TalonMainFrame extends JFrame {
 		);
 		
 		JLabel lblNewLabel_8 = new JLabel("Вид сводки");
+		lblNewLabel_8.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		JLabel lblNewLabel_9 = new JLabel("За период  с");
+		lblNewLabel_9.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		JLabel lblNewLabel_10 = new JLabel("по");
+		lblNewLabel_10.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
         String[] items1 = {
        		"1. Списки пациентов, записанных на прием",
@@ -1181,6 +1224,7 @@ public class TalonMainFrame extends JFrame {
         };
 
 		cmb_sv = new JComboBox<String>();
+		cmb_sv.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		cmb_sv.setModel(new DefaultComboBoxModel<>(items1));
 		cmb_sv.addActionListener(new ActionListener() {
 			@SuppressWarnings({ "rawtypes", "unused" })
@@ -1192,11 +1236,14 @@ public class TalonMainFrame extends JFrame {
 		});
 		
 		tf_sv2 = new CustomDateEditor();
+		tf_sv2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tf_sv1 = new CustomDateEditor();
+		tf_sv1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tf_sv1.setDate(System.currentTimeMillis());
 		tf_sv2.setDate(System.currentTimeMillis());
 		
 		JButton btnSvod = new JButton("Создать сводку");
+		btnSvod.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnSvod.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				System.out.println(cmb_sv.getSelectedIndex());
@@ -1541,15 +1588,15 @@ public class TalonMainFrame extends JFrame {
 		}
 	}
 	public void iterate(){
-		     int num = 0;
-			while (num < 1000){
-		     pBar.setValue(num);
+		int num = 0;
+		while (num < 1000){
+			pBar.setValue(num);
 		     try {
 		       Thread.sleep(500);
 		     }
 		       catch (InterruptedException e) {
 		     }
 		     num += 90;
-		   }
+		}
 	}
 }

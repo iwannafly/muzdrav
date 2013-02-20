@@ -194,9 +194,9 @@ public class OptionsDialog implements ActionListener {
      * @param align - выравнивание
      */
     private void buildDialogDefaults(final String msg, final int fontSize, final int align) {
-        dialog.setCursor(dialog.getToolkit().createCustomCursor(
-            new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0),
-            "null"));
+//        dialog.setCursor(dialog.getToolkit().createCustomCursor(
+//            new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0),
+//            "null"));
         dialog.setUndecorated(true);
         dialog.getContentPane().setLayout(new BoxLayout(
             dialog.getContentPane(), BoxLayout.Y_AXIS));

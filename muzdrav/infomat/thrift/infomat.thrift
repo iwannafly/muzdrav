@@ -43,6 +43,12 @@ exception PatientHasSomeReservedTalonsOnThisDay {
 }
 
 /**
+ * Кто-то другой успел записаться на выбранный талон
+ */
+exception SomebodyElseReservedThisTalon {
+}
+
+/**
  * Ошибка во время отмены талона на приём
  */
 exception ReleaseTalonOperationFailedException {
@@ -55,18 +61,19 @@ exception OmsNotValidException {
 }
 
 service ThriftInfomat extends kmiacServer.KmiacServer{
-	list<classifier.IntegerClassifier> getPoliclinics()
+	list<classifier.IntegerClassifier> getPoliclinicsTalon()
 		throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.StringClassifier> getSpecialities(1:i32 cpol)
+	list<classifier.StringClassifier> getSpecialitiesTalon(1:i32 cpol)
 		throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> getDoctors(1:i32 cpol, 2:string cdol)
+	list<classifier.IntegerClassifier> getDoctorsTalon(1:i32 cpol, 2:string cdol)
 		throws (1: kmiacServer.KmiacServerException kse);
 	list<TTalon> getTalons(1: i32 cpol, 2:string cdol, 3:i32 pcod)
 		throws (1: kmiacServer.KmiacServerException kse);
 	void reserveTalon(1:TPatient pat, 2:TTalon talon)
 		throws (1: kmiacServer.KmiacServerException kse,
 			2: ReserveTalonOperationFailedException rtofe,
-			3: PatientHasSomeReservedTalonsOnThisDay phsrtotd);
+			3: PatientHasSomeReservedTalonsOnThisDay phsrtotd,
+			4: SomebodyElseReservedThisTalon sertt);
 	TPatient checkOmsAndGetPatient(1:string oms)
 		throws (1: kmiacServer.KmiacServerException kse,
 			2: OmsNotValidException onve);
@@ -75,6 +82,12 @@ service ThriftInfomat extends kmiacServer.KmiacServer{
 	void releaseTalon(1:TTalon talon)
 		throws (1: kmiacServer.KmiacServerException kse,
 			2: ReleaseTalonOperationFailedException rtofe);
+	list<classifier.IntegerClassifier> getPoliclinicsSchedule()
+		throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> getSpecialitiesSchedule(1:i32 cpol)
+		throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getDoctorsSchedule(1:i32 cpol, 2:string cdol)
+		throws (1: kmiacServer.KmiacServerException kse);
 	list<TSheduleDay> getShedule(1:i32 pcod, 2:i32 cpol, 3: string cdol)
 		throws (1: kmiacServer.KmiacServerException kse);
 	bool isPatientAlreadyReserveTalonOnThisDay(1:TPatient pat, 2:TTalon talon)

@@ -159,12 +159,11 @@ public class ServerDiary extends Server implements Iface {
             throws KmiacServerException, MedicalHistoryNotFoundException {
     	if (!isMedicalHistoryExist(medHist.getId()))
     		throw new MedicalHistoryNotFoundException();
-        final int[] indexes = {2, 3, 4, 5, 6, 8, 9, 0};
-        //Изменить номер номер истории болезни, отделения и врачей (проводившего осмотр
-        // и добавившего запись) нельзя (в списке параметров не присутствуют):
+        final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 9, 10, 0};
+        //Изменить номер номер истории болезни нельзя (в списке параметров не присутствует):
         final String sqlQuery = "UPDATE c_osmotr SET jalob = ?, "
-            + "morbi = ?, status_praesense = ?, "
-            + "status_localis = ?, fisical_obs = ?, dataz = ?, timez = ? "
+            + "morbi = ?, status_praesense = ?, status_localis = ?, "
+            + "fisical_obs = ?, pcod_vrach = ?, dataz = ?, timez = ?, cpodr = ? "
             + "WHERE (id = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, false, medHist, MEDICAL_HISTORY_TYPES, indexes);

@@ -33,7 +33,24 @@ public class TalonList {
     public TalonList(final List<TTalon> list) {
         allTalonList = list;
         dateChecker = new DateChecker();
-        partitionWeekTalonList(allTalonList);
+        setFirstNotEmptyWeek();
+    }
+
+    private void setFirstNotEmptyWeek() {
+    	if ((allTalonList != null) && (allTalonList.size() > 0)) {
+            partitionWeekTalonList(allTalonList);
+    		while (dateChecker.getCurrentWeek()[6].getTime() < allTalonList.get(allTalonList.size() - 1).datap) {
+    			if (dateChecker.getCurrentWeek()[6].getTime() > allTalonList.get(0).datap)
+    				break;
+    			else
+    				setNextWeek();
+			}
+    		
+    	}
+	}
+    
+    public final List<TTalon> getAllTalonList() {
+    	return allTalonList;
     }
 
     public final List<TTalon> getMondayTalonList() {
@@ -66,9 +83,13 @@ public class TalonList {
 
     public final int getMaximumListSize() {
         int[] maxSizeArray = {
-            mondayTalonList.size(), tuesdayTalonList.size(), wednesdayTalonList.size(),
-            thursdayTalonList.size(), fridayTalonList.size(), saturdayTalonList.size(),
-            sundayTalonList.size()
+        		(mondayTalonList != null) ? mondayTalonList.size() : 0,
+                (tuesdayTalonList != null) ? tuesdayTalonList.size() : 0,
+                (wednesdayTalonList != null) ? wednesdayTalonList.size() : 0,
+                (thursdayTalonList != null) ? thursdayTalonList.size() : 0,
+                (fridayTalonList != null) ? fridayTalonList.size() : 0,
+                (saturdayTalonList != null) ? saturdayTalonList.size() : 0,
+                (sundayTalonList != null) ? sundayTalonList.size() : 0
         };
         int max = maxSizeArray[0];
         for (int i = 1; i < maxSizeArray.length; i++) {

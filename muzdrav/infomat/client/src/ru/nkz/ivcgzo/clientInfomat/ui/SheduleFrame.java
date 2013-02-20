@@ -98,6 +98,7 @@ public class SheduleFrame extends InfomatFrame {
         tbTalons = new JTable();
         tbTalons.setDefaultRenderer(String.class, new SheduleTableCellRenderer());
         tbTalons.setRowHeight(50);
+        tbTalons.getTableHeader().setReorderingAllowed(false);
         spTalon.setViewportView(tbTalons);
     }
     private void refreshTalonTableModel(final SheduleTableModel curSheduleTableModel) {
