@@ -63,10 +63,10 @@ public class AuthorizationFrame extends JDialog {
     }
 
     private void setDialogDefaults() {
-        setCursor(getToolkit().createCustomCursor(
-            new BufferedImage(CUSTOM_CURSOR_SIDE_SIZE, CUSTOM_CURSOR_SIDE_SIZE,
-                BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "null")
-        );
+//        setCursor(getToolkit().createCustomCursor(
+//            new BufferedImage(CUSTOM_CURSOR_SIDE_SIZE, CUSTOM_CURSOR_SIDE_SIZE,
+//                BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "null")
+//        );
         setAlwaysOnTop(true);
         setUndecorated(true);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -134,7 +134,7 @@ public class AuthorizationFrame extends JDialog {
         tfOmsNumber = new JTextField();
         tfOmsNumber.setHorizontalAlignment(SwingConstants.CENTER);
         tfOmsNumber.setDisabledTextColor(Color.WHITE);
-        tfOmsNumber.setEditable(false);
+        tfOmsNumber.getCaret().setVisible(false);
         tfOmsNumber.setFont(new Font("Courier New", Font.BOLD, FONT_SIZE));
         tfOmsNumber.setMinimumSize(new Dimension(900, 100));
         tfOmsNumber.setPreferredSize(new Dimension(900, 100));
