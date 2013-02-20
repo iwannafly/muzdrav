@@ -52,6 +52,7 @@
   	<copy file="${com_resources.dir}/stages.png" todir="${bin_resources.dir}" />
   	<copy file="${com_resources.dir}/diary.png" todir="${bin_resources.dir}" />
   	<copy file="${com_resources.dir}/childbirth.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/children.png" todir="${bin_resources.dir}" />
   	<copy file="${com_resources.dir}/archive.png" todir="${bin_resources.dir}" />
   </target>
 

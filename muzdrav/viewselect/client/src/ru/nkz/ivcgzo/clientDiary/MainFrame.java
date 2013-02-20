@@ -78,6 +78,8 @@ public class MainFrame extends JFrame {
     private JTextArea taStatusPraence;
     private JTextArea taFisicalObs;
     private JTextArea taStatusLocalis;
+    private JTextArea[] arrTextAreas = new JTextArea[]
+    		{taJalob, taDesiaseHistory, taStatusPraence, taFisicalObs, taStatusLocalis};
     private JLabel lblMedicalHistioryShablonHeader;
     private CustomTextField tfMedHShablonFilter;
     private CustomTable<TMedicalHistory, TMedicalHistory._Fields> tblMedHist;
@@ -606,6 +608,10 @@ public class MainFrame extends JFrame {
         clearMedicalHistoryComboBoxAreas();
     }
 
+    /**
+     * Очистка выбранных элементов выпадающих списков формы
+     * @author Балабаев Никита Дмитриевич
+     */
     private void clearMedicalHistoryComboBoxAreas() {
         ticcbOtd.setSelectedItem(null);
         ticcbPcodOsm.setSelectedItem(null);
@@ -746,8 +752,8 @@ public class MainFrame extends JFrame {
      */
     private void pasteShablonInField(JTextArea curTextField, final ShablonText shText) {
 		String newText = shText.getText(), oldText = curTextField.getText();
-		if (!oldText.isEmpty() && !newText.isEmpty()) {
-    		if (!isAsked) {
+		if (!oldText.isEmpty() && !newText.isEmpty()) {	//Текст шаблона и поля не пусты
+    		if (!isAsked) {	//Пользователь ещё не был опрошен
     			isAsked = true;
     			isAdding = getUserAnswer("Дополнить текущие данные?");
     		}
@@ -759,21 +765,18 @@ public class MainFrame extends JFrame {
     }
 
     private void pasteSelectedShablon(final Shablon shablon) {
-        if (shablon == null) {
+        if (shablon == null)
             return;
-        }
-        JTextArea[] arrTextAreas = new JTextArea[]
-        		{taJalob, taDesiaseHistory, taStatusPraence, taFisicalObs, taStatusLocalis};
+        //Индексы соответствия номера группы шаблона и текстовых полей:
         int[] arrIndexes = new int[] {-1, 0, 1, -1, -1, -1, 2, 3, 4};
         isAsked = false;
         isAdding = false;
 
         for (ShablonText shText : shablon.textList) {
-        	int curFieldNum = shText.getGrupId();	//Номер текущего заполняемого поля
-        	if ((curFieldNum >= 0) && (curFieldNum < arrIndexes.length) && 
-        		(arrIndexes[curFieldNum] >= 0)) {
-        		pasteShablonInField(arrTextAreas[arrIndexes[curFieldNum]], shText);
-        	}
+        	int curGroup = shText.getGrupId();	//Номер текущей группы шаблона
+        	if ((curGroup >= 0) && (curGroup < arrIndexes.length) && 
+        		(arrIndexes[curGroup] >= 0))
+        		pasteShablonInField(arrTextAreas[arrIndexes[curGroup]], shText);
         }
     }
 

@@ -98,8 +98,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JCheckBox;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
 import java.awt.event.ContainerAdapter;
 import java.awt.event.ContainerEvent;
 
@@ -3899,7 +3897,7 @@ public class MainFrame extends JFrame {
 	private void setChildrenPanel() {
 		this.pChildren = new Children(this.doctorAuth, this.patient);
 		tabbedPane.addTab("Новорождённый",
-				new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")),
+				new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/children.png")),
 				this.pChildren,
 				null);
 	}
