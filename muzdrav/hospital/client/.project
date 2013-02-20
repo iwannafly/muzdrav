@@ -62,6 +62,11 @@
 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/childbirth.png</locationURI>
 		</link>
 		<link>
+			<name>src/ru/nkz/ivcgzo/clientHospital/resources/children.png</name>
+			<type>1</type>
+			<locationURI>WORKSPACE_LOC/gitrep/common/resources/children.png</locationURI>
+		</link>
+		<link>
 			<name>src/ru/nkz/ivcgzo/clientHospital/resources/diary.png</name>
 			<type>1</type>
 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/diary.png</locationURI>
