@@ -2688,23 +2688,6 @@ public class MainFrame extends JFrame {
 	}
 	
 	}
-
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////Новорожденный//////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Установка панели информации о новорождённом
-	 * @author Балабаев Никита Дмитриевич
-	 */
-    private void setChildrenPanel() {
-    	this.pChildren = new Children(this.doctorAuth, this.patient);
-        tabbedPane.addTab("Новорождённый",
-        		new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")),
-        		pChildren,
-        		null);
-	}
     
     /**
 	 * Установка панели информации о течении родов
@@ -3904,6 +3887,22 @@ public class MainFrame extends JFrame {
 		panel_3.setLayout(gl_panel_3);
 		pChildbirth.setLayout(gl_pChildbirth);
     }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////Новорождённый//////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	* Установка панели информации о новорождённом
+	* @author Балабаев Никита Дмитриевич
+	*/
+	private void setChildrenPanel() {
+		this.pChildren = new Children(this.doctorAuth, this.patient);
+		tabbedPane.addTab("Новорождённый",
+				new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")),
+				this.pChildren,
+				null);
+	}
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////// Заключение ///////////////////////////////////////////////////
