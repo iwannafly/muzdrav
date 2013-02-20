@@ -13,6 +13,8 @@ public class configuration {
     public static final int medAppId = 17;
     public static final int opThrPort = 55020;
     public static final int opAppId = 20;
+	public static final int diaryThrPort = 55022;
+    public static final int diaryAppId = 22;
     public static final String appName = "Просмотр и выбор из классификатора";
     public static final String appVersion = "0.0.0.0";
     public static final boolean common = true;

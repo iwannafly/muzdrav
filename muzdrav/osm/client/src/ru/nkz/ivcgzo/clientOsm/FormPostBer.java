@@ -77,22 +77,22 @@ public class FormPostBer extends JFrame {
     private String oslcode;
     private FormRdInf inform;
     private FormRdDin dinform;
-    private JSpinner SVes;
-    private JSpinner SDsp;
-    private JSpinner SDcr;
-    private JSpinner SDtroch;
-    private JSpinner SCext;
-    private JSpinner SindSol;
+    private JTextField SVes;
+    private JTextField SDsp;
+    private JTextField SDcr;
+    private JTextField SDtroch;
+    private JTextField SCext;
+    private JTextField SindSol;
     private CustomDateEditor SDataPos;
     private CustomDateEditor SDataOsl;
     private CustomDateEditor SDataM;
     private CustomDateEditor TDataSn;
     private CustomDateEditor SDataRod;
     private CustomDateEditor SDataSert;
-    private JSpinner SYavka;
-    private JSpinner SCDiag;
-    private JSpinner SCvera;
-    private JSpinner SRost;
+    private JTextField SYavka;
+    private JTextField SCDiag;
+    private JTextField SCvera;
+    private JTextField SRost;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBRod;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPrishSn;
 	/**
@@ -222,7 +222,7 @@ public class FormPostBer extends JFrame {
 			rdSlStruct.setId_pvizit(Vvod.zapVr.id_pvizit);
 //			rdSlStruct.setAbort((int) SKolAb.getValue());
 //			rdSlStruct.setCmer((int) SMert.getValue());
-			rdSlStruct.setCext((int) SCext.getModel().getValue());
+			rdSlStruct.setCext(Integer.valueOf(SCext.getText()));
  			if (SDataM.getDate() != null)
 			rdSlStruct.setDataM( SDataM.getDate().getTime());
  			if (SDataOsl.getDate() != null)
@@ -249,19 +249,19 @@ public class FormPostBer extends JFrame {
 			rdSlStruct.setRub(ChBRub.isSelected());
 			rdSlStruct.setPredp(ChBPred.isSelected());
 //			rdSlStruct.setDeti((int) SKolDet.getModel().getValue());
-			rdSlStruct.setDsp((int) (SDsp.getModel()).getValue());
-			rdSlStruct.setDsr((int) SDcr.getModel().getValue());
-			rdSlStruct.setDTroch((int) SDtroch.getModel().getValue());
-			rdSlStruct.setIndsol((int) SindSol.getModel().getValue());
+			rdSlStruct.setDsp(Integer.valueOf(SDsp.getText()));
+			rdSlStruct.setDsr(Integer.valueOf(SDcr.getText()));
+			rdSlStruct.setDTroch(Integer.valueOf(SDtroch.getText()));
+			rdSlStruct.setIndsol(Integer.valueOf(SindSol.getText()));
 //			rdSlStruct.setShet((int) SKolBer.getModel().getValue());
 //			rdSlStruct.setKolrod((int) SParRod.getModel().getValue());
 //			rdSlStruct.setPolj((int) SPolJ.getModel().getValue());
 //			rdSlStruct.setPrmen((int) SMenC.getModel().getValue());
-			rdSlStruct.setRost((int) SRost.getModel().getValue());
-			rdSlStruct.setVesd((Double) SVes.getModel().getValue());
-			rdSlStruct.setYavka1((int) SYavka.getModel().getValue());
-           	rdSlStruct.setCdiagt((int) SCDiag.getModel().getValue());
-           	rdSlStruct.setCvera((int) SCvera.getModel().getValue());
+			rdSlStruct.setRost(Integer.valueOf(SRost.getText()));
+			rdSlStruct.setVesd(Double.valueOf(SVes.getText()));
+			rdSlStruct.setYavka1(Integer.valueOf(SYavka.getText()));
+           	rdSlStruct.setCdiagt(Integer.valueOf(SCDiag.getText()));
+           	rdSlStruct.setCvera(Integer.valueOf(SCvera.getText()));
            	rdSlStruct.setDataz(System.currentTimeMillis());
 			calcOslrod();
 			rdSlStruct.setOslrod(oslrod);
@@ -400,29 +400,23 @@ public class FormPostBer extends JFrame {
 		JLabel LIndSol = new JLabel("Индекс Соловьева");
 		LIndSol.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
-		SVes = new JSpinner();
+		SVes = new JTextField();
 		SVes.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SVes.setModel(new SpinnerNumberModel(0.0, 0.0, 250.0, 1.0));
 		
-		SDsp = new JSpinner();
+		SDsp = new JTextField();
 		SDsp.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SDsp.setModel(new SpinnerNumberModel(0, 0, 30, 1));
 		
-		SDcr = new JSpinner();
+		SDcr = new JTextField();
 		SDcr.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SDcr.setModel(new SpinnerNumberModel(0, 0, 30, 1));
 		
-		SDtroch = new JSpinner();
+		SDtroch = new JTextField();
 		SDtroch.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SDtroch.setModel(new SpinnerNumberModel(0,0,33,1));
 		
-		SCext = new JSpinner();
+		SCext = new JTextField();
 		SCext.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SCext.setModel(new SpinnerNumberModel(0, 0, 35, 1));
 		
-		SindSol = new JSpinner();
+		SindSol = new JTextField();
 		SindSol.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SindSol.setModel(new SpinnerNumberModel(0, 0, 20,1));
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -756,7 +750,7 @@ public class FormPostBer extends JFrame {
 		JLabel LYavka = new JLabel("Первая явка (недель)");
 		LYavka.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-				SYavka = new JSpinner();
+				SYavka = new JTextField();
 				SYavka.setFont(new Font("Tahoma", Font.BOLD, 12));
 				SYavka.addKeyListener(new KeyAdapter() {
 					@Override
@@ -766,7 +760,6 @@ public class FormPostBer extends JFrame {
 					SDataRod.setDate(rdSlStruct.getDataZs());}
 					}
 				});
-				SYavka.setModel(new SpinnerNumberModel(0,0, 40,1));
 		
 		JLabel LDataMes = new JLabel("Дата последних месячных");
 		LDataMes.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -874,17 +867,16 @@ public class FormPostBer extends JFrame {
 		JLabel lblCvera = new JLabel("C.vera");
 		lblCvera.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		SCDiag = new JSpinner();
+		SCDiag = new JTextField();
 		SCDiag.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SCDiag.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
 		
-		SCvera = new JSpinner();
+		SCvera = new JTextField();
 		SCvera.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		JLabel LRost = new JLabel("Рост");
 		LRost.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		SRost = new JSpinner();
+		SRost = new JTextField();
 		SRost.setFont(new Font("Tahoma", Font.BOLD, 12));
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
@@ -1035,13 +1027,13 @@ public class FormPostBer extends JFrame {
 	private void setPostBerData() {
 		//SRost.setValue(rdSlStruct.getRost());
 		try {
-			SVes.setValue(rdSlStruct.getVesd());
-			SDsp.setValue(rdSlStruct.getDsp());
-			SDcr.setValue(rdSlStruct.getDsr());
-			SDtroch.setValue(rdSlStruct.getDTroch());
-			SCext.setValue(rdSlStruct.getCext());
+			SVes.setText(String.valueOf(rdSlStruct.getVesd()));
+			SDsp.setText(String.valueOf(rdSlStruct.getDsp()));
+			SDcr.setText(String.valueOf(rdSlStruct.getDsr()));
+			SDtroch.setText(String.valueOf(rdSlStruct.getDTroch()));
+			SCext.setText(String.valueOf(rdSlStruct.getCext()));
 //			SMert.setValue(rdSlStruct.getCmer());
-			SindSol.setValue(rdSlStruct.getIndsol());
+			SindSol.setText(String.valueOf(rdSlStruct.getIndsol()));
 			SDataPos.setDate(rdSlStruct.getDatay());
 			if (rdSlStruct.getDatay() == 0)
 			SDataPos.setText(null);
@@ -1069,8 +1061,8 @@ public class FormPostBer extends JFrame {
 			SDataOsl.setDate(rdSlStruct.getDataosl());
 			if (rdSlStruct.getDataosl() == 0)
 			SDataOsl.setText(null);	
-			SYavka.setValue(rdSlStruct.getYavka1());
-			SRost.setValue(rdSlStruct.getRost());
+			SYavka.setText(String.valueOf(rdSlStruct.getYavka1()));
+			SRost.setText(String.valueOf(rdSlStruct.getRost()));
 			SDataM.setDate(rdSlStruct.getDataM());
 			if (rdSlStruct.getDataM() == 0)
 			SDataM.setText(null);
@@ -1080,8 +1072,8 @@ public class FormPostBer extends JFrame {
 //			SKolDet.setValue(rdSlStruct.getDeti());
 //			SPolJ.setValue(rdSlStruct.getPolj());
 //			SSrokA.setValue(rdSlStruct.getSrokab());
-			SCDiag.setValue(rdSlStruct.getCdiagt());
-			SCvera.setValue(rdSlStruct.getCvera());
+			SCDiag.setText(String.valueOf(rdSlStruct.getCdiagt()));
+			SCvera.setText(String.valueOf(rdSlStruct.getCvera()));
 			oslrod = rdSlStruct.getOslrod();
 			osostp = rdSlStruct.getOsp();
 //			if(rdSlStruct.isSetOslab())

@@ -154,6 +154,22 @@ DiagTypes = new Class<?>[] {Integer.class,String.class};
 		// TODO Auto-generated method stub
 
 	}
+	
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
 //////////////////////////Classifiers ////////////////////////////////////
 
 @Override

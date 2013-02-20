@@ -21,5 +21,6 @@ base port + 0	auth
 18	autoProc
 20	operation
 21	print
+22	diary
 
 55201	libUpd

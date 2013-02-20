@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.text.StyleConstants;
 
+import ru.nkz.ivcgzo.clientInfomat.Controller;
 import ru.nkz.ivcgzo.clientInfomat.IController;
 import ru.nkz.ivcgzo.clientInfomat.model.IModel;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IInfomatObserver;
@@ -85,6 +86,7 @@ public class InfomatView implements IInfomatObserver {
         mainFrame.addAppointmentListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 lastFrameSet = FrameSet.appointment;
+                ((Controller) controller).setTalonMode();
                 controller.openLpuSelectFrame();
             }
         });
@@ -97,6 +99,7 @@ public class InfomatView implements IInfomatObserver {
         mainFrame.addSheduleListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 lastFrameSet = FrameSet.shedule;
+                ((Controller) controller).setScheduleMode();
                 controller.openLpuSelectFrame();
             }
         });

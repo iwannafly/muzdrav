@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientInfomat.model.IModel;
+import ru.nkz.ivcgzo.clientInfomat.model.Model;
 import ru.nkz.ivcgzo.clientInfomat.ui.InfomatFrame;
 import ru.nkz.ivcgzo.clientInfomat.ui.InfomatView;
 import ru.nkz.ivcgzo.clientInfomat.ui.OptionsDialog;
@@ -18,6 +19,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftInfomat.OmsNotValidException;
 import ru.nkz.ivcgzo.thriftInfomat.PatientHasSomeReservedTalonsOnThisDay;
 import ru.nkz.ivcgzo.thriftInfomat.ReserveTalonOperationFailedException;
+import ru.nkz.ivcgzo.thriftInfomat.SomebodyElseReservedThisTalon;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
 public class Controller implements IController {
@@ -100,6 +102,9 @@ public class Controller implements IController {
                                 + " к выбранному специалисту."
                             );
                             e.printStackTrace();
+                        } catch (SomebodyElseReservedThisTalon e) {
+                            view.showMessageDialog("Кто-то уже успел записаться на этот талон.");
+                            e.printStackTrace();
                         } catch (KmiacServerException e) {
                             view.showMessageDialog("Ошибка во время записи. Запись отменена.");
                             e.printStackTrace();
@@ -154,6 +159,14 @@ public class Controller implements IController {
     @Override
     public final void setCurrentReservedTalon(final TTalon talon) {
         model.setCurrentReservedTalon(talon);
+    }
+
+    public void setTalonMode() {
+    	((Model) model).setTalonMode();
+    }
+
+    public void setScheduleMode() {
+    	((Model) model).setScheduleMode();
     }
 
     @Override

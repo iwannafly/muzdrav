@@ -26,14 +26,14 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>JSON-java</name>
+			<type>2</type>
+			<locationURI>WORKSPACE_LOC/gitrep/third/JSON-java</locationURI>
+		</link>
+		<link>
 			<name>config</name>
 			<type>2</type>
 			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/autoProc/config</locationURI>
-		</link>
-		<link>
-			<name>gen-java</name>
-			<type>2</type>
-			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/autoProc/thrift/gen-java</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

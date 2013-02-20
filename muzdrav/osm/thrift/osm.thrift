@@ -404,6 +404,9 @@ struct P_isl_ld {
 	14: optional i64 datav;
 	15: optional i32 vopl;
 	16: optional i32 id_pos;
+	17: optional i64 datap;
+	18: optional string name_pcisl;
+	19: optional i32 clpu;
 }
 
 struct Prez_d {
@@ -438,6 +441,7 @@ struct IsslMet {
 	12: optional i32 pvizitambId;
 	13: optional i32 cpodr;
 	14: optional i32 kod_lab;
+	15: optional i64 datap;
 }
 
 struct IsslPokaz {
@@ -490,6 +494,9 @@ struct IsslInfo{
 	10: optional string op_name;
 	11: optional string rez_name;
 	12: optional i32 gruppa;
+	13: optional i32 kodotd;
+	14: optional i64 datap;
+	15: optional string diag;
 }
 
 
@@ -510,17 +517,6 @@ struct Pdisp{
 	14: optional string cdol_ot;
 	15: optional i32 d_uch;
 	16: optional string diag_n;
-}
-
-struct Protokol{
-	1: optional i32 npasp;
-	2: optional i32 userId;
-	3: optional i32 pvizit_id;
-	4: optional i32 pvizit_ambId;
-	5: optional i32 cpol;
-	6: optional string cpodr_name;
-	7: optional string clpu_name;
-	8: optional i32 nstr;
 }
 
 struct Vypis {
@@ -748,10 +744,11 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printNaprKons(1: NaprKons nk) throws (1: kmiacServer.KmiacServerException kse);//консультация
 	string printVypis(1: Vypis vp) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
 	string printKek(1: i32 npasp, 2: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
-	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
+	string printProtokol(1: i32 npasp, 2: i32 userId, 3: i32 pvizit_id, 4: i32 pvizit_ambId, 5: i32 cpol, 6: i32 clpu, 7: i32 nstr) throws (1: kmiacServer.KmiacServerException kse);
 	string printMSK(1: i32 npasp)  throws (1: kmiacServer.KmiacServerException kse);
 	string printAnamZab(1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
 	string printSpravNetrud(1: SpravNetrud sn) throws (1: kmiacServer.KmiacServerException kse);
+	string printSprBass(1: i32 npasp, 2: i32 pol) throws (1: kmiacServer.KmiacServerException kse);
 
 
 //classifiers
@@ -761,7 +758,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_lds_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_vid_issl() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> get_n_s00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.StringClassifier> get_n_c00(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> get_n_c00(1: i32 npasp, 2: i32 pcod) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_tip() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_m00() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_p0c() throws (1: kmiacServer.KmiacServerException kse);

@@ -20,7 +20,9 @@ import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
 import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
+
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.serverManager.serverManager;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
@@ -60,6 +62,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.PokazNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Shablon;
+import ru.nkz.ivcgzo.thriftRegPatient.ShablonText;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
@@ -68,8 +71,6 @@ import ru.nkz.ivcgzo.thriftRegPatient.TerLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient.Iface;
 import ru.nkz.ivcgzo.thriftRegPatient.TipPodrNotFoundException;
-import ru.nkz.ivcgzo.thriftRegPatient.ShablonText;
-import ru.nkz.ivcgzo.thriftRegPatient.Shablon;
 
 /**
  * Класс, имплементирующий трифтовый интерфейс для связи с клиентом.
@@ -137,8 +138,8 @@ public class ServerRegPatient extends Server implements Iface {
         Date.class, String.class, String.class, Date.class,
     //  prof          tel           dsv         prizn
         String.class, String.class, Date.class, Integer.class,
-    //  ter_liv        region_liv     birthplace    ogrn_smo      obraz
-        Integer.class, Integer.class, String.class, String.class, Integer.class
+    //  ter_liv        region_liv     birthplace    ogrn_smo      obraz          status
+        Integer.class, Integer.class, String.class, String.class, Integer.class, Integer.class
     };
     private static final Class<?>[] KONTINGENT_TYPES = new Class<?>[] {
     //  id             npasp          kateg          datal
@@ -179,8 +180,8 @@ public class ServerRegPatient extends Server implements Iface {
         Time.class, Integer.class, Integer.class, Date.class, Time.class,
     //  cuser          dataosm     vremosm     dataz       jalob
         Integer.class, Date.class, Time.class, Date.class, String.class,
-    //  vid_st         pr_ber
-        Integer.class, Boolean.class
+    //  vid_st         pr_ber			srok_ber	komm
+        Integer.class, Boolean.class, String.class, String.class
     };
     private static final Class<?>[] NAMBK_TYPES = new Class<?>[] {
     //  npasp          nambk         nuch           cpol
@@ -223,7 +224,7 @@ public class ServerRegPatient extends Server implements Iface {
         "npasp", "fam", "im", "ot", "datar", "pol", "jitel", "sgrp", "mrab", "name_mr",
         "ncex", "cpol_pr", "terp", "tdoc", "docser", "docnum",  "datadoc", "odoc",
         "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv",
-        "birthplace", "ogrn_smo", "obraz"
+        "birthplace", "ogrn_smo", "obraz", "status"
     };
     private static final String[] NAMBK_FIELD_NAMES = {
         "npasp", "nambk", "nuch", "cpol", "datapr", "dataot", "ishod"
@@ -246,7 +247,7 @@ public class ServerRegPatient extends Server implements Iface {
         "cotd", "sv_time", "sv_day", "ntalon", "vidtr", "pr_out", "alkg", "meesr",
         "vid_tran", "diag_n", "diag_p", "named_n", "named_p", "nal_z", "nal_p", "t0c",
         "ad", "smp_data", "smp_time", "smp_num", "cotd_p", "datagos", "vremgos", "cuser",
-        "dataosm", "vremosm", "dataz", "jalob", "vid_st", "pr_ber"
+        "dataosm", "vremosm", "dataz", "jalob", "vid_st", "pr_ber", "srok_ber", "komm"
     };
     private static final String[] LGOTA_FIELD_NAMES = {
         "id", "npasp", "lgot", "datal", "name", "gri", "sin", "pp", "drg", "dot", "obo", "ndoc"
@@ -553,6 +554,21 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
 //////////////////////// Select Methods ////////////////////////////////////
 
     @Override
@@ -603,7 +619,7 @@ public class ServerRegPatient extends Server implements Iface {
             + "patient.datapr, patient.tdoc, patient.docser, patient.docnum, "
             + "patient.datadoc, patient.odoc, patient.snils, patient.dataz, "
             + "patient.prof, tel, patient.dsv, patient.prizn, patient.ter_liv, "
-            + "patient.region_liv, patient.birthplace, patient.ogrn_smo, patient.obraz "
+            + "patient.region_liv, patient.birthplace, patient.ogrn_smo, patient.obraz, patient.status "
             + "FROM patient "
             + "WHERE patient.npasp = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
@@ -831,10 +847,10 @@ public class ServerRegPatient extends Server implements Iface {
                     + "adm_gorod, adm_ul, adm_dom, adm_kv, mrab, name_mr, "
                     + "ncex, poms_strg, poms_tdoc, pdms_strg, pdms_ser, pdms_nom, "
                     + "cpol_pr, terp, tdoc, docser, docnum, datadoc, odoc, snils, dataz, prof, tel, dsv,"
-                    + "prizn, ter_liv, region_liv, birthplace, ogrn_smo, obraz) "
+                    + "prizn, ter_liv, region_liv, birthplace, ogrn_smo, obraz, status) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                     + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                    + "?, ?, ?, ?, ?);", true,
+                    + "?, ?, ?, ?, ?, ?);", true,
                     patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
                     avoidDefaultSqlDateValue(patinfo.getDatar()),
                     patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
@@ -853,9 +869,14 @@ public class ServerRegPatient extends Server implements Iface {
                     patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
                     patinfo.getProf(), patinfo.getTel(), avoidDefaultSqlDateValue(patinfo.getDsv()), 
                     patinfo.getPrizn(), patinfo.getTer_liv(), patinfo.getRegion_liv(), 
-                    patinfo.getBirthplace(), patinfo.getOgrn_smo(), patinfo.getObraz());
+                    patinfo.getBirthplace(), patinfo.getOgrn_smo(), patinfo.getObraz(), patinfo.getStatus());
                 int id = sme.getGeneratedKeys().getInt("npasp");
-                sme.setCommit();
+                sme.commitTransaction();
+                try {
+					serverManager.instance.getServerById(18).executeServerMethod(1803, id);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
                 return id;
             } else {
                 throw new PatientAlreadyExistException();
@@ -972,7 +993,7 @@ public class ServerRegPatient extends Server implements Iface {
     public final int addGosp(final Gosp gosp) throws GospAlreadyExistException,
             KmiacServerException {
         final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38};
+            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isGospExist(gosp)) {
                 sme.execPreparedT(
@@ -981,10 +1002,10 @@ public class ServerRegPatient extends Server implements Iface {
                     + "vidtr, pr_out, alkg, meesr, vid_tran, diag_n, diag_p, "
                     + "named_n, named_p, nal_z, nal_p, t0c, ad, smp_data, "
                     + "smp_time, smp_num, cotd_p, datagos, vremgos, cuser, "
-                    + "dataosm, vremosm, dataz, jalob, vid_st, pr_ber) "
+                    + "dataosm, vremosm, dataz, jalob, vid_st, pr_ber, srok_ber, komm) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                     + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                    + "?, ?, ?, ?);", true, gosp, GOSP_TYPES, indexes);
+                    + "?, ?, ?, ?, ?, ?);", true, gosp, GOSP_TYPES, indexes);
                 int id = sme.getGeneratedKeys().getInt("id");
                 sme.setCommit();
                 return id;
@@ -1131,7 +1152,7 @@ public class ServerRegPatient extends Server implements Iface {
                 + "pdms_ser = ?, pdms_nom = ?, cpol_pr = ?, terp = ?, tdoc=?, "
                 + "docser = ?, docnum = ?, datadoc = ?, odoc = ?, snils = ?, "
                 + "dataz = ?, prof = ?, tel = ?, dsv = ?, prizn = ?, ter_liv = ?, "
-                + "region_liv = ?, birthplace = ?, ogrn_smo = ?, obraz = ? WHERE npasp = ?", false,
+                + "region_liv = ?, birthplace = ?, ogrn_smo = ?, obraz = ?, status = ? WHERE npasp = ?", false,
                 patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
                 avoidDefaultSqlDateValue(patinfo.getDatar()),
                 patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
@@ -1148,9 +1169,14 @@ public class ServerRegPatient extends Server implements Iface {
                 patinfo.getTdoc(), patinfo.getDocser(), patinfo.getDocnum(),
                 avoidDefaultSqlDateValue(patinfo.getDatadoc()), patinfo.getOdoc(),
                 patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
-                patinfo.getProf(), patinfo.getTel(), avoidDefaultSqlDateValue(patinfo.getDsv()),
-                patinfo.getPrizn(), patinfo.getTer_liv(),patinfo.getRegion_liv(), patinfo.getBirthplace(), patinfo.getOgrn_smo(), patinfo.getObraz(), patinfo.getNpasp());
-            sme.setCommit();
+                patinfo.getProf(), patinfo.getTel(), avoidDefaultSqlDateValue(patinfo.getDsv()),patinfo.getPrizn(), patinfo.getTer_liv(),patinfo.getRegion_liv(), patinfo.getBirthplace(), patinfo.getOgrn_smo(), 
+                patinfo.getObraz(), patinfo.getStatus(), patinfo.getNpasp());
+            sme.commitTransaction();
+            try {
+				serverManager.instance.getServerById(18).executeServerMethod(1803, patinfo.npasp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
@@ -1190,7 +1216,7 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final void updateGosp(final Gosp gosp) throws KmiacServerException {
         final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 0
+            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 0
         };
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT("UPDATE c_gosp SET "
@@ -1202,7 +1228,7 @@ public class ServerRegPatient extends Server implements Iface {
                     + "nal_z = ?, nal_p = ?, t0c = ?, ad = ?, smp_data = ?, "
                     + "smp_time = ?, smp_num = ?, cotd_p = ?, datagos = ?, "
                     + "vremgos = ?, cuser = ?, dataosm = ?, vremosm = ?, "
-                    + "dataz = ?, jalob = ?, vid_st = ?, pr_ber = ? WHERE id = ?;", false,
+                    + "dataz = ?, jalob = ?, vid_st = ?, pr_ber = ?, srok_ber = ?, komm = ? WHERE id = ?;", false,
                     gosp, GOSP_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
@@ -1906,11 +1932,12 @@ public class ServerRegPatient extends Server implements Iface {
 	            	try (AutoCloseableResultSet acr = sse.execPreparedQuery(sqlQuery, uai.getCpodr())) {
 						if (acr.getResultSet().next()){
 		      				prlpu = acr.getResultSet().getInt("prlpu");
-							if (acr.getResultSet().getInt("prlpu") == 5){
-		          				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
-		      				}else{
-		          				sb.append("<h4 align=center> <b>ПЕРВИЧНЫЙ ОСМОТР В ПРИЕМНО-ДИАГНОСТИЧЕСКОМ ОТДЕЛЕНИИ</b> </h4>");
-		      				}
+	          				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
+//							if (acr.getResultSet().getInt("prlpu") == 5){
+//		          				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
+//		      				}else{
+//		          				sb.append("<h4 align=center> <b>ПЕРВИЧНЫЙ ОСМОТР В ПРИЕМНО-ДИАГНОСТИЧЕСКОМ ОТДЕЛЕНИИ</b> </h4>");
+//		      				}
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -1943,9 +1970,10 @@ public class ServerRegPatient extends Server implements Iface {
 		      					if (acr.getResultSet().getString("numline") != null)
  			      						sb.append(String.format("%s %s ", acr.getResultSet().getString("numline"), acr.getResultSet().getString("name")));
 		      					else sb.append(String.format("%s ", acr.getResultSet().getString("name")));
-		      					if (acr.getResultSet().getString("yn").equals("T"))
+		      					System.out.println(acr.getResultSet().getString("yn"));
+		      					if (acr.getResultSet().getString("yn").equalsIgnoreCase("T"))
 		      						if(elemAnam.isVybor())sb.append("<b>да </b>"); else sb.append("<b>нет </b>");
-		      					if (elemAnam.getComment() != null) sb.append(String.format("%s ", elemAnam.getComment().toLowerCase()));
+		      					if (elemAnam.getComment() != null) sb.append(String.format("<b>%s</b> ", elemAnam.getComment().toLowerCase()));
    		      					numline = acr.getResultSet().getInt("numstr");
    							}
    						} catch (Exception e) {
@@ -1956,10 +1984,10 @@ public class ServerRegPatient extends Server implements Iface {
    	   		            sb.append(String.format("<br><br>Подпись  _______________________________________________    %1$td.%1$tm.%1$tY г. <br><br>", new Date(System.currentTimeMillis())));
    	   					sb.append(String.format("Подпись врача __________________________________________    %1$td.%1$tm.%1$tY г.<br>", new Date(System.currentTimeMillis())));
    					}else{
-   	   					sb.append("Согласие на госпитализацию:   Я, __________________________________________________,<br>");
+   	   					sb.append("<br>Согласие на госпитализацию:   Я, __________________________________________________,<br>");
    	   					sb.append("как родитель/законный представитель __________________________________________________,<br>");
    	   		            sb.append(String.format("<br><br>Подпись врача _______________________________________________    %1$td.%1$tm.%1$tY г. <br><br>", new Date(System.currentTimeMillis())));
-   	   					sb.append(String.format("Подпись медицинской сестры __________________________________________    %1$td.%1$tm.%1$tY г.<br>", new Date(System.currentTimeMillis())));
+   	   					sb.append(String.format("Подпись медицинской сестры ________________________________________    %1$td.%1$tm.%1$tY г.<br>", new Date(System.currentTimeMillis())));
    					}
 
 					osw.write(sb.toString());

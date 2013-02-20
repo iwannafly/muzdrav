@@ -207,7 +207,22 @@ public class ServerLab extends Server implements Iface {
     public void saveUserConfig(final int id, final String config) throws TException {
     }
 
-    @Override
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
+   @Override
     public final List<Metod> getMetod(final int kodissl) throws KmiacServerException {
         String sqlQuery = "SELECT DISTINCT np.pcod AS c_p0e1, no.obst, no.nameobst AS name_obst "
             + "FROM n_nsi_obst no JOIN n_stoim ns ON (ns.c_obst = no.obst) "

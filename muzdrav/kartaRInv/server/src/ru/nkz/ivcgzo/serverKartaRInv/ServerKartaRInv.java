@@ -114,6 +114,21 @@ public class ServerKartaRInv extends Server implements Iface {
 			}
 
 	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
+	@Override
 	public Pinvk getPinvk(int npasp) throws KmiacServerException,TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_invk where npasp = ? ", npasp)) {
 			if (acrs.getResultSet().next())

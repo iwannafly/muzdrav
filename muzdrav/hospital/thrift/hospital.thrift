@@ -321,9 +321,10 @@ struct TPatientCommonInfo {
 	7: optional string adp_gorod;
 	8: optional string adp_ul;
 	9: optional string adp_dom;
-	10: optional string adp_kv;
-	11: optional i32 obraz;
-	12: optional i32 status;
+	10: optional string adp_korp;
+	11: optional string adp_kv;
+	12: optional i32 obraz;
+	13: optional i32 status;
 }
 
 struct TRd_SMPK {
@@ -615,10 +616,13 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 * @return Возвращает строку адреса файла свидетельства
 	 * @throws KmiacServerException исключение на стороне сервера
 	 * @throws ChildDocNotFoundException свидетельство не найдено
+	 * @throws ChildbirthNotFoundException связанные роды не найдены
+	 * @throws PatientNotFoundException новорождённый или мать не найдены
 	 * @author Балабаев Никита Дмитриевич
 	 */
     string printChildBirthDocument(1:i32 ndoc)
-    	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
+    	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe,
+				3:ChildbirthNotFoundException cbnfe, 4:PatientNotFoundException pnfe);
 	/**
 	 * Печать бланка мед.свидетельства о рождении
 	 * @return Возвращает строку адреса файла свидетельства

@@ -7,6 +7,8 @@ struct InputAuthInfo {
 	1: optional i32 userId;
 	2: optional string cpodr_name;
 	3: optional string clpu_name;
+    4: optional i32 cpodr;
+    5: optional i32 clpu;
 }
 
 struct InputSvodVed {
@@ -22,27 +24,31 @@ struct InputFacZd {
     4: i32 kvar;
 }
 
+struct InputPasUch {
+    1: string dateb;
+    2: string datef;
+    3: i32 uchnum;
+}
+
 struct VrachInfo {
-	1: i32 pcod;
-	2: string fam;
-	3: string im;
-	4: string ot;
-	5: string cdol;
+	1: string fam;
+	2: string im;
+	3: string ot;
+	4: string cdol;
+	5: i32 pcod;
 } 
 
 struct VrachTabel {
-	1: i32 pcod;
-	2: string cdol;
-	3: i64 datav;
-	4: double timep;
-	5: double timed;
-	6: double timeda;
-	7: double timeprf;
-	8: double timepr;
-	9: string nuch1;
-	10: string nuch2;
-	11: string nuch3;
-	12: i32 id;
+	1: i64 datav;
+	2: double timep;
+	3: double timed;
+	4: double timeda;
+	5: double timeprf;
+	6: double timepr;
+	7: i32 pcod;
+	8: i32 cpodr;
+	9: string cdol;
+	10: i32 id;
 }
 
 struct UchastokInfo {
@@ -79,27 +85,14 @@ struct InputStructPos {
     2: string date2;
 }
 
-
-/**
- * РРЅС„РѕСЂРјР°С†РёСЏ РѕС‚СЃС‚СѓС‚СЃС‚РІСѓРµС‚
- */
-exception VINotFoundException {
-}
-
-/**
- * РўР°РєР°СЏ СѓР¶Рµ Р·Р°РїРёСЃСЊ СЃСѓС‰РµСЃС‚РІСѓРµС‚
- */
-exception VTDuplException {
-}
-
 /*
- * РРЅС„РѕСЂРјР°С†РёСЏ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
+ * No information
  */
 exception VTException {
 }
 
 /**
- * Информация отстутствует
+ * No information
  */
 exception UchException {
 }
@@ -107,34 +100,31 @@ exception UchException {
 service ThriftOutputInfo extends kmiacServer.KmiacServer {
     
     /**
-     * Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РІСЂР°С‡РµР№, РІРµРґСѓС‰РёС… РїСЂРёРµРј
-     * @param pcod - РЈРЅРёРєР°Р»СЊРЅС‹Р№ РєРѕРґ СЃРїРµС†РёР°Р»РёСЃС‚Р°
-     * @return СЃРїРёСЃРѕРє thrift-РѕР±СЉРµРєС‚РѕРІ, СЃРѕРґРµСЂР¶Р°С‰РёС… РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РІСЂР°С‡Р°С…
+     * Возвращает список врачей, ведущих прием
+     * @param pcod - Уникальный код специалиста
+     * @return список thrift-объектов, содержащих информацию о врачах
      */
-    list<VrachInfo> getVrachTableInfo(1:i32 cpodr) throws (1: VINotFoundException vinfe,
-		2:kmiacServer.KmiacServerException kse);
+    list<VrachInfo> getVrachTableInfo(1:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
     
 
      /**
-     * Р’РѕР·РІСЂР°С‰Р°РµС‚ РІСЂРµРјСЏ СЂР°Р±РѕС‚С‹ РІСЂР°С‡РµР№
+     * Возвращает время работы врачей
      */
-    list<VrachTabel> getVrachTabel(1:i32 pcod) throws (1: VTException vte, 2:VTDuplException vtde,
-		3:kmiacServer.KmiacServerException kse);
+    list<VrachTabel> getVrachTabel(1:i32 pcod) throws (1: kmiacServer.KmiacServerException kse);
 		
 		
     /**
-     * Р”РѕР±Р°РІР»СЏРµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РІСЂР°С‡Рµ
+     * Добавляет информацию о враче
      */
-    i32 addVT(1:VrachTabel vt) throws (1: VTException vte, 2:VTDuplException vtde,
-		3:kmiacServer.KmiacServerException kse);
+    i32 addVT(1:VrachTabel vt, 2: i32 pcod, 3: string cdol, 4: i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 
     /**
-     * РћР±РЅРѕРІР»СЏРµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РІСЂР°С‡Рµ
+     * Обновляет информацию о враче
      */
 	void updateVT(1:VrachTabel vt) throws (1:kmiacServer.KmiacServerException kse); 
     
 	/**
-     * РЈРґР°Р»СЏРµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РІСЂР°С‡Рµ
+     * Удаляет информацию о враче
      */
 	void deleteVT(1:i32 vt);
 		
@@ -159,9 +149,10 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
     string printSvodVed(1: InputAuthInfo iaf 2: InputSvodVed isv) throws (1: kmiacServer.KmiacServerException kse);
 
     string printFacZd(1: InputAuthInfo iaf 2: InputFacZd ifz) throws (1: kmiacServer.KmiacServerException kse);
-	
+
+    string printPasUch(1: InputAuthInfo iaf 2: InputPasUch ipu) throws (1: kmiacServer.KmiacServerException kse);
    /**
-    * РЎРІРѕРґРєРё РїРѕ С„РѕСЂРјРµ 39
+    * Сводки по форме 39
     */
     string printDnevVr() throws (1: kmiacServer.KmiacServerException kse);
 
@@ -169,4 +160,3 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
 
     string nagrvr(1:i32 cpol)  throws (1: kmiacServer.KmiacServerException kse); 
 }
-

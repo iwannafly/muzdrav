@@ -6,15 +6,10 @@ import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Properties;
 
-import org.apache.thrift.TException;
-import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TThreadedSelectorServer;
-import org.apache.thrift.server.TThreadedSelectorServer.Args;
-import org.apache.thrift.transport.TNonblockingServerSocket;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
@@ -23,91 +18,173 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
-import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftServerAutoProc.LgkatNotFoundException;
-import ru.nkz.ivcgzo.thriftServerAutoProc.Lgota;
-import ru.nkz.ivcgzo.thriftServerAutoProc.Patient;
-import ru.nkz.ivcgzo.thriftServerAutoProc.PatientNotFoundException;
-import ru.nkz.ivcgzo.thriftServerAutoProc.ThriftServerAutoProc;
-import ru.nkz.ivcgzo.thriftServerAutoProc.ThriftServerAutoProc.Iface;
 
-public class ServerAutoProc extends Server implements Iface {
-	private TServer thrServ;
+public class ServerAutoProc extends Server {
+	private static final boolean DEBUG = Boolean.valueOf(System.getProperty("isDebug", "true"));
+	private static final String vr42erWorkAddr = "http://www.vrach42.ru/Services/er/mis";
+	private static final String vr42erTestAddr = "http://www.vrach42.ru/DemoServices/er/mis";
+	private static final String vr42iemkWorkAddr = "http://test.kuzdrav.ru/iemk/api/patient/register";
+	private static final String vr42iemkTestAddr = "http://test.kuzdrav.ru/iemk/api/patient/register";
 	private Properties prop;
-	SimpleDateFormat sdfData = new SimpleDateFormat("dd.MM.yyyy");
-//	private final TResultSetMapper<Patient, Patient._Fields> rsmpat;
+	private final JsonHttpTransport jtr;
 	
 	public ServerAutoProc(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
+		
+		jtr = new JsonHttpTransport();
+		
+		if (DEBUG)
+			System.out.println("ServerAutoProc DEBUG is set!!!");
 	}
 
 	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return -1;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
+	@Override
 	public void start() throws Exception {
-		try {
-			prop = new Properties();
-			prop.put("charSet","Cp866");
-			Class.forName("com.hxtt.sql.dbf.DBFDriver");
-			ThriftServerAutoProc.Processor<Iface> proc = new ThriftServerAutoProc.Processor<Iface>(this);
-			thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
-			thrServ.serve();
-		} catch (TException e) {
-			throw new Exception(e);
-		}
+		prop = new Properties();
+		prop.put("charSet","Cp866");
+		Class.forName("com.hxtt.sql.dbf.DBFDriver");
 	}
 
 	@Override
 	public void stop() {
-		if (thrServ != null)
-			thrServ.stop();
+		
 	}
 
 	@Override
-	public void testConnection() throws TException {
-	}
-
-	@Override
-	public void saveUserConfig(int id, String config) throws TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("UPDATE s_users SET config = ? WHERE id = ? ", false, config, id);
-			sme.setCommit();
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new TException();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-			throw new TException();
+	public Object executeServerMethod(int id, Object... params) throws Exception {
+		String methodName = null;
+		
+		try {
+			switch (id) {
+			case 1801:
+				methodName = "addReceptionTicketToVr42";
+				addReceptionTicketToVr42((int) params[0]);
+				break;
+			case 1802:
+				methodName = "remReceptionTicketFromVr42";
+				remReceptionTicketFromVr42((int) params[0]);
+				break;
+			case 1803:
+				methodName = "addPatientInfoToVr42";
+				addPatientInfoToVr42((int) params[0]);
+				break;
+			default:
+				throw new Exception();
+			}
+			
+			return null;
+		} catch (Exception e) {
+			if (methodName != null)
+				throw new Exception(String.format("Error executing server method with id %d (%s).", id, methodName), e);
+			else
+				throw new Exception(String.format("Unknown server method id %d.", id));
 		}
 	}
-
-	@Override
-	public Patient getPatientInfo(int npasp) throws PatientNotFoundException,
-			TException {
-		// TODO Auto-generated method stub
-		return null;
+	
+	
+	private void scheduleOperation(int addrType, String text) throws Exception {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("INSERT INTO scheduled (type, text) VALUES (?, ?)", false, addrType, text);
+			sme.setCommit();
+		}
 	}
-
-	@Override
-	public int setPatientInfo(Patient npasp) throws TException {
-		// TODO Auto-generated method stub
-		return 0;
+	
+	public void addReceptionTicketToVr42(int etalonId) throws Exception {
+		sendReceptionTicketToVr42(etalonId, 1);
 	}
-
-	@Override
-	public List<Lgota> getLgotaInfo(int npasp) throws LgkatNotFoundException,
-			TException {
-		// TODO Auto-generated method stub
-		return null;
+	
+	public void remReceptionTicketFromVr42(int etalonId) throws Exception {
+		sendReceptionTicketToVr42(etalonId, 2);
 	}
-
-	@Override
-	public int addLgotaInfo(Lgota npasp) throws TException {
-		// TODO Auto-generated method stub
-		return 0;
+	
+	private void sendReceptionTicketToVr42(int etalonId, int operId) throws Exception {
+		if (DEBUG)
+			return;
+		
+		String text;
+		
+		try {
+			text = new JsonTicketInfo(sse, etalonId, operId).toString();
+		} catch (JSONException e) {
+			e.printStackTrace();
+			throw new Exception("Can't make json for add reception ticket.", e);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new Exception("Can't query db to make json for add reception ticket.", e);
+		}
+		
+		try {
+			JSONObject resp = new JSONObject(jtr.sendPostRequest((DEBUG) ? vr42erTestAddr : vr42erWorkAddr, text));
+			if (!resp.getBoolean("IsSuccessful"))
+				throw new JSONException(String.format("Responce from server: %s", resp.getString("Error")));
+		} catch (JSONException e) {
+			throw new Exception("Malformed json.", e);
+		} catch (Exception e) {
+			e.printStackTrace();
+			try {
+				scheduleOperation(1, text);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				throw new Exception("Can't schedule operation for add reception ticket.", e);
+			}
+		}
 	}
-
-	@Override
-	public String getPL(String pl) throws KmiacServerException, TException {
+	
+	public void addPatientInfoToVr42(int npasp) throws Exception {
+		if (DEBUG)
+			return;
+		
+		String text;
+		
+		try {
+			text = new JsonPatientInfo(sse, npasp).toString();
+		} catch (JSONException e) {
+			e.printStackTrace();
+			throw new Exception("Can't make json for patient info.", e);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new Exception("Can't query db to make json for patient info.", e);
+		}
+		
+		try {
+			JSONObject resp = new JSONObject(jtr.sendPostRequest((DEBUG) ? vr42iemkTestAddr : vr42iemkWorkAddr, text));
+			if (!resp.getBoolean("IsSuccessful"))
+				throw new JSONException(String.format("Responce from server: %s", resp.getString("Error")));
+			try (SqlModifyExecutor sme = tse.startTransaction()) {
+				sme.execPrepared("UPDATE patient SET vr42_id = ?::uuid WHERE npasp = ? ", false, resp.getString("PatientId"), npasp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (JSONException e) {
+			throw new Exception("Malformed json.", e);
+		} catch (Exception e) {
+			e.printStackTrace();
+			try {
+				scheduleOperation(2, text);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				throw new Exception("Can't schedule operation for patient info.", e);
+			}
+		}
+	}
+	
+	
+	
+	public String getPL(String pl) {
 		String sqlpl;
 		String pathname;
 		String fname;

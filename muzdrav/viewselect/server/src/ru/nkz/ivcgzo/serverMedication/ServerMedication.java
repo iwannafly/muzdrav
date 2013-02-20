@@ -112,6 +112,21 @@ public class ServerMedication extends Server implements Iface {
         // TODO Auto-generated method stub
     }
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
     @Override
     public List<IntegerClassifier> getMedications() throws KmiacServerException {
         String sqlQuery = "SELECT pcod, name FROM n_med ORDER BY name;";
