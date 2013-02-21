@@ -1,5 +1,7 @@
 package ru.nkz.ivcgzo.clientHospital;
 
+//TODO: ВЫТАЩИТЬ СТРУКТУРУ Patient ИЗ Thrift-ФАЙЛОВ
+//TODO: РАЗОБРАТЬСЯ СО СТРУКТУРОЙ Lek ИЗ Thrift-ФАЙЛОВ
 import java.awt.Color;
 
 import javax.swing.BoxLayout;
@@ -7,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 
@@ -15,19 +18,20 @@ import ru.nkz.ivcgzo.thriftHospital.TPatient;
  * исследований, режимов и лечебных процедур
  * @author Балабаев Никита Дмитриевич
  */
-public final class Naznach extends JPanel {
+public final class Assignments extends JPanel {
 
 	private static final long serialVersionUID = 3513837719265529747L;
 	private UserAuthInfo userAuth = null;
     private TPatient patient = null;
     private JPanel pnlMedications, pnlResearch, pnlDiet, pnlProcedures;
+    private CustomTable<Lek, Lek._Fields> tblMedications;
 
 	/**
 	 * Создание экземпляра панели учёта медицинских назначений
 	 * @param authInfo Информация о вошедшем в систему пользователе
 	 * @param patientInfo Информация о пациенте
 	 */
-	public Naznach(final UserAuthInfo authInfo, final TPatient patientInfo) {
+	public Assignments(final UserAuthInfo authInfo, final TPatient patientInfo) {
 		this.userAuth = authInfo;
 		this.patient = patientInfo;
 		this.setInterface();	//Инициализация интерфейса

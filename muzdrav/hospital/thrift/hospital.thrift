@@ -327,61 +327,6 @@ struct TPatientCommonInfo {
 	13: optional i32 status;
 }
 
-struct TRd_SMPK {
-	1: i32 npasp;
-	2: i32 nrod;
-	3: i32 nnov;
-	4: optional i32 ndoc;
-	5: optional i64 dateoff;
-	6: optional i32 prvid;
-	7: optional i32 sm1;
-	8: optional i64 datas;
-	9: optional string times;
-	10: optional i32 kodmest;
-	11: optional i32 kolchild;
-	12: optional i32 b1;
-	13: optional i32 b2;
-	14: optional i32 b3;
-	15: optional i32 b4;
-	16: optional i32 b5;
-	17: optional i32 nreb;
-	18: optional string dsbasic;
-	19: optional i32 sostp;
-	20: optional i32 sm2;
-	21: optional i32 sm3;
-	22: optional string psm1;
-	23: optional string psm2;
-	24: optional string psm3;
-	25: optional string psm4;
-	26: optional string psm5;
-	27: optional string fioreb;
-	28: optional string fiozap;
-	29: optional i32 sm4;
-	30: optional i32 sm5;
-	31: optional i64 datazap;
-}
-
-struct TRd_ACCOMP {
-	1: i32 nnov;
-	2: i32 naccomp;
-	3: string accomp;
-	4: optional i32 priz;
-}
-
-struct TRd_PAT {
-	1: i32 nnov;
-	2: i32 npat;
-	3: string pat;
-	4: optional i32 priz;
-}
-
-struct TRd_DIAGnr {
-	1: i32 nnov;
-	2: i32 ndiag;
-	3: string diag;
-	4: optional i32 priz;
-}
-
 /**
  * Пациент с такими данными не найден.
  */

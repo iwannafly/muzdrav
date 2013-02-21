@@ -2,6 +2,12 @@
 ////////////TODO Рефакторить, рефакторить, рефакторить... /////////////////////
 package ru.nkz.ivcgzo.clientHospital;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -10,6 +16,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.ContainerAdapter;
+import java.awt.event.ContainerEvent;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +26,47 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JMenuBar;
+import javax.swing.JRadioButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
+import javax.swing.JSplitPane;
+import javax.swing.JPanel;
+import javax.swing.GroupLayout;
+import javax.swing.Timer;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JLabel;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JTextField;
+import javax.swing.BoxLayout;
+import javax.swing.JTextPane;
+import javax.swing.JButton;
+import javax.swing.UIManager;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import javax.swing.JCheckBox;
+import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import java.io.File;
+import java.io.IOException;
+
+
+import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
@@ -45,61 +95,8 @@ import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.TStage;
 import ru.nkz.ivcgzo.thriftHospital.Zakl;
 import ru.nkz.ivcgzo.thriftHospital.TRdIshod;
-import ru.nkz.ivcgzo.clientHospital.Children;
 import ru.nkz.ivcgzo.thriftHospital.RdDinStruct;
 import ru.nkz.ivcgzo.thriftHospital.RdSlStruct;
-
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JSplitPane;
-import javax.swing.JPanel;
-import javax.swing.GroupLayout;
-import javax.swing.Timer;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JTextField;
-import javax.swing.BoxLayout;
-import javax.swing.JTextPane;
-import javax.swing.JButton;
-import javax.swing.UIManager;
-
-import org.apache.thrift.TException;
-import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
-import javax.swing.border.LineBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Toolkit;
-
-import javax.swing.JRadioButton;
-import java.awt.Component;
-import javax.swing.Box;
-import java.awt.Dimension;
-
-import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.JToolBar;
-import java.awt.BorderLayout;
-import java.io.File;
-import java.io.IOException;
-
-import javax.swing.JCheckBox;
-import java.awt.event.ContainerAdapter;
-import java.awt.event.ContainerEvent;
 
 public class MainFrame extends JFrame {
 
@@ -110,7 +107,7 @@ public class MainFrame extends JFrame {
     private TPatient patient;
     private TPriemInfo priemInfo;
     private Children pChildren;
-    private Naznach pNaznach;
+    private Assignments pAssignments;
     private JMenuBar mbMain;
     private JMenu mnPatientOperation;
     private JMenuItem mntmSelectPatient;
@@ -420,7 +417,7 @@ public class MainFrame extends JFrame {
         } else {	//Скрытие вкладки "Роды":
             tabbedPane.removeTabAt(4);
         }
-        setNaznachPanel();
+        setpAssignmentsPanel();
         setZaklPanel();
     }
 
@@ -464,8 +461,8 @@ public class MainFrame extends JFrame {
         clearZaklText();
         if (pChildren != null)
         	pChildren.setPatient(null);
-        if (pNaznach != null)
-        	pNaznach.setPatient(null);
+        if (pAssignments != null)
+        	pAssignments.setPatient(null);
     }
 
     private class ShablonSearchListener implements DocumentListener {
@@ -577,8 +574,8 @@ public class MainFrame extends JFrame {
                     fillStageTable();
                     if (pChildren != null)
                     	pChildren.setPatient(patient);
-                    if (pNaznach != null)
-                    	pNaznach.setPatient(patient);
+                    if (pAssignments != null)
+                    	pAssignments.setPatient(patient);
 
         			try {
 						trdIshod = ClientHospital.tcl.getRdIshodInfo(
@@ -959,8 +956,8 @@ public class MainFrame extends JFrame {
                     fillStageTable();
                     if (pChildren != null)
                         pChildren.setPatient(patient);
-                    if (pNaznach != null)
-                    	pNaznach.setPatient(patient);
+                    if (pAssignments != null)
+                    	pAssignments.setPatient(patient);
                 }
             }
         });
@@ -3918,11 +3915,11 @@ public class MainFrame extends JFrame {
 	* Установка панели учёта назначений
 	* @author Балабаев Никита Дмитриевич
 	*/
-	private void setNaznachPanel() {
-		this.pNaznach = new Naznach(this.doctorAuth, this.patient);
+	private void setpAssignmentsPanel() {
+		this.pAssignments = new Assignments(this.doctorAuth, this.patient);
 		this.tabbedPane.addTab("Назначения",
 				new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/medication.png")),
-				this.pNaznach,
+				this.pAssignments,
 				null);
 	}
     

@@ -29,6 +29,7 @@ struct Lek {
 	15: optional i32 vracho;
 	16: optional i64 dataz;
 }
+
 struct LekPriem {
 	1: optional i32 id;
 	2: optional i32 nlek;
@@ -58,6 +59,6 @@ service ThriftMedication extends kmiacServer.KmiacServer {
 		throws (1: kmiacServer.KmiacServerException kse);
 	i32 addLek(1: Lek lek) throws (1: kmiacServer.KmiacServerException kse);
 	void deleteLek(1: i32 nlek) throws (1: kmiacServer.KmiacServerException kse);	
-	list<classifier.IntegerClassifier> getPeriods() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getPeriods()
+		throws (1: kmiacServer.KmiacServerException kse);
 }
-
