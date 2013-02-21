@@ -48,6 +48,7 @@ import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TInfoLPU;
 import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
+import ru.nkz.ivcgzo.thriftHospital.TMedication;
 import ru.nkz.ivcgzo.thriftHospital.TPatientCommonInfo;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.TRdIshod;
@@ -2645,6 +2646,13 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 		e1.printStackTrace();
 		throw new KmiacServerException();
 	}
+	}
+
+	@Override
+	public List<TMedication> getMedications(int idGosp)
+			throws KmiacServerException, TException {
+		
+		return null;
 	}
 
 //	public void addRdIshod(int npasp, int ngosp) throws KmiacServerException,

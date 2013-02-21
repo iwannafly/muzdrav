@@ -421,7 +421,7 @@ public class PIslForm {
 				pisl_ld.setCuser(MainForm.authInfo.pcod);
 				pisl_ld.setKod_ter(10);
 				
-				//System.out.print(pisl_ld);
+				//System.out.println("Добавление = "+pisl_ld);
 				
 				pisl_ld.setNisl(MainForm.ltc.AddIsl(pisl_ld));
 				tn_ldi.addItem(pisl_ld);
@@ -451,7 +451,9 @@ public class PIslForm {
 					upnisl.setNprob(Integer.parseInt(tFnprob.getText()));
 				}
 				
-				upnisl.setTalon(tFTalon.getText());
+				if (tFTalon.getText() != null){
+					upnisl.setTalon(tFTalon.getText());
+				}
 				
 				upnisl.setPcisl(cBpcisl.getSelectedPcod());
 				
@@ -472,7 +474,7 @@ public class PIslForm {
 				}
 
 				if (cBKod_ter.getSelectedPcod() != null){
-					upnisl.setNapravl(cBKod_ter.getSelectedPcod());
+					upnisl.setKod_ter(cBKod_ter.getSelectedPcod());
 				}
 				
 				if (tFnaprotd.getText() != null){	
@@ -496,7 +498,8 @@ public class PIslForm {
 				
 				upnisl.setCuser(cBCuser.getSelectedPcod());
 				
-				//System.out.print(upnisl);
+				//System.out.println("UPDATE = "+upnisl);
+				
 // , , , , , , , , , , , 				
 				MainForm.ltc.UpdIsl(upnisl);
 				
@@ -523,6 +526,11 @@ public class PIslForm {
 				if (cBnapravl.getSelectedPcod() != null){
 					tn_ldi.getSelectedItem().setNapravl(cBnapravl.getSelectedPcod());
 				}
+				
+				if (cBKod_ter.getSelectedPcod() != null){
+					tn_ldi.getSelectedItem().setKod_ter(cBKod_ter.getSelectedPcod());
+				}
+				
 				
 				if (tFnaprotd.getText() != null){	
 					tn_ldi.getSelectedItem().setNaprotd(Integer.parseInt(tFnaprotd.getText()));
@@ -724,7 +732,7 @@ public class PIslForm {
 		);
 		panel_6.setLayout(gl_panel_6);
 		
-		tn_ldi = new CustomTable<>(false, true, ObInfIsl.class, 2, "Код отделения", 3, "№ пробы", 4, "Орган. и системы", 6, "Дата пост.", 7, "Дата выпол.", 8, "Причина", 9, "Обстоятельства", 10, "Направлен", 11, "Код направ. ЛПУ", 12, "ФИО направ. врача", 13, "Вид оплаты", 14, "Диагноз", 15, "Код врача", 16, "Дата за полнения");
+		tn_ldi = new CustomTable<>(false, true, ObInfIsl.class, 2, "Код отделения", 3, "№ пробы", 4, "Орган. и системы", 6, "Дата пост.", 7, "Дата выпол.", 8, "Причина", 9, "Обстоятельства", 10, "Направлен", 21, "Направлен из города", 11, "Код направ. ЛПУ", 12, "ФИО направ. врача", 13, "Вид оплаты", 14, "Диагноз", 15, "Код врача", 16, "Дата за полнения");
 		tn_ldi.setFillsViewportHeight(true);
 		
 		tn_ldi.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -769,9 +777,13 @@ public class PIslForm {
 					cBpopl.setSelectedItem(null);
 				}
 				
-				cBnapravl.setSelectedPcod(tn_ldi.getSelectedItem().napravl);
+				if(tn_ldi.getSelectedItem().napravl !=0){
+					cBnapravl.setSelectedPcod(tn_ldi.getSelectedItem().napravl);
+				}else{
+					cBnapravl.setSelectedPcod(2);
+				}
 				
-				if (tn_ldi.getSelectedItem().isSetKod_ter()){
+				if (tn_ldi.getSelectedItem().kod_ter !=0){
 					cBKod_ter.setSelectedPcod(tn_ldi.getSelectedItem().kod_ter);
 				}else{
 					cBKod_ter.setSelectedPcod(10);
@@ -933,7 +945,7 @@ public class PIslForm {
 		
 		tn_ldi.setDateField(3);
 		tn_ldi.setDateField(4);
-		tn_ldi.setDateField(13);
+		tn_ldi.setDateField(14);
 		
 		scrollPane_1.setViewportView(tn_ldi);
 		panel_5.setLayout(gl_panel_5);
