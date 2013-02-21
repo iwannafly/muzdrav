@@ -7,14 +7,18 @@
 	<property name="src_thrift.dir" location="../thrift/gen-java" />
 	<property name="lib.dir" value="../../../../lib" />
 	<property name="bin_server_manager.dir" location="../../../common/managers/serverManager/bin" />
+	<property name="bin_admin_controller.dir" location="../../../common/managers/adminManager/bin" />
 	<property name="build.dir" location="bin" />
 	<property name="export.dir" location="../../manager/plugin/serverRegPatient.jar" />
+    <property name="src_reports.dir" location="../reports" />
+    <property name="dst_reports.dir" location="../../manager/plugin/reports" />
 
 	<path id="build.classpath">
 		<fileset dir="${lib.dir}">
 			<include name="*.jar" />
 		</fileset>
 		<pathelement path="${bin_server_manager.dir}" />
+		<pathelement path="${bin_admin_controller.dir}" />
 	</path>
 	
 	<property name="build.classpath" refid="build.classpath" />
@@ -36,6 +40,7 @@
 			destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
 			<classpath refid="build.classpath" />
 		</javac>
+	    <copy file="${src_reports.dir}/MedCardAmbPriem.htm" todir="${dst_reports.dir}" />
 	</target>
 
 	<!-- Создание jar файла -->

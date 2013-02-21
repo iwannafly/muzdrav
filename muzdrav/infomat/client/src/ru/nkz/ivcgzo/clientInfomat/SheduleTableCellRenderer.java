@@ -10,8 +10,6 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
-import ru.nkz.ivcgzo.clientInfomat.model.tableModels.SheduleTableModel;
-
 public class SheduleTableCellRenderer extends JLabel implements TableCellRenderer {
 
     private static final long serialVersionUID = -6093149415269084185L;
@@ -28,33 +26,12 @@ public class SheduleTableCellRenderer extends JLabel implements TableCellRendere
     public final Component getTableCellRendererComponent(final JTable table, final Object value,
             final boolean isSelected, final boolean hasFocus, final int row, final int column) {
         setOpaque(true);
-        int curVidp = ((SheduleTableModel) table.getModel()).getVidp(row, column);
-        switch (curVidp) {
-            case 0:
-                setBackground(Color.white);
-                setText("");
-                break;
-            case 1:
-                setBackground(Color.green);
-                setText((String) value);
-                break;
-            case 2:
-                setBackground(Color.yellow);
-                setText((String) value);
-                break;
-            case 3:
-                setBackground(Color.pink);
-                setText((String) value);
-                break;
-            case 4:
-                setBackground(Color.magenta);
-                setText((String) value);
-                break;
-            default:
-                setBackground(Color.white);
-                setText("");
-                break;
-        }
+        String strVal = (String) value;
+        if ((strVal != null) && (!strVal.isEmpty()))
+        	setBackground(Color.green);
+        else
+        	setBackground(Color.white);
+        setText(strVal);
         setHorizontalAlignment(SwingConstants.CENTER);
         if (hasFocus) {
             setBorder(BorderFactory.createLineBorder(

@@ -469,6 +469,13 @@ public class PacientInfoFrame extends JFrame {
 //                    changePatientSignInfo(curPatientId);
                 	tpSign.ChangePatientAnamnezInfo();
                 }
+                if (tbMain.getSelectedIndex() == 6) {
+                    if (curPatientId != 0 && tbl_priem.getSelectedItem() != null){
+                		curGospId = tbl_priem.getSelectedItem().id;
+            			MainForm.conMan.showLabRecordForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId);
+                	}else
+                		JOptionPane.showMessageDialog(tbl_priem, "Выберите обращения пациента.");
+                	}
                 if (tbMain.getSelectedIndex() == 5) {
                     selectAllPatientPriemInfo(curPatientId);
                     changePatientPriemInfo(curPatientId);
@@ -2486,9 +2493,10 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
         JButton btnOsm = new JButton("Первичный осмотр");
         btnOsm.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		if(curPatientId != 0 && curGospId != 0)
+                if (curPatientId != 0 && tbl_priem.getSelectedItem() != null){
+            		curGospId = tbl_priem.getSelectedItem().id;
         			MainForm.conMan.showDiaryForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId);
-        		else
+        		}else
         			JOptionPane.showMessageDialog(tbl_priem, "Отсутствуют обращения пациента.");
         	}
         });
@@ -3089,6 +3097,19 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
         scrollPane_3.setViewportView(tbl_priem);
         panel_23.setLayout(gl_panel_23);
         tpPriem.setLayout(gl_tpPriem);
+        
+        JPanel tpLDS = new JPanel();
+        tbMain.addTab("Лабораторно-диагностические исследования", null, tpLDS, null);
+        GroupLayout gl_tpLDS = new GroupLayout(tpLDS);
+        gl_tpLDS.setHorizontalGroup(
+        	gl_tpLDS.createParallelGroup(Alignment.LEADING)
+        		.addGap(0, 989, Short.MAX_VALUE)
+        );
+        gl_tpLDS.setVerticalGroup(
+        	gl_tpLDS.createParallelGroup(Alignment.LEADING)
+        		.addGap(0, 601, Short.MAX_VALUE)
+        );
+        tpLDS.setLayout(gl_tpLDS);
 
 
         tbl_priem.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -3244,6 +3265,7 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
         if (MainForm.authInfo.getCslu() != 1) {
             tbMain.remove(tpSign);
             tbMain.remove(tpPriem);
+            tbMain.remove(tpLDS);
             btnPrint_istb.setVisible(false);
             btnShowTalonSelectModule.setVisible(true);
         } else {
@@ -3684,8 +3706,8 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
         }
            try {
         	   curGospId = tbl_priem.getSelectedItem().id;
-            curNgosp = tbl_priem.getSelectedItem().ngosp;
-            Id_gosp = MainForm.tcl.getGosp(curGospId);
+        	   curNgosp = tbl_priem.getSelectedItem().ngosp;
+        	   Id_gosp = MainForm.tcl.getGosp(curGospId);
 //			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy hh:mm");
 //            if (Id_gosp.getJalob() != null){
 //                ta_jal_pr.setText(Id_gosp.getJalob());

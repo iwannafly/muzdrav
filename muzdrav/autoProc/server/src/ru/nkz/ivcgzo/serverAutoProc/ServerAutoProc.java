@@ -23,6 +23,8 @@ public class ServerAutoProc extends Server {
 	private static final boolean DEBUG = Boolean.valueOf(System.getProperty("isDebug", "true"));
 	private static final String vr42erWorkAddr = "http://www.vrach42.ru/Services/er/mis";
 	private static final String vr42erTestAddr = "http://www.vrach42.ru/DemoServices/er/mis";
+	private static final String vr42iemkWorkAddr = "http://test.kuzdrav.ru/iemk/api/patient/register";
+	private static final String vr42iemkTestAddr = "http://test.kuzdrav.ru/iemk/api/patient/register";
 	private Properties prop;
 	private final JsonHttpTransport jtr;
 	
@@ -75,6 +77,10 @@ public class ServerAutoProc extends Server {
 			case 1802:
 				methodName = "remReceptionTicketFromVr42";
 				remReceptionTicketFromVr42((int) params[0]);
+				break;
+			case 1803:
+				methodName = "addPatientInfoToVr42";
+				addPatientInfoToVr42((int) params[0]);
 				break;
 			default:
 				throw new Exception();
@@ -136,7 +142,44 @@ public class ServerAutoProc extends Server {
 				throw new Exception("Can't schedule operation for add reception ticket.", e);
 			}
 		}
+	}
+	
+	public void addPatientInfoToVr42(int npasp) throws Exception {
+		if (DEBUG)
+			return;
 		
+		String text;
+		
+		try {
+			text = new JsonPatientInfo(sse, npasp).toString();
+		} catch (JSONException e) {
+			e.printStackTrace();
+			throw new Exception("Can't make json for patient info.", e);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new Exception("Can't query db to make json for patient info.", e);
+		}
+		
+		try {
+			JSONObject resp = new JSONObject(jtr.sendPostRequest((DEBUG) ? vr42iemkTestAddr : vr42iemkWorkAddr, text));
+			if (!resp.getBoolean("IsSuccessful"))
+				throw new JSONException(String.format("Responce from server: %s", resp.getString("Error")));
+			try (SqlModifyExecutor sme = tse.startTransaction()) {
+				sme.execPrepared("UPDATE patient SET vr42_id = ?::uuid WHERE npasp = ? ", false, resp.getString("PatientId"), npasp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (JSONException e) {
+			throw new Exception("Malformed json.", e);
+		} catch (Exception e) {
+			e.printStackTrace();
+			try {
+				scheduleOperation(2, text);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				throw new Exception("Can't schedule operation for patient info.", e);
+			}
+		}
 	}
 	
 	

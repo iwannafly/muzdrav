@@ -573,7 +573,11 @@ public class TalonSelectFrame extends JFrame {
         lblName.setText(patientName);
         lblMiddlename.setText(patientMiddlename);
         curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename, idPvizit);
-        cbxPoliclinic.setSelectedPcod(curDoctorInfo.getCpodr());
+        try {
+			cbxPoliclinic.setSelectedPcod(curDoctorInfo.getCpodr());
+		} catch (RuntimeException e) {
+			cbxPoliclinic.setSelectedIndex(0);
+		}
     }
 
     public final void onConnect() {

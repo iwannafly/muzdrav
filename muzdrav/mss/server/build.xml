@@ -9,6 +9,8 @@
 	<property name="bin_server_manager.dir" location="../../../common/managers/serverManager/bin" />
 	<property name="build.dir" location="bin" />
 	<property name="export.dir" location="../../manager/plugin/serverMss.jar" />
+    <property name="src_reports.dir" location="../reports" />
+    <property name="dst_reports.dir" location="../../manager/plugin/reports" />
 	
 	<path id="build.classpath">
 	  <fileset dir="${lib.dir}">
@@ -34,6 +36,7 @@
 		<javac includeantruntime="false" srcdir="${src_server.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
 			<classpath refid="build.classpath"/>
 		</javac>
+	    <copy file="${src_reports.dir}/ShMSS.htm" todir="${dst_reports.dir}" />
 	</target>
 	
 	<!-- Создание jar файла -->

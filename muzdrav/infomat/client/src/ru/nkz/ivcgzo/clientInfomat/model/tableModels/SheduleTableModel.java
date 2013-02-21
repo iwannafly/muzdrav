@@ -17,7 +17,7 @@ public class SheduleTableModel implements TableModel {
     private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
     private List<TSheduleDay> sheduleList;
     private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("HH:mm");
-    private static final int ROW_COUNT = 4;
+    private static final int ROW_COUNT = 1;
     private static final String[] COLUMN_NAMES = {
         "Понедельник", "Вторник", "Среда" , "Четверг" , "Пятница", "Суббота", "Воскресенье"
     };
@@ -51,16 +51,9 @@ public class SheduleTableModel implements TableModel {
         return false;
     }
 
-    public final int getVidp(final int rowIndex, final int columnIndex) {
-        if (findSheduleDay(columnIndex + 1, rowIndex + 1) != null) {
-            return findSheduleDay(columnIndex + 1, rowIndex + 1).getVidp();
-        } else {
-            return 0;
-        }
-    }
-    private TSheduleDay findSheduleDay(final int denn, final int vidP) {
+    private TSheduleDay findSheduleDay(final int denn) {
         for (TSheduleDay sheduleDay : sheduleList) {
-            if ((sheduleDay.getWeekDay() == denn) && (sheduleDay.getVidp() == vidP)) {
+            if (sheduleDay.getWeekDay() == denn) {
                 return sheduleDay;
             }
         }
@@ -71,20 +64,24 @@ public class SheduleTableModel implements TableModel {
         if (sheduleDay == null) {
             return "";
         }
-        String timeStart = " ";
-        String timeEnd = " ";
-        if ((sheduleDay.isSetTimeStart()) && (sheduleDay.getTimeStart() != 0)) {
-            timeStart = DEFAULT_DATE_FORMAT.format(sheduleDay.getTimeStart());
+        if (!isTimeStartEndSet(sheduleDay)) {
+        	return "";
+        } else {
+        	return String.format("%s - %s", DEFAULT_DATE_FORMAT.format(sheduleDay.getTimeStart()), DEFAULT_DATE_FORMAT.format(sheduleDay.getTimeEnd()));
         }
-        if ((sheduleDay.isSetTimeEnd()) && (sheduleDay.getTimeEnd() != 0)) {
-            timeEnd = DEFAULT_DATE_FORMAT.format(sheduleDay.getTimeEnd());
-        }
-        return String.format("%s - %s", timeStart, timeEnd);
+    }
+    
+    private boolean isTimeStartEndSet(final TSheduleDay sheduleDay) {
+    	final String zeroTime = "00:00";
+    	return sheduleDay.isSetTimeStart() &&
+    			!DEFAULT_DATE_FORMAT.format(sheduleDay.getTimeStart()).equals(zeroTime) &&
+    			sheduleDay.isSetTimeEnd() &&
+    			!DEFAULT_DATE_FORMAT.format(sheduleDay.getTimeEnd()).equals(zeroTime);
     }
 
     @Override
     public final Object getValueAt(final int rowIndex, final int columnIndex) {
-        return createCellLabel(findSheduleDay(columnIndex + 1, rowIndex + 1));
+        return createCellLabel(findSheduleDay(columnIndex + 1));
     }
 
     public final List<TSheduleDay> getSheduleTalonList() {
