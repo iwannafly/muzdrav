@@ -18,8 +18,11 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-import ru.nkz.ivcgzo.thriftAssignments.*;
+import ru.nkz.ivcgzo.thriftHospital.TDiagnostic;
+import ru.nkz.ivcgzo.thriftHospital.TDiet;
+import ru.nkz.ivcgzo.thriftHospital.TMedication;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
+import ru.nkz.ivcgzo.thriftHospital.TProcedures;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 
 /**
