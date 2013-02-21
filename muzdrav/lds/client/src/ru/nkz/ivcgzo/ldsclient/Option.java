@@ -22,12 +22,12 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
-import ru.nkz.ivcgzo.ldsThrift.LDSThrift.Processor.InsS_ldi;
+//import ru.nkz.ivcgzo.ldsThrift.LDSThrift.Processor.InsS_ldi;
 import ru.nkz.ivcgzo.ldsThrift.LdiNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.Metod;
 import ru.nkz.ivcgzo.ldsThrift.MetodNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.N_ldi;
-import ru.nkz.ivcgzo.ldsThrift.S_ldi;
+//import ru.nkz.ivcgzo.ldsThrift.S_ldi;
 import ru.nkz.ivcgzo.ldsThrift.S_ot01;
 import ru.nkz.ivcgzo.ldsThrift.S_ot01ExistsException;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -65,7 +65,7 @@ public class Option {
 			@Override
 			public void windowOpened(WindowEvent e) {
 				
-				try {
+			/*	try {
 					List<N_ldi> alis = MainForm.ltc.getAllN_ldi();
 					
 					List<S_ldi> sisl = MainForm.ltc.getAllS_ldi();
@@ -119,7 +119,7 @@ public class Option {
 					e1.printStackTrace();
 				} 
 				
-				
+				*/
 				
 				
 				
@@ -287,13 +287,13 @@ public class Option {
 			@Override
 			public boolean doAction(CustomTableItemChangeEvent<N_ldi> event) {
 				try {
-					//MainForm.ltc.UpdN_ldi(event.getItem());
+					MainForm.ltc.UpdN_ldi(event.getItem());
 					
-					S_ldi upsldi = new S_ldi();
+					/*S_ldi upsldi = new S_ldi();
 					
 					upsldi.setName(event.getItem().name);
 					upsldi.setId(event.getItem().id);
-					MainForm.ltc.UpdS_ldi(upsldi);
+					MainForm.ltc.UpdS_ldi(upsldi);*/
 					
 					return true;
 				} catch (LdiNotFoundException e) {
