@@ -107,10 +107,10 @@ struct N_ldi {
 }
 
 
-struct S_ldi{
+/*struct S_ldi{
 	1: i32 id;
 	2: string name; 
-}
+}*/
 
 
 struct N_lds {
@@ -270,9 +270,9 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	list<N_ldi> getAllN_ldi();
 	void UpdN_ldi (1: N_ldi nldi) throws (1: LdiNotFoundException lnfe);
 
-	list<S_ldi> getAllS_ldi();
+/*	list<S_ldi> getAllS_ldi();
 	void InsS_ldi (1: S_ldi s_ldi);
-	void UpdS_ldi (1: S_ldi s_ldi) throws (1: SLdiNotFoundException s_lnfe);
+	void UpdS_ldi (1: S_ldi s_ldi) throws (1: SLdiNotFoundException s_lnfe);*/
 	
 	list<N_lds> getN_lds (1: i32 pcod);
 
