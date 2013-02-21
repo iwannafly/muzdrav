@@ -328,8 +328,8 @@ struct TPatientCommonInfo {
 }
 
 struct TMedication {
-	1: optional i32 nlek;
-	2: optional string namelek;
+	1: optional string name;
+	2: optional i32 nlek;
 	3: optional i32 idGosp;
 	4: optional i32 vrach;
 	5: optional i64 datan;
@@ -632,10 +632,16 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 */
     TPatientCommonInfo getPatientCommonInfo(1:i32 npasp)
     	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
+	
+/* Назначения */
     	
     /**
-     *
-     */
+	 * Получение списка лекарственных назначений
+	 * @param idGosp Идентификатор госпитализации
+	 * @return Возвращает список лекарственных назначений
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
 	list<TMedication> getMedications(1: i32 idGosp)
 		throws (1: kmiacServer.KmiacServerException kse);
 

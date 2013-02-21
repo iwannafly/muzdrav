@@ -283,7 +283,6 @@ public class MainFrame extends JFrame {
     private JTextField tfPatalogoAnDiagPcod;
     private JPanel panel;
     private JButton btnShowPatientInfo;
-    private JButton btnMedication;
     private JButton btnIssled;
     private JToolBar toolBar;
     private JTextField tfZaklDiagPcod;
@@ -881,26 +880,6 @@ public class MainFrame extends JFrame {
         btnIssled.setIcon(new ImageIcon(MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientHospital/resources/issled.png")));
         btnIssled.setRequestFocusEnabled(false);
-
-        btnMedication = new JButton();
-        btnMedication.setToolTipText("Лекарственные назначения");
-        toolBar.add(btnMedication);
-        btnMedication.setMaximumSize(new Dimension(35, 35));
-        btnMedication.setMinimumSize(new Dimension(35, 35));
-        btnMedication.setPreferredSize(new Dimension(35, 35));
-        btnMedication.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                if (patient != null) {
-                    ClientHospital.conMan.showMedicationForm(patient.getPatientId(),
-                        patient.getSurname(), patient.getName(), patient.getMiddlename(),
-                        patient.getGospitalCod());
-                }
-            }
-        });
-        btnMedication.setBorder(null);
-        btnMedication.setIcon(new ImageIcon(MainFrame.class.getResource(
-            "/ru/nkz/ivcgzo/clientHospital/resources/medication.png")));
-        btnMedication.setRequestFocusEnabled(false);
 
         btnOperation = new JButton();
         btnOperation.setToolTipText("Операции");

@@ -1,11 +1,13 @@
 package ru.nkz.ivcgzo.clientHospital;
 
-//TOFO: ИСПРАВИТЬ ДОБАВЛЕНИЕ ЛЕКАРСТВЕННЫХ НАЗНАЧЕНИЙ
+//TOFO: ИСПРАВИТЬ ДОБАВЛЕНИЕ ЛЕКАРСТВЕННЫХ НАЗНАЧЕНИЙ (скрыть промежуточную форму)
+//TODO: РЕШИТЬ ВОПРОС О ДЛИТЕЛЬНОСТИ ПРИЁМА ЛЕКАРСТВЕННЫХ НАЗНАЧЕНИЙ
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
@@ -17,9 +19,15 @@ import javax.swing.JScrollPane;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import org.apache.thrift.TException;
+
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-import ru.nkz.ivcgzo.thriftAssignments.*;
+import ru.nkz.ivcgzo.thriftHospital.TDiagnostic;
+import ru.nkz.ivcgzo.thriftHospital.TDiet;
+import ru.nkz.ivcgzo.thriftHospital.TMedication;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
+import ru.nkz.ivcgzo.thriftHospital.TProcedures;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 
 /**
@@ -30,12 +38,14 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 public final class Assignments extends JPanel {
 
 	private static final long serialVersionUID = 3513837719265529747L;
-    private static final String addIconPath = "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png";
-    private static final String delIconPath = "/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png";
+    private static final URL addIconURL = MainFrame.class.getResource(
+    		"/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png");
+    private static final URL delIconURL = MainFrame.class.getResource(
+    		"/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png");
+	private UserAuthInfo userAuth;
+    private TPatient patient;
     private Icon addIcon, delIcon;
     private Dimension defaultDimension;
-	private UserAuthInfo userAuth = null;
-    private TPatient patient = null;
     private JPanel pnlMedications, pnlDiagnostics, pnlDiet, pnlProcedures;
     private JScrollPane spMedications, spDiagnostics, spDiet, spProcedures;
     private CustomTable<TMedication, TMedication._Fields> tblMedications;
@@ -98,8 +108,8 @@ public final class Assignments extends JPanel {
 	private void updatePanel() {
 		this.clearAllTables();
 		if (this.patient != null) {
-			/*
 			this.fillTableMedications();
+			/*
 			this.fillTableDiagnostics();
 			this.fillTableDiet();
 			this.fillTableProcedures();
@@ -118,11 +128,25 @@ public final class Assignments extends JPanel {
 	}
 	
 	/**
+	 * Заполнение таблицы лекарственных назначений данными из БД
+	 */
+	private void fillTableMedications() {
+		try {
+			this.tblMedications.setData(
+					ClientHospital.tcl.getMedications(this.patient.getGospitalCod()));
+		} catch (KmiacServerException e) {
+			e.printStackTrace();
+		} catch (TException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * Инициализация пользовательского интерфейса панели
 	 */
 	private void setInterface() {
-		this.addIcon = new ImageIcon(MainFrame.class.getResource(Assignments.addIconPath));
-		this.delIcon = new ImageIcon(MainFrame.class.getResource(Assignments.delIconPath));
+		this.addIcon = new ImageIcon(Assignments.addIconURL);
+		this.delIcon = new ImageIcon(Assignments.delIconURL);
 		this.defaultDimension = new Dimension(50, 50);
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.setPanelMedications();
@@ -179,19 +203,19 @@ public final class Assignments extends JPanel {
 		this.spMedications = new JScrollPane();
 		this.pnlMedications.add(this.spMedications);
 		this.tblMedications = new CustomTable<TMedication, TMedication._Fields>(
-				false, false, TMedication.class, 2, "Наименование",
-				5, "Дата назначения", 13, "Длительность", 15, "Дата отмены");
+				false, false, TMedication.class, 0, "Наименование",
+				4, "Дата назначения", 14, "Дата отмены");
 		this.spMedications.setViewportView(this.tblMedications);
 		this.tblMedications.setDateField(1);
-		this.tblMedications.setDateField(3);
+		this.tblMedications.setDateField(2);
 	}
 	
 	private void setTableDiagnostics() {
 		this.spDiagnostics = new JScrollPane();
 		this.pnlDiagnostics.add(this.spDiagnostics);
 		this.tblDiagnostics = new CustomTable<TDiagnostic, TDiagnostic._Fields>(
-				false, false, TDiagnostic.class, 3, "Наименование",
-				7, "Дата назначения", 7, "Дата выполнения");
+				false, false, TDiagnostic.class, 2, "Наименование",
+				6, "Дата назначения", 6, "Дата выполнения");
 		this.spDiagnostics.setViewportView(this.tblDiagnostics);
 		this.tblDiagnostics.setDateField(1);
 		this.tblDiagnostics.setDateField(2);
@@ -243,6 +267,7 @@ public final class Assignments extends JPanel {
                     ClientHospital.conMan.showMedicationForm(patient.getPatientId(),
                         patient.getSurname(), patient.getName(), patient.getMiddlename(),
                         patient.getGospitalCod());
+                    fillTableMedications();
                 }
             }
         });
@@ -252,7 +277,10 @@ public final class Assignments extends JPanel {
 				this.defaultDimension, this.delIcon);
 		this.btnDelMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-            	//TODO
+                if ((patient != null) && (ClientHospital.conMan != null)) {
+                	//FIXME:
+                    fillTableMedications();
+                }
             }
         });
 	}
