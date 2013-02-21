@@ -119,9 +119,7 @@ public class MainFrame extends JFrame {
         });
         spMedicationList.setViewportView(lMedication);
     }
-
-
-
+	
     private void fillCurLekTextFields() {  
         if (curLek.isSetFlek()) {
             tfFormLek.setText(curLek.getFlek());
@@ -354,7 +352,7 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private final void  clearTextFields() {
+    private final void clearTextFields() {
         tfCountInDay.setText("");
         tfDose.setText("");
         tfFormLek.setText("");

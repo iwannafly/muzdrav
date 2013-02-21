@@ -3,7 +3,6 @@ namespace java ru.nkz.ivcgzo.thriftViewSelect
 include "../../../common/thrift/kmiacServer.thrift"
 include "../../../common/thrift/classifier.thrift" 
 
-
 struct PatientBriefInfo {
 	1: i32 npasp;
 	2: string fam;
