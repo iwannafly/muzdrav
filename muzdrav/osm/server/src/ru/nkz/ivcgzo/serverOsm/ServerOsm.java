@@ -1562,6 +1562,17 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
 			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
 			sb.append("<head>");
+			sb.append("<STYLE TYPE=\"text/css\">");
+			sb.append("	<!--");
+			sb.append("@page { size: 29.7cm 21cm; margin-left: 2cm; margin-right: 1.06cm; margin-top: 2.12cm; margin-bottom: 1.76cm }");
+			sb.append("P { margin-bottom: 0.21cm; direction: ltr; color: #000000; widows: 2; orphans: 2 }");
+			sb.append("P.western { font-family: \"Times New Roman\", serif; font-size: 12pt; so-language: ru-RU }");
+			sb.append("P.cjk { font-family: \"Times New Roman\", serif; font-size: 12pt }");
+			sb.append("P.ctl { font-family: \"Times New Roman\", serif; font-size: 12pt; so-language: ar-SA }");
+			sb.append("A:link { color: #000080; so-language: zxx; text-decoration: underline }");
+			sb.append("A:visited { color: #800000; so-language: zxx; text-decoration: underline }");
+			sb.append("-->");
+			sb.append("</STYLE>");
 				sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
 				sb.append("<title>Вкладыш в амб.карту</title>");
 			sb.append("</head>");
@@ -1686,6 +1697,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				if (acrs.getResultSet().next())
 					sb.append(String.format("%s %s %s",acrs.getResultSet().getString(1),acrs.getResultSet().getString(2),acrs.getResultSet().getString(3)));
 				sb.append("<br>Подпись ____________");
+	//			if (sb.length()>4550){
 				sb.append("<td style=\"border: 1px solid white; padding: 5px; font: 10px times new roman;\" width=\"40%\">");
 				acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav, p_vizit_amb.datap " +
 						"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) join n_ldi  on (n_ldi.pcod = p_rez_l.cpok)  " +
@@ -1701,10 +1713,15 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 						while (acrs.getResultSet().next()) {
 							if (acrs.getResultSet().getString(4) != null) {
 								sb.append("<table border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">Наименование показателя</th><th style=\"font: 10px times new roman;\">Результат</th></tr>");
+		//						if (sb.length()>4697){
 								do {
 									sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\"> %s </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
 								} 
 								while (acrs.getResultSet().next());
+//								}
+//								else {
+//									sb.append("<>");
+//								}
 							}
 							else {
 								sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th>Наименование показателя</th><th>Результат</th></tr>");
@@ -1715,6 +1732,37 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 							}
 						}		sb.append("</table><br>");		
 					}
+//				}
+//				else {
+//					acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav, p_vizit_amb.datap " +
+//							"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) join n_ldi  on (n_ldi.pcod = p_rez_l.cpok)  " +
+//							"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
+//							"where p_isl_ld.id_pos = ? " +
+//							"union " +
+//							"select p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, p_isl_ld.datav, p_vizit_amb.datap " +
+//							"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl) join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)  " +
+//							"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
+//							"where p_isl_ld.id_pos = ? ", pvizit_ambId, pvizit_ambId);
+//					if (acrs.getResultSet().isBeforeFirst()) {
+//						sb.append("<b>Назначенные исследования </b><br>");
+//						while (acrs.getResultSet().next()) {
+//							if (acrs.getResultSet().getString(4) != null) {
+//								sb.append("<table border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">Наименование показателя</th><th style=\"font: 10px times new roman;\">Результат</th></tr>");
+//								do {
+//									sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\"> %s </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
+//								} 
+//								while (acrs.getResultSet().next());
+//							}
+//							else {
+//								sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th>Наименование показателя</th><th>Результат</th></tr>");
+//								do {
+//									sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\">  </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(3)));
+//								} 
+//								while (acrs.getResultSet().next());
+//							}
+//						}		sb.append("</table><br>");	
+//					}
+//				}
 					acrs.close();
 					
 				sb.append("</td></tr></table></div>");
@@ -2484,7 +2532,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public List<StringClassifier> get_n_c00(int npasp, int pcod)
 			throws KmiacServerException, TException {
-	try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select n_c00.pcod as pcod,p_disp.diag as name  from p_disp join n_c00 on (p_disp.diag=n_c00.pcod) where npasp = ? and pcod = ?", npasp, pcod)) {
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select n_c00.pcod as pcod,p_disp.diag as name  from p_disp join n_c00 on (p_disp.diag=n_c00.pcod) where p_disp.npasp = ? and p_disp.pcod = ?", npasp, pcod)) {
 		return rsmStrClas.mapToList(acrs.getResultSet());
 	} catch (SQLException e) {
 		((SQLException) e.getCause()).printStackTrace();
