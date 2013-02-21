@@ -192,7 +192,7 @@ public class ServerKartaRInv extends Server implements Iface {
 				sme.execPreparedT("UPDATE p_invk SET dataz = ?, datav = ?, vrach = ?, mesto1 = ?, preds = ?, uchr = ?, " + 
 					"nom_mse = ?, name_mse = ?, ruk_mse = ?, rez_mse = ?, d_osv = ?, d_otpr = ?, d_inv = ?, d_invp = ?, " + 
 					"d_srok = ?, srok_inv = ?, diag = ?, diag_s1 = ?, diag_s2 = ?, diag_s3 = ?, oslog = ?, factor = ?, fact1 = ?, fact2 = ?, fact3 = ?, " + 
-					"fact4 = ?, prognoz= ?, potencial = ?,  med_reab = ?, ps_reab = ?, prof_reab = ?, soc_reab = ?, zakl = ?, zakl_name = ?, klin_prognoz = ?," + 
+					"fact4 = ?, prognoz= ?, potencial = ?,  med_reab = ?, ps_reab = ?, prof_reab = ?, soc_reab = ?, zakl = ?, zakl_name = ?, klin_prognoz = ?, " + 
 					"nar1= ?, nar2 = ?, nar3 = ?, nar4 = ?, nar5 = ?, nar6 = ?, ogr1 = ?, ogr2 = ?, ogr3 = ?, ogr4 = ?, " + 
 					"ogr5 = ?, ogr6= ?, ogr7 = ?, mr1n = ?, mr2n = ?, mr3n = ?, mr4n = ?, mr5n = ?, mr6n = ?, " + 
 					"mr7n= ?, mr8n = ?, mr9n = ?, mr10n = ?, mr11n = ?, mr12n = ?, mr13n = ?, mr14n = ?, mr15n = ?, mr16n = ?, " + 

@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -1159,7 +1160,6 @@ public class Vvod extends JFrame {
 				  			pdisp.setCod_sp(diagamb.getCod_sp());
 				  			pdisp.setCdol_ot(diagamb.getCdol());
 				  			pdisp.setD_uch(Integer.valueOf(tfNuch.getText()));
-				  			pdisp.setD_uch(Integer.valueOf(tfNuch.getText()));
 				  			pdisp.setDiag_n(tfNewDs.getText());
 				  			MainForm.tcl.setPdisp(pdisp);
 				  			if (!tfNewDs.isEmpty() && !tfNewDs.getText().equals(diagamb.diag)) {
@@ -2015,6 +2015,10 @@ public class Vvod extends JFrame {
 					e1.printStackTrace();
 				}
 				treeRezIssl.setModel(new DefaultTreeModel(createNodes()));
+
+						
+							
+
 			}
 		});
 		
@@ -2046,13 +2050,100 @@ public class Vvod extends JFrame {
 		
 		tfPlanDatIssl = new CustomDateEditor();
 		tfPlanDatIssl.setColumns(10);
+		
+		JButton btnNaprSave = new JButton("Сохранить");
+		btnNaprSave.setVisible(false);
+		btnNaprSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {	
+					if ((cmbOrgan.getSelectedItem() != null) ) {
+						P_isl_ld pisl = new P_isl_ld();
+						Prez_d prezd = new Prez_d();
+						Prez_l prezl = new Prez_l();
+						
+						for (PdiagAmb pd : tblDiag.getData()) {
+							if ((pd.diag_stat == 1) || (pd.diag_stat == 3)) {
+								pisl.setDiag(pd.diag);
+								break;
+							}
+						}
+						if (!pisl.isSetDiag()) {
+				  			JOptionPane.showMessageDialog(Vvod.this, "Запись на исследование не возможна, так как в посещении не выставлено ни одного основного диагноза.");
+				  			return;
+						}
+						
+						for (PokazMet pokazMet : tblNaprPokazMet.getData()) {
+							if (pokazMet.vybor) {
+								prezd.setKodisl(pokazMet.pcod);
+								break;
+							}
+						}
+						if (!prezd.isSetKodisl()) {
+				  			JOptionPane.showMessageDialog(Vvod.this, "Выберите хотя бы одно исследование.");
+				  			return;
+						}
+						if (tfPlanDatIssl.getDate() == null){
+							JOptionPane.showMessageDialog(Vvod.this, "Планируемая дата выполнения исследования не заполнена.");
+							return;
+						}
+						
+						pisl.setNpasp(Vvod.zapVr.getNpasp());
+						pisl.setPcisl(cmbOrgan.getSelectedPcod());
+						pisl.setNapravl(2);
+						pisl.setNaprotd(MainForm.authInfo.getCpodr());
+						pisl.setDatan(System.currentTimeMillis());
+						pisl.setVrach(MainForm.authInfo.getPcod());
+						pisl.setDataz(System.currentTimeMillis());
+						pisl.setPvizit_id(tblPos.getSelectedItem().getId_obr());
+						pisl.setId_pos(tblPos.getSelectedItem().getId());
+						pisl.setPrichina(pvizit.getCobr());
+						pisl.setKodotd(cmbNaprMesto.getSelectedPcod());
+						pisl.setVopl(cmbVidOpl.getSelectedPcod());
+						if (tfPlanDatIssl.getDate() != null)
+							pisl.setDatap(tfPlanDatIssl.getDate().getTime());
+						
+							pisl.setNisl(MainForm.tcl.AddPisl(pisl));
+						
+						List<String> selItems = new ArrayList<>();
+						for (IntegerClassifier el : listVidIssl)
+							if (el.pcod == cmbNaprMesto.getSelectedPcod()) {
+								for (PokazMet pokazMet : tblNaprPokazMet.getData()) {
+									if (pokazMet.vybor) {
+										if (el.name.equals("Л")) {
+											prezl.setNpasp(pisl.getNpasp());
+											prezl.setNisl(pisl.getNisl());
+											prezl.setCpok(pokazMet.pcod);
+											prezl.setId(MainForm.tcl.AddPrezl(prezl));	
+										}
+										else{
+											prezd.setNpasp(pisl.getNpasp());
+											prezd.setNisl(pisl.getNisl());
+											prezd.setKodisl(pokazMet.pcod);
+											prezd.setId(MainForm.tcl.AddPrezd(prezd));
+										}
+										selItems.add(pokazMet.getPcod());
+									}
+								}
+							}
+						} 
+					}
+				catch (KmiacServerException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (TException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+				treeRezIssl.setModel(new DefaultTreeModel(createNodes()));			
+			}
+		});
 		GroupLayout gl_pnlIssl = new GroupLayout(pnlIssl);
 		gl_pnlIssl.setHorizontalGroup(
 			gl_pnlIssl.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_pnlIssl.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.LEADING)
-						.addComponent(lblNaprPokazMet, GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
+						.addComponent(lblNaprPokazMet, GroupLayout.DEFAULT_SIZE, 618, Short.MAX_VALUE)
 						.addGroup(gl_pnlIssl.createSequentialGroup()
 							.addGroup(gl_pnlIssl.createParallelGroup(Alignment.LEADING, false)
 								.addComponent(lblNaprVidIssl, GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
@@ -2065,7 +2156,7 @@ public class Vvod extends JFrame {
 								.addGroup(gl_pnlIssl.createSequentialGroup()
 									.addGap(1)
 									.addComponent(cmbLpu, GroupLayout.PREFERRED_SIZE, 499, GroupLayout.PREFERRED_SIZE)))
-							.addPreferredGap(ComponentPlacement.RELATED, 58, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.RELATED, 4, Short.MAX_VALUE))
 						.addGroup(gl_pnlIssl.createSequentialGroup()
 							.addComponent(lblPlanDatIssl)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -2074,8 +2165,11 @@ public class Vvod extends JFrame {
 							.addComponent(lblNaprKab, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(tbNaprKab, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE))
-						.addComponent(btnNaprPrint, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-						.addComponent(spNaprPokazMet, GroupLayout.PREFERRED_SIZE, 613, GroupLayout.PREFERRED_SIZE))
+						.addComponent(spNaprPokazMet, GroupLayout.PREFERRED_SIZE, 613, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_pnlIssl.createSequentialGroup()
+							.addComponent(btnNaprPrint, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnNaprSave)))
 					.addContainerGap())
 		);
 		gl_pnlIssl.setVerticalGroup(
@@ -2096,7 +2190,7 @@ public class Vvod extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblNaprPokazMet)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(spNaprPokazMet, GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
+					.addComponent(spNaprPokazMet, GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblPlanDatIssl)
@@ -2104,12 +2198,14 @@ public class Vvod extends JFrame {
 						.addComponent(lblNaprKab)
 						.addComponent(tbNaprKab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
-					.addComponent(btnNaprPrint)
+					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnNaprSave)
+						.addComponent(btnNaprPrint))
 					.addGap(19))
 		);
 		
-		tblNaprPokazMet = new CustomTable<>(false, true, PokazMet.class, 0, "Код", 1, "Наименование", 2, "Выбор");
-		tblNaprPokazMet.setEditableFields(true, 2);
+		tblNaprPokazMet = new CustomTable<>(false, true, PokazMet.class, 1, "Наименование", 2, "Выбор");
+		tblNaprPokazMet.setEditableFields(true, 1);
 		tblNaprPokazMet.setFillsViewportHeight(true);
 		spNaprPokazMet.setViewportView(tblNaprPokazMet);
 		pnlIssl.setLayout(gl_pnlIssl);
@@ -3199,15 +3295,12 @@ public class Vvod extends JFrame {
 	private void pasteShablon(Shablon sh) {
 		if (sh == null)
 			return;
-		tbJal.setText("");
-		tbAnam.setText("");
-		tbStat.setText("");
-		tbLoc.setText("");
-		tbLech.setText("");
-		tbOcen.setText("");
-		tbZakl.setText("");
-		tbRecom.setText("");
-		
+	if (((tbJal.getText().equals("")) || (tbAnam.getText().equals("")) || (tbStat.getText().equals("")) 
+		|| (tbLoc.getText().equals("")) || (tbLech.getText().equals("")) || (tbOcen.getText().equals(""))
+		|| (tbZakl.getText().equals("")) || (tbRecom.getText().equals("")))
+	&&(JOptionPane.showConfirmDialog(Vvod.this, "Очистить поля?", "Очищение полей осмотра", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION))
+	{
+
 		for (ShablonText st : sh.textList) {
 			switch (st.grupId) {
 			case 1:
@@ -3238,7 +3331,40 @@ public class Vvod extends JFrame {
 				break;
 			}
 		}
-		
+	}
+	else
+	{
+		for (ShablonText st : sh.textList) {
+ 			switch (st.grupId) {
+ 			case 1:
+				tbJal.setText(tbJal.getText() + st.text);
+ 				break;
+ 			case 2:
+				tbAnam.setText(tbAnam.getText() + st.text);
+ 				break;
+ 			case 6:
+				tbStat.setText(tbStat.getText() + st.text);
+ 				break;
+ 			case 8:
+				tbLoc.setText(tbLoc.getText() + st.text);
+ 				break;
+ 			case 10:
+				tbLech.setText(tbLech.getText() + st.text);
+ 				break;
+ 			case 14:
+				tbOcen.setText(tbOcen.getText() + st.text);
+ 				break;
+ 			case 13:
+				tbZakl.setText(tbZakl.getText() + st.text);
+ 				break;
+ 			case 12:
+				tbRecom.setText(tbRecom.getText() + st.text);
+ 				break;
+ 			default:
+ 				break;
+ 			}
+		}
+	}
 		lblLastShab.setText(String.format("<html>Последний выбранный шаблон: %s %s</html>", sh.diag.trim(), sh.name));
 	}
 

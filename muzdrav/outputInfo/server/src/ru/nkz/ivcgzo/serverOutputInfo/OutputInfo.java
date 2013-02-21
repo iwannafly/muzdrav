@@ -25,8 +25,6 @@ import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo.Iface;
 import ru.nkz.ivcgzo.thriftOutputInfo.UchException;
 import ru.nkz.ivcgzo.thriftOutputInfo.UchastokInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.UchastokNum;
-import ru.nkz.ivcgzo.thriftOutputInfo.VINotFoundException;
-import ru.nkz.ivcgzo.thriftOutputInfo.VTDuplException;
 import ru.nkz.ivcgzo.thriftOutputInfo.VTException;
 import ru.nkz.ivcgzo.thriftOutputInfo.VrachInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.VrachTabel;
@@ -90,23 +88,23 @@ public class OutputInfo extends Server implements Iface {
 	// Табель врача
 	@Override
 	public List<VrachInfo> getVrachTableInfo(int cpodr)
-			throws VINotFoundException, KmiacServerException, TException {
+			throws KmiacServerException, TException {
 		serverVrachInfo svi = new serverVrachInfo (sse, tse);
 		return svi.getVrachTableInfo(cpodr);
 	}
 
 	@Override
 	public List<VrachTabel> getVrachTabel(int pcod) throws VTException,
-			VTDuplException, KmiacServerException, TException {
+			KmiacServerException, TException {
 		serverVrachInfo svi = new serverVrachInfo (sse, tse);
 		return svi.getVrachTabel(pcod);
 	}
 
 	@Override
-	public int addVT(VrachTabel vt) throws VTException, VTDuplException,
+	public int addVT(VrachTabel vt, int pcod,String cdol, int cpodr) throws VTException,
 			KmiacServerException, TException {
 		serverVrachInfo svi = new serverVrachInfo (sse, tse);
-		return svi.addVT(vt);
+		return svi.addVT(vt, pcod, cdol, cpodr);
 	}
 
 	@Override
@@ -238,5 +236,4 @@ public class OutputInfo extends Server implements Iface {
 	public String getName() {
 		return configuration.appName;
 	}
-	
 }
