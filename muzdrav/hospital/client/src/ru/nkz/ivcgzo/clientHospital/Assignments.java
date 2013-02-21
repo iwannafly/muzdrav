@@ -1,5 +1,7 @@
 package ru.nkz.ivcgzo.clientHospital;
 
+//TOFO: ИСПРАВИТЬ ДОБАВЛЕНИЕ ЛЕКАРСТВЕННЫХ НАЗНАЧЕНИЙ
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -129,58 +131,46 @@ public final class Assignments extends JPanel {
 		this.setPanelProcedures();
 	}
 	
-	private void setPanelMedications() {
-		this.pnlMedications = new JPanel();
-		this.pnlMedications.setBorder(
+	/**
+	 * Установка параметров заданной панели
+	 * @param parentPanel Родительская панель, в которую будет добавлена текущая
+	 * @param curPanel Текущая панель
+	 * @param header Заголовок текущей панели
+	 */
+	private void setCustomPanel(JPanel parentPanel, JPanel curPanel, String header) {
+		curPanel.setBorder(
 				new TitledBorder(
 						new LineBorder(new Color(0, 0, 0), 1, true),
-						"Лекарственные назначения", TitledBorder.LEFT,
+						header, TitledBorder.LEFT,
 						TitledBorder.TOP, null, null));
-		this.pnlMedications.setLayout(
-				new BoxLayout(this.pnlMedications, BoxLayout.X_AXIS));
-		this.add(this.pnlMedications);
+		curPanel.setLayout(new BoxLayout(curPanel, BoxLayout.X_AXIS));
+		parentPanel.add(curPanel);
+	}
+	
+	private void setPanelMedications() {
+		this.pnlMedications = new JPanel();
+		this.setCustomPanel(this, this.pnlMedications, "Лекарственные назначения");
 		this.setTableMedication();
 		this.setButtonsMedication();
 	}
 	
 	private void setPanelDiagnostics() {
 		this.pnlDiagnostics = new JPanel();
-		this.pnlDiagnostics.setBorder(
-				new TitledBorder(
-						new LineBorder(new Color(0, 0, 0), 1, true),
-						"Исследования", TitledBorder.LEFT,
-						TitledBorder.TOP, null, null));
-		this.pnlDiagnostics.setLayout(
-				new BoxLayout(this.pnlDiagnostics, BoxLayout.X_AXIS));
-		this.add(this.pnlDiagnostics);
+		this.setCustomPanel(this, this.pnlDiagnostics, "Исследования");
 		this.setTableDiagnostics();
 		this.setButtonsDiagnostics();
 	}
 	
 	private void setPanelDiet() {
 		this.pnlDiet = new JPanel();
-		this.pnlDiet.setBorder(
-				new TitledBorder(
-						new LineBorder(new Color(0, 0, 0), 1, true),
-						"Режим и диета", TitledBorder.LEFT,
-						TitledBorder.TOP, null, null));
-		this.pnlDiet.setLayout(
-				new BoxLayout(this.pnlDiet, BoxLayout.X_AXIS));
-		this.add(this.pnlDiet);
+		this.setCustomPanel(this, this.pnlDiet, "Режим и диета");
 		this.setTableDiet();
 		this.setButtonsDiet();
 	}
 	
 	private void setPanelProcedures() {
 		this.pnlProcedures = new JPanel();
-		this.pnlProcedures.setBorder(
-				new TitledBorder(
-						new LineBorder(new Color(0, 0, 0), 1, true),
-						"Лечебные процедуры", TitledBorder.LEFT,
-						TitledBorder.TOP, null, null));
-		this.pnlProcedures.setLayout(
-				new BoxLayout(this.pnlProcedures, BoxLayout.X_AXIS));
-		this.add(this.pnlProcedures);
+		this.setCustomPanel(this, this.pnlDiet, "Лечебные процедуры");
 		this.setTableProcedures();
 		this.setButtonsProcedures();
 	}
@@ -230,7 +220,7 @@ public final class Assignments extends JPanel {
 	 * @param curDim Размерность кнопки
 	 * @param curIcon Иконка, устанавливаемая на кнопку
 	 */
-	private void setAddDelButton(JPanel curPanel, JButton curButton, Dimension curDim, Icon curIcon) {
+	private void setCustomButton(JPanel curPanel, JButton curButton, Dimension curDim, Icon curIcon) {
 		if (curButton == null)
 			return;
 		if (curDim != null) {
@@ -245,7 +235,7 @@ public final class Assignments extends JPanel {
 	
 	private void setButtonsMedication() {
 		this.btnAddMedication = new JButton();
-		setAddDelButton(this.pnlMedications, this.btnAddMedication,
+		this.setCustomButton(this.pnlMedications, this.btnAddMedication,
 				this.defaultDimension, this.addIcon);
 		this.btnAddMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -258,7 +248,7 @@ public final class Assignments extends JPanel {
         });
 
 		this.btnDelMedication = new JButton();
-		setAddDelButton(this.pnlMedications, this.btnDelMedication,
+		this.setCustomButton(this.pnlMedications, this.btnDelMedication,
 				this.defaultDimension, this.delIcon);
 		this.btnDelMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -269,7 +259,7 @@ public final class Assignments extends JPanel {
 	
 	private void setButtonsDiagnostics() {
 		this.btnAddDiagnostic = new JButton();
-		setAddDelButton(this.pnlDiagnostics, this.btnAddDiagnostic,
+		this.setCustomButton(this.pnlDiagnostics, this.btnAddDiagnostic,
 				this.defaultDimension, this.addIcon);
 		this.btnAddDiagnostic.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -282,7 +272,7 @@ public final class Assignments extends JPanel {
         });
 
 		this.btnDelDiagnostic = new JButton();
-		setAddDelButton(this.pnlDiagnostics, this.btnDelDiagnostic,
+		this.setCustomButton(this.pnlDiagnostics, this.btnDelDiagnostic,
 				this.defaultDimension, this.delIcon);
 		this.btnDelDiagnostic.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -293,7 +283,7 @@ public final class Assignments extends JPanel {
 	
 	private void setButtonsDiet() {
 		this.btnAddDiet = new JButton();
-		setAddDelButton(this.pnlDiet, this.btnAddDiet,
+		this.setCustomButton(this.pnlDiet, this.btnAddDiet,
 				this.defaultDimension, this.addIcon);
 		this.btnAddDiet.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -302,7 +292,7 @@ public final class Assignments extends JPanel {
         });
 
 		this.btnDelDiet = new JButton();
-		setAddDelButton(this.pnlDiet, this.btnDelDiet,
+		this.setCustomButton(this.pnlDiet, this.btnDelDiet,
 				this.defaultDimension, this.delIcon);
 		this.btnDelDiet.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -313,7 +303,7 @@ public final class Assignments extends JPanel {
 	
 	private void setButtonsProcedures() {
 		this.btnAddProcedure = new JButton();
-		setAddDelButton(this.pnlProcedures, this.btnAddProcedure,
+		this.setCustomButton(this.pnlProcedures, this.btnAddProcedure,
 				this.defaultDimension, this.addIcon);
 		this.btnAddProcedure.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -322,7 +312,7 @@ public final class Assignments extends JPanel {
         });
 
 		this.btnDelProcedure = new JButton();
-		setAddDelButton(this.pnlProcedures, this.btnDelProcedure,
+		this.setCustomButton(this.pnlProcedures, this.btnDelProcedure,
 				this.defaultDimension, this.delIcon);
 		this.btnDelProcedure.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
