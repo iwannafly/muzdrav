@@ -553,6 +553,7 @@ public  class MainForm extends Client<thriftKartaRInv.Client> {
 				MainForm.conMan.reconnect(e);
 				}
 			}
+			
 		});
 		
 		 lblpatient = new JLabel("Пациент:");
@@ -2795,7 +2796,6 @@ public  class MainForm extends Client<thriftKartaRInv.Client> {
 	
 	private void showKart(int npasp) {
 		try {
-			searchedNpasp = npasp;	
 			pinvk = new Pinvk();
 			patInf = new PatientCommonInfo();	
 			patInf = MainForm.tcl.getPatientCommonInfo(npasp);
@@ -2811,7 +2811,7 @@ public  class MainForm extends Client<thriftKartaRInv.Client> {
 			// TODO Auto-generated catch block
 //		e1.printStackTrace();
 //	}
-//	try {
+//	try { 
 			//pinvk = MainForm.tcl.getPinvk(searchedNpasp);
 							
 			bg_psih.clearSelection();
