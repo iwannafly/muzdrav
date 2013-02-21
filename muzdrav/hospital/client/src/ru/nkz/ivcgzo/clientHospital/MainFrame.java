@@ -65,7 +65,6 @@ import javax.swing.event.DocumentListener;
 import java.io.File;
 import java.io.IOException;
 
-
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
@@ -417,7 +416,7 @@ public class MainFrame extends JFrame {
         } else {	//Скрытие вкладки "Роды":
             tabbedPane.removeTabAt(4);
         }
-        setpAssignmentsPanel();
+        setAssignmentsPanel();
         setZaklPanel();
     }
 
@@ -3915,7 +3914,7 @@ public class MainFrame extends JFrame {
 	* Установка панели учёта назначений
 	* @author Балабаев Никита Дмитриевич
 	*/
-	private void setpAssignmentsPanel() {
+	private void setAssignmentsPanel() {
 		this.pAssignments = new Assignments(this.doctorAuth, this.patient);
 		this.tabbedPane.addTab("Назначения",
 				new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/medication.png")),

@@ -1,17 +1,18 @@
 package ru.nkz.ivcgzo.clientHospital;
 
-//TODO: ВЫТАЩИТЬ СТРУКТУРУ Patient ИЗ Thrift-ФАЙЛОВ
 //TODO: РАЗОБРАТЬСЯ СО СТРУКТУРОЙ Lek ИЗ Thrift-ФАЙЛОВ
 import java.awt.Color;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftAssignments.*;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 
 /**
  * Панель учёта медицинских назначений: препаратов, 
@@ -23,8 +24,10 @@ public final class Assignments extends JPanel {
 	private static final long serialVersionUID = 3513837719265529747L;
 	private UserAuthInfo userAuth = null;
     private TPatient patient = null;
-    private JPanel pnlMedications, pnlResearch, pnlDiet, pnlProcedures;
-    private CustomTable<Lek, Lek._Fields> tblMedications;
+    private JPanel pnlMedications, pnlDiagnostics, pnlDiet, pnlProcedures;
+    private JScrollPane spMedictaions, spDiagnostics, spDiet, spProcedures;
+    private CustomTable<Medication, Medication._Fields> tblMedications;
+    private CustomTable<Diagnostic, Diagnostic._Fields> tblDiagnostics;
 
 	/**
 	 * Создание экземпляра панели учёта медицинских назначений
@@ -84,14 +87,13 @@ public final class Assignments extends JPanel {
 	 * Инициализация пользовательского интерфейса панели
 	 */
 	private void setInterface() {
-		//TODO:
 		this.pnlMedications = new JPanel();
 		this.pnlMedications.setBorder(
 				new TitledBorder(
 						new LineBorder(new Color(0, 0, 0), 1, true),
 						"Лекарственные назначения", TitledBorder.LEFT, TitledBorder.TOP, null, null));
-		this.pnlResearch = new JPanel();
-		this.pnlResearch.setBorder(
+		this.pnlDiagnostics = new JPanel();
+		this.pnlDiagnostics.setBorder(
 				new TitledBorder(
 						new LineBorder(new Color(0, 0, 0), 1, true),
 						"Исследования", TitledBorder.LEFT, TitledBorder.TOP, null, null));
@@ -107,8 +109,36 @@ public final class Assignments extends JPanel {
 						"Лечебные процедуры", TitledBorder.LEFT, TitledBorder.TOP, null, null));
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.add(this.pnlMedications);
-		this.add(this.pnlResearch);
+		this.add(this.pnlDiagnostics);
 		this.add(this.pnlDiet);
 		this.add(this.pnlProcedures);
+		this.setAllTables();
+	}
+	
+	private void setAllTables() {
+		this.setTableMedication();
+		this.setTableDiagnostics();
+	}
+	
+	private void setTableMedication() {
+		this.spMedictaions = new JScrollPane();
+		this.pnlMedications.add(this.spMedictaions);
+		this.tblMedications = new CustomTable<Medication, Medication._Fields>(
+				false, false, Medication.class, 6, "Наименование", 4, "Дата назначения",
+				12, "Длительность", 14, "Дата отмены");
+		this.spMedictaions.setViewportView(this.tblMedications);
+		this.tblMedications.setDateField(1);
+		this.tblMedications.setDateField(3);
+	}
+	
+	private void setTableDiagnostics() {
+		this.spDiagnostics = new JScrollPane();
+		this.pnlDiagnostics.add(this.spDiagnostics);
+		this.tblDiagnostics = new CustomTable<Diagnostic, Diagnostic._Fields>(
+				false, false, Diagnostic.class, 3, "Наименование",
+				7, "Дата назначения", 7, "Дата выполнения");
+		this.spDiagnostics.setViewportView(this.tblDiagnostics);
+		this.tblDiagnostics.setDateField(1);
+		this.tblDiagnostics.setDateField(2);
 	}
 }
