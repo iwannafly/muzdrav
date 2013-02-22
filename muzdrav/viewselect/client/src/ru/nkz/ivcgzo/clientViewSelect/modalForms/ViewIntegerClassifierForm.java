@@ -191,7 +191,8 @@ public class ViewIntegerClassifierForm extends ModalForm {
 			indexesCount = 0;
 			for (int i = 0; i < super.getRowCount(); i++) {
 				for (int j = 0; j < super.getColumnCount(); j++) {
-					if (super.getValueAt(i,  j).toString().toLowerCase().indexOf(previousString) > -1) {
+					Object val = super.getValueAt(i,  j);
+					if ((val != null) && (val.toString().toLowerCase().indexOf(previousString) > -1)) {
 						indexes[indexesCount++] = i;
 						break;
 					}
