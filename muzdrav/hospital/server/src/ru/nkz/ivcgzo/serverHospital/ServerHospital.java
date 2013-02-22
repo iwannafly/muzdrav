@@ -48,6 +48,7 @@ import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TInfoLPU;
 import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
+import ru.nkz.ivcgzo.thriftHospital.TMedication;
 import ru.nkz.ivcgzo.thriftHospital.TPatientCommonInfo;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.TRdIshod;
@@ -90,6 +91,7 @@ public class ServerHospital extends Server implements Iface {
 	private TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
 	private TResultSetMapper<TBirthPlace, TBirthPlace._Fields> rsmBirthPlace;
 	private TResultSetMapper<TInfoLPU, TInfoLPU._Fields> rsmInfoLPU;
+	private TResultSetMapper<TMedication, TMedication._Fields> rsmMedication;
 
     private static final String[] SIMPLE_PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "fam", "im", "ot", "datar", "datap", "cotd", "npal", "nist"
@@ -148,6 +150,10 @@ public class ServerHospital extends Server implements Iface {
     };
     private static final String[] BIRTHPLACE_FIELD_NAMES = {
         "region", "city", "type"
+    };
+    private static final String[] MEDICATION_FIELD_NAMES = {
+        "name", "nlek", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed", "sposv",
+        "spriem", "pereod", "dlitkl", "komm", "datao", "vracho", "dataz"
     };
     private static final Class<?>[] RdIshodtipes = new Class<?>[] {
 //    	   "npasp",      "ngosp",   "id_berem",         "id",	   "serdm",     "mesto", 
@@ -257,6 +263,7 @@ public class ServerHospital extends Server implements Iface {
                 COMMON_PATIENT_FIELD_NAMES);
         rsmBirthPlace = new TResultSetMapper<>(TBirthPlace.class, BIRTHPLACE_FIELD_NAMES);
         rsmInfoLPU = new TResultSetMapper<>(TInfoLPU.class, LPU_FIELD_NAMES);
+        rsmMedication = new TResultSetMapper<>(TMedication.class, MEDICATION_FIELD_NAMES);
     }
 
     @Override
@@ -2645,6 +2652,21 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 		e1.printStackTrace();
 		throw new KmiacServerException();
 	}
+	}
+
+	@Override
+	public List<TMedication> getMedications(int idGosp)
+			throws KmiacServerException {
+        String sqlQuery = "SELECT n_med.name as name, c_lek.* " +
+                "FROM c_lek " +
+                "INNER JOIN n_med ON (c_lek.klek = n_med.pcod) " +
+                "WHERE (c_lek.id_gosp = ?);";
+            try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
+                return rsmMedication.mapToList(acrs.getResultSet());
+            } catch (SQLException e) {
+                log.log(Level.ERROR, "Exception (getMedications): ", e);
+                throw new KmiacServerException();
+            }
 	}
 
 //	public void addRdIshod(int npasp, int ngosp) throws KmiacServerException,
