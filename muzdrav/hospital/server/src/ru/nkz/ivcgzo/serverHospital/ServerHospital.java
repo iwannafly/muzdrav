@@ -153,7 +153,7 @@ public class ServerHospital extends Server implements Iface {
     };
     private static final String[] MEDICATION_FIELD_NAMES = {
         "name", "nlek", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed", "sposv",
-        "spriem", "pereod", "dlitkl", "komm", "datao", "vracho", "dataz"
+        "spriem", "pereod", "datae", "komm", "datao", "vracho", "dataz"
     };
     private static final Class<?>[] RdIshodtipes = new Class<?>[] {
 //    	   "npasp",      "ngosp",   "id_berem",         "id",	   "serdm",     "mesto", 

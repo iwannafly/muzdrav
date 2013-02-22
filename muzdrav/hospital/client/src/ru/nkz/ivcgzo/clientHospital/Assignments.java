@@ -1,8 +1,5 @@
 package ru.nkz.ivcgzo.clientHospital;
 
-//TOFO: ИСПРАВИТЬ ДОБАВЛЕНИЕ ЛЕКАРСТВЕННЫХ НАЗНАЧЕНИЙ (скрыть промежуточную форму)
-//TODO: РЕШИТЬ ВОПРОС О ДЛИТЕЛЬНОСТИ ПРИЁМА ЛЕКАРСТВЕННЫХ НАЗНАЧЕНИЙ
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -194,7 +191,7 @@ public final class Assignments extends JPanel {
 	
 	private void setPanelProcedures() {
 		this.pnlProcedures = new JPanel();
-		this.setCustomPanel(this, this.pnlDiet, "Лечебные процедуры");
+		this.setCustomPanel(this, this.pnlProcedures, "Лечебные процедуры");
 		this.setTableProcedures();
 		this.setButtonsProcedures();
 	}
@@ -204,10 +201,11 @@ public final class Assignments extends JPanel {
 		this.pnlMedications.add(this.spMedications);
 		this.tblMedications = new CustomTable<TMedication, TMedication._Fields>(
 				false, false, TMedication.class, 0, "Наименование",
-				4, "Дата назначения", 14, "Дата отмены");
+				4, "Дата назначения", 12, "Дата окончания", 14, "Дата отмены");
 		this.spMedications.setViewportView(this.tblMedications);
 		this.tblMedications.setDateField(1);
 		this.tblMedications.setDateField(2);
+		this.tblMedications.setDateField(3);
 	}
 	
 	private void setTableDiagnostics() {
