@@ -52,7 +52,7 @@ service ThriftMedication extends kmiacServer.KmiacServer {
 	void deleteLekPriem(1: list<LekPriem> lekPriems)
 		throws (1: kmiacServer.KmiacServerException kse);
 	void changeLekPriemStatus(1: i32 id, 2: bool status)
-		throws (1: kmiacServer.KmiacServerException kse);	
+		throws (1: kmiacServer.KmiacServerException kse);
 	Lek getLek(1: i32 nlek)
 		throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getLekShortList(1: i32 idGosp)

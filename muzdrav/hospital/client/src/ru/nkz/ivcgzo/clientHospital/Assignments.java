@@ -1,9 +1,13 @@
 package ru.nkz.ivcgzo.clientHospital;
 
+//TOFO: ИСПРАВИТЬ ДОБАВЛЕНИЕ ЛЕКАРСТВЕННЫХ НАЗНАЧЕНИЙ (скрыть промежуточную форму)
+//TODO: РЕШИТЬ ВОПРОС О ДЛИТЕЛЬНОСТИ ПРИЁМА ЛЕКАРСТВЕННЫХ НАЗНАЧЕНИЙ
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
@@ -15,9 +19,15 @@ import javax.swing.JScrollPane;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import org.apache.thrift.TException;
+
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-import ru.nkz.ivcgzo.thriftAssignments.*;
+import ru.nkz.ivcgzo.thriftHospital.TDiagnostic;
+import ru.nkz.ivcgzo.thriftHospital.TDiet;
+import ru.nkz.ivcgzo.thriftHospital.TMedication;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
+import ru.nkz.ivcgzo.thriftHospital.TProcedures;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 
 /**
@@ -28,12 +38,14 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 public final class Assignments extends JPanel {
 
 	private static final long serialVersionUID = 3513837719265529747L;
-    private static final String addIconPath = "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png";
-    private static final String delIconPath = "/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png";
+    private static final URL addIconURL = MainFrame.class.getResource(
+    		"/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png");
+    private static final URL delIconURL = MainFrame.class.getResource(
+    		"/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png");
+	private UserAuthInfo userAuth;
+    private TPatient patient;
     private Icon addIcon, delIcon;
     private Dimension defaultDimension;
-	private UserAuthInfo userAuth = null;
-    private TPatient patient = null;
     private JPanel pnlMedications, pnlDiagnostics, pnlDiet, pnlProcedures;
     private JScrollPane spMedications, spDiagnostics, spDiet, spProcedures;
     private CustomTable<TMedication, TMedication._Fields> tblMedications;
@@ -96,8 +108,8 @@ public final class Assignments extends JPanel {
 	private void updatePanel() {
 		this.clearAllTables();
 		if (this.patient != null) {
-			/*
 			this.fillTableMedications();
+			/*
 			this.fillTableDiagnostics();
 			this.fillTableDiet();
 			this.fillTableProcedures();
@@ -116,11 +128,25 @@ public final class Assignments extends JPanel {
 	}
 	
 	/**
+	 * Заполнение таблицы лекарственных назначений данными из БД
+	 */
+	private void fillTableMedications() {
+		try {
+			this.tblMedications.setData(
+					ClientHospital.tcl.getMedications(this.patient.getGospitalCod()));
+		} catch (KmiacServerException e) {
+			e.printStackTrace();
+		} catch (TException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * Инициализация пользовательского интерфейса панели
 	 */
 	private void setInterface() {
-		this.addIcon = new ImageIcon(MainFrame.class.getResource(Assignments.addIconPath));
-		this.delIcon = new ImageIcon(MainFrame.class.getResource(Assignments.delIconPath));
+		this.addIcon = new ImageIcon(Assignments.addIconURL);
+		this.delIcon = new ImageIcon(Assignments.delIconURL);
 		this.defaultDimension = new Dimension(50, 50);
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.setPanelMedications();
@@ -129,58 +155,46 @@ public final class Assignments extends JPanel {
 		this.setPanelProcedures();
 	}
 	
-	private void setPanelMedications() {
-		this.pnlMedications = new JPanel();
-		this.pnlMedications.setBorder(
+	/**
+	 * Установка параметров заданной панели
+	 * @param parentPanel Родительская панель, в которую будет добавлена текущая
+	 * @param curPanel Текущая панель
+	 * @param header Заголовок текущей панели
+	 */
+	private void setCustomPanel(JPanel parentPanel, JPanel curPanel, String header) {
+		curPanel.setBorder(
 				new TitledBorder(
 						new LineBorder(new Color(0, 0, 0), 1, true),
-						"Лекарственные назначения", TitledBorder.LEFT,
+						header, TitledBorder.LEFT,
 						TitledBorder.TOP, null, null));
-		this.pnlMedications.setLayout(
-				new BoxLayout(this.pnlMedications, BoxLayout.X_AXIS));
-		this.add(this.pnlMedications);
+		curPanel.setLayout(new BoxLayout(curPanel, BoxLayout.X_AXIS));
+		parentPanel.add(curPanel);
+	}
+	
+	private void setPanelMedications() {
+		this.pnlMedications = new JPanel();
+		this.setCustomPanel(this, this.pnlMedications, "Лекарственные назначения");
 		this.setTableMedication();
 		this.setButtonsMedication();
 	}
 	
 	private void setPanelDiagnostics() {
 		this.pnlDiagnostics = new JPanel();
-		this.pnlDiagnostics.setBorder(
-				new TitledBorder(
-						new LineBorder(new Color(0, 0, 0), 1, true),
-						"Исследования", TitledBorder.LEFT,
-						TitledBorder.TOP, null, null));
-		this.pnlDiagnostics.setLayout(
-				new BoxLayout(this.pnlDiagnostics, BoxLayout.X_AXIS));
-		this.add(this.pnlDiagnostics);
+		this.setCustomPanel(this, this.pnlDiagnostics, "Исследования");
 		this.setTableDiagnostics();
 		this.setButtonsDiagnostics();
 	}
 	
 	private void setPanelDiet() {
 		this.pnlDiet = new JPanel();
-		this.pnlDiet.setBorder(
-				new TitledBorder(
-						new LineBorder(new Color(0, 0, 0), 1, true),
-						"Режим и диета", TitledBorder.LEFT,
-						TitledBorder.TOP, null, null));
-		this.pnlDiet.setLayout(
-				new BoxLayout(this.pnlDiet, BoxLayout.X_AXIS));
-		this.add(this.pnlDiet);
+		this.setCustomPanel(this, this.pnlDiet, "Режим и диета");
 		this.setTableDiet();
 		this.setButtonsDiet();
 	}
 	
 	private void setPanelProcedures() {
 		this.pnlProcedures = new JPanel();
-		this.pnlProcedures.setBorder(
-				new TitledBorder(
-						new LineBorder(new Color(0, 0, 0), 1, true),
-						"Лечебные процедуры", TitledBorder.LEFT,
-						TitledBorder.TOP, null, null));
-		this.pnlProcedures.setLayout(
-				new BoxLayout(this.pnlProcedures, BoxLayout.X_AXIS));
-		this.add(this.pnlProcedures);
+		this.setCustomPanel(this, this.pnlDiet, "Лечебные процедуры");
 		this.setTableProcedures();
 		this.setButtonsProcedures();
 	}
@@ -189,19 +203,19 @@ public final class Assignments extends JPanel {
 		this.spMedications = new JScrollPane();
 		this.pnlMedications.add(this.spMedications);
 		this.tblMedications = new CustomTable<TMedication, TMedication._Fields>(
-				false, false, TMedication.class, 2, "Наименование",
-				5, "Дата назначения", 13, "Длительность", 15, "Дата отмены");
+				false, false, TMedication.class, 0, "Наименование",
+				4, "Дата назначения", 14, "Дата отмены");
 		this.spMedications.setViewportView(this.tblMedications);
 		this.tblMedications.setDateField(1);
-		this.tblMedications.setDateField(3);
+		this.tblMedications.setDateField(2);
 	}
 	
 	private void setTableDiagnostics() {
 		this.spDiagnostics = new JScrollPane();
 		this.pnlDiagnostics.add(this.spDiagnostics);
 		this.tblDiagnostics = new CustomTable<TDiagnostic, TDiagnostic._Fields>(
-				false, false, TDiagnostic.class, 3, "Наименование",
-				7, "Дата назначения", 7, "Дата выполнения");
+				false, false, TDiagnostic.class, 2, "Наименование",
+				6, "Дата назначения", 6, "Дата выполнения");
 		this.spDiagnostics.setViewportView(this.tblDiagnostics);
 		this.tblDiagnostics.setDateField(1);
 		this.tblDiagnostics.setDateField(2);
@@ -230,7 +244,7 @@ public final class Assignments extends JPanel {
 	 * @param curDim Размерность кнопки
 	 * @param curIcon Иконка, устанавливаемая на кнопку
 	 */
-	private void setAddDelButton(JPanel curPanel, JButton curButton, Dimension curDim, Icon curIcon) {
+	private void setCustomButton(JPanel curPanel, JButton curButton, Dimension curDim, Icon curIcon) {
 		if (curButton == null)
 			return;
 		if (curDim != null) {
@@ -245,7 +259,7 @@ public final class Assignments extends JPanel {
 	
 	private void setButtonsMedication() {
 		this.btnAddMedication = new JButton();
-		setAddDelButton(this.pnlMedications, this.btnAddMedication,
+		this.setCustomButton(this.pnlMedications, this.btnAddMedication,
 				this.defaultDimension, this.addIcon);
 		this.btnAddMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -253,23 +267,27 @@ public final class Assignments extends JPanel {
                     ClientHospital.conMan.showMedicationForm(patient.getPatientId(),
                         patient.getSurname(), patient.getName(), patient.getMiddlename(),
                         patient.getGospitalCod());
+                    fillTableMedications();
                 }
             }
         });
 
 		this.btnDelMedication = new JButton();
-		setAddDelButton(this.pnlMedications, this.btnDelMedication,
+		this.setCustomButton(this.pnlMedications, this.btnDelMedication,
 				this.defaultDimension, this.delIcon);
 		this.btnDelMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-            	//TODO
+                if ((patient != null) && (ClientHospital.conMan != null)) {
+                	//FIXME:
+                    fillTableMedications();
+                }
             }
         });
 	}
 	
 	private void setButtonsDiagnostics() {
 		this.btnAddDiagnostic = new JButton();
-		setAddDelButton(this.pnlDiagnostics, this.btnAddDiagnostic,
+		this.setCustomButton(this.pnlDiagnostics, this.btnAddDiagnostic,
 				this.defaultDimension, this.addIcon);
 		this.btnAddDiagnostic.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -282,7 +300,7 @@ public final class Assignments extends JPanel {
         });
 
 		this.btnDelDiagnostic = new JButton();
-		setAddDelButton(this.pnlDiagnostics, this.btnDelDiagnostic,
+		this.setCustomButton(this.pnlDiagnostics, this.btnDelDiagnostic,
 				this.defaultDimension, this.delIcon);
 		this.btnDelDiagnostic.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -293,7 +311,7 @@ public final class Assignments extends JPanel {
 	
 	private void setButtonsDiet() {
 		this.btnAddDiet = new JButton();
-		setAddDelButton(this.pnlDiet, this.btnAddDiet,
+		this.setCustomButton(this.pnlDiet, this.btnAddDiet,
 				this.defaultDimension, this.addIcon);
 		this.btnAddDiet.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -302,7 +320,7 @@ public final class Assignments extends JPanel {
         });
 
 		this.btnDelDiet = new JButton();
-		setAddDelButton(this.pnlDiet, this.btnDelDiet,
+		this.setCustomButton(this.pnlDiet, this.btnDelDiet,
 				this.defaultDimension, this.delIcon);
 		this.btnDelDiet.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -313,7 +331,7 @@ public final class Assignments extends JPanel {
 	
 	private void setButtonsProcedures() {
 		this.btnAddProcedure = new JButton();
-		setAddDelButton(this.pnlProcedures, this.btnAddProcedure,
+		this.setCustomButton(this.pnlProcedures, this.btnAddProcedure,
 				this.defaultDimension, this.addIcon);
 		this.btnAddProcedure.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -322,7 +340,7 @@ public final class Assignments extends JPanel {
         });
 
 		this.btnDelProcedure = new JButton();
-		setAddDelButton(this.pnlProcedures, this.btnDelProcedure,
+		this.setCustomButton(this.pnlProcedures, this.btnDelProcedure,
 				this.defaultDimension, this.delIcon);
 		this.btnDelProcedure.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {

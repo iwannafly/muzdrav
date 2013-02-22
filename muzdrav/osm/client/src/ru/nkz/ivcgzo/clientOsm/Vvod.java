@@ -1914,81 +1914,13 @@ public class Vvod extends JFrame {
 		btnNaprPrint = new JButton("Печать");
 		btnNaprPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					if ((cmbOrgan.getSelectedItem() != null) ) {
-						P_isl_ld pisl = new P_isl_ld();
-						Prez_d prezd = new Prez_d();
-						Prez_l prezl = new Prez_l();
-						
-						for (PdiagAmb pd : tblDiag.getData()) {
-							if ((pd.diag_stat == 1) || (pd.diag_stat == 3)) {
-								pisl.setDiag(pd.diag);
-								break;
-							}
-						}
-						if (!pisl.isSetDiag()) {
-				  			JOptionPane.showMessageDialog(Vvod.this, "Запись на исследование не возможна, так как в посещении не выставлено ни одного основного диагноза.");
-				  			return;
-						}
-						
-						for (PokazMet pokazMet : tblNaprPokazMet.getData()) {
-							if (pokazMet.vybor) {
-								prezd.setKodisl(pokazMet.pcod);
-								break;
-							}
-						}
-						if (!prezd.isSetKodisl()) {
-				  			JOptionPane.showMessageDialog(Vvod.this, "Выберите хотя бы одно исследование.");
-				  			return;
-						}
-						if (tfPlanDatIssl.getDate() == null){
-							JOptionPane.showMessageDialog(Vvod.this, "Планируемая дата выполнения исследования не заполнена.");
-							return;
-						}
-						
-						pisl.setNpasp(Vvod.zapVr.getNpasp());
-						pisl.setPcisl(cmbOrgan.getSelectedPcod());
-						pisl.setNapravl(2);
-						pisl.setNaprotd(MainForm.authInfo.getCpodr());
-						pisl.setDatan(System.currentTimeMillis());
-						pisl.setVrach(MainForm.authInfo.getPcod());
-						pisl.setDataz(System.currentTimeMillis());
-						pisl.setPvizit_id(tblPos.getSelectedItem().getId_obr());
-						pisl.setId_pos(tblPos.getSelectedItem().getId());
-						pisl.setPrichina(pvizit.getCobr());
-						pisl.setKodotd(cmbNaprMesto.getSelectedPcod());
-						pisl.setVopl(cmbVidOpl.getSelectedPcod());
-						if (tfPlanDatIssl.getDate() != null)
-							pisl.setDatap(tfPlanDatIssl.getDate().getTime());
-						pisl.setNisl(MainForm.tcl.AddPisl(pisl));
-						List<String> selItems = new ArrayList<>();
-						for (IntegerClassifier el : listVidIssl)
-							if (el.pcod == cmbNaprMesto.getSelectedPcod()) {
-								for (PokazMet pokazMet : tblNaprPokazMet.getData()) {
-									if (pokazMet.vybor) {
-										if (el.name.equals("Л")) {
-											prezl.setNpasp(pisl.getNpasp());
-											prezl.setNisl(pisl.getNisl());
-											prezl.setCpok(pokazMet.pcod);
-											prezl.setId(MainForm.tcl.AddPrezl(prezl));	
-										}
-										else{
-											prezd.setNpasp(pisl.getNpasp());
-											prezd.setNisl(pisl.getNisl());
-											prezd.setKodisl(pokazMet.pcod);
-											prezd.setId(MainForm.tcl.AddPrezd(prezd));
-										}
-										selItems.add(pokazMet.getPcod());
-									}
-								}
-						}
-						if (selItems.size() != 0) {
-							IsslMet isslmet = new IsslMet();
+
+							try {
+								IsslMet isslmet = new IsslMet();
 							isslmet.setPvizitId(tblPos.getSelectedItem().getId_obr());
 							isslmet.setPvizitambId(tblPos.getSelectedItem().getId());
 							isslmet.setUserId(MainForm.authInfo.getUser_id());
 							isslmet.setNpasp(Vvod.zapVr.getNpasp());
-							isslmet.setPokaz(selItems);
 							if (cmbNaprMesto.getSelectedItem() != null) {
 								isslmet.setMesto(cmbNaprMesto.getSelectedItem().getName());
 								isslmet.setKod_lab(cmbNaprMesto.getSelectedItem().getPcod());
@@ -1998,26 +1930,26 @@ public class Vvod extends JFrame {
 							isslmet.setClpu_name(cmbLpu.getSelectedItem().getName());
 							isslmet.setCpodr_name(MainForm.authInfo.getCpodr_name());
 							isslmet.setCpodr(MainForm.authInfo.getCpodr());
-							isslmet.setDatap(tfPlanDatIssl.getDate().getTime());
 							
-							String servPath = MainForm.tcl.printIsslMetod(isslmet);
-							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+							String servPath;
+							
+								servPath = MainForm.tcl.printIsslMetod(isslmet);
+								String cliPath;
+								cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
        						MainForm.conMan.openFileInEditor(cliPath, false);
-						}
-					}
-				}
-				
-					catch (TException e1) {
-					e1.printStackTrace();
-					MainForm.conMan.reconnect(e1);
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-				treeRezIssl.setModel(new DefaultTreeModel(createNodes()));
 
-						
-							
+							} catch (KmiacServerException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (TException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							 catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 
 			}
 		});
@@ -2052,7 +1984,6 @@ public class Vvod extends JFrame {
 		tfPlanDatIssl.setColumns(10);
 		
 		JButton btnNaprSave = new JButton("Сохранить");
-		btnNaprSave.setVisible(false);
 		btnNaprSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {	
@@ -3331,6 +3262,7 @@ public class Vvod extends JFrame {
 				break;
 			}
 		}
+		addDiagShablon(sh.diag.trim());
 	}
 	else
 	{
@@ -3364,6 +3296,7 @@ public class Vvod extends JFrame {
  				break;
  			}
 		}
+		addDiagShablon(sh.diag.trim());
 	}
 		lblLastShab.setText(String.format("<html>Последний выбранный шаблон: %s %s</html>", sh.diag.trim(), sh.name));
 	}
@@ -3446,6 +3379,49 @@ public class Vvod extends JFrame {
 		  		diagamb.setDiag_stat(1);
 				diagamb.setDiag(mkb.pcod);
 				diagamb.setNamed(mkb.name);
+				diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
+	 			tblDiag.addItem(diagamb);
+  			}
+		} catch (KmiacServerException e1) {
+			e1.printStackTrace();
+		} catch (TException e1) {
+			MainForm.conMan.reconnect(e1);
+		}
+	}
+	
+	private void addDiagShablon(String diag_pcod) {
+		try {
+  			if (diag_pcod != null) {
+		  		for (PdiagAmb da : tblDiag.getData()) {
+					if (da.diag.equals(diag_pcod)) {
+			  			JOptionPane.showMessageDialog(Vvod.this, String.format("Диагноз %s уже есть в списке.", diag_pcod));
+			  			return;
+					}
+				}
+		  		diagamb = new PdiagAmb();
+		  		diagamb.setId_obr(zapVr.getId_pvizit());
+		  		diagamb.setId_pos(tblPos.getSelectedItem().id);
+		  		diagamb.setNpasp(zapVr.getNpasp());
+		  		for (PdiagZ pd : tblZaklDiag.getData()){
+		  			if (pd.getDiag().equals(diag_pcod)) 
+		  				{diagamb.setDatad(pd.getDatad());
+		  				diagamb.setPredv(false);}
+	  				}
+
+		  		if (!diagamb.isSetDatad()){
+		  			diagamb.setDatad(System.currentTimeMillis());
+		  			diagamb.setPredv(true);
+		  		}
+		  		if (!isStat) {
+			  		diagamb.setCod_sp(MainForm.authInfo.pcod);
+			  		diagamb.setCdol(MainForm.authInfo.cdol);
+		  		} else {
+			  		diagamb.setCod_sp(pvizitAmb.cod_sp);
+			  		diagamb.setCdol(pvizitAmb.cdol);
+		  		}
+		  		diagamb.setDiag_stat(1);
+				diagamb.setDiag(diag_pcod);
+				diagamb.setNamed(MainForm.tcl.get_n_mkb(diag_pcod));
 				diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
 	 			tblDiag.addItem(diagamb);
   			}
