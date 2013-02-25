@@ -1,7 +1,5 @@
 package ru.nkz.ivcgzo.clientHospital;
 
-//TODO: ИСПРАВИТЬ БАГИ С ИЗМЕНЕНИЕМ ЯЧЕЕК
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -28,7 +26,6 @@ import javax.swing.border.TitledBorder;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnostic;
 import ru.nkz.ivcgzo.thriftHospital.TDiet;
@@ -148,17 +145,16 @@ public final class Assignments extends JPanel {
 	 * Заполнение таблицы лекарственных назначений данными из БД
 	 */
 	private void fillTableMedications() {
-		try {
-			this.lastMedItem = null;
-			this.tblMedications.setData(
-					ClientHospital.tcl.getMedications(this.patient.getGospitalCod()));
-			this.tblMedications.revalidate();
-			this.updateMedicationsSelection();
-		} catch (KmiacServerException e) {
-			e.printStackTrace();
-		} catch (TException e) {
-			e.printStackTrace();
-		}
+		if ((this.patient != null) && (ClientHospital.tcl != null))
+			try {
+				this.lastMedItem = null;
+				this.tblMedications.setData(
+						ClientHospital.tcl.getMedications(this.patient.getGospitalCod()));
+				this.updateMedicationsSelection();
+			} catch (TException e) {
+				showErrorDialog("Ошибка загрузки лекарственных назначений");
+				e.printStackTrace();
+			}
 	}
 	
 	private void updateMedicationsSelection() {
@@ -192,7 +188,8 @@ public final class Assignments extends JPanel {
 	 * @param curPanel Текущая панель
 	 * @param header Заголовок текущей панели
 	 */
-	private void setCustomPanel(JPanel parentPanel, JPanel curPanel, String header) {
+	private void setCustomPanel(JPanel parentPanel, JPanel curPanel,
+			final String header) {
 		curPanel.setBorder(
 				new TitledBorder(
 						new LineBorder(new Color(0, 0, 0), 1, true),
@@ -208,7 +205,8 @@ public final class Assignments extends JPanel {
 	 * @param curFont Желаемый шрифт текста
 	 * @param curSP Полоса прокрутки текстовой области
 	 */
-	private void setCustomTextArea(JTextArea curArea, Font curFont, JScrollPane curSP) {
+	private void setCustomTextArea(JTextArea curArea,
+			final Font curFont, JScrollPane curSP) {
 		curArea.setFont(curFont);
 		curArea.setLineWrap(true);
 		curArea.setWrapStyleWord(true);
@@ -226,7 +224,7 @@ public final class Assignments extends JPanel {
 	 * @param curTooltip Подсказка, устанавливаемая на кнопку
 	 */
 	private void setCustomButton(JComponent curPanel, JButton curButton,
-			Dimension curDim, Icon curIcon, String curTooltip) {
+			final Dimension curDim, final Icon curIcon, final String curTooltip) {
 		if (curButton == null)
 			return;
 		if (curDim != null) {
@@ -248,11 +246,22 @@ public final class Assignments extends JPanel {
      * @return Возвращает <code>true</code>, если пользователь подтвердил;
 	 * иначе - <code>false</code>
      */
-    private boolean getUserAnswer(String strQuestion) {
+    private boolean getUserAnswer(final String strQuestion) {
 		int opResult = JOptionPane.showConfirmDialog(
 	            this, strQuestion, "Подтверждение",
 	            JOptionPane.YES_NO_OPTION);
 		return (opResult == JOptionPane.YES_OPTION);
+    }
+    
+    /**
+     * Отображение пользователю диалога ошибки
+     * с заданным текстом ошибки
+     * @param msgText Текст ошибки
+     */
+    private void showErrorDialog(final String msgText) {
+    	JOptionPane.showMessageDialog(
+	            this, msgText, "Ошибка",
+	            JOptionPane.ERROR_MESSAGE);
     }
 	
 	private void setPanelMedications() {
@@ -385,10 +394,25 @@ public final class Assignments extends JPanel {
 				this.defaultDimension, this.saveIcon, "Сохранить назначение");
 		this.btnSaveMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                if ((patient != null) && (ClientHospital.conMan != null) &&
-                	(tblMedications.getSelectedItem() != null)) {
-                	//FIXME:
-                    fillTableMedications();
+            	TMedication curItem = tblMedications.getSelectedItem();
+                if ((patient != null) && (ClientHospital.tcl != null) &&
+                	(curItem != null)) {
+            		if (curItem.isSetDatao()) {
+            			if ((curItem.getDatao() < curItem.getDatan()) ||
+            				(curItem.getDatao() > curItem.getDatae())) {
+            				showErrorDialog("Некорректная дата отмены");
+            				return;
+            			}
+            			if (!curItem.isSetVracho())
+            				curItem.setVracho(userAuth.getPcod());
+            		}
+					try {
+						ClientHospital.tcl.updateMedication(curItem);
+	                    fillTableMedications();
+					} catch (TException e1) {
+						showErrorDialog("Ошибка при сохранении назначения");
+						e1.printStackTrace();
+					}
                 }
             }
         });
@@ -398,12 +422,17 @@ public final class Assignments extends JPanel {
 				this.defaultDimension, this.delIcon, "Удалить назначение");
 		this.btnDelMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                if ((patient != null) && (ClientHospital.conMan != null) &&
-                    (tblMedications.getSelectedItem() != null) &&
-                	getUserAnswer("Вы действительно хотите удалить назначение?")) {
-                	//FIXME:
-                    fillTableMedications();
-                }
+            	TMedication curItem = tblMedications.getSelectedItem();
+                if ((patient != null) && (ClientHospital.tcl != null) &&
+                    (curItem != null) &&
+                	getUserAnswer("Вы действительно хотите удалить назначение?"))
+					try {
+						ClientHospital.tcl.deleteMedication(curItem.getNlek());
+	                    fillTableMedications();
+					} catch (TException e1) {
+						showErrorDialog("Ошибка при удалении назначения");
+						e1.printStackTrace();
+					}
             }
         });
 	}

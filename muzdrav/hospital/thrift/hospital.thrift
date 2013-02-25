@@ -347,14 +347,6 @@ struct TMedication {
 	17: optional i64 dataz;
 }
 
-struct TLekPriem {
-	1: optional i32 id;
-	2: optional i32 nlek;
-	3: optional i64 date;
-	4: optional i64 timep;
-	5: optional bool status;
-}
-
 struct TDiagnostic {
 	1: optional i32 nisl;
 	2: optional i32 cisl;
@@ -362,9 +354,14 @@ struct TDiagnostic {
 	4: optional string pokaz;
 	5: optional string pokaz_name;
 	6: optional string rez;
-	7: optional i64 datav;
-	8: optional string op_name;
-	9: optional string rez_name;
+	7: optional i64 datan;
+	8: optional i64 datap;
+	9: optional i64 datav;
+	10: optional i32 vrach;
+	11: optional i32 kodvr;
+	12: optional string diag;
+	13: optional string op_name;
+	14: optional string rez_name;
 }
 
 struct TDiet {
@@ -643,6 +640,22 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 * @author Балабаев Никита Дмитриевич
 	 */
 	list<TMedication> getMedications(1: i32 idGosp)
+		throws (1: kmiacServer.KmiacServerException kse);
+    /**
+	 * Обновление лекарственного назначения
+	 * @param med Исправленное лекарственное назначение
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	void updateMedication(1: TMedication med)
+		throws (1: kmiacServer.KmiacServerException kse);
+    /**
+	 * Удаление лекарственного назначения
+	 * @param nlek Уникальный номер лекарственного назначения
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	void deleteMedication(1: i32 nlek)
 		throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
