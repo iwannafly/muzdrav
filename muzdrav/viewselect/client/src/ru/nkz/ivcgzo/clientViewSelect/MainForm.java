@@ -52,6 +52,7 @@ import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewPolpTreeForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewStringClassifierForm;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortFields;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortOrder;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
@@ -282,6 +283,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		medStaFrm = new MedStaErrorsForm();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object showModal(IClient parent, Object... params) {
 		if (conMan != null && parent != null)
@@ -354,14 +356,22 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					
 				case 7:
 				case 8:
+				case 29:
 					setFrame(intFrm);
 					intFrm.rightSnapWindow();
 					dialog = prepareModal(parent);
 					intFrm.setModalityListener();
-					if ((int) params[0] == 7)
+					switch ((int) params[0]) {
+					case 7:
 						intFrm.prepare((IntegerClassifiers) params[1], (ClassifierSortOrder) params[2], (ClassifierSortFields) params[3]);
-					else
+						break;
+					case 8:
 						intFrm.prepare((IntegerClassifiers) params[1], ClassifierSortOrder.none, null);
+						break;
+					case 29:
+						intFrm.prepare((List<IntegerClassifier>) params[1]);
+						break;
+					}
 					dialog.setVisible(true);
 					try {
 						return intFrm.getResults();
@@ -373,14 +383,22 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					
 				case 9:
 				case 10:
+				case 30:
 					setFrame(strFrm);
 					strFrm.rightSnapWindow();
 					dialog = prepareModal(parent);
 					strFrm.setModalityListener();
-					if ((int) params[0] == 9)
+					switch ((int) params[0]) {
+					case 9:
 						strFrm.prepare((StringClassifiers) params[1], (ClassifierSortOrder) params[2], (ClassifierSortFields) params[3]);
-					else
+						break;
+					case 10:
 						strFrm.prepare((StringClassifiers) params[1], ClassifierSortOrder.none, null);
+						break;
+					case 30:
+						strFrm.prepare((List<StringClassifier>) params[1]);
+						break;
+					}
 					dialog.setVisible(true);
 					try {
 						return strFrm.getResults();
