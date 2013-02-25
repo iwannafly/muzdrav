@@ -5,6 +5,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -169,6 +170,11 @@ public class ViewIntegerClassifierForm extends ModalForm {
 		}
 	}
 	
+	public void prepare(List<IntegerClassifier> list) {
+		tblIntClass.setData(list);
+		setFilterModel();
+	}
+	
 	private class FilterModel extends CustomTable<IntegerClassifier, IntegerClassifier._Fields>.CustomTableModel {
 		private static final long serialVersionUID = -4774136922669712220L;
 		
@@ -191,7 +197,8 @@ public class ViewIntegerClassifierForm extends ModalForm {
 			indexesCount = 0;
 			for (int i = 0; i < super.getRowCount(); i++) {
 				for (int j = 0; j < super.getColumnCount(); j++) {
-					if (super.getValueAt(i,  j).toString().toLowerCase().indexOf(previousString) > -1) {
+					Object val = super.getValueAt(i,  j);
+					if ((val != null) && (val.toString().toLowerCase().indexOf(previousString) > -1)) {
 						indexes[indexesCount++] = i;
 						break;
 					}

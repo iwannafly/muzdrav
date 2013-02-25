@@ -640,31 +640,46 @@ public class PIslForm {
 							
 							for ( int i = 0; i<sot01.size(); i++){
 								
-								addLbIsl.setNpasp(tn_ldi.getSelectedItem().npasp);
+								/*addLbIsl.setNpasp(tn_ldi.getSelectedItem().npasp);
 								addLbIsl.setNisl(tn_ldi.getSelectedItem().nisl);
-								addLbIsl.setCpok(sot01.get(i).pcod);
+								addLbIsl.setCpok(sot01.get(i).pcod);*/
 								
 								for (int j = 0; j<srS_ot01.size(); j++){
 									
 									if (sot01.get(i).pcod.equals(srS_ot01.get(j).pcod)){
 										//System.out.print(sot01.get(i).pcod+" == "+srS_ot01.get(j).pcod);
+										addLbIsl.setNpasp(tn_ldi.getSelectedItem().npasp);
+										addLbIsl.setNisl(tn_ldi.getSelectedItem().nisl);
+										addLbIsl.setCpok(sot01.get(i).pcod);
 										addLbIsl.setPcod_m(srS_ot01.get(j).c_obst);
 										addLbIsl.setStoim(srS_ot01.get(j).stoim);
-										break;
+	
+										try {
+											
+											MainForm.ltc.AddLIsl(addLbIsl);
+											
+										} catch (LIslExistsException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+										
+										if ((j < srS_ot01.size()-1)&&(!sot01.get(i).pcod.equals(srS_ot01.get(j+1).pcod))){
+											break;
+										} 
 									}
 									
 								}
 								
 								//System.out.print(addLbIsl);
 								//addLbIsl.setNpasp(tn_ldi.getSelectedItem().npasp);
-								try {
-			
+/*								try {
+	
 									MainForm.ltc.AddLIsl(addLbIsl);
 									
 								} catch (LIslExistsException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
-								}
+								}*/
 							}
 							lbIs = MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl,tn_ldi.getSelectedItem().pcisl);
 							
@@ -1918,6 +1933,7 @@ public class PIslForm {
 		JPanel panel_3 = new JPanel();
 		
 		JPanel panel_8 = new JPanel();
+		panel_8.setVisible(false);
 		
 		JPanel panel_9 = new JPanel();
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
@@ -2040,29 +2056,44 @@ public class PIslForm {
 						
 						if (check == false){
 							
-							nLI.setNisl(tn_ldi.getSelectedItem().nisl);
+							/*nLI.setNisl(tn_ldi.getSelectedItem().nisl);
 							nLI.setNpasp(tn_ldi.getSelectedItem().npasp);
-							nLI.setCpok(dnli.get(i).pcod);
+							nLI.setCpok(dnli.get(i).pcod);*/
 							//nLI.setPcod_m(dnli.get(i).c_obst);
 							
 							for (int j = 0; j<dstoim.size(); j++){
 								
 								if (dnli.get(i).pcod.equals(dstoim.get(j).pcod)){
+									nLI.setNisl(tn_ldi.getSelectedItem().nisl);
+									nLI.setNpasp(tn_ldi.getSelectedItem().npasp);
+									nLI.setCpok(dnli.get(i).pcod);
 									nLI.setPcod_m(dstoim.get(j).c_obst);
 									nLI.setStoim(dstoim.get(j).stoim);
-									break;
+									
+									try {
+										
+										MainForm.ltc.AddLIsl(nLI);
+										
+									} catch (LIslExistsException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+
+									if ((j<dstoim.size()-1)&&(!dnli.get(i).pcod.equals(dstoim.get(j+1).pcod))){
+										break;
+									}
 								}
 								
 							}
 							
-							try {
+/*							try {
 								
 								MainForm.ltc.AddLIsl(nLI);
 								
 							} catch (LIslExistsException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
-							}
+							}*/
 						}
 						
 					}
@@ -2104,8 +2135,10 @@ public class PIslForm {
 		panel_9.setLayout(gl_panel_9);
 		
 		JLabel lblNewLabel_23 = new JLabel("Метод исследования");
+		lblNewLabel_23.setVisible(false);
 		
 		cBLpcod_m = new ThriftStringClassifierCombobox<>(true);
+		cBLpcod_m.setVisible(false);
 		cBLpcod_m.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 			

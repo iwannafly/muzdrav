@@ -23,7 +23,7 @@ struct Lek {
 	9: optional i32 sposv;
 	10: optional i32 spriem;
 	11: optional i32 pereod;
-	12: optional i32 dlitk;
+	12: optional i64 datae;
 	13: optional string komm;
 	14: optional i64 datao;
 	15: optional i32 vracho;

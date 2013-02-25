@@ -86,6 +86,9 @@
 
 	<target name="main" description="Компиляция всех серверных модулей для тестового сервера">
 		<antcall target="jar" />
+		<subant>
+			<fileset dir="${muzdrav.dir}" includes="**/server/build.xml" />
+		</subant>
 		<antcall target="copyJarsToSharedPath" />
 	</target>
 

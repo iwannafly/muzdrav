@@ -451,16 +451,18 @@ public class ServerLab extends Server implements Iface {
     public List<Isl> getIslList(int gospId) throws KmiacServerException {
         final String sql = "SELECT p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, p_rez_l.zpok, "
     		+ "p_isl_ld.datav, '' as op_name, '' as rez_name  "
-            + "FROM p_isl_ld JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) "
+            + "FROM p_isl_ld "
+            + "JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) "
     		+ "JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) "
-            + "WHERE p_isl_ld.id_gosp = ? "
+            + "WHERE (p_isl_ld.id_gosp = ?) "
             + "UNION "
             + "SELECT p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, "
             + "p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name "
-            + "FROM p_isl_ld JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) "
+            + "FROM p_isl_ld "
+            + "JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) "
             + "JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) "
             + "LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) "
-            + "WHERE p_isl_ld.id_gosp = ?;";
+            + "WHERE (p_isl_ld.id_gosp = ?);";
        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, gospId, gospId)) {
            return rsmIsl.mapToList(acrs.getResultSet());
        } catch (SQLException e) {
