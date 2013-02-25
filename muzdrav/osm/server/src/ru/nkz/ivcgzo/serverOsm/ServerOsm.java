@@ -4,14 +4,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.rmi.ServerException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JOptionPane;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
@@ -24,7 +21,6 @@ import ru.nkz.ivcgzo.serverManager.serverManager;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
-import ru.nkz.ivcgzo.serverManager.common.IServer;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
@@ -907,117 +903,142 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public String printIsslMetod(IsslMet im) throws KmiacServerException, TException {
 		String path;
+		StringBuilder sb;
+		List<String> mts;
 		int kod_lab = 0, id_issl = 0, napr_vr = 0, kod_lab_pol = 0;
 		Date data_napr = null, data_post  =null;
 		String diag = null, name_clpu = null, name_lab = null, vrInfo = null;
 		
 		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
-			AutoCloseableResultSet acrs;
+			AutoCloseableResultSet oAcrs;
+			AutoCloseableResultSet iAcrs;
 			
-			StringBuilder sb = new StringBuilder(0x10000);
-			acrs = sse.execPreparedQuery("select nisl, kodotd, diag, datan, datap, vrach from p_isl_ld where id_pos = ? ", im.getPvizitambId());
-			if (acrs.getResultSet().next())
-				{kod_lab=acrs.getResultSet().getInt(2);
-				 id_issl=acrs.getResultSet().getInt(1);
-				 diag=acrs.getResultSet().getString(3);
-				 data_napr=acrs.getResultSet().getDate(4);
-				 data_post=acrs.getResultSet().getDate(5);
-				 napr_vr=acrs.getResultSet().getInt(6);
-				};
+			mts = new ArrayList<>();
+			oAcrs = sse.execPreparedQuery("select nisl, kodotd, diag, datan, datap, vrach from p_isl_ld where id_pos = ? ", im.getPvizitambId());
+			while (oAcrs.getResultSet().next()) {
+				kod_lab = oAcrs.getResultSet().getInt(2);
+				id_issl = oAcrs.getResultSet().getInt(1);
+				diag = oAcrs.getResultSet().getString(3);
+				data_napr = oAcrs.getResultSet().getDate(4);
+				data_post = oAcrs.getResultSet().getDate(5);
+				napr_vr = oAcrs.getResultSet().getInt(6);
+				
+				sb = new StringBuilder(0x10000);
+				
+				sb.append("<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"100%\">");
+				sb.append("<tr valign=\"top\">");
+					sb.append("<td width=\"50%\" style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px; font: 11px times new roman;\">");
+						sb.append("<b>Информация для пациента:</b><br><br>");
+						
+						iAcrs = sse.execPreparedQuery("select n_m00.name_s, n_lds.name from n_lds inner join n_m00 on (n_m00.pcod=n_lds.clpu) where n_lds.pcod = ? ", kod_lab);
+						if (iAcrs.getResultSet().next()) {
+							name_clpu = iAcrs.getResultSet().getString(1);
+							name_lab = iAcrs.getResultSet().getString(2);
+						}
+						sb.append("<b>Дата:</b><br />");
+						sb.append("<b>Время:</b><br />");
+						sb.append("<b>Подготовка:</b><br />");
+					sb.append("</td>");
+					
+					iAcrs.close();
+					iAcrs = sse.execPreparedQuery("SELECT v.fam, v.im, v.ot FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) WHERE v.pcod = ? ", napr_vr);
+					if (iAcrs.getResultSet().next()) {
+						vrInfo = String.format("%s %s %s", iAcrs.getResultSet().getString(1), iAcrs.getResultSet().getString(2), iAcrs.getResultSet().getString(3));
+						sb.append("<td width=\"50%\" style=\"border: 1px solid black; padding: 5px; font: 11px times new roman;\">");
+						sb.append(String.format("<b>%s</b><br /><br>", name_clpu));
+						sb.append("<b>Направление на исследование</b><br /><br>");
+						sb.append(String.format("<b>Лаборатория: %s</b><br><br />", name_lab));
+					}
+					iAcrs.close();
+					
+					iAcrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom, poms_ser, poms_nom FROM patient WHERE npasp = ? ", im.getNpasp());
+					if (iAcrs.getResultSet().next()) {
+						sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br />", iAcrs.getResultSet().getString(1), iAcrs.getResultSet().getString(2), iAcrs.getResultSet().getString(3)));
+						if (iAcrs.getResultSet().getString(7)!=null)sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br />", iAcrs.getResultSet().getString(7), iAcrs.getResultSet().getString(8)));
+						if (iAcrs.getResultSet().getString(7)==null)sb.append(String.format("<b>Номер полиса:</b> %s<br />", iAcrs.getResultSet().getString(8)));
+						sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br />", iAcrs.getResultSet().getDate(4)));
+						if (iAcrs.getResultSet().getString(5)!=null)
+						sb.append(String.format("<b>Адрес:</b> %s, %s<br />", iAcrs.getResultSet().getString(5), iAcrs.getResultSet().getString(6)));
+					}
+					sb.append("<b>Диагноз: </b>");
+					sb.append(String.format("%s <br>", diag));
+					sb.append(String.format("<b>Врач:</b> %s<br /><br>", vrInfo));
+					sb.append("<b>Наименование исследований:</b>");
+					sb.append("<ol>");
+					iAcrs.close();
+					
+					iAcrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav, p_vizit.datao " +
+							"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) join n_ldi  on (n_ldi.pcod = p_rez_l.cpok)  " +
+							"join p_vizit on (p_vizit.id = p_isl_ld.pvizit_id) "+
+							"where p_isl_ld.nisl = ? " +
+							"union " +
+							"select p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, p_isl_ld.datav, p_vizit.datao " +
+							"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl) join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)  " +
+							"join p_vizit on (p_vizit.id = p_isl_ld.pvizit_id) "+
+							"where p_isl_ld.nisl = ? ", id_issl, id_issl);
+					while (iAcrs.getResultSet().next()) {
+						if (iAcrs.getResultSet().getString(3) != null) {
+							do {
+								sb.append(String.format("<li>%s</li>", iAcrs.getResultSet().getString(3)));
+							} while (iAcrs.getResultSet().next());
+						}
+					}	
+
+					sb.append("</ol>");
+					sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
+					sb.append(String.format("<b>Планируемая дата выполнения:</b> %1$td.%1$tm.%1$tY<br />", data_post));
+					sb.append("<b>Подпись врача:</b><br />");
+					sb.append("</td>");
+				sb.append("</tr>");
+				sb.append("</table>");
+				iAcrs.close();
+				
+				mts.add(sb.toString());
+			};
+			oAcrs.close();
+			
+			sb = new StringBuilder(0x10000);
 			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
 			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
 			sb.append("<head>");
 			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
 			sb.append("<title>Направление на…</title>");
 			sb.append("<style type=\"text/css\" media=\"print\">");
-			sb.append("div.page	{ ");
-			sb.append("writing-mode: tb-rl;");
-			sb.append("height: 80%;");
-			sb.append("margin: 10% 0%;");
-			sb.append("}");
+			sb.append("<!--");
+			sb.append("@media print {");
+			sb.append("table { page-break-after:auto }");
+			sb.append("tr    { page-break-inside:avoid; page-break-after:auto }");
+			sb.append("td    { page-break-inside:avoid; page-break-after:auto }");
+			sb.append("thead { display:table-header-group }");
+			sb.append("tfoot { display:table-footer-group } }");
+			sb.append("@page { size: 21cm 29.7cm; margin: 1cm }");
+			sb.append("-->");
 			sb.append("</style>");
 			sb.append("</head>");
 			sb.append("<body>");
-			sb.append("<div>");
-			sb.append("<table cellpadding=\"5\" cellspacing=\"0\">");
-			sb.append("<tr valign=\"top\">");
-			sb.append("<th>");
-			sb.append("<div class='page'>");
-			sb.append("<table cellpadding=\"5\" cellspacing=\"0\">");
-			sb.append("<tr valign=\"top\">");
-				sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px; font: 11px times new roman;\" width=\"150px\">");
-					sb.append("<b>Информация для пациента:</b><br><br>");
-					acrs.close();
-					acrs = sse.execPreparedQuery("select n_m00.name_s, n_lds.name from n_lds inner join n_m00 on (n_m00.pcod=n_lds.clpu) where n_lds.pcod = ? ", kod_lab);
-					if (acrs.getResultSet().next()) {
-						name_clpu = acrs.getResultSet().getString(1);
-						name_lab = acrs.getResultSet().getString(2);
-					}
-					acrs.close();
-					sb.append("<b>Дата:</b><br />");
-					sb.append("<b>Время:</b><br />");
-					sb.append("<b>Подготовка:</b><br />");
-				sb.append("</td>");
-				acrs.close();
-				acrs = sse.execPreparedQuery("SELECT v.fam, v.im, v.ot FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) WHERE v.pcod = ? ", napr_vr);
-				if (acrs.getResultSet().next()) {
-					vrInfo = String.format("%s %s %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3));
-					sb.append("<td style=\"border: 1px solid black; padding: 5px; font: 11px times new roman;\" width=\"250px\">");
-					sb.append(String.format("<b>%s</b><br /><br>", name_clpu));
-					sb.append("<b>Направление на исследование</b><br /><br>");
-					sb.append(String.format("<b>Лаборатория: %s</b><br><br />", name_lab));
-				}
-				
-				acrs.close();
-							acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom, poms_ser, poms_nom FROM patient WHERE npasp = ? ", im.getNpasp());
-				if (acrs.getResultSet().next()) {
-					sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-					if (acrs.getResultSet().getString(7)!=null)sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br />", acrs.getResultSet().getString(7), acrs.getResultSet().getString(8)));
-					if (acrs.getResultSet().getString(7)==null)sb.append(String.format("<b>Номер полиса:</b> %s<br />", acrs.getResultSet().getString(8)));
-					sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
-					if (acrs.getResultSet().getString(5)!=null)
-					sb.append(String.format("<b>Адрес:</b> %s, %s<br />", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
-				}
-				sb.append("<b>Диагноз: </b>");
-					sb.append(String.format("%s <br>", diag));
-				acrs.close();
-				sb.append(String.format("<b>Врач:</b> %s<br /><br>", vrInfo));
-				sb.append("<b>Наименование исследований:</b>");
-				sb.append("<ol>");
-				acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav, p_vizit.datao " +
-						"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) join n_ldi  on (n_ldi.pcod = p_rez_l.cpok)  " +
-						"join p_vizit on (p_vizit.id = p_isl_ld.pvizit_id) "+
-						"where p_isl_ld.nisl = ? " +
-						"union " +
-						"select p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, p_isl_ld.datav, p_vizit.datao " +
-						"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl) join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)  " +
-						"join p_vizit on (p_vizit.id = p_isl_ld.pvizit_id) "+
-						"where p_isl_ld.nisl = ? ", id_issl, id_issl);
-						while (acrs.getResultSet().next()) {
-							if (acrs.getResultSet().getString(3) != null) {
-							do {
-								sb.append(String.format("<li>%s</li>", acrs.getResultSet().getString(3)));
-							} 
-							while (acrs.getResultSet().next());
-							}
-	
-							}	
-
-				sb.append("</ol>");
-				sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
-				sb.append(String.format("<b>Планируемая дата выполнения:</b> %1$td.%1$tm.%1$tY<br />", data_post));
-				sb.append("<b>Подпись врача:</b><br />");
-				sb.append("</td>");
-			sb.append("</tr>");
-			sb.append("</table>");
 			
-			sb.append("</div>");
-			sb.append("</th>");
+			for (int i = 0; i < mts.size(); i++) {
+				if (i > (mts.size() - 2))
+					sb.append("<table cellpadding=\"5\" cellspacing=\"8\" width=\"50%\" style=\"page-break-after: auto\">");
+				else
+					sb.append("<table cellpadding=\"5\" cellspacing=\"8\" width=\"100%\" style=\"page-break-after: auto\">");
+				for (int j = 0; (j < 1) && (i != mts.size()); j++) {
+					sb.append("<tr>");
+					for (int k = 0; (k < 2) && (i != mts.size()); k++) {
+						sb.append("<td width=\"50%\" height=\"480\" style=\"border: none; padding: 0cm\">");
+						sb.append(mts.get(i++));
+						sb.append("</td>");
+					}
+					sb.append("</tr>");
+				}
+				sb.append("</table>");
+			}
+			
 			sb.append("</body>");
 			sb.append("</html>");
 			
-			acrs.close();
 			osw.write(sb.toString());
+			
 			return path;
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
