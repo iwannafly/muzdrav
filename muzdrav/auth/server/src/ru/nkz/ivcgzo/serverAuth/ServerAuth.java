@@ -108,6 +108,11 @@ public class ServerAuth extends Server implements Iface {
 					cpodrTableName = "n_lds";
 					n00KategField = "''::character varying(1)";
 					break;
+				case 4:
+				case 5:
+					cpodrTableName = "n_t40";
+					n00KategField = "''::character varying(1)";
+					break;
 				default:
 					throw new UserNotFoundException();
 				}
