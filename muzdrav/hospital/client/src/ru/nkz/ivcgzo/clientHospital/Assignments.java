@@ -66,6 +66,7 @@ public final class Assignments extends JPanel {
     private CustomTable<TDiet, TDiet._Fields> tblDiet;
     private CustomTable<TProcedures, TProcedures._Fields> tblProcedures;
     private TMedication lastMedItem;
+    private TDiagnostic lastDiagItem;
     private JButton btnAddMedication, btnSaveMedication, btnDelMedication;
     private JButton btnAddDiagnostic, btnDelDiagnostic;
     private JButton btnAddDiet, btnDelDiet;
@@ -123,8 +124,8 @@ public final class Assignments extends JPanel {
 		this.clearAllTables();
 		if (this.patient != null) {
 			this.fillTableMedications();
-			/*
 			this.fillTableDiagnostics();
+			/*
 			this.fillTableDiet();
 			this.fillTableProcedures();
 			*/
@@ -149,7 +150,8 @@ public final class Assignments extends JPanel {
 			try {
 				this.lastMedItem = null;
 				this.tblMedications.setData(
-						ClientHospital.tcl.getMedications(this.patient.getGospitalCod()));
+						ClientHospital.tcl.getMedications(
+								this.patient.getGospitalCod()));
 				this.updateMedicationsSelection();
 			} catch (TException e) {
 				showErrorDialog("Ошибка загрузки лекарственных назначений");
@@ -157,6 +159,26 @@ public final class Assignments extends JPanel {
 			}
 	}
 	
+	/**
+	 * Заполнение таблицы исследований данными из БД
+	 */
+	private void fillTableDiagnostics() {
+		if ((this.patient != null) && (ClientHospital.tcl != null))
+			try {
+				this.lastDiagItem = null;
+				this.tblDiagnostics.setData(
+						ClientHospital.tcl.getDiagnostics(
+								this.patient.getGospitalCod()));
+				this.updateDiagnosticsSelection();
+			} catch (TException e) {
+				showErrorDialog("Ошибка загрузки исследований");
+				e.printStackTrace();
+			}
+	}
+	
+	/**
+	 * Изменение выделения таблицы лекарственных назначений
+	 */
 	private void updateMedicationsSelection() {
 		TMedication curItem = this.tblMedications.getSelectedItem();
 		if ((curItem == null) || (this.lastMedItem == curItem))
@@ -165,6 +187,22 @@ public final class Assignments extends JPanel {
 		//TODO: ПРОДОЛЖИТЬ
 		String strInfo = "Форма выпуска: " + curItem.getFlek();
 		this.taMedicationsInfo.setText(strInfo);
+	}
+	
+	/**
+	 * Изменение выделения таблицы исследований
+	 */
+	private void updateDiagnosticsSelection() {
+		TDiagnostic curItem = this.tblDiagnostics.getSelectedItem();
+		if ((curItem == null) || (this.lastDiagItem == curItem))
+			return;
+		this.lastDiagItem = curItem;
+		String strInfo = "";
+		if (curItem.isSetOp_name())
+			strInfo += "Описание исследования: " + curItem.getOp_name() + '\n';
+		if (curItem.isSetRez_name())
+			strInfo += "Заключение: " + curItem.getRez_name();
+		this.taDiagnosticsResult.setText(strInfo);
 	}
 	
 	/**
@@ -351,11 +389,10 @@ public final class Assignments extends JPanel {
 		this.spDiagnosticsTbl = new JScrollPane();
 		this.vbDiagnosticsTbl.add(this.spDiagnosticsTbl);
 		this.tblDiagnostics = new CustomTable<TDiagnostic, TDiagnostic._Fields>(
-				false, false, TDiagnostic.class, 2, "Наименование",
-				6, "Дата назначения", 6, "Дата выполнения");
+				false, false, TDiagnostic.class, 1, "Код исследования",
+				2, "Наименование исследования", 3, "Результат", 4, "Дата выполнения");
+		this.tblDiagnostics.setDateField(3);
 		this.spDiagnosticsTbl.setViewportView(this.tblDiagnostics);
-		this.tblDiagnostics.setDateField(1);
-		this.tblDiagnostics.setDateField(2);
 	}
 	
 	private void setTableDiet() {

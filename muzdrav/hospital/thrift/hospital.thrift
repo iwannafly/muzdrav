@@ -364,6 +364,16 @@ struct TDiagnostic {
 	14: optional string rez_name;
 }
 
+struct TDiagnostic {
+	1: optional i32 nisl;
+	2: optional string cpok;
+	3: optional string cpok_name;
+	4: optional string result;
+	5: optional i64 datav;
+	6: optional string op_name;
+	7: optional string rez_name;
+}
+
 struct TDiet {
 }
 
@@ -656,6 +666,15 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 * @author Балабаев Никита Дмитриевич
 	 */
 	void deleteMedication(1: i32 nlek)
+		throws (1: kmiacServer.KmiacServerException kse);
+    /**
+	 * Получение списка результатов лабораторных и диагностических исследований
+	 * @param idGosp Идентификатор госпитализации
+	 * @return Возвращает список результатов исследований
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	list<TDiagnostic> getDiagnostics(1: i32 idGosp)
 		throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
