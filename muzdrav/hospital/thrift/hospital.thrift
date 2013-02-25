@@ -340,7 +340,7 @@ struct TMedication {
 	10: optional i32 sposv;
 	11: optional i32 spriem;
 	12: optional i32 pereod;
-	13: optional i32 dlitk;
+	13: optional i64 datae;
 	14: optional string komm;
 	15: optional i64 datao;
 	16: optional i32 vracho;

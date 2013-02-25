@@ -535,7 +535,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<Metod> GetLabStoim(String pcisl, int kodotd) throws TException {
-		try (AutoCloseableResultSet	acrs =sse. execPreparedQuery("select n_stoim.pcod, n_stoim.c_obst, n_stoim.stoim from s_ot01 JOIN n_stoim on(s_ot01.pcod = n_stoim.pcod) where (s_ot01.c_obst = n_stoim.c_obst) and (s_ot01.c_nz1 = ?) and (s_ot01.cotd = ?)", pcisl, kodotd)){
+		try (AutoCloseableResultSet	acrs =sse. execPreparedQuery("select n_stoim.pcod, n_stoim.c_obst, n_stoim.stoim from s_ot01 JOIN n_stoim on(s_ot01.pcod = n_stoim.pcod) where (s_ot01.c_obst = n_stoim.c_obst) and (s_ot01.c_nz1 = ?) and (s_ot01.cotd = ?) order by s_ot01.pcod", pcisl, kodotd)){
 		return rmsMetod.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
