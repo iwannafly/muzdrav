@@ -972,8 +972,10 @@ public class ServerOsm extends Server implements Iface {
 							acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom, poms_ser, poms_nom FROM patient WHERE npasp = ? ", im.getNpasp());
 				if (acrs.getResultSet().next()) {
 					sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-					if (acrs.getResultSet().getString(7)!=null)sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br />", acrs.getResultSet().getString(7), acrs.getResultSet().getString(8)));
-					if (acrs.getResultSet().getString(7)==null)sb.append(String.format("<b>Номер полиса:</b> %s<br />", acrs.getResultSet().getString(8)));
+					if ((acrs.getResultSet().getString(7)!=null) && (acrs.getResultSet().getString(8)!=null))sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br />", acrs.getResultSet().getString(7), acrs.getResultSet().getString(8)));
+					if (acrs.getResultSet().getString(7)==null)sb.append(String.format("<b>Серия и номер полиса полиса:</b> %s<br />", acrs.getResultSet().getString(8)));
+					if ((acrs.getResultSet().getString(7)==null) && (acrs.getResultSet().getString(8)==null))sb.append("<b>Серия и номер полиса:</b> -<br />");
+					if (acrs.getResultSet().getString(8)==null)sb.append(String.format("<b>Серия и номер полиса:</b> %s<br />", acrs.getResultSet().getString(7)));
 					sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
 					if (acrs.getResultSet().getString(5)!=null)
 					sb.append(String.format("<b>Адрес:</b> %s, %s<br />", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
@@ -1587,7 +1589,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append("<head>");
 			sb.append("<STYLE TYPE=\"text/css\">");
 			sb.append("	<!--");
-			sb.append("@page { size: 29.7cm 21cm; margin-left: 2cm; margin-right: 1.06cm; margin-top: 2.12cm; margin-bottom: 1.76cm }");
+			sb.append("@page { size: 29.7cm 21cm; margin-left: 1cm; margin-right: 1.06cm; margin-top: 1.12cm; margin-bottom: 1.2cm }");
 			sb.append("P { margin-bottom: 0.21cm; direction: ltr; color: #000000; widows: 2; orphans: 2 }");
 			sb.append("P.western { font-family: \"Times New Roman\", serif; font-size: 12pt; so-language: ru-RU }");
 			sb.append("P.cjk { font-family: \"Times New Roman\", serif; font-size: 12pt }");
@@ -1720,8 +1722,8 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				if (acrs.getResultSet().next())
 					sb.append(String.format("%s %s %s",acrs.getResultSet().getString(1),acrs.getResultSet().getString(2),acrs.getResultSet().getString(3)));
 				sb.append("<br>Подпись ____________");
-	//			if (sb.length()>4550){
-				sb.append("<td style=\"border: 1px solid white; padding: 5px; font: 10px times new roman;\" width=\"40%\">");
+				if (sb.length()>4600){
+				sb.append("<td style=\"border-top: 1px solid white; border-bottom: 1px solid white; border-left: 1px solid white; border-right: none; padding: 5px; font: 10px times new roman;\" width=\"40%\">");
 				acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav, p_vizit_amb.datap " +
 						"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) join n_ldi  on (n_ldi.pcod = p_rez_l.cpok)  " +
 						"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
@@ -1749,43 +1751,60 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 							else {
 								sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th>Наименование показателя</th><th>Результат</th></tr>");
 								do {
-									sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\">  </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(3)));
+									sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\" width=\"30\">  </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(3)));
 								} 
 								while (acrs.getResultSet().next());
 							}
 						}		sb.append("</table><br>");		
 					}
-//				}
-//				else {
-//					acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav, p_vizit_amb.datap " +
-//							"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) join n_ldi  on (n_ldi.pcod = p_rez_l.cpok)  " +
-//							"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
-//							"where p_isl_ld.id_pos = ? " +
-//							"union " +
-//							"select p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, p_isl_ld.datav, p_vizit_amb.datap " +
-//							"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl) join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)  " +
-//							"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
-//							"where p_isl_ld.id_pos = ? ", pvizit_ambId, pvizit_ambId);
-//					if (acrs.getResultSet().isBeforeFirst()) {
-//						sb.append("<b>Назначенные исследования </b><br>");
-//						while (acrs.getResultSet().next()) {
-//							if (acrs.getResultSet().getString(4) != null) {
-//								sb.append("<table border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">Наименование показателя</th><th style=\"font: 10px times new roman;\">Результат</th></tr>");
-//								do {
-//									sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\"> %s </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
-//								} 
-//								while (acrs.getResultSet().next());
-//							}
-//							else {
-//								sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th>Наименование показателя</th><th>Результат</th></tr>");
-//								do {
-//									sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\">  </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(3)));
-//								} 
-//								while (acrs.getResultSet().next());
-//							}
-//						}		sb.append("</table><br>");	
-//					}
-//				}
+				}
+				else {
+					acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav, p_vizit_amb.datap " +
+							"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) join n_ldi  on (n_ldi.pcod = p_rez_l.cpok)  " +
+							"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
+							"where p_isl_ld.id_pos = ? " +
+							"union " +
+							"select p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, p_isl_ld.datav, p_vizit_amb.datap " +
+							"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl) join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)  " +
+							"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
+							"where p_isl_ld.id_pos = ? ", pvizit_ambId, pvizit_ambId);
+					if (acrs.getResultSet().isBeforeFirst()) {
+						sb.append("<br><b>Назначенные исследования </b><br>");
+						while (acrs.getResultSet().next()) {
+							if (sb.length()>4600){
+								sb.append("</table>");
+								sb.append("<td style=\"border-top: 1px solid white; border-bottom: 1px solid white; border-left: 1px solid white; border-right: none; padding: 5px; font: 10px times new roman;\" width=\"40%\">");
+								sb.append("<br>");
+								sb.append("<table border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> ");
+								do {
+									if (acrs.getResultSet().getString(4) != null) 
+										sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\"> %s </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
+									else 
+										sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\" width=\"30\">  </th></tr>", acrs.getResultSet().getString(3)));
+								} 
+								
+								while (acrs.getResultSet().next());
+							}
+							if (sb.length()<4600){
+							//while(sb.length()<4550){
+								sb.append("<br>");
+								sb.append("<table border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">Наименование показателя</th><th style=\"font: 10px times new roman;\">Результат</th></tr>");
+								do{
+									if (acrs.getResultSet().getString(4) != null)
+										sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\"> %s </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
+									else 
+										sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\" width=\"30\">  </th></tr>", acrs.getResultSet().getString(3)));
+								}
+								
+								while ((sb.length()<4600) && (acrs.getResultSet().next()));
+								
+							}
+						
+								
+						}
+							sb.append("</table><br>");	
+					}
+				}
 					acrs.close();
 					
 				sb.append("</td></tr></table></div>");
