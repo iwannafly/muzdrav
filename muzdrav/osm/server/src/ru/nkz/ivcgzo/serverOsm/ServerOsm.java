@@ -985,7 +985,7 @@ public class ServerOsm extends Server implements Iface {
 					}	
 
 					sb.append("</ol>");
-					sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
+					sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", data_napr));
 					sb.append(String.format("<b>Планируемая дата выполнения:</b> %1$td.%1$tm.%1$tY<br />", data_post));
 					sb.append("<b>Подпись врача:</b><br />");
 					sb.append("</td>");
@@ -1006,26 +1006,43 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<style type=\"text/css\" media=\"print\">");
 			sb.append("<!--");
 			sb.append("@media print {");
-			sb.append("table { page-break-after:auto }");
-			sb.append("tr    { page-break-inside:avoid; page-break-after:auto }");
+			sb.append("table { page-break-after:avoid }");
+			sb.append("tr    { page-break-inside:avoid; page-break-after:avoid }");
 			sb.append("td    { page-break-inside:avoid; page-break-after:auto }");
 			sb.append("thead { display:table-header-group }");
 			sb.append("tfoot { display:table-footer-group } }");
-			sb.append("@page { size: 21cm 29.7cm; margin: 1cm }");
+			sb.append("@page { size: 21cm 29.7cm; margin-left: 1cm; margin-right: 1cm; margin-top: 1cm; margin-bottom: 1cm  }");
+			sb.append("P { margin-bottom: 0.21cm; direction: ltr; color: #000000; widows: 2; orphans: 2 }");
+			sb.append("P.western { font-family: \"Times New Roman\", serif; font-size: 12pt; so-language: ru-RU }");
+			sb.append("P.cjk { font-family: \"Times New Roman\", serif; font-size: 12pt }");
+			sb.append("P.ctl { font-family: \"Times New Roman\", serif; font-size: 12pt; so-language: ar-SA }");
+			sb.append("A:link { color: #000080; so-language: zxx; text-decoration: underline }");
+			sb.append("A:visited { color: #800000; so-language: zxx; text-decoration: underline }");
 			sb.append("-->");
 			sb.append("</style>");
+			/*sb.append("<STYLE TYPE=\"text/css\">");
+			sb.append("	<!--");
+			sb.append("@page { size: 29.7cm 21cm; margin-left: 1cm; margin-right: 1.06cm; margin-top: 1.12cm; margin-bottom: 1.2cm }");
+			sb.append("P { margin-bottom: 0.21cm; direction: ltr; color: #000000; widows: 2; orphans: 2 }");
+			sb.append("P.western { font-family: \"Times New Roman\", serif; font-size: 12pt; so-language: ru-RU }");
+			sb.append("P.cjk { font-family: \"Times New Roman\", serif; font-size: 12pt }");
+			sb.append("P.ctl { font-family: \"Times New Roman\", serif; font-size: 12pt; so-language: ar-SA }");
+			sb.append("A:link { color: #000080; so-language: zxx; text-decoration: underline }");
+			sb.append("A:visited { color: #800000; so-language: zxx; text-decoration: underline }");
+			sb.append("-->");
+			sb.append("</STYLE>");*/
 			sb.append("</head>");
 			sb.append("<body>");
 			
 			for (int i = 0; i < mts.size(); i++) {
 				if (i > (mts.size() - 2))
 					sb.append("<table cellpadding=\"5\" cellspacing=\"8\" width=\"50%\" style=\"page-break-after: auto\">");
-				else
-					sb.append("<table cellpadding=\"5\" cellspacing=\"8\" width=\"100%\" style=\"page-break-after: auto\">");
+					else
+						sb.append("<table cellpadding=\"5\" cellspacing=\"8\" width=\"100%\" style=\"page-break-after: auto\">");
 				for (int j = 0; (j < 1) && (i != mts.size()); j++) {
 					sb.append("<tr>");
 					for (int k = 0; (k < 2) && (i != mts.size()); k++) {
-						sb.append("<td width=\"50%\" height=\"480\" style=\"border: none; padding: 0cm\">");
+						sb.append("<td width=\"50%\" height=\"480\" style=\"border: none; padding: 0cm\"><br>");
 						sb.append(mts.get(i++));
 						sb.append("</td>");
 					}
@@ -3161,9 +3178,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public List<P_isl_ld> getIsslInfoDate(int id_pvizit)
+	public List<P_isl_ld> getIsslInfoDate(int id_pvizitAmb)
 			throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_isl_ld.*, n_nz1.name as name_pcisl from p_isl_ld inner join n_nz1 on (p_isl_ld.pcisl=n_nz1.pcod) where p_isl_ld.pvizit_id = ? ", id_pvizit)) 
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_isl_ld.*, n_nz1.name as name_pcisl from p_isl_ld inner join n_nz1 on (p_isl_ld.pcisl=n_nz1.pcod) where p_isl_ld.id_pos = ? ", id_pvizitAmb)) 
 		{
 			return rsmPislld.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {

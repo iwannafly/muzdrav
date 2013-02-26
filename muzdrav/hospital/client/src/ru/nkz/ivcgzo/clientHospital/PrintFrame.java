@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import javax.swing.border.EtchedBorder;
 import java.awt.Color;
+import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 public class PrintFrame extends JDialog {
 
     private static final long serialVersionUID = -5679060070597306575L;
@@ -37,6 +39,7 @@ public class PrintFrame extends JDialog {
     private TPatient patient;
     private Component hgButtonsLeft;
     private Component hgButtonsRight;
+    private JPanel panel;
 
     public PrintFrame() {
         initialization();
@@ -59,49 +62,66 @@ public class PrintFrame extends JDialog {
     }
 
     private void setVerticalComponentsContaner() {
-        addHorizontalTextFields();
+        panel = new JPanel();
+        panel.setBorder(new LineBorder(new Color(0, 0, 0), 2));
+        getContentPane().add(panel);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        verticalStrut = Box.createVerticalStrut(10);
-        getContentPane().add(verticalStrut);
+        addHorizontalTextFields();
 
         addHorizontalButtons();
     }
 
     private void addHorizontalTextFields() {
         hbDateOptions = Box.createHorizontalBox();
+        panel.add(hbDateOptions);
         hbDateOptions.setBorder(new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
-        getContentPane().add(hbDateOptions);
 
         lblDateStart = new JLabel("  C  ");
         hbDateOptions.add(lblDateStart);
 
         cdeDateStart = new CustomDateEditor();
+        hbDateOptions.add(cdeDateStart);
         cdeDateStart.setAlignmentX(Component.LEFT_ALIGNMENT);
         cdeDateStart.setMaximumSize(new Dimension(300, 20));
-        hbDateOptions.add(cdeDateStart);
         cdeDateStart.setColumns(10);
 
         lblDateEnd = new JLabel("  По  ");
         hbDateOptions.add(lblDateEnd);
 
         cdeDateEnd = new CustomDateEditor();
+        hbDateOptions.add(cdeDateEnd);
         cdeDateEnd.setAlignmentX(Component.LEFT_ALIGNMENT);
         cdeDateEnd.setMaximumSize(new Dimension(300, 20));
-        hbDateOptions.add(cdeDateEnd);
         cdeDateEnd.setColumns(10);
     }
 
     private void addHorizontalButtons() {
+        verticalStrut = Box.createVerticalStrut(10);
+        verticalStrut.setPreferredSize(new Dimension(0, 5));
+        verticalStrut.setMinimumSize(new Dimension(0, 5));
+        verticalStrut.setMaximumSize(new Dimension(32767, 5));
+        panel.add(verticalStrut);
         hbButtons = Box.createHorizontalBox();
+        hbButtons.setMinimumSize(new Dimension(32000, 25));
+        hbButtons.setPreferredSize(new Dimension(32000, 25));
+        hbButtons.setMaximumSize(new Dimension(32000, 25));
+        panel.add(hbButtons);
         hbButtons.setBorder(new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
-        getContentPane().add(hbButtons);
+
+        hgButtonsLeft = Box.createHorizontalGlue();
+        hbButtons.add(hgButtonsLeft);
 
         addPrintButton();
         addCancelButton();
+
+        hgButtonsRight = Box.createHorizontalGlue();
+        hbButtons.add(hgButtonsRight);
     }
 
     private void addPrintButton() {
         btnPrint = new JButton("Распечатать");
+        hbButtons.add(btnPrint);
         btnPrint.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -128,14 +148,11 @@ public class PrintFrame extends JDialog {
                         PrintFrame.this, WindowEvent.WINDOW_CLOSING));
             }
         });
-
-        hgButtonsLeft = Box.createHorizontalGlue();
-        hbButtons.add(hgButtonsLeft);
-        hbButtons.add(btnPrint);
     }
 
     private void addCancelButton() {
         btnCancel = new JButton("Отмена");
+        hbButtons.add(btnCancel);
         btnCancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -143,10 +160,6 @@ public class PrintFrame extends JDialog {
                     PrintFrame.this, WindowEvent.WINDOW_CLOSING));
             }
         });
-        hbButtons.add(btnCancel);
-
-        hgButtonsRight = Box.createHorizontalGlue();
-        hbButtons.add(hgButtonsRight);
     }
 
     public final void setPatient(final TPatient inPatient) {

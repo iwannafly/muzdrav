@@ -122,6 +122,7 @@ public final class Assignments extends JPanel {
 	 */
 	private void updatePanel() {
 		this.clearAllTables();
+		this.clearAllTextFields();
 		if (this.patient != null) {
 			this.fillTableMedications();
 			this.fillTableDiagnostics();
@@ -143,12 +144,21 @@ public final class Assignments extends JPanel {
 	}
 	
 	/**
+	 * Очистка всех текстовых полей
+	 */
+	private void clearAllTextFields() {
+		this.taMedicationsInfo.setText(null);
+		this.taDiagnosticsResult.setText(null);
+	}
+	
+	/**
 	 * Заполнение таблицы лекарственных назначений данными из БД
 	 */
 	private void fillTableMedications() {
 		if ((this.patient != null) && (ClientHospital.tcl != null))
 			try {
 				this.lastMedItem = null;
+				this.taMedicationsInfo.setText(null);
 				this.tblMedications.setData(
 						ClientHospital.tcl.getMedications(
 								this.patient.getGospitalCod()));
@@ -166,6 +176,7 @@ public final class Assignments extends JPanel {
 		if ((this.patient != null) && (ClientHospital.tcl != null))
 			try {
 				this.lastDiagItem = null;
+				this.taDiagnosticsResult.setText(null);
 				this.tblDiagnostics.setData(
 						ClientHospital.tcl.getDiagnostics(
 								this.patient.getGospitalCod()));

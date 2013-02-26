@@ -104,7 +104,6 @@ public class PIslForm {
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBvopl;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBrez;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBCuser;
-	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBKod_ter;
 	private JTable table;
 	public JTabbedPane tabbedPane;
 	public JTextPane tPop_name;
@@ -472,10 +471,8 @@ public class PIslForm {
 				if (cBnapravl.getSelectedPcod() != null){
 					upnisl.setNapravl(cBnapravl.getSelectedPcod());
 				}
-
-				if (cBKod_ter.getSelectedPcod() != null){
-					upnisl.setKod_ter(cBKod_ter.getSelectedPcod());
-				}
+				
+				upnisl.setKod_ter(tn_ldi.getSelectedItem().kod_ter);
 				
 				if (tFnaprotd.getText() != null){	
 					upnisl.setNaprotd(Integer.parseInt(tFnaprotd.getText()));
@@ -526,11 +523,6 @@ public class PIslForm {
 				if (cBnapravl.getSelectedPcod() != null){
 					tn_ldi.getSelectedItem().setNapravl(cBnapravl.getSelectedPcod());
 				}
-				
-				if (cBKod_ter.getSelectedPcod() != null){
-					tn_ldi.getSelectedItem().setKod_ter(cBKod_ter.getSelectedPcod());
-				}
-				
 				
 				if (tFnaprotd.getText() != null){	
 					tn_ldi.getSelectedItem().setNaprotd(Integer.parseInt(tFnaprotd.getText()));
@@ -797,14 +789,6 @@ public class PIslForm {
 				}else{
 					cBnapravl.setSelectedPcod(2);
 				}
-				
-				if (tn_ldi.getSelectedItem().kod_ter !=0){
-					cBKod_ter.setSelectedPcod(tn_ldi.getSelectedItem().kod_ter);
-				}else{
-					cBKod_ter.setSelectedPcod(10);
-				}
-				
-					
 				//if (tn_ldi.getSelectedItem().naprotd != 0)
 				tFnaprotd.setText(String.valueOf(tn_ldi.getSelectedItem().naprotd));
 				
@@ -919,7 +903,6 @@ public class PIslForm {
 					tFdatap.setText(null);
 					tFdatav.setText(null);
 					cBprichina.setSelectedItem(0);
-					cBKod_ter.setSelectedItem(0); 
 					cBpopl.setSelectedItem(0);
 					cBvopl.setSelectedItem(0);
 					cBVrach.setSelectedItem(0);
@@ -1202,10 +1185,27 @@ public class PIslForm {
 							if (res != null)
 								tFnaprotd.setText(String.valueOf(res.pcod));
 						}else{
-								IntegerClassifier res = MainForm.conMan.showIntegerClassifierSelector(IntegerClassifiers.n_m00);
+								/*IntegerClassifier res = MainForm.conMan.showIntegerClassifierSelector(IntegerClassifiers.n_m00);
 								//IntegerClassifier res = MainForm.conMan.showIntegerClassifierSelector(MainForm.ltc.GetKlasNsipol(cBKod_ter.getSelectedPcod()));
 								if (res != null)
-									tFnaprotd.setText(String.valueOf(res.pcod));
+									tFnaprotd.setText(String.valueOf(res.pcod));*/
+							
+							
+		                	int[] res = null;
+		                	if (tFnaprotd.getText() != null )
+		                		res = MainForm.conMan.showPolpTreeForm("Классификатор подразделений ЛПУ", 0, 0, 0);
+		                	else
+		                		res = MainForm.conMan.showPolpTreeForm("Классификатор подразделений ЛПУ", 0, 0, 0);
+		                    if (res != null) {
+		                    	tFnaprotd.setText(Integer.toString(res[2]));
+		                    	//cBKod_ter.setSelectedPcod(res[0]);
+		                    	tn_ldi.getSelectedItem().setKod_ter(res[0]);
+		                    	
+		                    }
+							
+							
+							
+							
 						}
 						
 					}
@@ -1258,11 +1258,6 @@ public class PIslForm {
 			tFTalon = new CustomTextField();
 			tFTalon.setColumns(10);
 			
-			JLabel lblNewLabel_12 = new JLabel("Город");
-			lblNewLabel_12.setFont(new Font("Tahoma", Font.PLAIN, 12));
-			
-			cBKod_ter = new ThriftIntegerClassifierCombobox<>(true);
-			
 			GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 			gl_panel_1.setHorizontalGroup(
 				gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -1305,15 +1300,12 @@ public class PIslForm {
 								.addGap(10)
 								.addComponent(cBnapravl, GroupLayout.PREFERRED_SIZE, 217, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(lblNewLabel_12)
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(cBKod_ter, 0, 131, Short.MAX_VALUE)
-								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(lblNewLabel_7)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(tFnaprotd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(tFnaprotd, GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(btnnaprotd, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+								.addComponent(btnnaprotd, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+								.addGap(84))
 							.addGroup(gl_panel_1.createSequentialGroup()
 								.addContainerGap()
 								.addComponent(lblNewLabel_8)
@@ -1322,7 +1314,7 @@ public class PIslForm {
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(lblNewLabel_9, GroupLayout.PREFERRED_SIZE, 76, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(cBvopl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+								.addComponent(cBvopl, GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE))
 							.addGroup(gl_panel_1.createSequentialGroup()
 								.addContainerGap()
 								.addComponent(lblNewLabel_10)
@@ -1335,7 +1327,7 @@ public class PIslForm {
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(label_2)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(cBCuser, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+								.addComponent(cBCuser, 0, 241, Short.MAX_VALUE)))
 						.addGap(50))
 			);
 			gl_panel_1.setVerticalGroup(
@@ -1386,9 +1378,7 @@ public class PIslForm {
 									.addComponent(cBnapravl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 									.addComponent(lblNewLabel_7)
 									.addComponent(tFnaprotd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addComponent(btnnaprotd)
-									.addComponent(lblNewLabel_12)
-									.addComponent(cBKod_ter, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+									.addComponent(btnnaprotd))))
 						.addGap(8)
 						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
