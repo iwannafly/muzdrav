@@ -327,7 +327,7 @@ public class MedicationOptionsFrame extends JDialog {
                 if (!tfIntakePerDay.getText().isEmpty()) {
                     tmpLek.setPereod(Integer.valueOf(tfIntakePerDay.getText()));
                 }
-                tmpLek.setDatao(cdeDateTo.getDate().getTime());
+                tmpLek.setDatae(cdeDateTo.getDate().getTime());
                 tmpLek.setDatan(cdeDateFrom.getDate().getTime());
                 tmpLek.setDataz(System.currentTimeMillis());
                 try {

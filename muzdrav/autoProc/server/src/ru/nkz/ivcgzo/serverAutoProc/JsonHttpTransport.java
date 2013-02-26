@@ -18,7 +18,7 @@ public class JsonHttpTransport {
 		requestAuthentication();
 	}
 	
-	public String sendPostRequest(String addr, String text) throws MalformedURLException, IOException {
+	public synchronized String sendPostRequest(String addr, String text) throws MalformedURLException, IOException {
 		String response = "";
 		HttpURLConnection conn;
 		conn = (HttpURLConnection) new URL(addr).openConnection();

@@ -20,7 +20,9 @@ import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
 import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
+
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.serverManager.serverManager;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
@@ -60,6 +62,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.PokazNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Shablon;
+import ru.nkz.ivcgzo.thriftRegPatient.ShablonText;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
@@ -68,8 +71,6 @@ import ru.nkz.ivcgzo.thriftRegPatient.TerLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient.Iface;
 import ru.nkz.ivcgzo.thriftRegPatient.TipPodrNotFoundException;
-import ru.nkz.ivcgzo.thriftRegPatient.ShablonText;
-import ru.nkz.ivcgzo.thriftRegPatient.Shablon;
 
 /**
  * Класс, имплементирующий трифтовый интерфейс для связи с клиентом.
@@ -870,7 +871,12 @@ public class ServerRegPatient extends Server implements Iface {
                     patinfo.getPrizn(), patinfo.getTer_liv(), patinfo.getRegion_liv(), 
                     patinfo.getBirthplace(), patinfo.getOgrn_smo(), patinfo.getObraz(), patinfo.getStatus());
                 int id = sme.getGeneratedKeys().getInt("npasp");
-                sme.setCommit();
+                sme.commitTransaction();
+                try {
+					serverManager.instance.getServerById(18).executeServerMethod(1803, id);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
                 return id;
             } else {
                 throw new PatientAlreadyExistException();
@@ -1165,7 +1171,12 @@ public class ServerRegPatient extends Server implements Iface {
                 patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
                 patinfo.getProf(), patinfo.getTel(), avoidDefaultSqlDateValue(patinfo.getDsv()),patinfo.getPrizn(), patinfo.getTer_liv(),patinfo.getRegion_liv(), patinfo.getBirthplace(), patinfo.getOgrn_smo(), 
                 patinfo.getObraz(), patinfo.getStatus(), patinfo.getNpasp());
-            sme.setCommit();
+            sme.commitTransaction();
+            try {
+				serverManager.instance.getServerById(18).executeServerMethod(1803, patinfo.npasp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();

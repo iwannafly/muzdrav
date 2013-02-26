@@ -33,6 +33,8 @@ public class Model implements IModel {
     private TTalon currentTalon;
     private TTalon currentReservedTalon;
     private TPatient patient;
+    private boolean talonMode;
+    private boolean scheduleMode;
 
     @Override
     public final List<IntegerClassifier> getPoliclinics() {
@@ -86,19 +88,34 @@ public class Model implements IModel {
 
     @Override
     public final void setPoliclinics() throws TException {
-        policlinics = ClientInfomat.tcl.getPoliclinics();
+    	if (talonMode)
+    		policlinics = ClientInfomat.tcl.getPoliclinicsTalon();
+    	else if (scheduleMode)
+    		policlinics = ClientInfomat.tcl.getPoliclinicsSchedule();
+    	else
+    		throw new TException("Choose ether talon or shcedule mode.");
         firePoliclinicsChanged();
     }
 
     @Override
     public final void setSpecialities(final int cpol) throws TException {
-        specialities = ClientInfomat.tcl.getSpecialities(cpol);
+    	if (talonMode)
+            specialities = ClientInfomat.tcl.getSpecialitiesTalon(cpol);
+        else if (scheduleMode)
+            specialities = ClientInfomat.tcl.getSpecialitiesSchedule(cpol);
+        else
+            throw new TException("Choose ether talon or shcedule mode.");
         fireSpecialitiesChanged();
     }
 
     @Override
     public final void setDoctors(final int cpol, final String cdol) throws TException {
-        doctors = ClientInfomat.tcl.getDoctors(cpol, cdol);
+    	if (talonMode)
+            doctors = ClientInfomat.tcl.getDoctorsTalon(cpol, cdol);
+        else if (scheduleMode)
+            doctors = ClientInfomat.tcl.getDoctorsSchedule(cpol, cdol);
+        else
+            throw new TException("Choose ether talon or shcedule mode.");
         fireDoctorsChanged();
     }
 
@@ -247,6 +264,16 @@ public class Model implements IModel {
     @Override
     public final void removeInfomatObserver(final IInfomatObserver obs) {
         infomatObservers.remove(obs);
+    }
+
+    public void setTalonMode() {
+    	talonMode = true;
+    	scheduleMode = false;
+    }
+
+    public void setScheduleMode() {
+    	scheduleMode = true;
+    	talonMode = false;
     }
 
     private void fireCurrentPoliclinicChanged() {

@@ -5,11 +5,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Properties;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
@@ -20,16 +16,18 @@ import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 
 public class ServerAutoProc extends Server {
-	private static final boolean DEBUG = Boolean.valueOf(System.getProperty("isDebug", "true"));
-	private static final String vr42erWorkAddr = "http://www.vrach42.ru/Services/er/mis";
-	private static final String vr42erTestAddr = "http://www.vrach42.ru/DemoServices/er/mis";
+	public static final boolean DEBUG = Boolean.valueOf(System.getProperty("isDebug", "true"));
 	private Properties prop;
 	private final JsonHttpTransport jtr;
+	PatientInfoUpdater piUpd;
+	TicketInfoUpdater tiUpd;
 	
 	public ServerAutoProc(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		
 		jtr = new JsonHttpTransport();
+		piUpd = new PatientInfoUpdater(jtr, sse, tse);
+		tiUpd = new TicketInfoUpdater(jtr, sse, tse);
 		
 		if (DEBUG)
 			System.out.println("ServerAutoProc DEBUG is set!!!");
@@ -55,6 +53,11 @@ public class ServerAutoProc extends Server {
 		prop = new Properties();
 		prop.put("charSet","Cp866");
 		Class.forName("com.hxtt.sql.dbf.DBFDriver");
+		
+		if (!ServerAutoProc.DEBUG) {
+			piUpd.start();
+			tiUpd.start();
+		}
 	}
 
 	@Override
@@ -76,6 +79,10 @@ public class ServerAutoProc extends Server {
 				methodName = "remReceptionTicketFromVr42";
 				remReceptionTicketFromVr42((int) params[0]);
 				break;
+			case 1803:
+				methodName = "addPatientInfoToVr42";
+				piUpd.sendPatientInfoToVr42((int) params[0]);
+				break;
 			default:
 				throw new Exception();
 			}
@@ -90,55 +97,13 @@ public class ServerAutoProc extends Server {
 	}
 	
 	
-	private void scheduleOperation(int addrType, String text) throws Exception {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("INSERT INTO scheduled (type, text) VALUES (?, ?)", false, addrType, text);
-			sme.setCommit();
-		}
-	}
-	
 	public void addReceptionTicketToVr42(int etalonId) throws Exception {
-		sendReceptionTicketToVr42(etalonId, 1);
+		tiUpd.sendReceptionTicketToVr42(etalonId, 1);
 	}
 	
 	public void remReceptionTicketFromVr42(int etalonId) throws Exception {
-		sendReceptionTicketToVr42(etalonId, 2);
+		tiUpd.sendReceptionTicketToVr42(etalonId, 2);
 	}
-	
-	private void sendReceptionTicketToVr42(int etalonId, int operId) throws Exception {
-		if (DEBUG)
-			return;
-		
-		String text;
-		
-		try {
-			text = new JsonTicketInfo(sse, etalonId, operId).toString();
-		} catch (JSONException e) {
-			e.printStackTrace();
-			throw new Exception("Can't make json for add reception ticket.", e);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new Exception("Can't query db to make json for add reception ticket.", e);
-		}
-		
-		try {
-			JSONObject resp = new JSONObject(jtr.sendPostRequest((DEBUG) ? vr42erTestAddr : vr42erWorkAddr, text));
-			if (!resp.getBoolean("IsSuccessful"))
-				throw new JSONException(String.format("Responce from server: %s", resp.getString("Error")));
-		} catch (JSONException e) {
-			throw new Exception("Malformed json.", e);
-		} catch (Exception e) {
-			e.printStackTrace();
-			try {
-				scheduleOperation(1, text);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-				throw new Exception("Can't schedule operation for add reception ticket.", e);
-			}
-		}
-		
-	}
-	
 	
 	
 	public String getPL(String pl) {

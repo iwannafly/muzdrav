@@ -297,7 +297,7 @@ public class UserPanel extends JPanel {
 		tblVrach.setIntegerClassifierSelector(3, MainForm.conMan.getIntegerClassifier(IntegerClassifiers.n_z30));
 		tblVrach.setStringClassifierSelector(5, MainForm.tcl.get_n_z00());
 		
-		tblMrab.setIntegerClassifierSelector(0, MainForm.tcl.get_n_p0s13());
+		tblMrab.setIntegerClassifierSelector(0, MainForm.tcl.get_n_p0s15());
 		new TableVidSluComboBoxEditorRenderer(tblMrab, 0, 1);
 		tblMrab.setIntegerClassifierSelector(4, MainForm.conMan.getIntegerClassifier(IntegerClassifiers.n_priznd));
 		tblMrab.setStringClassifierSelector(2, MainForm.conMan.getStringClassifier(StringClassifiers.n_s00));
@@ -314,7 +314,7 @@ public class UserPanel extends JPanel {
 	
 	class TableVidSluComboBoxEditorRenderer extends AbstractCellEditor implements TableCellEditor, TableCellRenderer {
 		private static final long serialVersionUID = -5851458127435781104L;
-		private static final int sluCount = 4;
+		private static final int sluCount = 6;
 		private int sluColIdx;
 		private int colIdx;
 		private CustomTable<MestoRab, MestoRab._Fields> table;
@@ -332,6 +332,8 @@ public class UserPanel extends JPanel {
 			cmbs[1] = new TableComboBoxIntegerEditor(null, true, MainForm.tcl.get_n_o00(MainForm.authInfo.clpu));
 			cmbs[2] = new TableComboBoxIntegerEditor(null, true, MainForm.tcl.get_n_n00(MainForm.authInfo.clpu));
 			cmbs[3] = new TableComboBoxIntegerEditor(null, true, MainForm.tcl.get_n_lds(MainForm.authInfo.clpu));
+			cmbs[4] = new TableComboBoxIntegerEditor(IntegerClassifiers.n_t40, true, null);
+			cmbs[5] = new TableComboBoxIntegerEditor(IntegerClassifiers.n_t40, true, null);
 			
 			resetColumnModel();
 		}
