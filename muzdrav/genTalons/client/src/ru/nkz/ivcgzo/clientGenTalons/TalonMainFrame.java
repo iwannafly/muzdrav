@@ -1596,9 +1596,10 @@ public class TalonMainFrame extends JFrame {
 						RaspisanieUnit.CreateTalons(pBar, MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
 						setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						JOptionPane.showMessageDialog(null, "Формирование талонов завершено.", null, JOptionPane.INFORMATION_MESSAGE); 
-				        nday = Integer.valueOf(sp_day.getValue().toString());
-		                nmonth = cmb_month.getSelectedIndex()+1;
-		                nyear = Integer.valueOf(sp_god.getValue().toString());
+						ChangeTalonInfo();
+//				        nday = Integer.valueOf(sp_day.getValue().toString());
+//		                nmonth = cmb_month.getSelectedIndex()+1;
+//		                nyear = Integer.valueOf(sp_god.getValue().toString());
 // 					    if (nmonth != 0 && nday != 0 && nyear != 0){
 //			                ChangeDatap();
 //						}

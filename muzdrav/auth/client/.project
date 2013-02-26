@@ -35,5 +35,30 @@
 			<type>2</type>
 			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/auth/thrift/gen-java</locationURI>
 		</link>
+		<link>
+  			<name>src/ru/nkz/ivcgzo/clientAuth/resources/icon_1_16x16.png</name>
+  			<type>1</type>
+  			<locationURI>WORKSPACE_LOC/gitrep/common/resources/icon_1_16x16.png</locationURI>
+  		</link>
+  		<link>
+  			<name>src/ru/nkz/ivcgzo/clientAuth/resources/icon_2_32x32.png</name>
+  			<type>1</type>
+  			<locationURI>WORKSPACE_LOC/gitrep/common/resources/icon_2_32x32.png</locationURI>
+  		</link>
+  		<link>
+  			<name>src/ru/nkz/ivcgzo/clientAuth/resources/icon_3_64x64.png</name>
+  			<type>1</type>
+  			<locationURI>WORKSPACE_LOC/gitrep/common/resources/icon_3_64x64.png</locationURI>
+  		</link>
+  		<link>
+  			<name>src/ru/nkz/ivcgzo/clientAuth/resources/icon_4_128x128.png</name>
+  			<type>1</type>
+  			<locationURI>WORKSPACE_LOC/gitrep/common/resources/icon_4_128x128.png</locationURI>
+  		</link>
+  		<link>
+  			<name>src/ru/nkz/ivcgzo/clientAuth/resources/kmiacLogo_small.png</name>
+  			<type>1</type>
+  			<locationURI>WORKSPACE_LOC/gitrep/common/resources/kmiacLogo_small.png</locationURI>
+  		</link>
 	</linkedResources>
 </projectDescription>
