@@ -84,6 +84,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.Cgosp;
@@ -2982,6 +2983,7 @@ public class Vvod extends JFrame {
 				tbZakl.setText(pvizit.getZakl());
 				tbZaklRek.setText(pvizit.getRecomend());
 				tbLech.setText(pvizit.getLech());
+				treeRezIssl.setModel(new DefaultTreeModel(createNodes()));
 				
 				pvizitAmbCopy = new PvizitAmb(pvizitAmb);
 				priemCopy = new Priem(priem);
@@ -3004,7 +3006,7 @@ public class Vvod extends JFrame {
 		root.add(issinfo);
 		
 		try {
-			{	for (P_isl_ld issl : MainForm.tcl.getIsslInfoDate(Vvod.zapVr.id_pvizit))
+			{	for (P_isl_ld issl : MainForm.tcl.getIsslInfoDate(tblPos.getSelectedItem().id))
 					issinfo.add(new IsslInfoTreeNode(issl));
 			}
 			
@@ -3464,7 +3466,7 @@ public class Vvod extends JFrame {
 		  		}
 		  		diagamb.setDiag_stat(1);
 				diagamb.setDiag(diag_pcod);
-				diagamb.setNamed(MainForm.tcl.get_n_mkb(diag_pcod));
+				diagamb.setNamed(MainForm.conMan.getNameFromPcodString(StringClassifiers.n_c00, diag_pcod));
 				diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
 	 			tblDiag.addItem(diagamb);
   			}

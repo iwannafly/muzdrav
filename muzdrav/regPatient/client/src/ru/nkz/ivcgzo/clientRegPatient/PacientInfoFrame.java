@@ -472,7 +472,8 @@ public class PacientInfoFrame extends JFrame {
                 if (tbMain.getSelectedIndex() == 6) {
                     if (curPatientId != 0 && tbl_priem.getSelectedItem() != null){
                 		curGospId = tbl_priem.getSelectedItem().id;
-            			MainForm.conMan.showLabRecordForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId);
+                		tbMain.setSelectedIndex(5);
+                		MainForm.conMan.showLabRecordForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId);
                 	}else
                 		JOptionPane.showMessageDialog(tbl_priem, "Выберите обращения пациента.");
                 	}
@@ -3087,10 +3088,10 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
         		.addComponent(scrollPane_3, GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
         );
 
-        tbl_priem = new CustomTable<>(true, false, AllGosp.class, 3,"N ист. бол.",4,"Дата",5,"Отделение",6,"Диагноз", 7, "Наименование");
+        tbl_priem = new CustomTable<>(true, false, AllGosp.class, 3,"N ист. бол.",4,"Дата",5,"Отделение",6,"Диагноз", 7, "Наименование", 0, "Id");
         tbl_priem.setFont(new Font("Tahoma", Font.PLAIN, 12));
         tbl_priem.setDateField(1);
-        tbl_priem.setPreferredWidths(70,70,65,60,500);
+        tbl_priem.setPreferredWidths(70,70,65,60,500,50);
         tbl_priem.setFillsViewportHeight(true);
         tbl_priem.setShowVerticalLines(true);
         tbl_priem.setShowHorizontalLines(true);
