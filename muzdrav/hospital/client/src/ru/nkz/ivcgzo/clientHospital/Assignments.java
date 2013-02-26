@@ -68,7 +68,7 @@ public final class Assignments extends JPanel {
     private TMedication lastMedItem;
     private TDiagnostic lastDiagItem;
     private JButton btnAddMedication, btnSaveMedication, btnDelMedication;
-    private JButton btnAddDiagnostic, btnDelDiagnostic;
+    private JButton btnAddDiagnostic;
     private JButton btnAddDiet, btnDelDiet;
     private JButton btnAddProcedure, btnDelProcedure;
 
@@ -494,8 +494,10 @@ public final class Assignments extends JPanel {
 		this.vbDiagnosticsTbl.add(this.spDiagnosticsTbl);
 		this.tblDiagnostics = new CustomTable<TDiagnostic, TDiagnostic._Fields>(
 				false, false, TDiagnostic.class, 1, "Код исследования",
-				2, "Наименование исследования", 3, "Результат", 4, "Дата выполнения");
+				2, "Наименование исследования", 3, "Результат",
+				4, "Дата назначения", 5, "Дата выполнения");
 		this.tblDiagnostics.setDateField(3);
+		this.tblDiagnostics.setDateField(4);
 		this.spDiagnosticsTbl.setViewportView(this.tblDiagnostics);
 	}
 	
@@ -503,7 +505,10 @@ public final class Assignments extends JPanel {
 		this.spDiet = new JScrollPane();
 		this.vbDietTbl.add(this.spDiet);
 		this.tblDiet = new CustomTable<TDiet, TDiet._Fields>(
-				false, false, TDiet.class);
+				false, false, TDiet.class, 0, "Тип",
+				1, "№", 2, "Дата назначения", 3, "Дата отмены");
+		this.tblDiagnostics.setDateField(2);
+		this.tblDiagnostics.setDateField(3);
 		this.spDiet.setViewportView(this.tblDiet);
 	}
 	
@@ -511,7 +516,11 @@ public final class Assignments extends JPanel {
 		this.spProcedures = new JScrollPane();
 		this.vbProceduresTbl.add(this.spProcedures);
 		this.tblProcedures = new CustomTable<TProcedures, TProcedures._Fields>(
-				false, false, TProcedures.class);
+				false, false, TProcedures.class,
+				0, "Наименование процедуры", 1, "Дата начала", 
+				2, "Дата окончания", 3, "Кол-во проведённых процедур");
+		this.tblDiagnostics.setDateField(1);
+		this.tblDiagnostics.setDateField(2);
 		this.spProcedures.setViewportView(this.tblProcedures);
 	}
 	
@@ -554,15 +563,6 @@ public final class Assignments extends JPanel {
 		this.btnAddDiagnostic.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
             	btnAddDiagnosticClick();
-            }
-        });
-
-		this.btnDelDiagnostic = new JButton();
-		this.setCustomButton(this.vbDiagnosticsBtn, this.btnDelDiagnostic,
-				this.defaultDimension, this.delIcon, "Удалить исследование");
-		this.btnDelDiagnostic.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-            	//TODO
             }
         });
 	}

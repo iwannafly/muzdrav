@@ -159,7 +159,7 @@ public class ServerHospital extends Server implements Iface {
         "ed_name", "sposv_name", "vrach_name", "vracho_name"
     };    
     private static final String[] DIAGNOSTIC_FIELD_NAMES = {
-        "nisl", "cpok", "cpok_name", "result", "datav", "op_name", "rez_name"
+        "nisl", "cpok", "cpok_name", "result", "datan", "datav", "op_name", "rez_name"
     };
     
     private static final Class<?>[] RdIshodtipes = new Class<?>[] {
@@ -2720,14 +2720,14 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 	public List<TDiagnostic> getDiagnostics(int idGosp) throws KmiacServerException {
         String sqlQuery = 
 		"SELECT DISTINCT p_isl_ld.nisl, n_ldi.pcod AS cpok, n_ldi.name_n AS cpok_name, " +
-				"p_rez_l.zpok AS result, p_isl_ld.datav, '' AS op_name, '' AS rez_name " +
+			"p_rez_l.zpok AS result, p_isl_ld.datan, p_isl_ld.datav, '' AS op_name, '' AS rez_name " +
 		"FROM p_isl_ld " +
 		"JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) " +
 		"JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " +
 		"WHERE (p_isl_ld.id_gosp = ?) " +
 		"UNION " +
 		"SELECT DISTINCT p_isl_ld.nisl, n_ldi.pcod AS cpok, n_ldi.name_n AS cpok_name, " +
-			"n_arez.name AS result, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name " +
+			"n_arez.name AS result, p_isl_ld.datan, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name " +
 		"FROM p_isl_ld " +
 		"JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) " +
 		"JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) " +
