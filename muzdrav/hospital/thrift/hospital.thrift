@@ -347,6 +347,10 @@ struct TMedication {
 	15: optional i64 datao;
 	16: optional i32 vracho;
 	17: optional i64 dataz;
+	18: optional string ed_name;
+	19: optional string sposv_name;
+	20: optional string vrach_name;
+	21: optional string vracho_name;
 }
 
 struct TDiagnostic {
