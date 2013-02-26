@@ -36,6 +36,7 @@ public class tableVrach extends JPanel {
 	private int codPodr = 0;
 	private int pcod = 0;
 	private int id = 0;
+	private String cdol = null;
 
 public tableVrach(){
 	addComponentListener(new ComponentAdapter() {
@@ -57,7 +58,8 @@ public void initialize() {
 		public void mouseClicked(MouseEvent arg0) {
 		    try {
 		    	pcod = tableVrachInfo.getSelectedItem().pcod;
-		    	tableVrachTabel.setData(MainForm.tcl.getVrachTabel(pcod));
+		    	cdol = tableVrachInfo.getSelectedItem().cdol;
+		    	tableVrachTabel.setData(MainForm.tcl.getVrachTabel(pcod, cdol));
 		    }  catch (VTException e) {
 		    	JOptionPane.showMessageDialog(tableVrach.this, "tableVrach error", "error", JOptionPane.ERROR_MESSAGE);
 		    } catch (KmiacServerException e) {
