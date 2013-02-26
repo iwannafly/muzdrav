@@ -1,10 +1,10 @@
 package ru.nkz.ivcgzo.clientGenTalons;
 
 import java.awt.Cursor;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+//import java.util.Date;
+//import java.text.ParseException;
+//import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Calendar;
 import java.util.List;
 import javax.swing.JFrame;
@@ -51,11 +51,11 @@ import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
 import ru.nkz.ivcgzo.thriftGenTalon.NraspNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
-import ru.nkz.ivcgzo.thriftGenTalon.TalonNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.VidpNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
 import ru.nkz.ivcgzo.clientGenTalons.SvodkiUnit;
+import ru.nkz.ivcgzo.thriftGenTalon.TalonNotFoundException;
 
 import javax.swing.JProgressBar;
 import javax.swing.JComboBox;
@@ -63,18 +63,25 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.apache.thrift.TException;
+import com.toedter.calendar.JCalendar;
+
 import javax.swing.DefaultComboBoxModel;
 import java.awt.Font;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
+import javax.swing.SwingConstants;
 
 public class TalonMainFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	private static JCalendar calendar;
+//	private static boolean dateSelected;
+//	private long getDatep = 0;
 	private JPanel contentPane;
 	private JTree treevrach;
 	private String curSpec = null;
 	private int curVrach = 0;
 	private int ind = 0;
-	private long getDatep = 0;
 	private final ButtonGroup btnGroup_cxema = new ButtonGroup();
 	private final ButtonGroup btnGroup_talon = new ButtonGroup();
 	private JRadioButton cxm_1;
@@ -94,22 +101,11 @@ public class TalonMainFrame extends JFrame {
 	private List<Norm> NormInfo;
 	private List<Ndv> NdvInfo;
 	private List<Talon> TalonInfo;
-	private CustomTable<Nrasp, Nrasp._Fields> tbl_rasp;
 	private CustomTable<Norm, Norm._Fields> tbl_norm;
 	private CustomTable<Ndv, Ndv._Fields> tbl_ndv;
 	private CustomTable<Talon, Talon._Fields> tbl_talon;
 	private CustomDateEditor tf_datn;
 	private CustomDateEditor tf_datk;
-	private CustomTimeEditor tf_day1_p1;
-	private CustomTimeEditor tf_day1_p2;
-	private CustomTimeEditor tf_day2_p1;
-	private CustomTimeEditor tf_day2_p2;
-	private CustomTimeEditor tf_day3_p1;
-	private CustomTimeEditor tf_day3_p2;
-	private CustomTimeEditor tf_day4_p1;
-	private CustomTimeEditor tf_day4_p2;
-	private CustomTimeEditor tf_day5_p1;
-	private CustomTimeEditor tf_day5_p2;
 	private CustomDateEditor tf_sv1;
 	private CustomDateEditor tf_sv2;
 	private JComboBox<String> cmb_sv;
@@ -119,6 +115,58 @@ public class TalonMainFrame extends JFrame {
 	private int nmonth = 0;
 	private int nyear = 0;
 	private int nday = 0;
+	private CustomTimeEditor tf_day1_pp1;
+	private CustomTimeEditor tf_day1_pp2;
+	private CustomTimeEditor tf_day1_int1;
+	private CustomTimeEditor tf_day1_pd1;
+	private CustomTimeEditor tf_day1_pause1;
+	private CustomTimeEditor tf_day1_pd2;
+	private CustomTimeEditor tf_day1_int2;
+	private CustomTimeEditor tf_day1_pause2;
+	private CustomTimeEditor tf_day1_pv1;
+	private CustomTimeEditor tf_day1_pv2;
+	private CustomTimeEditor tf_day2_pp1;
+	private CustomTimeEditor tf_day2_pp2;
+	private CustomTimeEditor tf_day2_pv2;
+	private CustomTimeEditor tf_day2_pd2;
+	private CustomTimeEditor tf_day2_int2;
+	private CustomTimeEditor tf_day2_pv1;
+	private CustomTimeEditor tf_day2_pd1;
+	private CustomTimeEditor tf_day2_int1;
+	private CustomTimeEditor tf_day2_pause1;
+	private CustomTimeEditor tf_day2_pause2;
+	private CustomTimeEditor tf_day3_pp1;
+	private CustomTimeEditor tf_day3_pp2;
+	private CustomTimeEditor tf_day3_pv1;
+	private CustomTimeEditor tf_day3_pv2;
+	private CustomTimeEditor tf_day3_pd1;
+	private CustomTimeEditor tf_day3_pd2;
+	private CustomTimeEditor tf_day3_int1;
+	private CustomTimeEditor tf_day3_int2;
+	private CustomTimeEditor tf_day3_pause1;
+	private CustomTimeEditor tf_day3_pause2;
+	private CustomTimeEditor tf_day4_int1;
+	private CustomTimeEditor tf_day4_int2;
+	private CustomTimeEditor tf_day4_pause1;
+	private CustomTimeEditor tf_day4_pause2;
+	private CustomTimeEditor tf_day4_pp1;
+	private CustomTimeEditor tf_day4_pp2;
+	private CustomTimeEditor tf_day4_pv1;
+	private CustomTimeEditor tf_day4_pv2;
+	private CustomTimeEditor tf_day4_pd1;
+	private CustomTimeEditor tf_day4_pd2;
+	private CustomTimeEditor tf_day5_int1;
+	private CustomTimeEditor tf_day5_int2;
+	private CustomTimeEditor tf_day5_pause1;
+	private CustomTimeEditor tf_day5_pause2;
+	private CustomTimeEditor tf_day5_pp1;
+	private CustomTimeEditor tf_day5_pp2;
+	private CustomTimeEditor tf_day5_pv1;
+	private CustomTimeEditor tf_day5_pv2;
+	private CustomTimeEditor tf_day5_pd1;
+	private CustomTimeEditor tf_day5_pd2;
+	private JPanel panel_13;
+	private JPanel panel_14;
 
 	/**
 	 * Launch the application.
@@ -142,7 +190,7 @@ public class TalonMainFrame extends JFrame {
 	public TalonMainFrame() {
 		setTitle("Электронная регистратура");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(1, 1, 1114, 690); //(x,y,width,height)
+		setBounds(1, 1, 1036, 708); //(x,y,width,height)
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -157,9 +205,8 @@ public class TalonMainFrame extends JFrame {
 					ChangeNormInfo();
 				}
 				if (tbMain.getSelectedIndex() == 2) {
-					ChangeDatap();
+//					ChangeDatap();
 					ChangeTalonInfo();
-//					tal_1.setSelected(true);
 				}
 			}
 		});
@@ -169,13 +216,14 @@ public class TalonMainFrame extends JFrame {
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 245, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tbMain, GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE))
+					.addComponent(tbMain, GroupLayout.PREFERRED_SIZE, 756, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(85, Short.MAX_VALUE))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 646, Short.MAX_VALUE)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addContainerGap()
+					.addGap(11)
 					.addComponent(tbMain, GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE))
 		);
 		
@@ -187,283 +235,11 @@ public class TalonMainFrame extends JFrame {
 		
 		JPanel panel_2 = new JPanel();
 		
+		panel_13 = new JPanel();
+		panel_13.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0420\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043F\u0440\u0438\u0435\u043C\u0430:", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
 		JPanel panel_4 = new JPanel();
 		panel_4.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u041E\u0442\u043C\u0435\u043D\u0430 \u0444\u043E\u0440\u043C\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F \u0442\u0430\u043B\u043E\u043D\u043E\u0432", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
-		JPanel panel_6 = new JPanel();
-		panel_6.setBorder(new TitledBorder(null, "\u0420\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043F\u0440\u0438\u0435\u043C\u0430", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
-		JPanel panel_8 = new JPanel();
-		panel_8.setBorder(new TitledBorder(null, "\u041F\u0435\u0440\u0435\u0440\u044B\u0432", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		GroupLayout gl_tbRasp = new GroupLayout(tbRasp);
-		gl_tbRasp.setHorizontalGroup(
-			gl_tbRasp.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_tbRasp.createSequentialGroup()
-					.addGap(23)
-					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
-						.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 369, Short.MAX_VALUE)
-						.addComponent(panel_1, 0, 0, Short.MAX_VALUE))
-					.addGap(54)
-					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_8, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE))
-					.addGap(160))
-		);
-		gl_tbRasp.setVerticalGroup(
-			gl_tbRasp.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_tbRasp.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_tbRasp.createSequentialGroup()
-							.addComponent(panel_8, GroupLayout.PREFERRED_SIZE, 192, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
-						.addGroup(gl_tbRasp.createSequentialGroup()
-							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(panel_6, GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)))
-					.addContainerGap())
-		);
-		
-		JLabel lblNewLabel_7 = new JLabel("Время");
-		lblNewLabel_7.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		JLabel lblNewLabel_2 = new JLabel("Понедельник");
-		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		JLabel lblNewLabel_3 = new JLabel("Вторник");
-		lblNewLabel_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		JLabel lblNewLabel_4 = new JLabel("Среда");
-		lblNewLabel_4.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		JLabel lblNewLabel_5 = new JLabel("Четверг");
-		lblNewLabel_5.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		JLabel lblNewLabel_6 = new JLabel("Пятница");
-		lblNewLabel_6.setFont(new Font("Tahoma", Font.PLAIN, 12));
-
-		tf_day1_p1 = new CustomTimeEditor();
-		tf_day1_p1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		tf_day1_p2 = new CustomTimeEditor();
-		tf_day1_p2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		tf_day2_p1 = new CustomTimeEditor();
-		tf_day2_p1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		tf_day2_p2 = new CustomTimeEditor();
-		tf_day2_p2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		tf_day3_p1 = new CustomTimeEditor();
-		tf_day3_p1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		tf_day3_p2 = new CustomTimeEditor();
-		tf_day3_p2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		tf_day4_p1 = new CustomTimeEditor();
-		tf_day4_p1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		tf_day4_p2 = new CustomTimeEditor();
-		tf_day4_p2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		tf_day5_p1 = new CustomTimeEditor();
-		tf_day5_p1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		tf_day5_p2 = new CustomTimeEditor();
-		tf_day5_p2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		
-		JButton btnNewButton_1 = new JButton("Сохранить");
-		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try{
-					if (tbl_rasp.getSelectedItem() != null){
-						for (int i=0; i <= NraspInfo.size()-1; i++){
-							if (NraspInfo.get(i).getDenn() == 1){
-								NraspInfo.get(i).setTimep_n(tf_day1_p1.getTime().getTime());
-								NraspInfo.get(i).setTimep_k(tf_day1_p2.getTime().getTime());
-							}
-							if (NraspInfo.get(i).getDenn() == 2){
-								NraspInfo.get(i).setTimep_n(tf_day2_p1.getTime().getTime());
-								NraspInfo.get(i).setTimep_k(tf_day2_p2.getTime().getTime());
-							}
-							if (NraspInfo.get(i).getDenn() == 3){
-								NraspInfo.get(i).setTimep_n(tf_day3_p1.getTime().getTime());
-								NraspInfo.get(i).setTimep_k(tf_day3_p2.getTime().getTime());
-							}
-							if (NraspInfo.get(i).getDenn() == 4){
-								NraspInfo.get(i).setTimep_n(tf_day4_p1.getTime().getTime());
-								NraspInfo.get(i).setTimep_k(tf_day4_p2.getTime().getTime());
-							}
-							if (NraspInfo.get(i).getDenn() == 5){
-								NraspInfo.get(i).setTimep_n(tf_day5_p1.getTime().getTime());
-								NraspInfo.get(i).setTimep_k(tf_day5_p2.getTime().getTime());
-							}
-						}
-						
-						tbl_rasp.setData(NraspInfo);
-						MainForm.tcl.updateNrasp(tbl_rasp.getData());
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		btnNewButton_1.setToolTipText("Сохранить перерыв");
-		GroupLayout gl_panel_8 = new GroupLayout(panel_8);
-		gl_panel_8.setHorizontalGroup(
-			gl_panel_8.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_8.createSequentialGroup()
-					.addComponent(btnNewButton_1)
-					.addGap(26)
-					.addComponent(lblNewLabel_7, GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
-					.addGap(56))
-				.addGroup(gl_panel_8.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel_8.createParallelGroup(Alignment.LEADING, false)
-						.addGroup(gl_panel_8.createSequentialGroup()
-							.addGroup(gl_panel_8.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblNewLabel_2)
-								.addComponent(lblNewLabel_5)
-								.addComponent(lblNewLabel_6))
-							.addGap(10)
-							.addGroup(gl_panel_8.createParallelGroup(Alignment.TRAILING, false)
-								.addComponent(tf_day5_p1)
-								.addComponent(tf_day2_p1, Alignment.LEADING)
-								.addComponent(tf_day1_p1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
-								.addComponent(tf_day3_p1)
-								.addComponent(tf_day4_p1, Alignment.LEADING)))
-						.addComponent(lblNewLabel_3)
-						.addComponent(lblNewLabel_4))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_8.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(tf_day5_p2)
-						.addComponent(tf_day4_p2)
-						.addComponent(tf_day3_p2)
-						.addComponent(tf_day2_p2)
-						.addComponent(tf_day1_p2, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE))
-					.addGap(33))
-		);
-		gl_panel_8.setVerticalGroup(
-			gl_panel_8.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_8.createSequentialGroup()
-					.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel_7)
-						.addComponent(btnNewButton_1))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
-						.addComponent(tf_day1_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblNewLabel_2)
-						.addComponent(tf_day1_p2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel_3)
-						.addComponent(tf_day2_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tf_day2_p2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGroup(gl_panel_8.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_8.createSequentialGroup()
-							.addGap(12)
-							.addComponent(lblNewLabel_4))
-						.addGroup(gl_panel_8.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
-								.addComponent(tf_day3_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(tf_day3_p2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_panel_8.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_8.createSequentialGroup()
-							.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
-								.addComponent(tf_day4_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(tf_day4_p2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
-								.addComponent(tf_day5_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(tf_day5_p2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-						.addGroup(gl_panel_8.createSequentialGroup()
-							.addGap(7)
-							.addComponent(lblNewLabel_5)
-							.addGap(18)
-							.addComponent(lblNewLabel_6)))
-					.addGap(36))
-		);
-		panel_8.setLayout(gl_panel_8);
-		
-		JScrollPane sp_rasp = new JScrollPane();
-		
-		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По");
-		tbl_rasp.setFont(new Font("Tahoma", Font.PLAIN, 12));
-//		tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.get_intClass());
-		tbl_rasp.setPreferredWidths(130,100,60,60);
-		tbl_rasp.setEditableFields(false, 0,1);
-		tbl_rasp.setTimeField(2);
-		tbl_rasp.setTimeField(3);
-		tbl_rasp.setColumnSelectionAllowed(true);
-        tbl_rasp.setRowSelectionAllowed(true);
-		tbl_rasp.setFillsViewportHeight(true);
-		sp_rasp.setViewportView(tbl_rasp);
-
-        //изменить
-        tbl_rasp.registerUpdateSelectedRowListener(new CustomTableItemChangeEventListener<Nrasp>() {
-            @Override
-            public boolean doAction(CustomTableItemChangeEvent<Nrasp> event) {
-                try {
-					if (tbl_rasp.getSelectedItem() != null)
-						MainForm.tcl.updateNrasp(tbl_rasp.getData());
-                } catch (KmiacServerException e) {
-                    e.printStackTrace();
-                    return false;
-                } catch (TException e) {
-                    e.printStackTrace();
-                    return false;
-                }
-                return true;
-            }
-        });
-		
-		JButton btn_save = new JButton("Сохранить");
-		btn_save.setToolTipText("Сохранить расписание");
-		btn_save.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try{
-                    tbl_rasp.updateSelectedItem();
-					if (tbl_rasp.getSelectedItem() != null)
-						MainForm.tcl.updateNrasp(tbl_rasp.getData());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		
-		JButton btn_del = new JButton("Удалить");
-		btn_del.setToolTipText("Удалить расписание");
-		btn_del.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try{
-					//if (tbl_rasp.getData() != null){
-						MainForm.tcl.deleteNrasp(MainForm.authInfo.cpodr, curVrach, curSpec);
-					//}
-					tbl_rasp.setData(new ArrayList<Nrasp>());
-					ClearOtmetka();
-					ClearTimePause();
-				} catch (KmiacServerException kse){
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-		GroupLayout gl_panel_6 = new GroupLayout(panel_6);
-		gl_panel_6.setHorizontalGroup(
-			gl_panel_6.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_6.createSequentialGroup()
-					.addGroup(gl_panel_6.createParallelGroup(Alignment.LEADING)
-						.addComponent(sp_rasp, GroupLayout.PREFERRED_SIZE, 352, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_panel_6.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(btn_save)
-							.addGap(31)
-							.addComponent(btn_del)))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		);
-		gl_panel_6.setVerticalGroup(
-			gl_panel_6.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panel_6.createSequentialGroup()
-					.addGap(5)
-					.addComponent(sp_rasp, GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
-					.addGap(17)
-					.addGroup(gl_panel_6.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btn_save)
-						.addComponent(btn_del)))
-		);
-		panel_6.setLayout(gl_panel_6);
 		
 		JScrollPane sp_ndv = new JScrollPane();
 		
@@ -490,245 +266,951 @@ public class TalonMainFrame extends JFrame {
 			}
 		});
 		btn_ndv_add.setToolTipText("добавить");
-
-		JButton btn_ndv_del = new JButton("-");
-		btn_ndv_del.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				tbl_ndv.requestFocus();
-				tbl_ndv.deleteSelectedRow();
-			}
-		});
-		btn_ndv_del.setToolTipText("удалить");
 		
-		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
-		gl_panel_4.setHorizontalGroup(
-			gl_panel_4.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panel_4.createSequentialGroup()
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_4.createSequentialGroup()
+				JButton btn_ndv_del = new JButton("-");
+				btn_ndv_del.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						tbl_ndv.requestFocus();
+						tbl_ndv.deleteSelectedRow();
+					}
+				});
+				btn_ndv_del.setToolTipText("удалить");
+				
+				GroupLayout gl_panel_4 = new GroupLayout(panel_4);
+				gl_panel_4.setHorizontalGroup(
+					gl_panel_4.createParallelGroup(Alignment.TRAILING)
+						.addGroup(Alignment.LEADING, gl_panel_4.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE))
+							.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(sp_ndv, GroupLayout.PREFERRED_SIZE, 198, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+								.addComponent(btn_ndv_save)
+								.addGroup(Alignment.TRAILING, gl_panel_4.createSequentialGroup()
+									.addComponent(btn_ndv_add, GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(btn_ndv_del, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)))
+							.addGap(6))
+				);
+				gl_panel_4.setVerticalGroup(
+					gl_panel_4.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_panel_4.createSequentialGroup()
-							.addGap(12)
-							.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE))
-						.addGroup(gl_panel_4.createSequentialGroup()
+							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+									.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
+									.addGroup(gl_panel_4.createSequentialGroup()
+										.addGap(33)
+										.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+											.addComponent(btn_ndv_add)
+											.addComponent(btn_ndv_del))
+										.addPreferredGap(ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+										.addComponent(btn_ndv_save, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
+										.addGap(10)))
+								.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE))
+							.addGap(32))
+				);
+				
+				otm_day_1 = new JRadioButton("Понедельник");
+				otm_day_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+				otm_day_1.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						try{
+							if (!NraspInfo.isEmpty()){
+								for (int i=0; i <= NraspInfo.size()-1; i++) 
+									if (NraspInfo.get(i).getDenn() == 1)
+										NraspInfo.get(i).setPfd(otm_day_1.isSelected());
+//								tbl_rasp.setData(NraspInfo);
+								MainForm.tcl.updateNrasp(NraspInfo);
+							}
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+				
+				otm_day_2 = new JRadioButton("Вторник");
+				otm_day_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+				otm_day_2.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						try{
+							if (!NraspInfo.isEmpty()){
+								for (int i=0; i <= NraspInfo.size()-1; i++) 
+									if (NraspInfo.get(i).getDenn() == 2)
+										NraspInfo.get(i).setPfd(otm_day_2.isSelected());
+//								tbl_rasp.setData(NraspInfo);
+								MainForm.tcl.updateNrasp(NraspInfo);
+							}
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+				
+				otm_day_3 = new JRadioButton("Среда");
+				otm_day_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
+				otm_day_3.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						try{
+							if (!NraspInfo.isEmpty()){
+								for (int i=0; i <= NraspInfo.size()-1; i++) 
+									if (NraspInfo.get(i).getDenn() == 3)
+										NraspInfo.get(i).setPfd(otm_day_3.isSelected());
+//								tbl_rasp.setData(NraspInfo);
+								MainForm.tcl.updateNrasp(NraspInfo);
+							}
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+				
+				otm_day_4 = new JRadioButton("Четверг");
+				otm_day_4.setFont(new Font("Tahoma", Font.PLAIN, 12));
+				otm_day_4.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						try{
+//							if (tbl_rasp.getSelectedItem() != null){
+							if (!NraspInfo.isEmpty()){
+								for (int i=0; i <= NraspInfo.size()-1; i++){ 
+									if (NraspInfo.get(i).getDenn() == 4)
+										NraspInfo.get(i).setPfd(otm_day_4.isSelected());
+//		    				System.out.println(NraspInfo.get(i).getId()+", "+NraspInfo.get(i).isPfd());
+								}
+								MainForm.tcl.updateNrasp(NraspInfo);
+							}
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+				
+				otm_day_5 = new JRadioButton("Пятница");
+				otm_day_5.setFont(new Font("Tahoma", Font.PLAIN, 12));
+				otm_day_5.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						try{
+							if (!NraspInfo.isEmpty()){
+								for (int i=0; i <= NraspInfo.size()-1; i++) 
+									if (NraspInfo.get(i).getDenn() == 5)
+										NraspInfo.get(i).setPfd(otm_day_5.isSelected());
+//								tbl_rasp.setData(NraspInfo);
+								MainForm.tcl.updateNrasp(NraspInfo);
+							}
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+				GroupLayout gl_panel_7 = new GroupLayout(panel_7);
+				gl_panel_7.setHorizontalGroup(
+					gl_panel_7.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_7.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(btn_ndv_add, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+							.addGroup(gl_panel_7.createParallelGroup(Alignment.LEADING)
+								.addComponent(otm_day_1)
+								.addComponent(otm_day_2)
+								.addComponent(otm_day_3)
+								.addComponent(otm_day_4)
+								.addComponent(otm_day_5))
+							.addContainerGap(71, Short.MAX_VALUE))
+				);
+				gl_panel_7.setVerticalGroup(
+					gl_panel_7.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_7.createSequentialGroup()
+							.addComponent(otm_day_1)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btn_ndv_del, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
+							.addComponent(otm_day_2)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btn_ndv_save)))
+							.addComponent(otm_day_3)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(otm_day_4)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(otm_day_5)
+							.addGap(0, 0, Short.MAX_VALUE))
+				);
+				panel_7.setLayout(gl_panel_7);
+				
+				tbl_ndv =new CustomTable<>(true, true, Ndv.class, 1,"Дата начала",2,"окончания");
+				tbl_ndv.setFont(new Font("Tahoma", Font.PLAIN, 12));
+				tbl_ndv.setPreferredWidths(90,90);
+				tbl_ndv.setDateField(0);
+				tbl_ndv.setDateField(1);
+				tbl_ndv.setColumnSelectionAllowed(true);
+				tbl_ndv.setRowSelectionAllowed(true);
+				tbl_ndv.setFillsViewportHeight(true);
+				sp_ndv.setViewportView(tbl_ndv);
+				panel_4.setLayout(gl_panel_4);
+				
+						tbl_ndv.registerDeleteSelectedRowListener(new CustomTableItemChangeEventListener<Ndv>() {
+							@Override
+							public boolean doAction(CustomTableItemChangeEvent<Ndv> event) {
+					        	try {
+					        		if (tbl_ndv.getSelectedItem() !=  null) { 
+					        			MainForm.tcl.deleteNdv(tbl_ndv.getSelectedItem().getId());
+					        		}
+					        	} catch (Exception e) {
+					        		e.printStackTrace();
+					        		return false;
+					        	}
+					        	return true;
+							}
+						});
+						
+								tbl_ndv.registerAddRowListener(new CustomTableItemChangeEventListener<Ndv>() {
+									@Override
+									public boolean doAction(CustomTableItemChangeEvent<Ndv> event) {
+								        try {
+											Ndv item = event.getItem();
+										    item.setId(tbl_ndv.getSelectedItem().id);
+										    item.setCpol(MainForm.authInfo.cpodr);
+										    item.setCdol(curSpec);
+										    item.setPcod(curVrach);
+										    item.setDatan(tbl_ndv.getSelectedItem().datan);
+										    item.setDatak(tbl_ndv.getSelectedItem().datak);
+										    MainForm.tcl.addNdv(event.getItem());
+										} catch (Exception e) {
+											e.printStackTrace();
+											return false;
+										}
+										return true;
+									}
+								});
+								
+										//изменить
+										tbl_ndv.registerUpdateSelectedRowListener(new CustomTableItemChangeEventListener<Ndv>() {
+											@Override
+											public boolean doAction(CustomTableItemChangeEvent<Ndv> event) {
+										        try {
+													if (tbl_ndv.getSelectedItem() != null)
+														MainForm.tcl.updateNdv(tbl_ndv.getData());
+												} catch (Exception e) {
+													e.printStackTrace();
+													return false;
+												}
+												return true;
+											}
+										});
+		GroupLayout gl_tbRasp = new GroupLayout(tbRasp);
+		gl_tbRasp.setHorizontalGroup(
+			gl_tbRasp.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_tbRasp.createSequentialGroup()
+					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
+						.addGroup(Alignment.TRAILING, gl_tbRasp.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(panel_13, GroupLayout.DEFAULT_SIZE, 731, Short.MAX_VALUE))
+						.addGroup(gl_tbRasp.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 495, GroupLayout.PREFERRED_SIZE))
+						.addGroup(Alignment.TRAILING, gl_tbRasp.createSequentialGroup()
+							.addGap(23)
+							.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
+								.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 367, GroupLayout.PREFERRED_SIZE)
+								.addGroup(Alignment.TRAILING, gl_tbRasp.createSequentialGroup()
+									.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 359, GroupLayout.PREFERRED_SIZE)
+									.addGap(333)))))
 					.addContainerGap())
 		);
-		gl_panel_4.setVerticalGroup(
-			gl_panel_4.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panel_4.createSequentialGroup()
-					.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
-					.addGap(16)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-							.addComponent(btn_ndv_del)
-							.addComponent(btn_ndv_save, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE))
-						.addComponent(btn_ndv_add))
-					.addGap(1))
-		);
-		
-		otm_day_1 = new JRadioButton("Понедельник");
-		otm_day_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		otm_day_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try{
-					if (tbl_rasp.getSelectedItem() != null){
-						for (int i=0; i <= NraspInfo.size()-1; i++) 
-							if (NraspInfo.get(i).getDenn() == 1)
-								NraspInfo.get(i).setPfd(otm_day_1.isSelected());
-						tbl_rasp.setData(NraspInfo);
-						MainForm.tcl.updateNrasp(tbl_rasp.getData());
-					}
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-		
-		otm_day_2 = new JRadioButton("Вторник");
-		otm_day_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		otm_day_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try{
-					if (tbl_rasp.getSelectedItem() != null){
-						for (int i=0; i <= NraspInfo.size()-1; i++) 
-							if (NraspInfo.get(i).getDenn() == 2)
-								NraspInfo.get(i).setPfd(otm_day_2.isSelected());
-						tbl_rasp.setData(NraspInfo);
-						MainForm.tcl.updateNrasp(tbl_rasp.getData());
-					}
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-		
-		otm_day_3 = new JRadioButton("Среда");
-		otm_day_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		otm_day_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try{
-					if (tbl_rasp.getSelectedItem() != null){
-						for (int i=0; i <= NraspInfo.size()-1; i++) 
-							if (NraspInfo.get(i).getDenn() == 3)
-								NraspInfo.get(i).setPfd(otm_day_3.isSelected());
-						tbl_rasp.setData(NraspInfo);
-						MainForm.tcl.updateNrasp(tbl_rasp.getData());
-					}
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-		
-		otm_day_4 = new JRadioButton("Четверг");
-		otm_day_4.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		otm_day_4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try{
-					if (tbl_rasp.getSelectedItem() != null){
-						for (int i=0; i <= NraspInfo.size()-1; i++){ 
-							if (NraspInfo.get(i).getDenn() == 4)
-								NraspInfo.get(i).setPfd(otm_day_4.isSelected());
-//		    				System.out.println(NraspInfo.get(i).getId()+", "+NraspInfo.get(i).isPfd());
-						}
-						tbl_rasp.setData(NraspInfo);
-//						MainForm.tcl.updateNrasp(NraspInfo);
-						MainForm.tcl.updateNrasp(tbl_rasp.getData());
-					}
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-		
-		otm_day_5 = new JRadioButton("Пятница");
-		otm_day_5.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		otm_day_5.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try{
-					if (tbl_rasp.getSelectedItem() != null){
-						for (int i=0; i <= NraspInfo.size()-1; i++) 
-							if (NraspInfo.get(i).getDenn() == 5)
-								NraspInfo.get(i).setPfd(otm_day_5.isSelected());
-						tbl_rasp.setData(NraspInfo);
-						MainForm.tcl.updateNrasp(tbl_rasp.getData());
-					}
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-		GroupLayout gl_panel_7 = new GroupLayout(panel_7);
-		gl_panel_7.setHorizontalGroup(
-			gl_panel_7.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_7.createSequentialGroup()
+		gl_tbRasp.setVerticalGroup(
+			gl_tbRasp.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_tbRasp.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_7.createParallelGroup(Alignment.LEADING)
-						.addComponent(otm_day_1)
-						.addComponent(otm_day_2)
-						.addComponent(otm_day_3)
-						.addComponent(otm_day_4)
-						.addComponent(otm_day_5))
-					.addContainerGap(71, Short.MAX_VALUE))
+					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_13, GroupLayout.PREFERRED_SIZE, 242, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 257, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
 		);
-		gl_panel_7.setVerticalGroup(
-			gl_panel_7.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_7.createSequentialGroup()
-					.addComponent(otm_day_1)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(otm_day_2)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(otm_day_3)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(otm_day_4)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(otm_day_5)
-					.addGap(0, 0, Short.MAX_VALUE))
-		);
-		panel_7.setLayout(gl_panel_7);
 		
-		tbl_ndv =new CustomTable<>(true, true, Ndv.class, 1,"Дата начала",2,"окончания");
-		tbl_ndv.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		tbl_ndv.setPreferredWidths(90,90);
-		tbl_ndv.setDateField(0);
-		tbl_ndv.setDateField(1);
-        tbl_ndv.setColumnSelectionAllowed(true);
-        tbl_ndv.setRowSelectionAllowed(true);
-		tbl_ndv.setFillsViewportHeight(true);
-		sp_ndv.setViewportView(tbl_ndv);
-		panel_4.setLayout(gl_panel_4);
-
-		tbl_ndv.registerDeleteSelectedRowListener(new CustomTableItemChangeEventListener<Ndv>() {
-			@Override
-			public boolean doAction(CustomTableItemChangeEvent<Ndv> event) {
-	        	try {
-	        		if (tbl_ndv.getSelectedItem() !=  null) { 
-	        			MainForm.tcl.deleteNdv(tbl_ndv.getSelectedItem().getId());
-	        		}
-	        	} catch (Exception e) {
-	        		e.printStackTrace();
-	        		return false;
-	        	}
-	        	return true;
-			}
-		});
-
-		tbl_ndv.registerAddRowListener(new CustomTableItemChangeEventListener<Ndv>() {
-			@Override
-			public boolean doAction(CustomTableItemChangeEvent<Ndv> event) {
-		        try {
-					Ndv item = event.getItem();
-				    item.setId(tbl_ndv.getSelectedItem().id);
-				    item.setCpol(MainForm.authInfo.cpodr);
-				    item.setCdol(curSpec);
-				    item.setPcod(curVrach);
-				    item.setDatan(tbl_ndv.getSelectedItem().datan);
-				    item.setDatak(tbl_ndv.getSelectedItem().datak);
-				    MainForm.tcl.addNdv(event.getItem());
+		JButton btn_save = new JButton("Сохранить");
+		btn_save.setToolTipText("Сохранить расписание");
+		btn_save.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+//				try{
+//                    tbl_rasp.updateSelectedItem();
+//					if (tbl_rasp.getSelectedItem() != null)
+//						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+				try{
+//					if (tbl_rasp.getSelectedItem() != null){
+						for (int i=0; i <= NraspInfo.size()-1; i++){
+							if (NraspInfo.get(i).getDenn() == 1){
+								if (NraspInfo.get(i).getVidp() == 1){
+									NraspInfo.get(i).setTime_n(tf_day1_pp1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day1_pp2.getTime().getTime());
+								}
+								if (NraspInfo.get(i).getVidp() == 2){
+									NraspInfo.get(i).setTime_n(tf_day1_pv1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day1_pv2.getTime().getTime());
+								}
+								if (NraspInfo.get(i).getVidp() == 3){
+									NraspInfo.get(i).setTime_n(tf_day1_pd1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day1_pd2.getTime().getTime());
+								}
+								NraspInfo.get(i).setTime_int_n(tf_day1_int1.getTime().getTime());
+								NraspInfo.get(i).setTime_int_k(tf_day1_int2.getTime().getTime());
+								NraspInfo.get(i).setTimep_n(tf_day1_pause1.getTime().getTime());
+								NraspInfo.get(i).setTimep_k(tf_day1_pause2.getTime().getTime());
+							}
+							if (NraspInfo.get(i).getDenn() == 2){
+								if (NraspInfo.get(i).getVidp() == 1){
+									NraspInfo.get(i).setTime_n(tf_day2_pp1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day2_pp2.getTime().getTime());
+								}
+								if (NraspInfo.get(i).getVidp() == 2){
+									NraspInfo.get(i).setTime_n(tf_day2_pv1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day2_pv2.getTime().getTime());
+								}
+								if (NraspInfo.get(i).getVidp() == 3){
+									NraspInfo.get(i).setTime_n(tf_day2_pd1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day2_pd2.getTime().getTime());
+								}
+								NraspInfo.get(i).setTime_int_n(tf_day2_int1.getTime().getTime());
+								NraspInfo.get(i).setTime_int_k(tf_day2_int2.getTime().getTime());
+								NraspInfo.get(i).setTimep_n(tf_day2_pause1.getTime().getTime());
+								NraspInfo.get(i).setTimep_k(tf_day2_pause2.getTime().getTime());
+							}
+							if (NraspInfo.get(i).getDenn() == 3){
+								if (NraspInfo.get(i).getVidp() == 1){
+									NraspInfo.get(i).setTime_n(tf_day3_pp1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day3_pp2.getTime().getTime());
+								}
+								if (NraspInfo.get(i).getVidp() == 2){
+									NraspInfo.get(i).setTime_n(tf_day3_pv1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day3_pv2.getTime().getTime());
+								}
+								if (NraspInfo.get(i).getVidp() == 3){
+									NraspInfo.get(i).setTime_n(tf_day3_pd1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day3_pd2.getTime().getTime());
+								}
+								NraspInfo.get(i).setTime_int_n(tf_day3_int1.getTime().getTime());
+								NraspInfo.get(i).setTime_int_k(tf_day3_int2.getTime().getTime());
+								NraspInfo.get(i).setTimep_n(tf_day3_pause1.getTime().getTime());
+								NraspInfo.get(i).setTimep_k(tf_day3_pause2.getTime().getTime());
+							}
+							if (NraspInfo.get(i).getDenn() == 4){
+								if (NraspInfo.get(i).getVidp() == 1){
+									NraspInfo.get(i).setTime_n(tf_day4_pp1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day4_pp2.getTime().getTime());
+								}
+								if (NraspInfo.get(i).getVidp() == 2){
+									NraspInfo.get(i).setTime_n(tf_day4_pv1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day4_pv2.getTime().getTime());
+								}
+									if (NraspInfo.get(i).getVidp() == 3){
+									NraspInfo.get(i).setTime_n(tf_day4_pd1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day4_pd2.getTime().getTime());
+								}
+								NraspInfo.get(i).setTime_int_n(tf_day4_int1.getTime().getTime());
+								NraspInfo.get(i).setTime_int_k(tf_day4_int2.getTime().getTime());
+								NraspInfo.get(i).setTimep_n(tf_day4_pause1.getTime().getTime());
+								NraspInfo.get(i).setTimep_k(tf_day4_pause2.getTime().getTime());
+							}
+							if (NraspInfo.get(i).getDenn() == 5){
+								if (NraspInfo.get(i).getVidp() == 1){
+									NraspInfo.get(i).setTime_n(tf_day5_pp1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day5_pp2.getTime().getTime());
+								}
+								if (NraspInfo.get(i).getVidp() == 2){
+									NraspInfo.get(i).setTime_n(tf_day5_pv1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day5_pv2.getTime().getTime());
+								}
+								if (NraspInfo.get(i).getVidp() == 3){
+									NraspInfo.get(i).setTime_n(tf_day5_pd1.getTime().getTime());
+									NraspInfo.get(i).setTime_k(tf_day5_pd2.getTime().getTime());
+								}
+								NraspInfo.get(i).setTime_int_n(tf_day5_int1.getTime().getTime());
+								NraspInfo.get(i).setTime_int_k(tf_day5_int2.getTime().getTime());
+								NraspInfo.get(i).setTimep_n(tf_day5_pause1.getTime().getTime());
+								NraspInfo.get(i).setTimep_k(tf_day5_pause2.getTime().getTime());
+							}
+						}
+						
+//						tbl_rasp.setData(NraspInfo);
+						MainForm.tcl.updateNrasp(NraspInfo);
+//					}
 				} catch (Exception e) {
 					e.printStackTrace();
-					return false;
 				}
-				return true;
 			}
 		});
-
-		//изменить
-		tbl_ndv.registerUpdateSelectedRowListener(new CustomTableItemChangeEventListener<Ndv>() {
-			@Override
-			public boolean doAction(CustomTableItemChangeEvent<Ndv> event) {
-		        try {
-					if (tbl_ndv.getSelectedItem() != null)
-						MainForm.tcl.updateNdv(tbl_ndv.getData());
-				} catch (Exception e) {
-					e.printStackTrace();
-					return false;
+		
+		JButton btn_del = new JButton("Удалить");
+		btn_del.setToolTipText("Удалить расписание");
+		btn_del.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+					MainForm.tcl.deleteNrasp(MainForm.authInfo.cpodr, curVrach, curSpec);
+//					tbl_rasp.setData(new ArrayList<Nrasp>());
+					ClearOtmetka();
+					ClearTimePause();
+				} catch (KmiacServerException kse){
+				} catch (Exception e1) {
+					e1.printStackTrace();
 				}
-				return true;
 			}
 		});
+		
+		JPanel panel_17 = new JPanel();
+		panel_17.setBorder(new TitledBorder(UIManager.getBorder("CheckBoxMenuItem.border"), "\u0412\u0438\u0434 \u043F\u0440\u0438\u0435\u043C\u0430:", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+		
+		JPanel panel_18 = new JPanel();
+		panel_18.setBorder(new TitledBorder(null, "\u0412\u0440\u0435\u043C\u044F \u043F\u0440\u0438\u0435\u043C\u0430 (\u0427\u0427 : \u041C\u041C)", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+		GroupLayout gl_panel_13 = new GroupLayout(panel_13);
+		gl_panel_13.setHorizontalGroup(
+			gl_panel_13.createParallelGroup(Alignment.TRAILING)
+				.addGroup(Alignment.LEADING, gl_panel_13.createSequentialGroup()
+					.addGroup(gl_panel_13.createParallelGroup(Alignment.TRAILING, false)
+						.addGroup(Alignment.LEADING, gl_panel_13.createSequentialGroup()
+							.addGap(232)
+							.addComponent(btn_save)
+							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(btn_del))
+						.addGroup(Alignment.LEADING, gl_panel_13.createSequentialGroup()
+							.addComponent(panel_17, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(panel_18, GroupLayout.PREFERRED_SIZE, 575, GroupLayout.PREFERRED_SIZE)))
+					.addGap(47))
+		);
+		gl_panel_13.setVerticalGroup(
+			gl_panel_13.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_panel_13.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_13.createParallelGroup(Alignment.BASELINE)
+						.addComponent(panel_17, GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)
+						.addComponent(panel_18, GroupLayout.PREFERRED_SIZE, 172, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_13.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btn_save)
+						.addComponent(btn_del))
+					.addContainerGap())
+		);
+		
+		panel_14 = new JPanel();
+		panel_14.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u041F\u043E\u043D\u0435\u0434\u0435\u043B\u044C\u043D\u0438\u043A", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		tf_day1_pp1 = new CustomTimeEditor();
+		tf_day1_pp1.setColumns(10);
+		
+		tf_day1_pp2 = new CustomTimeEditor();
+		tf_day1_pp2.setColumns(10);
+		
+		tf_day1_int1 = new CustomTimeEditor();
+		tf_day1_int1.setColumns(10);
+		
+		tf_day1_pd1 = new CustomTimeEditor();
+		tf_day1_pd1.setColumns(10);
+		
+		tf_day1_pause1 = new CustomTimeEditor();
+		tf_day1_pause1.setColumns(10);
+		
+		tf_day1_pd2 = new CustomTimeEditor();
+		tf_day1_pd2.setColumns(10);
+		
+		tf_day1_int2 = new CustomTimeEditor();
+		tf_day1_int2.setColumns(10);
+		
+		tf_day1_pause2 = new CustomTimeEditor();
+		tf_day1_pause2.setColumns(10);
+		
+		tf_day1_pv1 = new CustomTimeEditor();
+		tf_day1_pv1.setColumns(10);
+		
+		tf_day1_pv2 = new CustomTimeEditor();
+		tf_day1_pv2.setColumns(10);
+		GroupLayout gl_panel_14 = new GroupLayout(panel_14);
+		gl_panel_14.setHorizontalGroup(
+			gl_panel_14.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 102, Short.MAX_VALUE)
+				.addGroup(gl_panel_14.createSequentialGroup()
+					.addGroup(gl_panel_14.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_14.createSequentialGroup()
+							.addComponent(tf_day1_pp1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tf_day1_pp2, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_14.createSequentialGroup()
+							.addGroup(gl_panel_14.createParallelGroup(Alignment.LEADING)
+								.addComponent(tf_day1_int1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+								.addComponent(tf_day1_pd1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+								.addComponent(tf_day1_pause1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel_14.createParallelGroup(Alignment.LEADING)
+								.addComponent(tf_day1_pd2, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
+								.addComponent(tf_day1_int2, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
+								.addComponent(tf_day1_pause2, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)))
+						.addGroup(gl_panel_14.createSequentialGroup()
+							.addComponent(tf_day1_pv1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tf_day1_pv2, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)))
+					.addGap(34))
+		);
+		gl_panel_14.setVerticalGroup(
+			gl_panel_14.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 152, Short.MAX_VALUE)
+				.addGroup(gl_panel_14.createSequentialGroup()
+					.addGroup(gl_panel_14.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day1_pp1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day1_pp2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_14.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day1_pv1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day1_pv2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(gl_panel_14.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day1_pd1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day1_pd2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_14.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day1_int1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day1_int2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_14.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day1_pause1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day1_pause2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(63, Short.MAX_VALUE))
+		);
+		panel_14.setLayout(gl_panel_14);
+		
+		JPanel panel_12 = new JPanel();
+		panel_12.setBorder(new TitledBorder(null, "\u0421\u0440\u0435\u0434\u0430", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		tf_day3_pp1 = new CustomTimeEditor();
+		tf_day3_pp1.setColumns(10);
+		
+		tf_day3_pp2 = new CustomTimeEditor();
+		tf_day3_pp2.setColumns(10);
+		
+		tf_day3_pv1 = new CustomTimeEditor();
+		tf_day3_pv1.setColumns(10);
+		
+		tf_day3_pv2 = new CustomTimeEditor();
+		tf_day3_pv2.setColumns(10);
+		
+		tf_day3_pd1 = new CustomTimeEditor();
+		tf_day3_pd1.setColumns(10);
+		
+		tf_day3_pd2 = new CustomTimeEditor();
+		tf_day3_pd2.setColumns(10);
+		
+		tf_day3_int1 = new CustomTimeEditor();
+		tf_day3_int1.setColumns(10);
+		
+		tf_day3_int2 = new CustomTimeEditor();
+		tf_day3_int2.setColumns(10);
+		
+		tf_day3_pause1 = new CustomTimeEditor();
+		tf_day3_pause1.setColumns(10);
+		
+		tf_day3_pause2 = new CustomTimeEditor();
+		tf_day3_pause2.setColumns(10);
+		GroupLayout gl_panel_12 = new GroupLayout(panel_12);
+		gl_panel_12.setHorizontalGroup(
+			gl_panel_12.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_12.createSequentialGroup()
+					.addGroup(gl_panel_12.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_12.createSequentialGroup()
+							.addComponent(tf_day3_pp1, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tf_day3_pp2, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_12.createSequentialGroup()
+							.addComponent(tf_day3_pv1, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tf_day3_pv2, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_12.createSequentialGroup()
+							.addGroup(gl_panel_12.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(tf_day3_pause1, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+								.addComponent(tf_day3_int1, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+								.addComponent(tf_day3_pd1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel_12.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(tf_day3_pause2, 0, 0, Short.MAX_VALUE)
+								.addComponent(tf_day3_int2, 0, 0, Short.MAX_VALUE)
+								.addComponent(tf_day3_pd2, GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))))
+					.addGap(3))
+		);
+		gl_panel_12.setVerticalGroup(
+			gl_panel_12.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_12.createSequentialGroup()
+					.addGroup(gl_panel_12.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day3_pp1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day3_pp2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_12.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day3_pv1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day3_pv2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_12.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day3_pd1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day3_pd2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_12.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day3_int1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day3_int2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_12.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day3_pause1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day3_pause2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		panel_12.setLayout(gl_panel_12);
+		
+		JPanel panel_15 = new JPanel();
+		panel_15.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0427\u0435\u0442\u0432\u0435\u0440\u0433", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		tf_day4_int1 = new CustomTimeEditor();
+		tf_day4_int1.setColumns(10);
+		
+		tf_day4_int2 = new CustomTimeEditor();
+		tf_day4_int2.setColumns(10);
+		
+		tf_day4_pause1 = new CustomTimeEditor();
+		tf_day4_pause1.setColumns(10);
+		
+		tf_day4_pause2 = new CustomTimeEditor();
+		tf_day4_pause2.setColumns(10);
+		
+		tf_day4_pp1 = new CustomTimeEditor();
+		tf_day4_pp1.setColumns(10);
+		
+		tf_day4_pp2 = new CustomTimeEditor();
+		tf_day4_pp2.setColumns(10);
+		
+		tf_day4_pv1 = new CustomTimeEditor();
+		tf_day4_pv1.setColumns(10);
+		
+		tf_day4_pv2 = new CustomTimeEditor();
+		tf_day4_pv2.setColumns(10);
+		
+		tf_day4_pd1 = new CustomTimeEditor();
+		tf_day4_pd1.setColumns(10);
+		
+		tf_day4_pd2 = new CustomTimeEditor();
+		tf_day4_pd2.setColumns(10);
+		GroupLayout gl_panel_15 = new GroupLayout(panel_15);
+		gl_panel_15.setHorizontalGroup(
+			gl_panel_15.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 111, Short.MAX_VALUE)
+				.addGroup(gl_panel_15.createSequentialGroup()
+					.addGroup(gl_panel_15.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_15.createSequentialGroup()
+							.addComponent(tf_day4_pp1, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tf_day4_pp2, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_15.createSequentialGroup()
+							.addComponent(tf_day4_pv1, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tf_day4_pv2, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_15.createSequentialGroup()
+							.addGroup(gl_panel_15.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(tf_day4_pause1, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+								.addComponent(tf_day4_int1, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+								.addComponent(tf_day4_pd1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel_15.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(tf_day4_pause2, 0, 0, Short.MAX_VALUE)
+								.addComponent(tf_day4_int2, 0, 0, Short.MAX_VALUE)
+								.addComponent(tf_day4_pd2, GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))))
+					.addGap(3))
+		);
+		gl_panel_15.setVerticalGroup(
+			gl_panel_15.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 152, Short.MAX_VALUE)
+				.addGroup(gl_panel_15.createSequentialGroup()
+					.addGroup(gl_panel_15.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day4_pp1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day4_pp2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_15.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day4_pv1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day4_pv2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_15.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day4_pd1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day4_pd2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_15.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day4_int1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day4_int2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_15.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day4_pause1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day4_pause2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		panel_15.setLayout(gl_panel_15);
+		
+		JPanel panel_16 = new JPanel();
+		panel_16.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u041F\u044F\u0442\u043D\u0438\u0446\u0430", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		tf_day5_int1 = new CustomTimeEditor();
+		tf_day5_int1.setColumns(10);
+		
+		tf_day5_int2 = new CustomTimeEditor();
+		tf_day5_int2.setColumns(10);
+		
+		tf_day5_pause1 = new CustomTimeEditor();
+		tf_day5_pause1.setColumns(10);
+		
+		tf_day5_pause2 = new CustomTimeEditor();
+		tf_day5_pause2.setColumns(10);
+		
+		tf_day5_pp1 = new CustomTimeEditor();
+		tf_day5_pp1.setColumns(10);
+		
+		tf_day5_pp2 = new CustomTimeEditor();
+		tf_day5_pp2.setColumns(10);
+		
+		tf_day5_pv1 = new CustomTimeEditor();
+		tf_day5_pv1.setColumns(10);
+		
+		tf_day5_pv2 = new CustomTimeEditor();
+		tf_day5_pv2.setColumns(10);
+		
+		tf_day5_pd1 = new CustomTimeEditor();
+		tf_day5_pd1.setColumns(10);
+		
+		tf_day5_pd2 = new CustomTimeEditor();
+		tf_day5_pd2.setColumns(10);
+		GroupLayout gl_panel_16 = new GroupLayout(panel_16);
+		gl_panel_16.setHorizontalGroup(
+			gl_panel_16.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 111, Short.MAX_VALUE)
+				.addGroup(gl_panel_16.createSequentialGroup()
+					.addGroup(gl_panel_16.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_16.createSequentialGroup()
+							.addComponent(tf_day5_pp1, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tf_day5_pp2, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_16.createSequentialGroup()
+							.addComponent(tf_day5_pv1, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tf_day5_pv2, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_16.createSequentialGroup()
+							.addGroup(gl_panel_16.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(tf_day5_pause1, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+								.addComponent(tf_day5_int1, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+								.addComponent(tf_day5_pd1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel_16.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(tf_day5_pause2, 0, 0, Short.MAX_VALUE)
+								.addComponent(tf_day5_int2, 0, 0, Short.MAX_VALUE)
+								.addComponent(tf_day5_pd2, GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))))
+					.addGap(3))
+		);
+		gl_panel_16.setVerticalGroup(
+			gl_panel_16.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 152, Short.MAX_VALUE)
+				.addGroup(gl_panel_16.createSequentialGroup()
+					.addGroup(gl_panel_16.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day5_pp1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day5_pp2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_16.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day5_pv1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day5_pv2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_16.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day5_pd1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day5_pd2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_16.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day5_int1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day5_int2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_16.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day5_pause1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day5_pause2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		panel_16.setLayout(gl_panel_16);
+		
+		JPanel panel_11 = new JPanel();
+		panel_11.setBorder(new TitledBorder(null, "\u0412\u0442\u043E\u0440\u043D\u0438\u043A", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		tf_day2_pp1 = new CustomTimeEditor();
+		tf_day2_pp1.setColumns(10);
+		
+		tf_day2_pp2 = new CustomTimeEditor();
+		tf_day2_pp2.setColumns(10);
+		
+		tf_day2_pv2 = new CustomTimeEditor();
+		tf_day2_pv2.setColumns(10);
+		
+		tf_day2_pd2 = new CustomTimeEditor();
+		tf_day2_pd2.setColumns(10);
+		
+		tf_day2_int2 = new CustomTimeEditor();
+		tf_day2_int2.setColumns(10);
+		
+		tf_day2_pv1 = new CustomTimeEditor();
+		tf_day2_pv1.setColumns(10);
+		
+		tf_day2_pd1 = new CustomTimeEditor();
+		tf_day2_pd1.setColumns(10);
+		
+		tf_day2_int1 = new CustomTimeEditor();
+		tf_day2_int1.setColumns(10);
+		
+		tf_day2_pause1 = new CustomTimeEditor();
+		tf_day2_pause1.setColumns(10);
+		
+		tf_day2_pause2 = new CustomTimeEditor();
+		tf_day2_pause2.setColumns(10);
+		GroupLayout gl_panel_11 = new GroupLayout(panel_11);
+		gl_panel_11.setHorizontalGroup(
+			gl_panel_11.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_11.createSequentialGroup()
+					.addComponent(tf_day2_pp1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tf_day2_pp2, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_panel_11.createParallelGroup(Alignment.TRAILING)
+					.addGroup(gl_panel_11.createSequentialGroup()
+						.addGroup(gl_panel_11.createParallelGroup(Alignment.LEADING)
+							.addComponent(tf_day2_int1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tf_day2_pd1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tf_day2_pause1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addGroup(gl_panel_11.createParallelGroup(Alignment.LEADING)
+							.addComponent(tf_day2_pd2, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tf_day2_int2, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tf_day2_pause2, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+						.addGap(34))
+					.addGroup(Alignment.LEADING, gl_panel_11.createSequentialGroup()
+						.addComponent(tf_day2_pv1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(tf_day2_pv2, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)))
+		);
+		gl_panel_11.setVerticalGroup(
+			gl_panel_11.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_11.createSequentialGroup()
+					.addGroup(gl_panel_11.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day2_pp1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day2_pp2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_11.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day2_pv1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day2_pv2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(gl_panel_11.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day2_pd1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day2_pd2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_11.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day2_int1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day2_int2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_11.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day2_pause1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day2_pause2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(63, Short.MAX_VALUE))
+		);
+		panel_11.setLayout(gl_panel_11);
+		GroupLayout gl_panel_18 = new GroupLayout(panel_18);
+		gl_panel_18.setHorizontalGroup(
+			gl_panel_18.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_18.createSequentialGroup()
+					.addComponent(panel_14, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
+					.addGap(1)
+					.addComponent(panel_11, GroupLayout.PREFERRED_SIZE, 102, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_12, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_15, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_16, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(12, Short.MAX_VALUE))
+		);
+		gl_panel_18.setVerticalGroup(
+			gl_panel_18.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_18.createSequentialGroup()
+					.addGroup(gl_panel_18.createParallelGroup(Alignment.BASELINE)
+						.addComponent(panel_14, GroupLayout.PREFERRED_SIZE, 152, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panel_11, GroupLayout.PREFERRED_SIZE, 152, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panel_12, GroupLayout.PREFERRED_SIZE, 152, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panel_15, GroupLayout.PREFERRED_SIZE, 152, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panel_16, GroupLayout.PREFERRED_SIZE, 152, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap())
+		);
+		panel_18.setLayout(gl_panel_18);
+		
+		JLabel lblNewLabel_14 = new JLabel("Первичный");
+		lblNewLabel_14.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		
+		JLabel lblNewLabel_15 = new JLabel("Повторный");
+		lblNewLabel_15.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		
+		JLabel lblNewLabel_16 = new JLabel("На дому");
+		lblNewLabel_16.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		
+		JLabel lblNewLabel_17 = new JLabel("Интернет");
+		lblNewLabel_17.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		
+		JLabel lblNewLabel_18 = new JLabel("Перерыв");
+		lblNewLabel_18.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		GroupLayout gl_panel_17 = new GroupLayout(panel_17);
+		gl_panel_17.setHorizontalGroup(
+			gl_panel_17.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_17.createSequentialGroup()
+					.addGroup(gl_panel_17.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_panel_17.createSequentialGroup()
+							.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(lblNewLabel_14))
+						.addGroup(gl_panel_17.createSequentialGroup()
+							.addContainerGap()
+							.addGroup(gl_panel_17.createParallelGroup(Alignment.TRAILING)
+								.addComponent(lblNewLabel_16)
+								.addComponent(lblNewLabel_15)))
+						.addGroup(gl_panel_17.createSequentialGroup()
+							.addGap(14)
+							.addComponent(lblNewLabel_17, GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE))
+						.addGroup(gl_panel_17.createSequentialGroup()
+							.addContainerGap(24, Short.MAX_VALUE)
+							.addComponent(lblNewLabel_18)))
+					.addGap(5))
+		);
+		gl_panel_17.setVerticalGroup(
+			gl_panel_17.createParallelGroup(Alignment.TRAILING)
+				.addGroup(Alignment.LEADING, gl_panel_17.createSequentialGroup()
+					.addGap(19)
+					.addComponent(lblNewLabel_14)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lblNewLabel_15)
+					.addGap(11)
+					.addComponent(lblNewLabel_16)
+					.addGap(11)
+					.addComponent(lblNewLabel_17)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lblNewLabel_18)
+					.addContainerGap(25, Short.MAX_VALUE))
+		);
+		panel_17.setLayout(gl_panel_17);
+		panel_13.setLayout(gl_panel_13);
 		
 		cbx_rasp = new JCheckBox("учитывать четные и нечетные дни ");
 		cbx_rasp.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		JButton btn_new = new JButton("Создать");
 		btn_new.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				try {
+					MainForm.tcl.deleteNrasp(MainForm.authInfo.cpodr, curVrach, curSpec);
+					ClearOtmetka();
+					ClearTimePause();
+				} catch (KmiacServerException kse){
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
 				if (cbx_rasp.isSelected()){
 					RaspisanieUnit.NewRaspisanie(MainForm.authInfo.cpodr, curVrach, curSpec,1);
 				}
 				else {
 					RaspisanieUnit.NewRaspisanie(MainForm.authInfo.cpodr, curVrach, curSpec, 0);
 				}
-				ClearOtmetka();
 				ShowTimePause();
 				ChangeNraspInfo();
 			}
@@ -927,13 +1409,17 @@ public class TalonMainFrame extends JFrame {
 		panel_10.setBorder(new TitledBorder(null, "\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440 \u0442\u0430\u043B\u043E\u043D\u043E\u0432", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout gl_tbTalon = new GroupLayout(tbTalon);
 		gl_tbTalon.setHorizontalGroup(
-			gl_tbTalon.createParallelGroup(Alignment.TRAILING)
+			gl_tbTalon.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tbTalon.createSequentialGroup()
 					.addGap(25)
-					.addGroup(gl_tbTalon.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel_5, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE)
-						.addComponent(panel_10, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 738, Short.MAX_VALUE))
-					.addGap(73))
+					.addGroup(gl_tbTalon.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_tbTalon.createSequentialGroup()
+							.addGap(10)
+							.addComponent(panel_10, 0, 0, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(gl_tbTalon.createSequentialGroup()
+							.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 597, Short.MAX_VALUE)
+							.addGap(129))))
 		);
 		gl_tbTalon.setVerticalGroup(
 			gl_tbTalon.createParallelGroup(Alignment.LEADING)
@@ -969,13 +1455,15 @@ public class TalonMainFrame extends JFrame {
 				if (nmonth != 0 && nday != 0 && nyear != 0){
 	                nmonth = cmb_month.getSelectedIndex()+1;
 	                sp_day.setValue(1);
-	                ChangeDatap();
+//	                ChangeDatap();
 				}
         	}
         });
         cmb_month.setMaximumRowCount(12);
+        cmb_month.setVisible(false);
 
         sp_god = new JSpinner();
+        sp_god.setVisible(false);
         sp_god.setFont(new Font("Tahoma", Font.PLAIN, 12));
         sp_god.setModel(new SpinnerNumberModel(new Integer(2012), new Integer(2012), null, new Integer(1)));
         sp_god.addChangeListener(new ChangeListener() {
@@ -983,11 +1471,12 @@ public class TalonMainFrame extends JFrame {
 			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
 				if (nmonth != 0 && nday != 0 && nyear != 0){
 	                nyear = Integer.valueOf(sp_god.getValue().toString());
-					ChangeDatap();
+//					ChangeDatap();
 				}
         	}
         });
 		sp_day = new JSpinner();
+		sp_day.setVisible(false);
 		sp_day.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		sp_day.setModel(new SpinnerNumberModel(2, 1, 31, 1));
 		sp_day.addChangeListener(new ChangeListener() {
@@ -996,7 +1485,7 @@ public class TalonMainFrame extends JFrame {
 //				if (cmb_month.getSelectedIndex() != 0 && Integer.valueOf(sp_day.getValue().toString()) != 0 && Integer.valueOf(sp_god.getValue().toString()) != 0){
 				if (nmonth != 0 && nday != 0 && nyear != 0){
 			        nday = Integer.valueOf(sp_day.getValue().toString());
-					ChangeDatap();
+//					ChangeDatap();
 				}
 			}
 		});
@@ -1015,47 +1504,63 @@ public class TalonMainFrame extends JFrame {
 		lblNewLabel_12.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		JLabel lblNewLabel_13 = new JLabel("День");
 		lblNewLabel_13.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		
+		lblNewLabel_11.setVisible(false);
+		lblNewLabel_12.setVisible(false);
+		lblNewLabel_13.setVisible(false);
 		JScrollPane scrollPane_1 = new JScrollPane();
+		
+		calendar = new JCalendar();
+		calendar.addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent evt) {
+//				dateSelected = true;
+//				ChangeDatap();
+				ChangeTalonInfo();
+			}
+		});
+		calendar.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
 		GroupLayout gl_panel_10 = new GroupLayout(panel_10);
 		gl_panel_10.setHorizontalGroup(
 			gl_panel_10.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_10.createSequentialGroup()
+					.addGap(24)
+					.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 171, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
 					.addGroup(gl_panel_10.createParallelGroup(Alignment.LEADING)
+						.addComponent(calendar, GroupLayout.PREFERRED_SIZE, 174, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_panel_10.createSequentialGroup()
-							.addGap(35)
-							.addComponent(lblNewLabel_11)
-							.addGap(55)
-							.addComponent(lblNewLabel_12)
-							.addGap(114)
+							.addGap(19)
 							.addComponent(lblNewLabel_13))
+						.addComponent(sp_day, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_panel_10.createSequentialGroup()
-							.addGap(24)
-							.addGroup(gl_panel_10.createParallelGroup(Alignment.LEADING)
-								.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 164, GroupLayout.PREFERRED_SIZE)
-								.addGroup(gl_panel_10.createSequentialGroup()
-									.addComponent(sp_god, GroupLayout.PREFERRED_SIZE, 59, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(cmb_month, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(sp_day, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)))))
-					.addGap(437))
+							.addGap(11)
+							.addComponent(lblNewLabel_11))
+						.addComponent(sp_god, GroupLayout.PREFERRED_SIZE, 59, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel_10.createSequentialGroup()
+							.addGap(17)
+							.addComponent(lblNewLabel_12))
+						.addComponent(cmb_month, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(303, Short.MAX_VALUE))
 		);
 		gl_panel_10.setVerticalGroup(
 			gl_panel_10.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_10.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel_10.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel_12)
-						.addComponent(lblNewLabel_13)
-						.addComponent(lblNewLabel_11))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_10.createParallelGroup(Alignment.BASELINE)
-						.addComponent(cmb_month, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(sp_day, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(sp_god, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
+					.addGroup(gl_panel_10.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_10.createSequentialGroup()
+							.addComponent(calendar, GroupLayout.PREFERRED_SIZE, 130, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblNewLabel_11)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(sp_god, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblNewLabel_13)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(sp_day, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblNewLabel_12)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(cmb_month, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(scrollPane_1, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		
@@ -1094,9 +1599,9 @@ public class TalonMainFrame extends JFrame {
 				        nday = Integer.valueOf(sp_day.getValue().toString());
 		                nmonth = cmb_month.getSelectedIndex()+1;
 		                nyear = Integer.valueOf(sp_god.getValue().toString());
- 					    if (nmonth != 0 && nday != 0 && nyear != 0){
-			                ChangeDatap();
-						}
+// 					    if (nmonth != 0 && nday != 0 && nyear != 0){
+//			                ChangeDatap();
+//						}
 					}else {
 					    if (curSpec == null  && ind == 2) System.out.println("Выберите врачебную специальность.");
 					    if (curVrach == 0  && ind == 3) System.out.println("Выберите врача.");
@@ -1124,6 +1629,7 @@ public class TalonMainFrame extends JFrame {
 		btnGroup_talon.add(tal_2);
 		
 		tal_3 = new JRadioButton("для выбранного врача");
+		tal_3.setHorizontalAlignment(SwingConstants.CENTER);
 		tal_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnGroup_talon.add(tal_3);
 		tal_3.setSelected(true);
@@ -1329,11 +1835,7 @@ public class TalonMainFrame extends JFrame {
 						ChangeNdvInfo();
 					}
 					if (tbMain.getSelectedIndex() == 1) ChangeNormInfo();
-					if (tbMain.getSelectedIndex() == 2) {
-						ChangeDatap();
-//						ChangeTalonInfo();
-//						tal_1.setSelected(true);
-					}
+					if (tbMain.getSelectedIndex() == 2) ChangeTalonInfo();
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -1378,7 +1880,7 @@ public class TalonMainFrame extends JFrame {
 		treevrach.setModel(new DefaultTreeModel(createNodes()));
 		
 		try {
-			tbl_rasp.setIntegerClassifierSelector(1, MainForm.tcl.getVidp());
+//			tbl_rasp.setIntegerClassifierSelector(1, MainForm.tcl.getVidp());
 			tbl_norm.setIntegerClassifierSelector(0, MainForm.tcl.getVidp());
 			tbl_talon.setIntegerClassifierSelector(1, MainForm.tcl.getVidp());
 		} catch (KmiacServerException kse){
@@ -1386,14 +1888,14 @@ public class TalonMainFrame extends JFrame {
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-		try {
-			MainForm.tcl.getAzt();
-			tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.getAzt());
-		} catch (KmiacServerException kse){
-		} catch (AztNotFoundException anfe){
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
+//		try {
+//			MainForm.tcl.getAzt();
+//			tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.getAzt());
+//		} catch (KmiacServerException kse){
+//		} catch (AztNotFoundException anfe){
+//		} catch (Exception e1) {
+//			e1.printStackTrace();
+//		}
 	}
 	
 	  private DefaultMutableTreeNode createNodes() {
@@ -1438,7 +1940,7 @@ public class TalonMainFrame extends JFrame {
 	private void ChangeNraspInfo(){
 		try {
 			btnGroup_cxema.clearSelection();
-			tbl_rasp.setData(new ArrayList<Nrasp>());
+//			tbl_rasp.setData(new ArrayList<Nrasp>());
 			try {
 				NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, 0);
 				if (!NraspInfo.isEmpty())
@@ -1455,7 +1957,7 @@ public class TalonMainFrame extends JFrame {
 				}
 			}
             if (NraspInfo.size() > 0) {
-    			tbl_rasp.setData(NraspInfo);
+//    			tbl_rasp.setData(NraspInfo);
     			ShowOtmetka();
     			ShowTimePause();
             }
@@ -1466,10 +1968,10 @@ public class TalonMainFrame extends JFrame {
 	}
 	private void ChangeCxemaInfo(int cxm){
 		try {
-			tbl_rasp.setData(new ArrayList<Nrasp>());
+//			tbl_rasp.setData(new ArrayList<Nrasp>());
 			NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, cxm);
             if (!NraspInfo.isEmpty()) {
-    			tbl_rasp.setData(NraspInfo);
+//    			tbl_rasp.setData(NraspInfo);
     			ShowOtmetka();
     			ShowTimePause();
             }
@@ -1503,7 +2005,7 @@ public class TalonMainFrame extends JFrame {
 	private void ChangeTalonInfo(){
 		try {
 			tbl_talon.setData(new ArrayList<Talon>());
-			TalonInfo = MainForm.tcl.getTalon(MainForm.authInfo.cpodr, curVrach, curSpec, getDatep);
+			TalonInfo = MainForm.tcl.getTalon(MainForm.authInfo.cpodr, curVrach, curSpec, calendar.getDate().getTime());
 			tbl_talon.setData(TalonInfo);
 		} catch (TalonNotFoundException tnfe) {
 		} catch (Exception e) {
@@ -1520,16 +2022,62 @@ public class TalonMainFrame extends JFrame {
 	}
 
 	private void ClearTimePause() {
-		tf_day1_p1.setValue(null);
-		tf_day1_p2.setValue(null);
-		tf_day2_p1.setValue(null);
-		tf_day2_p2.setValue(null);
-		tf_day3_p1.setValue(null);
-		tf_day3_p2.setValue(null);
-		tf_day4_p1.setValue(null);
-		tf_day4_p2.setValue(null);
-		tf_day5_p1.setValue(null);
-		tf_day5_p2.setValue(null);
+		tf_day1_pause1.setValue(null);
+		tf_day1_pause2.setValue(null);
+		tf_day2_pause1.setValue(null);
+		tf_day2_pause2.setValue(null);
+		tf_day3_pause1.setValue(null);
+		tf_day3_pause2.setValue(null);
+		tf_day4_pause1.setValue(null);
+		tf_day4_pause2.setValue(null);
+		tf_day5_pause1.setValue(null);
+		tf_day5_pause2.setValue(null);
+		tf_day1_pause1.setValue(null);
+		tf_day1_pause1.setValue(null);
+
+		tf_day1_pp1.setValue(null);
+		tf_day1_pp2.setValue(null);
+		tf_day2_pp1.setValue(null);
+		tf_day2_pp2.setValue(null);
+		tf_day3_pp1.setValue(null);
+		tf_day3_pp2.setValue(null);
+		tf_day4_pp1.setValue(null);
+		tf_day4_pp2.setValue(null);
+		tf_day5_pp1.setValue(null);
+		tf_day5_pp2.setValue(null);
+
+		tf_day1_pv1.setValue(null);
+		tf_day1_pv2.setValue(null);
+		tf_day2_pv1.setValue(null);
+		tf_day2_pv2.setValue(null);
+		tf_day3_pv1.setValue(null);
+		tf_day3_pv2.setValue(null);
+		tf_day4_pv1.setValue(null);
+		tf_day4_pv2.setValue(null);
+		tf_day5_pv1.setValue(null);
+		tf_day5_pv2.setValue(null);
+
+		tf_day1_pd1.setValue(null);
+		tf_day1_pd2.setValue(null);
+		tf_day2_pd1.setValue(null);
+		tf_day2_pd2.setValue(null);
+		tf_day3_pd1.setValue(null);
+		tf_day3_pd2.setValue(null);
+		tf_day4_pd1.setValue(null);
+		tf_day4_pd2.setValue(null);
+		tf_day5_pd1.setValue(null);
+		tf_day5_pd2.setValue(null);
+		
+		tf_day1_int1.setValue(null);
+		tf_day1_int2.setValue(null);
+		tf_day2_int1.setValue(null);
+		tf_day2_int2.setValue(null);
+		tf_day3_int1.setValue(null);
+		tf_day3_int2.setValue(null);
+		tf_day4_int1.setValue(null);
+		tf_day4_int2.setValue(null);
+		tf_day5_int1.setValue(null);
+		tf_day5_int2.setValue(null);
 	}
 
 	private void ShowOtmetka(){
@@ -1547,56 +2095,115 @@ public class TalonMainFrame extends JFrame {
 	private void ShowTimePause(){
 		for (int i=0; i <= NraspInfo.size()-1; i++){ 
 			if (NraspInfo.get(i).getDenn() == 1){
-				tf_day1_p1.setTime(NraspInfo.get(i).getTimep_n());
-				tf_day1_p2.setTime(NraspInfo.get(i).getTimep_k());
+				if (NraspInfo.get(i).getVidp() == 1){
+					tf_day1_pp1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day1_pp2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				if (NraspInfo.get(i).getVidp() == 2){
+					tf_day1_pv1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day1_pv2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				if (NraspInfo.get(i).getVidp() == 3){
+					tf_day1_pd1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day1_pd2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				tf_day1_pause1.setTime(NraspInfo.get(i).getTimep_n());
+				tf_day1_pause2.setTime(NraspInfo.get(i).getTimep_k());
+				tf_day1_int1.setTime(NraspInfo.get(i).getTime_int_n());
+				tf_day1_int2.setTime(NraspInfo.get(i).getTime_int_k());
 			}
 			if (NraspInfo.get(i).getDenn() == 2){
-				tf_day2_p1.setTime(NraspInfo.get(i).getTimep_n());
-				tf_day2_p2.setTime(NraspInfo.get(i).getTimep_k());
+				if (NraspInfo.get(i).getVidp() == 1){
+					tf_day2_pp1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day2_pp2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				if (NraspInfo.get(i).getVidp() == 2){
+					tf_day2_pv1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day2_pv2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				if (NraspInfo.get(i).getVidp() == 3){
+					tf_day2_pd1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day2_pd2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				tf_day2_pause1.setTime(NraspInfo.get(i).getTimep_n());
+				tf_day2_pause2.setTime(NraspInfo.get(i).getTimep_k());
+				tf_day2_int1.setTime(NraspInfo.get(i).getTime_int_n());
+				tf_day2_int2.setTime(NraspInfo.get(i).getTime_int_k());
 			}
 			if (NraspInfo.get(i).getDenn() == 3){
-				tf_day3_p1.setTime(NraspInfo.get(i).getTimep_n());
-				tf_day3_p2.setTime(NraspInfo.get(i).getTimep_k());
+				if (NraspInfo.get(i).getVidp() == 1){
+					tf_day3_pp1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day3_pp2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				if (NraspInfo.get(i).getVidp() == 2){
+					tf_day3_pv1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day3_pv2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				if (NraspInfo.get(i).getVidp() == 3){
+					tf_day3_pd1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day3_pd2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				tf_day3_pause1.setTime(NraspInfo.get(i).getTimep_n());
+				tf_day3_pause2.setTime(NraspInfo.get(i).getTimep_k());
+				tf_day3_int1.setTime(NraspInfo.get(i).getTime_int_n());
+				tf_day3_int2.setTime(NraspInfo.get(i).getTime_int_k());
 			}
 			if (NraspInfo.get(i).getDenn() == 4){
-				tf_day4_p1.setTime(NraspInfo.get(i).getTimep_n());
-				tf_day4_p2.setTime(NraspInfo.get(i).getTimep_k());
+				if (NraspInfo.get(i).getVidp() == 1){
+					tf_day4_pp1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day4_pp2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				if (NraspInfo.get(i).getVidp() == 2){
+					tf_day4_pv1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day4_pv2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				if (NraspInfo.get(i).getVidp() == 3){
+					tf_day4_pd1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day4_pd2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				tf_day4_pause1.setTime(NraspInfo.get(i).getTimep_n());
+				tf_day4_pause2.setTime(NraspInfo.get(i).getTimep_k());
+				tf_day4_int1.setTime(NraspInfo.get(i).getTime_int_n());
+				tf_day4_int2.setTime(NraspInfo.get(i).getTime_int_k());
 			}
 			if (NraspInfo.get(i).getDenn() == 5){
-				tf_day5_p1.setTime(NraspInfo.get(i).getTimep_n());
-				tf_day5_p2.setTime(NraspInfo.get(i).getTimep_k());
+				if (NraspInfo.get(i).getVidp() == 1){
+					tf_day5_pp1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day5_pp2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				if (NraspInfo.get(i).getVidp() == 2){
+					tf_day5_pv1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day5_pv2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				if (NraspInfo.get(i).getVidp() == 3){
+					tf_day5_pd1.setTime(NraspInfo.get(i).getTime_n());
+					tf_day5_pd2.setTime(NraspInfo.get(i).getTime_k());
+				}
+				tf_day5_pause1.setTime(NraspInfo.get(i).getTimep_n());
+				tf_day5_pause2.setTime(NraspInfo.get(i).getTimep_k());
+				tf_day5_int1.setTime(NraspInfo.get(i).getTime_int_n());
+				tf_day5_int2.setTime(NraspInfo.get(i).getTime_int_k());
 			}
 		}
 	}
 
-	public void ChangeDatap(){
-		try{
-			String numday = null;
-			String nummonth = null;
-			if (nday<10) numday = "0"+String.valueOf(nday);
-			else numday = String.valueOf(nday);
-			if (nmonth<10) nummonth = "0"+String.valueOf(nmonth);
-			else nummonth = String.valueOf(nmonth);
-			SimpleDateFormat frm = new SimpleDateFormat("dd.MM.yyyy");
-			String strDat = numday+"."+nummonth+"."+String.valueOf(nyear);
-			Date dat = frm.parse(strDat);
-			getDatep = dat.getTime();
+//	public void ChangeDatap(){
+//		getDatep = calendar.getDate().getTime();
+//		try{
+//			String numday = null;
+//			String nummonth = null;
+//			if (nday<10) numday = "0"+String.valueOf(nday);
+//			else numday = String.valueOf(nday);
+//			if (nmonth<10) nummonth = "0"+String.valueOf(nmonth);
+//			else nummonth = String.valueOf(nmonth);
+//			SimpleDateFormat frm = new SimpleDateFormat("dd.MM.yyyy");
+//			String strDat = numday+"."+nummonth+"."+String.valueOf(nyear);
+//			Date dat = frm.parse(strDat);
+//			getDatep = dat.getTime();
 //		    System.out.println(strDat+ ",   "+ dat+ ",   "+ getDatep);
-			ChangeTalonInfo();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-	}
-	public void iterate(){
-		int num = 0;
-		while (num < 1000){
-			pBar.setValue(num);
-		     try {
-		       Thread.sleep(500);
-		     }
-		       catch (InterruptedException e) {
-		     }
-		     num += 90;
-		}
-	}
+//			ChangeTalonInfo();
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//		}
+//	}
 }
