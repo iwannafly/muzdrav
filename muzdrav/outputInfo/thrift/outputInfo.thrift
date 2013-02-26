@@ -110,7 +110,7 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
      /**
      * Возвращает время работы врачей
      */
-    list<VrachTabel> getVrachTabel(1:i32 pcod) throws (1: kmiacServer.KmiacServerException kse);
+    list<VrachTabel> getVrachTabel(1:i32 pcod, 2: string cdol) throws (1: kmiacServer.KmiacServerException kse);
 		
 		
     /**

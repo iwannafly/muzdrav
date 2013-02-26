@@ -38,7 +38,7 @@ public class serverVrachInfo extends serverTemplate {
 	}
 	public List<VrachInfo> getVrachTableInfo(int cpodr) throws KmiacServerException, TException {
 				String sqlQuery = "SELECT a.fam, a.im, a.ot, a.pcod, b.cdol " 
-				+ "FROM s_vrach a, s_mrab b WHERE a.pcod=b.pcod AND cpodr=?";
+				+ "FROM s_vrach a, s_mrab b WHERE a.pcod=b.pcod AND cpodr=? AND b.cslu=2 AND b.priznd=1";
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr)) {
 			ResultSet rs = acrs.getResultSet();
 			List<VrachInfo> VrachInfo = tableVrachInfo.mapToList(rs);
@@ -53,10 +53,10 @@ public class serverVrachInfo extends serverTemplate {
 		}
 	}
 	
-	public List<VrachTabel> getVrachTabel(int pcod) throws KmiacServerException, TException {
+	public List<VrachTabel> getVrachTabel(int pcod, String cdol) throws KmiacServerException, TException {
 				String sqlQuery = "SELECT datav, timep, timed, timeda, timeprf, " 
-				+ "timepr, pcod, cpodr, cdol, id FROM s_tabel WHERE pcod=? ORDER BY datav DESC";
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
+				+ "timepr, pcod, cpodr, cdol, id FROM s_tabel WHERE pcod=? AND cdol=? ORDER BY datav DESC";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod, cdol)) {
 			ResultSet rs = acrs.getResultSet();
 			List<VrachTabel> VrachTabel = tableVrachTabel.mapToList(rs);
 			return VrachTabel;	
