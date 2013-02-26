@@ -78,4 +78,3 @@ service ThriftDiary extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getDoctorsFromOtd(1:i32 clpu, 2:i32 cpodr)
 		throws (1:kmiacServer.KmiacServerException kse);
 }
-

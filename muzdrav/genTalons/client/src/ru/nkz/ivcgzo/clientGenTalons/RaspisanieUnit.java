@@ -21,14 +21,17 @@ public class RaspisanieUnit {
 
 	public static  List<Nrasp> nrasp;
 	public static List<Nrasp> pauselist;
+	public static List<Nrasp> internetlist;
 	public static List<Rasp> rasp;
 	public static List<Talon> timelist;
 	public static List<Norm> mdlit;
+	public static int proc;
 	public static int dlit;
 	public static int TalonCount;
 	public static long timepause_n = 0;
 	public static long timepause_k = 0;
-	public static int proc;
+	public static long time_int_n = 0;
+	public static long time_int_k = 0;
 
 	static void NewRaspisanie(int cpodr, int pcod, String cdol, int cxm){
 		try {
@@ -47,6 +50,8 @@ public class RaspisanieUnit {
 					tmpNrasp.setTime_k(Time.valueOf("00:00:00").getTime());
 					tmpNrasp.setTimep_n(Time.valueOf("00:00:00").getTime());
 					tmpNrasp.setTimep_k(Time.valueOf("00:00:00").getTime());
+					tmpNrasp.setTime_int_n(Time.valueOf("00:00:00").getTime());
+					tmpNrasp.setTime_int_k(Time.valueOf("00:00:00").getTime());
 					tmpNrasp.setPfd(false);
 					NraspInf.add(tmpNrasp);
 				}
@@ -67,6 +72,8 @@ public class RaspisanieUnit {
 					tmpNrasp.setTime_k(Time.valueOf("00:00:00").getTime());
 					tmpNrasp.setTimep_n(Time.valueOf("00:00:00").getTime());
 					tmpNrasp.setTimep_k(Time.valueOf("00:00:00").getTime());
+					tmpNrasp.setTime_int_n(Time.valueOf("00:00:00").getTime());
+					tmpNrasp.setTime_int_k(Time.valueOf("00:00:00").getTime());
 					tmpNrasp.setPfd(false);
 					NraspInf.add(tmpNrasp);
 				}
@@ -138,6 +145,7 @@ public class RaspisanieUnit {
 			cal1.add(Calendar.DAY_OF_MONTH, -1);
 			rasp = new ArrayList<Rasp>();
 			pauselist = new ArrayList<Nrasp>();
+			internetlist = new ArrayList<Nrasp>();
 			while (!cal1.equals(cal2)) {
 				cal1.add(Calendar.DAY_OF_MONTH, 1);
 				if (getPrrabFromCalendar(cal1.getTimeInMillis())){
@@ -158,12 +166,12 @@ public class RaspisanieUnit {
 									tmpRasp.setPcod(nrasp.get(i).getPcod());
 									tmpRasp.setDenn(nrasp.get(i).getDenn());
 									tmpRasp.setDatap(cal1.getTimeInMillis());
-									tmpRasp.setTime_n(new Time(nrasp.get(i).getTime_n()).getTime());
-									tmpRasp.setTime_k(new Time(nrasp.get(i).getTime_k()).getTime());
 									tmpRasp.setVidp(nrasp.get(i).getVidp());
 									tmpRasp.setCpol(nrasp.get(i).getCpol());
 									tmpRasp.setCdol(nrasp.get(i).getCdol());
 									tmpRasp.setPfd(nrasp.get(i).isPfd());
+									tmpRasp.setTime_n(new Time(nrasp.get(i).getTime_n()).getTime());
+									tmpRasp.setTime_k(new Time(nrasp.get(i).getTime_k()).getTime());
 									rasp.add(tmpRasp);
 									if (!new Time(nrasp.get(i).getTimep_n()).toString().equalsIgnoreCase("00:00:00") && !new Time(nrasp.get(i).getTimep_k()).toString().equalsIgnoreCase("00:00:00")){
 										Nrasp tmpPause = new Nrasp();
@@ -174,6 +182,16 @@ public class RaspisanieUnit {
 										tmpPause.setTimep_n(new Time(nrasp.get(i).getTimep_n()).getTime());
 										tmpPause.setTimep_k(new Time(nrasp.get(i).getTimep_k()).getTime());
 										pauselist.add(tmpPause);
+									}
+									if (!new Time(nrasp.get(i).getTime_int_n()).toString().equalsIgnoreCase("00:00:00") && !new Time(nrasp.get(i).getTime_int_k()).toString().equalsIgnoreCase("00:00:00")){
+										Nrasp tmpInternet = new Nrasp();
+										tmpInternet.setPcod(tmpRasp.getPcod());
+										tmpInternet.setDenn(tmpRasp.getDenn());
+										tmpInternet.setCdol(tmpRasp.getCdol());
+										tmpInternet.setVidp(tmpRasp.getVidp());
+										tmpInternet.setTime_int_n(new Time(nrasp.get(i).getTime_int_n()).getTime());
+										tmpInternet.setTime_int_k(new Time(nrasp.get(i).getTime_int_k()).getTime());
+										internetlist.add(tmpInternet);
 									}
 								}
 							}
@@ -221,6 +239,18 @@ public class RaspisanieUnit {
 							}
 						}
 					}
+					if (internetlist.size() != 0) {
+						for (int j=0; j <= internetlist.size()-1; j++){
+							if (rasp.get(i).getPcod()==internetlist.get(j).getPcod() && 
+								rasp.get(i).getDenn()==internetlist.get(j).getDenn() &&
+								rasp.get(i).getCdol()==internetlist.get(j).getCdol() &&
+								rasp.get(i).getVidp()==internetlist.get(j).getVidp()){
+								time_int_n = internetlist.get(j).getTime_int_n();
+								time_int_k = internetlist.get(j).getTime_int_k();
+								break;
+							}
+						}
+					}
 					
 					if (dlit != 0){
 						if (timepause_n==0 && timepause_k==0){
@@ -245,6 +275,11 @@ public class RaspisanieUnit {
 							tmpTalon.setNrasp(rasp.get(i).getId());
 							String d = dtf.format(dtf.parse((sdf.format(tmpTalon.getDatap())+' '+stf.format(tmpTalon.getTimep()) ) ) );
 							tmpTalon.setDatapt(dtf.parse(d).getTime());
+							if (time_int_n !=0 && time_int_k != 0)
+								if (getTalonInternet(timelist.get(j).getTimep(), time_int_n, time_int_k)){
+									tmpTalon.setVidp(1);
+									tmpTalon.setPrv(1);
+								}
 							talonlist.add(tmpTalon);
 						}
 					}
@@ -300,6 +335,21 @@ public class RaspisanieUnit {
 			}
 		}
 		return timelist;
+	}
+
+	private static boolean getTalonInternet(long timep, long timen, long timek) {
+		Calendar cal1 = Calendar.getInstance();
+		Calendar cal2 = Calendar.getInstance();
+		Calendar cal3 = Calendar.getInstance();
+		cal1.setTimeInMillis(timep);
+		cal2.setTimeInMillis(timen);
+		cal3.setTimeInMillis(timek);
+
+		while (cal2.compareTo(cal3)<0) {
+		if ((cal1.compareTo(cal2)>0 && cal1.compareTo(cal3)<0) || (cal1.compareTo(cal2)==0 || cal1.compareTo(cal3)==0))
+			return true;
+		}
+		return false;
 	}
 
 	private static boolean getPrrabFromCalendar(long cdate) {

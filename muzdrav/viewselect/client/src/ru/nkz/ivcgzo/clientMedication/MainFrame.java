@@ -119,9 +119,7 @@ public class MainFrame extends JFrame {
         });
         spMedicationList.setViewportView(lMedication);
     }
-
-
-
+	
     private void fillCurLekTextFields() {  
         if (curLek.isSetFlek()) {
             tfFormLek.setText(curLek.getFlek());
@@ -151,8 +149,8 @@ public class MainFrame extends JFrame {
             tfVrachFrom.setText(String.valueOf(curLek.getVrach()));
         }
 
-        if (curLek.isSetDatao()) {
-            cdeDateTo.setDate(curLek.getDatao());
+        if (curLek.isSetDatae()) {
+            cdeDateTo.setDate(curLek.getDatae());
         }
 
         if (curLek.isSetVracho()) {
@@ -222,7 +220,7 @@ public class MainFrame extends JFrame {
         pInfo.add(tfVrachFrom);
         tfVrachFrom.setColumns(10);
 
-        lblDateTo = new JLabel("  Дата отмены");
+        lblDateTo = new JLabel("  Дата окончания");
         pInfo.add(lblDateTo);
 
         cdeDateTo = new CustomDateEditor();
@@ -354,7 +352,7 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private final void  clearTextFields() {
+    private final void clearTextFields() {
         tfCountInDay.setText("");
         tfDose.setText("");
         tfFormLek.setText("");

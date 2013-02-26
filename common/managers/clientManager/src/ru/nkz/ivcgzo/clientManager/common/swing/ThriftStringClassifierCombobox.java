@@ -74,8 +74,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		}
 		setModel();
 		setData(list);
-		if (classifier != null)
-			setFormListeners();
+		setFormListeners();
 	}
 	
 	private void setModel() {
@@ -122,7 +121,9 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 				if (e.getClickCount() == 2) {
 					loadClassifier();
 					if (isEnabled() && itemsBcp.size() > 0) {
-						StringClassifier res = ConnectionManager.instance.showStringClassifierSelector(classifier);
+						if (searcher != null)
+							searcher.getEditor().selectAll();
+						StringClassifier res = (classifier != null) ? ConnectionManager.instance.showStringClassifierSelector(classifier) : ConnectionManager.instance.showStringClassifierSelector(itemsBcp);
 						
 						if (res != null)
 							setSelectedPcod(res.pcod);
@@ -411,6 +412,10 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 					prevSelItem = selItem;
 				}
 			});
+		}
+		
+		public CustomComboBoxEditor getEditor() {
+			return editor;
 		}
 	}
 	
