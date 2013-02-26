@@ -105,7 +105,7 @@ public class ServerHospital extends Server implements Iface {
     };
     private static final String[] MEDICAL_HISTORY_FIELD_NAMES = {
         "id", "id_gosp", "jalob", "morbi", "status_praesense", "status_localis",
-        "fisical_obs", "pcod_vrach", "dataz", "timez"
+        "fisical_obs", "pcod_vrach", "dataz", "timez", "pcod_added", "cpodr"
     };
     private static final String[] PRIEM_INFO_FIELD_NAMES = {
         "pl_extr", "datap", "dataosm", "naprav",
@@ -201,8 +201,8 @@ public class ServerHospital extends Server implements Iface {
     private static final Class<?>[] MEDICAL_HISTORY_TYPES = {
     //  id             id_gosp       jalob         morbi          st_praesense  status_localis
         Integer.class, Integer.class, String.class, String.class, String.class, String.class,
-    //  fisical_obs   pcod_vrach    dataz       timez
-        String.class, Integer.class, Date.class, Time.class
+    //  fisical_obs   pcod_vrach     dataz       timez       pcod_added     cpodr
+        String.class, Integer.class, Date.class, Time.class, Integer.class, Integer.class 
     };
     private static final Class<?>[] LIFE_HISTORY_TYPES = {
     //  npasp          allerg        farmkol       vitae
@@ -711,11 +711,11 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final int addMedicalHistory(final TMedicalHistory medHist)
             throws KmiacServerException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
         final String sqlQuery = "INSERT INTO c_osmotr (id_gosp, jalob, "
             + "morbi, status_praesense, "
-            + "status_localis, fisical_obs, pcod_vrach, dataz, timez) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            + "status_localis, fisical_obs, pcod_vrach, dataz, timez, pcod_added, cpodr) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, true, medHist, MEDICAL_HISTORY_TYPES, indexes);
             int id = sme.getGeneratedKeys().getInt("id");

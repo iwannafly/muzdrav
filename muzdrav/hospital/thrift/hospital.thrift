@@ -65,6 +65,8 @@ struct TMedicalHistory{
 	8:optional i32 pcodVrach;
 	9:optional i64 dataz;
 	10:optional i64 timez;
+	11:optional i32 pcod_added;
+	12:optional i32 cpodr;
 }
 
 struct TLifeHistory{
