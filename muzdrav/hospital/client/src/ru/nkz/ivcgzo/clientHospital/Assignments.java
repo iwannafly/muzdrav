@@ -122,6 +122,7 @@ public final class Assignments extends JPanel {
 	 */
 	private void updatePanel() {
 		this.clearAllTables();
+		this.clearAllTextFields();
 		if (this.patient != null) {
 			this.fillTableMedications();
 			this.fillTableDiagnostics();
@@ -143,12 +144,21 @@ public final class Assignments extends JPanel {
 	}
 	
 	/**
+	 * Очистка всех текстовых полей
+	 */
+	private void clearAllTextFields() {
+		this.taMedicationsInfo.setText(null);
+		this.taDiagnosticsResult.setText(null);
+	}
+	
+	/**
 	 * Заполнение таблицы лекарственных назначений данными из БД
 	 */
 	private void fillTableMedications() {
 		if ((this.patient != null) && (ClientHospital.tcl != null))
 			try {
 				this.lastMedItem = null;
+				this.taMedicationsInfo.setText(null);
 				this.tblMedications.setData(
 						ClientHospital.tcl.getMedications(
 								this.patient.getGospitalCod()));
@@ -166,6 +176,7 @@ public final class Assignments extends JPanel {
 		if ((this.patient != null) && (ClientHospital.tcl != null))
 			try {
 				this.lastDiagItem = null;
+				this.taDiagnosticsResult.setText(null);
 				this.tblDiagnostics.setData(
 						ClientHospital.tcl.getDiagnostics(
 								this.patient.getGospitalCod()));
@@ -184,8 +195,14 @@ public final class Assignments extends JPanel {
 		if ((curItem == null) || (this.lastMedItem == curItem))
 			return;
 		this.lastMedItem = curItem;
-		//TODO: ПРОДОЛЖИТЬ
-		String strInfo = "Форма выпуска: " + curItem.getFlek();
+		String strInfo = "";
+		if (curItem.isSetFlek())
+			strInfo += "Лекарственая форма: " + curItem.getFlek() + '\n';
+		if (curItem.isSetKomm() && (curItem.getKomm().length() > 0))
+			strInfo += "Указания по приёму: " + curItem.getKomm() + '\n';
+		strInfo += "Назначивший врач: " + curItem.getVrach_name();
+		if (curItem.isSetVracho() && curItem.isSetVracho_name())
+			strInfo += '\n' + "Отменивший врач: " + curItem.getVracho_name();
 		this.taMedicationsInfo.setText(strInfo);
 	}
 	
@@ -301,6 +318,92 @@ public final class Assignments extends JPanel {
 	            this, msgText, "Ошибка",
 	            JOptionPane.ERROR_MESSAGE);
     }
+    
+    /**
+     * Событие нажатия на кнопку добавления лек. назначения
+     */
+    private void btnAddMedicationClick() {
+        if ((patient != null) && (ClientHospital.conMan != null)) {
+            ClientHospital.conMan.showMedicationForm(patient.getPatientId(),
+                patient.getSurname(), patient.getName(), patient.getMiddlename(),
+                patient.getGospitalCod());
+            fillTableMedications();
+        }
+    }
+    
+    /**
+     * Функция проверки лекарственного назначения на корректность
+     * @param med Проверяемое лекарственное назначение
+     * @return Возвращает <code>true</code>, если назначение корректно;
+	 * иначе - <code>false</code>
+     */
+    private boolean checkMedication(TMedication med) {
+		if (med.isSetDatao()) {
+			if ((med.getDatao() < med.getDatan()) ||
+				(med.getDatao() > med.getDatae())) {
+				showErrorDialog("Некорректная дата отмены");
+				return false;
+			}
+			if (!med.isSetVracho())
+				med.setVracho(userAuth.getPcod());
+		}
+		if (med.isSetDoza() && (med.getDoza() <= 0)) {
+			showErrorDialog("Некорректная разовая доза");
+			return false;
+		}
+		if (med.isSetPereod() && (med.getPereod() <= 0)) {
+			showErrorDialog("Некорректная периодичность приёма");
+			return false;
+		}
+		return true;
+    }
+
+    /**
+     * Событие нажатия на кнопку сохранения лек. назначения
+     */
+    private void btnSaveMedicationClick() {
+    	TMedication curItem = tblMedications.getSelectedItem();
+        if ((patient != null) && (ClientHospital.tcl != null) &&
+        	(curItem != null)) {
+        	if (!checkMedication(curItem))
+        		return;
+			try {
+				ClientHospital.tcl.updateMedication(curItem);
+                fillTableMedications();
+			} catch (TException e1) {
+				showErrorDialog("Ошибка при сохранении назначения");
+				e1.printStackTrace();
+			}
+        }
+    }
+    
+    /**
+     * Событие нажатия на кнопку удаления лек. назначения
+     */
+    private void btnDelMedicationClick() {
+    	TMedication curItem = tblMedications.getSelectedItem();
+        if ((patient != null) && (ClientHospital.tcl != null) &&
+            (curItem != null) &&
+        	getUserAnswer("Вы действительно хотите удалить назначение?"))
+			try {
+				ClientHospital.tcl.deleteMedication(curItem.getNlek());
+                fillTableMedications();
+			} catch (TException e1) {
+				showErrorDialog("Ошибка при удалении назначения");
+				e1.printStackTrace();
+			}
+    }
+    
+    /**
+     * Событие нажатия на кнопку добавления исследования
+     */
+    private void btnAddDiagnosticClick() {
+        if ((patient != null) && (ClientHospital.conMan != null)) {
+            ClientHospital.conMan.showLabRecordForm(patient.getPatientId(),
+                patient.getSurname(), patient.getName(), patient.getMiddlename(),
+                patient.getGospitalCod());
+        }
+    }
 	
 	private void setPanelMedications() {
 		this.pnlMedications = new JPanel();
@@ -368,20 +471,21 @@ public final class Assignments extends JPanel {
 		this.spMedicationsTbl = new JScrollPane();
 		this.vbMedicationsTbl.add(this.spMedicationsTbl);
 		this.tblMedications = new CustomTable<TMedication, TMedication._Fields>(
-				false, false, TMedication.class, 0, "Наименование", 10, "Периодичность",
-				4, "Дата назначения", 12, "Дата окончания", 14, "Дата отмены");
+				false, false, TMedication.class, 0, "Наименование",
+				4, "Дата назначения", 12, "Дата окончания", 14, "Дата отмены",
+				18, "Способ введения", 10, "Схема приёма", 11, "Кол-во в день",
+				7, "Разовая доза", 17, "ед.");
 		tblMedications.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				updateMedicationsSelection();
 			}
 		});
-		this.tblMedications.setIntegerClassifierSelector(1, IntegerClassifiers.n_period);
+		this.tblMedications.setDateField(1);
 		this.tblMedications.setDateField(2);
 		this.tblMedications.setDateField(3);
-		this.tblMedications.setDateField(4);
-		//TODO: ПРОДОЛЖИТЬ
-		this.tblMedications.setEditableFields(true, 1, 4);
+		this.tblMedications.setIntegerClassifierSelector(5, IntegerClassifiers.n_period);
+		this.tblMedications.setEditableFields(true, 3, 5, 6, 7);
 		this.spMedicationsTbl.setViewportView(this.tblMedications);
 	}
 	
@@ -414,62 +518,31 @@ public final class Assignments extends JPanel {
 	private void setButtonsMedication() {
 		this.btnAddMedication = new JButton();
 		this.setCustomButton(this.vbMedicationsBtn, this.btnAddMedication,
-				this.defaultDimension, this.addIcon, "Добавить назначение");
+				this.defaultDimension, this.addIcon,
+				"Добавить лекарственное назначение");
 		this.btnAddMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                if ((patient != null) && (ClientHospital.conMan != null)) {
-                    ClientHospital.conMan.showMedicationForm(patient.getPatientId(),
-                        patient.getSurname(), patient.getName(), patient.getMiddlename(),
-                        patient.getGospitalCod());
-                    fillTableMedications();
-                }
+            	btnAddMedicationClick();
             }
         });
 		
 		this.btnSaveMedication = new JButton();
 		this.setCustomButton(this.vbMedicationsBtn, this.btnSaveMedication,
-				this.defaultDimension, this.saveIcon, "Сохранить назначение");
+				this.defaultDimension, this.saveIcon,
+				"Сохранить лекарственное назначение");
 		this.btnSaveMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-            	TMedication curItem = tblMedications.getSelectedItem();
-                if ((patient != null) && (ClientHospital.tcl != null) &&
-                	(curItem != null)) {
-            		if (curItem.isSetDatao()) {
-            			if ((curItem.getDatao() < curItem.getDatan()) ||
-            				(curItem.getDatao() > curItem.getDatae())) {
-            				showErrorDialog("Некорректная дата отмены");
-            				return;
-            			}
-            			if (!curItem.isSetVracho())
-            				curItem.setVracho(userAuth.getPcod());
-            		}
-					try {
-						ClientHospital.tcl.updateMedication(curItem);
-	                    fillTableMedications();
-					} catch (TException e1) {
-						showErrorDialog("Ошибка при сохранении назначения");
-						e1.printStackTrace();
-					}
-                }
+            	btnSaveMedicationClick();
             }
         });
 
 		this.btnDelMedication = new JButton();
 		this.setCustomButton(this.vbMedicationsBtn, this.btnDelMedication,
-				this.defaultDimension, this.delIcon, "Удалить назначение");
+				this.defaultDimension, this.delIcon,
+				"Удалить лекарственное назначение");
 		this.btnDelMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-            	TMedication curItem = tblMedications.getSelectedItem();
-                if ((patient != null) && (ClientHospital.tcl != null) &&
-                    (curItem != null) &&
-                	getUserAnswer("Вы действительно хотите удалить назначение?"))
-					try {
-						ClientHospital.tcl.deleteMedication(curItem.getNlek());
-	                    fillTableMedications();
-					} catch (TException e1) {
-						showErrorDialog("Ошибка при удалении назначения");
-						e1.printStackTrace();
-					}
+            	btnDelMedicationClick();
             }
         });
 	}
@@ -480,11 +553,7 @@ public final class Assignments extends JPanel {
 				this.defaultDimension, this.addIcon, "Добавить исследование");
 		this.btnAddDiagnostic.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                if ((patient != null) && (ClientHospital.conMan != null)) {
-                    ClientHospital.conMan.showLabRecordForm(patient.getPatientId(),
-                        patient.getSurname(), patient.getName(), patient.getMiddlename(),
-                        patient.getGospitalCod());
-                }
+            	btnAddDiagnosticClick();
             }
         });
 
