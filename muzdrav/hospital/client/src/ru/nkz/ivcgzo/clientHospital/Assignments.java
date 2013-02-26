@@ -223,21 +223,6 @@ public final class Assignments extends JPanel {
 	}
 	
 	/**
-	 * Инициализация пользовательского интерфейса панели
-	 */
-	private void setInterface() {
-		this.addIcon = new ImageIcon(Assignments.addIconURL);
-		this.saveIcon = new ImageIcon(Assignments.saveIconURL);
-		this.delIcon = new ImageIcon(Assignments.delIconURL);
-		this.defaultDimension = new Dimension(50, 50);
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		this.setPanelMedications();
-		this.setPanelDiagnostics();
-		this.setPanelDiet();
-		this.setPanelProcedures();
-	}
-	
-	/**
 	 * Установка параметров заданной панели
 	 * @param parentPanel Родительская панель, в которую будет добавлена текущая
 	 * @param curPanel Текущая панель
@@ -405,6 +390,24 @@ public final class Assignments extends JPanel {
         }
     }
 	
+	/**
+	 * Инициализация пользовательского интерфейса панели
+	 */
+	private void setInterface() {
+		this.addIcon = new ImageIcon(Assignments.addIconURL);
+		this.saveIcon = new ImageIcon(Assignments.saveIconURL);
+		this.delIcon = new ImageIcon(Assignments.delIconURL);
+		this.defaultDimension = new Dimension(50, 50);
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.setPanelMedications();
+		this.setPanelDiagnostics();
+		this.setPanelDiet();
+		this.setPanelProcedures();
+	}
+	
+    /**
+     * Инициализация панели медицинских назначений
+     */
 	private void setPanelMedications() {
 		this.pnlMedications = new JPanel();
 		this.setCustomPanel(this, this.pnlMedications, "Лекарственные назначения");
@@ -417,25 +420,12 @@ public final class Assignments extends JPanel {
 		this.setButtonsMedication();
 	}
 	
-	private void setInfoMedication() {
-		this.spMedicationsInfo = new JScrollPane();
-		this.vbMedicationsTbl.add(this.spMedicationsInfo);
-		this.taMedicationsInfo = new JTextArea();
-		this.setCustomTextArea(this.taMedicationsInfo,
-				Assignments.defaultFont, this.spMedicationsInfo);
-	}
-	
-	private void setInfoDiagnostics() {
-		this.spDiagnosticsResult = new JScrollPane();
-		this.vbDiagnosticsTbl.add(this.spDiagnosticsResult);
-		this.taDiagnosticsResult = new JTextArea();
-		this.setCustomTextArea(this.taDiagnosticsResult,
-				Assignments.defaultFont, this.spDiagnosticsResult);
-	}
-	
+    /**
+     * Инициализация панели лабораторных и диагностических исследований
+     */
 	private void setPanelDiagnostics() {
 		this.pnlDiagnostics = new JPanel();
-		this.setCustomPanel(this, this.pnlDiagnostics, "Исследования");
+		this.setCustomPanel(this, this.pnlDiagnostics, "Лабораторные и диагностические исследования");
 		this.vbDiagnosticsTbl = Box.createVerticalBox();
 		this.pnlDiagnostics.add(this.vbDiagnosticsTbl);
 		this.setTableDiagnostics();
@@ -445,6 +435,9 @@ public final class Assignments extends JPanel {
 		this.setButtonsDiagnostics();
 	}
 	
+    /**
+     * Инициализация панели режимов и диет
+     */
 	private void setPanelDiet() {
 		this.pnlDiet = new JPanel();
 		this.setCustomPanel(this, this.pnlDiet, "Режим и диета");
@@ -456,6 +449,9 @@ public final class Assignments extends JPanel {
 		this.setButtonsDiet();
 	}
 	
+    /**
+     * Инициализация панели лечебных процедур
+     */
 	private void setPanelProcedures() {
 		this.pnlProcedures = new JPanel();
 		this.setCustomPanel(this, this.pnlProcedures, "Лечебные процедуры");
@@ -467,6 +463,9 @@ public final class Assignments extends JPanel {
 		this.setButtonsProcedures();
 	}
 	
+	/**
+     * Инициализация таблицы медицинских назначений
+     */
 	private void setTableMedication() {
 		this.spMedicationsTbl = new JScrollPane();
 		this.vbMedicationsTbl.add(this.spMedicationsTbl);
@@ -488,7 +487,10 @@ public final class Assignments extends JPanel {
 		this.tblMedications.setEditableFields(true, 3, 5, 6, 7);
 		this.spMedicationsTbl.setViewportView(this.tblMedications);
 	}
-	
+
+	/**
+     * Инициализация таблицы лабораторных и диагностических исследований
+     */
 	private void setTableDiagnostics() {
 		this.spDiagnosticsTbl = new JScrollPane();
 		this.vbDiagnosticsTbl.add(this.spDiagnosticsTbl);
@@ -500,7 +502,10 @@ public final class Assignments extends JPanel {
 		this.tblDiagnostics.setDateField(4);
 		this.spDiagnosticsTbl.setViewportView(this.tblDiagnostics);
 	}
-	
+
+	/**
+     * Инициализация таблицы режимов и диет
+     */
 	private void setTableDiet() {
 		this.spDiet = new JScrollPane();
 		this.vbDietTbl.add(this.spDiet);
@@ -511,7 +516,10 @@ public final class Assignments extends JPanel {
 		this.tblDiagnostics.setDateField(3);
 		this.spDiet.setViewportView(this.tblDiet);
 	}
-	
+
+	/**
+     * Инициализация таблицы лечебных процедур
+     */
 	private void setTableProcedures() {
 		this.spProcedures = new JScrollPane();
 		this.vbProceduresTbl.add(this.spProcedures);
@@ -523,7 +531,32 @@ public final class Assignments extends JPanel {
 		this.tblDiagnostics.setDateField(2);
 		this.spProcedures.setViewportView(this.tblProcedures);
 	}
-	
+
+	/**
+     * Инициализация поля информации о медицинских назначениях
+     */
+	private void setInfoMedication() {
+		this.spMedicationsInfo = new JScrollPane();
+		this.vbMedicationsTbl.add(this.spMedicationsInfo);
+		this.taMedicationsInfo = new JTextArea();
+		this.setCustomTextArea(this.taMedicationsInfo,
+				Assignments.defaultFont, this.spMedicationsInfo);
+	}
+
+	/**
+     * Инициализация поля информации о лабораторных и диагностических исследованиях
+     */
+	private void setInfoDiagnostics() {
+		this.spDiagnosticsResult = new JScrollPane();
+		this.vbDiagnosticsTbl.add(this.spDiagnosticsResult);
+		this.taDiagnosticsResult = new JTextArea();
+		this.setCustomTextArea(this.taDiagnosticsResult,
+				Assignments.defaultFont, this.spDiagnosticsResult);
+	}
+
+	/**
+     * Инициализация кнопок панели медицинских назначений
+     */
 	private void setButtonsMedication() {
 		this.btnAddMedication = new JButton();
 		this.setCustomButton(this.vbMedicationsBtn, this.btnAddMedication,
@@ -555,7 +588,10 @@ public final class Assignments extends JPanel {
             }
         });
 	}
-	
+
+	/**
+     * Инициализация кнопок панели лабораторных и диагностических исследований
+     */
 	private void setButtonsDiagnostics() {
 		this.btnAddDiagnostic = new JButton();
 		this.setCustomButton(this.vbDiagnosticsBtn, this.btnAddDiagnostic,
@@ -566,7 +602,10 @@ public final class Assignments extends JPanel {
             }
         });
 	}
-	
+
+	/**
+     * Инициализация кнопок панели режима и диеты
+     */
 	private void setButtonsDiet() {
 		this.btnAddDiet = new JButton();
 		this.setCustomButton(this.vbDietBtn, this.btnAddDiet,
@@ -586,7 +625,10 @@ public final class Assignments extends JPanel {
             }
         });
 	}
-	
+
+	/**
+     * Инициализация кнопок панели лечебных процедур
+     */
 	private void setButtonsProcedures() {
 		this.btnAddProcedure = new JButton();
 		this.setCustomButton(this.vbProceduresBtn, this.btnAddProcedure,
