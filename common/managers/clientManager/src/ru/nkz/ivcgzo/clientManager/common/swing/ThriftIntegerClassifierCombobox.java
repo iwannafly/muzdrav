@@ -74,8 +74,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		}
 		setModel();
 		setData(list);
-		if (classifier != null)
-			setFormListeners();
+		setFormListeners();
 	}
 	
 	private void setModel() {
@@ -122,7 +121,9 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 				if (e.getClickCount() == 2) {
 					loadClassifier();
 					if (isEnabled() && itemsBcp.size() > 0) {
-						IntegerClassifier res = ConnectionManager.instance.showIntegerClassifierSelector(classifier);
+						if (searcher != null)
+							searcher.getEditor().selectAll();
+						IntegerClassifier res = (classifier != null) ? ConnectionManager.instance.showIntegerClassifierSelector(classifier) : ConnectionManager.instance.showIntegerClassifierSelector(itemsBcp);
 						
 						if (res != null)
 							setSelectedPcod(res.pcod);
@@ -413,6 +414,10 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 					prevSelItem = selItem;
 				}
 			});
+		}
+		
+		public CustomComboBoxEditor getEditor() {
+			return editor;
 		}
 	}
 	

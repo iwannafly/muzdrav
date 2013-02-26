@@ -45,6 +45,7 @@ import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 import ru.nkz.ivcgzo.thriftHospital.TBirthPlace;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
+import ru.nkz.ivcgzo.thriftHospital.TDiagnostic;
 import ru.nkz.ivcgzo.thriftHospital.TInfoLPU;
 import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
@@ -92,6 +93,7 @@ public class ServerHospital extends Server implements Iface {
 	private TResultSetMapper<TBirthPlace, TBirthPlace._Fields> rsmBirthPlace;
 	private TResultSetMapper<TInfoLPU, TInfoLPU._Fields> rsmInfoLPU;
 	private TResultSetMapper<TMedication, TMedication._Fields> rsmMedication;
+	private TResultSetMapper<TDiagnostic, TDiagnostic._Fields> rsmDiagnostic;
 
     private static final String[] SIMPLE_PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "fam", "im", "ot", "datar", "datap", "cotd", "npal", "nist"
@@ -154,7 +156,11 @@ public class ServerHospital extends Server implements Iface {
     private static final String[] MEDICATION_FIELD_NAMES = {
         "name", "nlek", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed", "sposv",
         "spriem", "pereod", "datae", "komm", "datao", "vracho", "dataz"
+    };    
+    private static final String[] DIAGNOSTIC_FIELD_NAMES = {
+        "nisl", "cpok", "cpok_name", "result", "datav", "op_name", "rez_name"
     };
+    
     private static final Class<?>[] RdIshodtipes = new Class<?>[] {
 //    	   "npasp",      "ngosp",   "id_berem",         "id",	   "serdm",     "mesto", 
      Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,
@@ -264,6 +270,7 @@ public class ServerHospital extends Server implements Iface {
         rsmBirthPlace = new TResultSetMapper<>(TBirthPlace.class, BIRTHPLACE_FIELD_NAMES);
         rsmInfoLPU = new TResultSetMapper<>(TInfoLPU.class, LPU_FIELD_NAMES);
         rsmMedication = new TResultSetMapper<>(TMedication.class, MEDICATION_FIELD_NAMES);
+        rsmDiagnostic = new TResultSetMapper<>(TDiagnostic.class, DIAGNOSTIC_FIELD_NAMES);
     }
 
     @Override
@@ -2643,30 +2650,85 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 	public void DeleteRdSl(int id_pvizit, int npasp)
 			throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-		sme.execPrepared("DELETE FROM p_rd_sl WHERE id_pvizit = ? and npasp = ?", false, id_pvizit, npasp);
-		sme.setCommit();
-	} catch (SQLException e) {
-		((SQLException) e.getCause()).printStackTrace();
-		throw new KmiacServerException();
-	} catch (InterruptedException e1) {
-		e1.printStackTrace();
-		throw new KmiacServerException();
-	}
+			sme.execPrepared("DELETE FROM p_rd_sl WHERE id_pvizit = ? and npasp = ?", false, id_pvizit, npasp);
+			sme.setCommit();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
-	public List<TMedication> getMedications(int idGosp)
+	public List<TMedication> getMedications(final int idGosp)
 			throws KmiacServerException {
         String sqlQuery = "SELECT n_med.name as name, c_lek.* " +
                 "FROM c_lek " +
                 "INNER JOIN n_med ON (c_lek.klek = n_med.pcod) " +
                 "WHERE (c_lek.id_gosp = ?);";
-            try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
-                return rsmMedication.mapToList(acrs.getResultSet());
-            } catch (SQLException e) {
-                log.log(Level.ERROR, "Exception (getMedications): ", e);
-                throw new KmiacServerException();
-            }
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
+            return rsmMedication.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception (getMedications): ", e);
+            throw new KmiacServerException();
+        }
+	}
+
+	@Override
+	public void updateMedication(final TMedication med) throws KmiacServerException {
+        final String sqlQuery = "UPDATE c_lek " +
+        						"SET doza = ?, spriem = ?, pereod = ?, datao = ?, " +
+        						"vracho = ? " +
+        						"WHERE (nlek = ?);";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, med.getDoza(), med.getSpriem(), med.getPereod(),
+            		(med.isSetDatao()) ? new Date(med.getDatao()) : null,
+            		(med.isSetVracho()) ? med.getVracho() : null,
+            		med.getNlek());
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQLException | InterruptedException (updateMedication): ", e);
+            throw new KmiacServerException();
+        }
+		
+	}
+
+	@Override
+	public void deleteMedication(final int nlek) throws KmiacServerException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM c_lek WHERE (nlek = ?);", false, nlek);
+			sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQLException | InterruptedException (deleteMedication): ", e);
+            throw new KmiacServerException();
+        }
+	}
+
+	@Override
+	public List<TDiagnostic> getDiagnostics(int idGosp) throws KmiacServerException {
+        String sqlQuery = 
+		"SELECT DISTINCT p_isl_ld.nisl, n_ldi.pcod AS cpok, n_ldi.name_n AS cpok_name, " +
+				"p_rez_l.zpok AS result, p_isl_ld.datav, '' AS op_name, '' AS rez_name " +
+		"FROM p_isl_ld " +
+		"JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) " +
+		"JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " +
+		"WHERE (p_isl_ld.id_gosp = ?) " +
+		"UNION " +
+		"SELECT DISTINCT p_isl_ld.nisl, n_ldi.pcod AS cpok, n_ldi.name_n AS cpok_name, " +
+			"n_arez.name AS result, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name " +
+		"FROM p_isl_ld " +
+		"JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) " +
+		"JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) " +
+		"LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) " +
+		"WHERE (p_isl_ld.id_gosp = ?);";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp, idGosp)) {
+            return rsmDiagnostic.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception (getDiagnostics): ", e);
+            throw new KmiacServerException();
+        }
 	}
 
 //	public void addRdIshod(int npasp, int ngosp) throws KmiacServerException,

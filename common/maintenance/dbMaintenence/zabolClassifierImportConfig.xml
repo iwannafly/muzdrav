@@ -97,6 +97,7 @@
 		<table srcName="STRLPU" dstName="n_strlpu" />
 		<table srcName="SVL" dstName="n_svl" />
 		<table srcName="T00" dstName="n_t00" />
+		<table srcName="T40" dstName="n_t40" />
 		<table srcName="U00" dstName="n_u00" />
 		<table srcName="U10" dstName="n_u10" />
 		<table srcName="U50" dstName="n_u50" />

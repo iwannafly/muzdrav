@@ -2098,9 +2098,9 @@ public class Vvod extends JFrame {
 							.addComponent(tbNaprKab, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE))
 						.addComponent(spNaprPokazMet, GroupLayout.PREFERRED_SIZE, 613, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_pnlIssl.createSequentialGroup()
-							.addComponent(btnNaprPrint, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNaprSave)))
+							.addComponent(btnNaprSave)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnNaprPrint, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		gl_pnlIssl.setVerticalGroup(
@@ -3173,7 +3173,10 @@ public class Vvod extends JFrame {
 			else
 				setTitle("Врачебный осмотр, режим статистика");
 			if (zapVr.npasp > 0) {
-				setTitle(String.format("%s - %d, %s %s %s, номер и серия полиса: %s %s, %8$td.%8$tm.%8$tY ", getTitle(), zapVr.getNpasp(), zapVr.getFam(), zapVr.getIm(), zapVr.getOth(), zapVr.getNompolis(), zapVr.getSerpolis(), zapVr.getDatar()));
+				if (zapVr.serpolis == null) setTitle(String.format("%s - %d, %s %s %s, номер и серия полиса: %s, %7$td.%7$tm.%7$tY ", getTitle(), zapVr.getNpasp(), zapVr.getFam(), zapVr.getIm(), zapVr.getOth(), zapVr.getNompolis(), zapVr.getDatar()));
+				if (zapVr.nompolis == null) setTitle(String.format("%s - %d, %s %s %s, серия и номер полиса: %s, %7$td.%7$tm.%7$tY ", getTitle(), zapVr.getNpasp(), zapVr.getFam(), zapVr.getIm(), zapVr.getOth(), zapVr.getSerpolis(), zapVr.getDatar()));;
+				if ((zapVr.serpolis != null) && (zapVr.nompolis != null))setTitle(String.format("%s - %d, %s %s %s, номер и серия полиса: %s %s, %8$td.%8$tm.%8$tY ", getTitle(), zapVr.getNpasp(), zapVr.getFam(), zapVr.getIm(), zapVr.getOth(), zapVr.getNompolis(), zapVr.getSerpolis(), zapVr.getDatar()));
+				if ((zapVr.serpolis == null) && (zapVr.nompolis == null))setTitle(String.format("%s - %d, %s %s %s, номер и серия полиса: -, %6$td.%6$tm.%6$tY ", getTitle(), zapVr.getNpasp(), zapVr.getFam(), zapVr.getIm(), zapVr.getOth(), zapVr.getDatar()));
 				int age = (int) ((System.currentTimeMillis() - zapVr.datar) / 31556952000L);
 				btnBer.setEnabled(!isStat && (zapVr.pol != 1) && ((age > 13) && (age < 50)));
 				btnRecPriem.setEnabled(!isStat);
@@ -3225,79 +3228,119 @@ public class Vvod extends JFrame {
 	
 	private void pasteShablon(Shablon sh) {
 		if (sh == null)
+			
 			return;
-	if (((tbJal.getText().equals("")) || (tbAnam.getText().equals("")) || (tbStat.getText().equals("")) 
-		|| (tbLoc.getText().equals("")) || (tbLech.getText().equals("")) || (tbOcen.getText().equals(""))
-		|| (tbZakl.getText().equals("")) || (tbRecom.getText().equals("")))
-	&&(JOptionPane.showConfirmDialog(Vvod.this, "Очистить поля?", "Очищение полей осмотра", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION))
+	if ((tbJal.getText().length() != 0) || (tbAnam.getText().length() != 0) || (tbStat.getText().length() != 0) 
+		|| (tbLoc.getText().length() != 0) || (tbLech.getText().length() != 0) || (tbOcen.getText().length() != 0)
+		|| (tbZakl.getText().length() != 0) || (tbRecom.getText().length() != 0))
 	{
-
-		for (ShablonText st : sh.textList) {
-			switch (st.grupId) {
-			case 1:
-				tbJal.setText(st.text);
-				break;
-			case 2:
-				tbAnam.setText(st.text);
-				break;
-			case 6:
-				tbStat.setText(st.text);
-				break;
-			case 8:
-				tbLoc.setText(st.text);
-				break;
-			case 10:
-				tbLech.setText(st.text);
-				break;
-			case 14:
-				tbOcen.setText(st.text);
-				break;
-			case 13:
-				tbZakl.setText(st.text);
-				break;
-			case 12:
-				tbRecom.setText(st.text);
-				break;
-			default:
-				break;
+		if (JOptionPane.showConfirmDialog(Vvod.this, "Очистить поля?", "Очищение полей осмотра", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION)
+			{
+			for (ShablonText st : sh.textList) {
+				switch (st.grupId) {
+				case 1:
+					tbJal.setText(st.text);
+					break;
+				case 2:
+					tbAnam.setText(st.text);
+					break;
+				case 6:
+					tbStat.setText(st.text);
+					break;
+				case 8:
+					tbLoc.setText(st.text);
+					break;
+				case 10:
+					tbLech.setText(st.text);
+					break;
+				case 14:
+					tbOcen.setText(st.text);
+					break;
+				case 13:
+					tbZakl.setText(st.text);
+					break;
+				case 12:
+					tbRecom.setText(st.text);
+					break;
+				default:
+					break;
+				}
 			}
-		}
 		addDiagShablon(sh.diag.trim());
-	}
-	else
-	{
-		for (ShablonText st : sh.textList) {
- 			switch (st.grupId) {
- 			case 1:
-				tbJal.setText(tbJal.getText() + st.text);
- 				break;
- 			case 2:
-				tbAnam.setText(tbAnam.getText() + st.text);
- 				break;
- 			case 6:
-				tbStat.setText(tbStat.getText() + st.text);
- 				break;
- 			case 8:
-				tbLoc.setText(tbLoc.getText() + st.text);
- 				break;
- 			case 10:
-				tbLech.setText(tbLech.getText() + st.text);
- 				break;
- 			case 14:
-				tbOcen.setText(tbOcen.getText() + st.text);
- 				break;
- 			case 13:
-				tbZakl.setText(tbZakl.getText() + st.text);
- 				break;
- 			case 12:
-				tbRecom.setText(tbRecom.getText() + st.text);
- 				break;
- 			default:
- 				break;
- 			}
-		}
+			}
+		else {
+			for (ShablonText st : sh.textList) {
+				switch (st.grupId) {
+				case 1:
+					tbJal.setText(tbJal.getText() + st.text);
+					break;
+				case 2:
+					tbAnam.setText(tbAnam.getText() + st.text);
+					break;
+				case 6:
+					tbStat.setText(tbStat.getText() + st.text);
+					break;
+				case 8:
+					tbLoc.setText(tbLoc.getText() + st.text);
+					break;
+				case 10:
+					tbLech.setText(tbLech.getText() + st.text);
+					break;
+				case 14:
+					tbOcen.setText(tbOcen.getText() + st.text);
+					break;
+				case 13:
+					tbZakl.setText(tbZakl.getText() + st.text);
+					break;
+				case 12:
+					tbRecom.setText(tbRecom.getText() + st.text);
+					break;
+				default:
+					break;
+				}
+			}
 		addDiagShablon(sh.diag.trim());
+		}
 	}
+	
+	if ((tbJal.getText().length() == 0) && (tbAnam.getText().length() == 0) && (tbStat.getText().length() == 0) 
+			&& (tbLoc.getText().length() == 0) && (tbLech.getText().length() == 0) && (tbOcen.getText().length() == 0)
+			&& (tbZakl.getText().length() == 0) && (tbRecom.getText().length() == 0))
+		{
+
+			for (ShablonText st : sh.textList) {
+				switch (st.grupId) {
+				case 1:
+					tbJal.setText(st.text);
+					break;
+				case 2:
+					tbAnam.setText(st.text);
+					break;
+				case 6:
+					tbStat.setText(st.text);
+					break;
+				case 8:
+					tbLoc.setText(st.text);
+					break;
+				case 10:
+					tbLech.setText(st.text);
+					break;
+				case 14:
+					tbOcen.setText(st.text);
+					break;
+				case 13:
+					tbZakl.setText(st.text);
+					break;
+				case 12:
+					tbRecom.setText(st.text);
+					break;
+				default:
+					break;
+				}
+			}
+			addDiagShablon(sh.diag.trim());
+		}
+
 		lblLastShab.setText(String.format("<html>Последний выбранный шаблон: %s %s</html>", sh.diag.trim(), sh.name));
 	}
 
