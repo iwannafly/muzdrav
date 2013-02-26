@@ -81,47 +81,43 @@ public class OutputInfo extends Server implements Iface {
 	// Паспорт участка
 	@Override
 	public String printPasUch(InputAuthInfo iaf, InputPasUch ipu) throws KmiacServerException, TException {
-		serverPaspUch spu = new serverPaspUch(sse, tse);
-		return spu.printPasUch(iaf, ipu);
+		//serverPaspUch spu = new serverPaspUch(sse, tse);
+		//return spu.printPasUch(iaf, ipu);
+		return new serverPaspUch(sse, tse).printPasUch(iaf, ipu);
 	}
 
 	// Сведения о структуре посещений
 	@Override
 	public String printStructPos(InputStructPosAuth ispa, InputStructPos isp)
 			throws KmiacServerException, TException {
-		serverStructPos ssp = new serverStructPos (sse, tse);
-		return ssp.printStructPos(ispa, isp);
+		return new serverStructPos (sse, tse).printStructPos(ispa, isp);
 	}
 	
 	// Факторы, влияющие на состояние здоровья
 	@Override
 	public String printFacZd(InputAuthInfo iaf, InputFacZd ifz)
 			throws KmiacServerException, TException {
-		serverFacZd sfz = new serverFacZd (sse, tse);
-		return sfz.printFacZd(iaf, ifz);
+		return new serverFacZd (sse, tse).printFacZd(iaf, ifz);
 	}
 	
 	// Сводная ведомость зарегестрированных заболеваний
 	@Override
 	public String printSvodVed(InputAuthInfo iaf, InputSvodVed isv)
 			throws KmiacServerException, TException {
-		serverSvodVed svg = new serverSvodVed (sse, tse);
-		return svg.printSvodVed(iaf, isv);
+		return new serverSvodVed (sse, tse).printSvodVed(iaf, isv);
 	}
 	
 	// Табель врача
 	@Override
 	public List<VrachInfo> getVrachTableInfo(int cpodr)
 			throws VINotFoundException, KmiacServerException, TException {
-		serverVrachInfo svi = new serverVrachInfo (sse, tse);
-		return svi.getVrachTableInfo(cpodr);
+		return new serverVrachInfo (sse, tse).getVrachTableInfo(cpodr);
 	}
 
 	@Override
 	public List<VrachTabel> getVrachTabel(int pcod) throws VTException,
 			VTDuplException, KmiacServerException, TException {
-		serverVrachInfo svi = new serverVrachInfo (sse, tse);
-		return svi.getVrachTabel(pcod);
+		return new serverVrachInfo (sse, tse).getVrachTabel(pcod);
 	}
 
 	@Override
@@ -139,22 +135,19 @@ public class OutputInfo extends Server implements Iface {
 
 	@Override
 	public void deleteVT(int vt) throws TException {
-		serverVrachInfo svi = new serverVrachInfo (sse, tse);
-		svi.deleteVT(vt);
+		new serverVrachInfo (sse, tse).deleteVT(vt);
 	}
 
 	@Override
 	public List<UchastokInfo> getUch(int cpol) throws UchException,
 			KmiacServerException, TException {
-		serverUchNum snu = new serverUchNum (sse, tse);
-		return snu.getUch(cpol);
+		return new serverUchNum (sse, tse).getUch(cpol);
 	}
 
 	@Override
 	public List<UchastokNum> getUchNum(int pcod) throws UchException,
 			KmiacServerException, TException {
-		serverUchNum snu = new serverUchNum (sse, tse);
-		return snu.getUchNum(pcod);
+		return new serverUchNum (sse, tse).getUchNum(pcod);
 	}
 
 	@Override
@@ -198,9 +191,7 @@ public class OutputInfo extends Server implements Iface {
 	}
 	
 	@Override
-	public String printNoVipPlanDisp(InputPlanDisp ipd)
-			throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
+	public String printNoVipPlanDisp(InputPlanDisp ipd) {
 		return null;
 	}
 
