@@ -582,10 +582,11 @@ public class MainFrame extends JFrame {
     		ticcbOtd.setSelectedPcod(curMedHist.getCpodr());
     	else
     		ticcbOtd.setSelectedItem(null);
+		ticcbPcodOsm.setSelectedItem(null);
     	if (curMedHist.isSetPcodVrach())
-    		ticcbPcodOsm.setSelectedPcod(curMedHist.getPcodVrach());
-    	else
-    		ticcbPcodOsm.setSelectedItem(null);
+    		try {
+    			ticcbPcodOsm.setSelectedPcod(curMedHist.getPcodVrach());
+    		} catch (Exception e) {}
         if (taJalob != null)
             taJalob.setText(curMedHist.getJalob());
         if (taDesiaseHistory != null)

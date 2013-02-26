@@ -154,11 +154,12 @@ public class ServerHospital extends Server implements Iface {
         "region", "city", "type"
     };
     private static final String[] MEDICATION_FIELD_NAMES = {
-        "name", "nlek", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed", "sposv",
-        "spriem", "pereod", "datae", "komm", "datao", "vracho", "dataz"
+        "name", "nlek", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed",
+        "sposv", "spriem", "pereod", "datae", "komm", "datao", "vracho", "dataz",
+        "ed_name", "sposv_name", "vrach_name", "vracho_name"
     };    
     private static final String[] DIAGNOSTIC_FIELD_NAMES = {
-        "nisl", "cpok", "cpok_name", "result", "datav", "op_name", "rez_name"
+        "nisl", "cpok", "cpok_name", "result", "datan", "datav", "op_name", "rez_name"
     };
     
     private static final Class<?>[] RdIshodtipes = new Class<?>[] {
@@ -2664,9 +2665,15 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 	@Override
 	public List<TMedication> getMedications(final int idGosp)
 			throws KmiacServerException {
-        String sqlQuery = "SELECT n_med.name as name, c_lek.* " +
+        String sqlQuery = "SELECT n_med.name AS name, c_lek.*, n_edd.name AS ed_name, " +
+        		"n_svl.name AS sposv_name, (v.fam || ' ' || v.im || ' ' || v.ot) AS vrach_name, " +
+        		"(vo.fam || ' ' || vo.im || ' ' || vo.ot) AS vracho_name " +
                 "FROM c_lek " +
-                "INNER JOIN n_med ON (c_lek.klek = n_med.pcod) " +
+                "JOIN n_med ON (c_lek.klek = n_med.pcod) " +
+                "JOIN s_vrach v ON (c_lek.vrach = v.pcod) " +
+                "LEFT JOIN s_vrach vo ON (c_lek.vracho = vo.pcod) " +
+                "LEFT JOIN n_edd ON (c_lek.ed = n_edd.pcod) " +
+                "LEFT JOIN n_svl ON (c_lek.sposv = n_svl.pcod) " +
                 "WHERE (c_lek.id_gosp = ?);";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
             return rsmMedication.mapToList(acrs.getResultSet());
@@ -2683,7 +2690,10 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         						"vracho = ? " +
         						"WHERE (nlek = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, med.getDoza(), med.getSpriem(), med.getPereod(),
+            sme.execPrepared(sqlQuery, false,
+            		(med.isSetDoza()) ? med.getDoza() : null,
+            		(med.isSetSpriem()) ? med.getSpriem() : null,
+            		(med.isSetPereod()) ? med.getPereod() : null,
             		(med.isSetDatao()) ? new Date(med.getDatao()) : null,
             		(med.isSetVracho()) ? med.getVracho() : null,
             		med.getNlek());
@@ -2710,14 +2720,14 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 	public List<TDiagnostic> getDiagnostics(int idGosp) throws KmiacServerException {
         String sqlQuery = 
 		"SELECT DISTINCT p_isl_ld.nisl, n_ldi.pcod AS cpok, n_ldi.name_n AS cpok_name, " +
-				"p_rez_l.zpok AS result, p_isl_ld.datav, '' AS op_name, '' AS rez_name " +
+			"p_rez_l.zpok AS result, p_isl_ld.datan, p_isl_ld.datav, '' AS op_name, '' AS rez_name " +
 		"FROM p_isl_ld " +
 		"JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) " +
 		"JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " +
 		"WHERE (p_isl_ld.id_gosp = ?) " +
 		"UNION " +
 		"SELECT DISTINCT p_isl_ld.nisl, n_ldi.pcod AS cpok, n_ldi.name_n AS cpok_name, " +
-			"n_arez.name AS result, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name " +
+			"n_arez.name AS result, p_isl_ld.datan, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name " +
 		"FROM p_isl_ld " +
 		"JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) " +
 		"JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) " +
