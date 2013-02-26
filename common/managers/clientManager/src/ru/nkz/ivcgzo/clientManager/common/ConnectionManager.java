@@ -834,11 +834,61 @@ public class ConnectionManager {
 	 * Открывает сгенерированный отчет в офисном редакторе.
 	 * @param path - путь к отчету
 	 * @param print - печатать ли файл на <b>принтере по умолчанию</b>
+     * @deprecated Процедура скоро будет удалена. Вместо нее следует использовать {@link #openFileInTextProcessor(String, boolean)}.
 	 */
 	public void openFileInEditor(String path, boolean print) {
 		if (print)
-			DocumentPrinter.printFile(path);
+			DocumentPrinter.printViaTextProcessor(path);
 		else
-			DocumentPrinter.editFile(path);
+			DocumentPrinter.openInTextProcessor(path);
+	}
+	
+	/**
+	 * Открывает сгенерированный отчет в офисном текстовом процессоре.
+	 * @param path - путь к отчету
+	 * @param print - печатать ли файл на <b>принтере по умолчанию</b>
+	 */
+	public void openFileInTextProcessor(String path, boolean print) {
+		if (print)
+			DocumentPrinter.printViaTextProcessor(path);
+		else
+			DocumentPrinter.openInTextProcessor(path);
+	}
+	
+	/**
+	 * Открывает сгенерированный отчет в офисном табличном процессоре.
+	 * @param path - путь к отчету
+	 * @param print - печатать ли файл на <b>принтере по умолчанию</b>
+	 */
+	public void openFileInTableProcessor(String path, boolean print) {
+		if (print)
+			DocumentPrinter.printViaTableProcessor(path);
+		else
+			DocumentPrinter.openInTableProcessor(path);
+	}
+	
+	/**
+	 * Открывает сгенерированный отчет в средстве просмотра по
+	 * умолчанию. Обычно им является браузер.
+	 * @param path - путь к отчету
+	 */
+	public void openFileInDefaultViewer(String path) {
+		DocumentPrinter.openDefault(path);
+	}
+	
+	/**
+	 * Создает пустой файл для отчета с путем по умолчанию.
+	 * @param fileName - имя файла без расширения
+	 */
+	public String createReport(String fileName) throws IOException {
+		return DocumentPrinter.createReportFile(fileName);
+	}
+	
+	/**
+	 * Создает пустой файл для реестра с путем по умолчанию.
+	 * @param fileName - имя файла без расширения
+	 */
+	public String createReestr(String fileName) throws IOException {
+		return DocumentPrinter.createReestrFile(fileName);
 	}
 }
