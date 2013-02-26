@@ -2982,6 +2982,7 @@ public class Vvod extends JFrame {
 				tbZakl.setText(pvizit.getZakl());
 				tbZaklRek.setText(pvizit.getRecomend());
 				tbLech.setText(pvizit.getLech());
+				treeRezIssl.setModel(new DefaultTreeModel(createNodes()));
 				
 				pvizitAmbCopy = new PvizitAmb(pvizitAmb);
 				priemCopy = new Priem(priem);
@@ -3004,7 +3005,7 @@ public class Vvod extends JFrame {
 		root.add(issinfo);
 		
 		try {
-			{	for (P_isl_ld issl : MainForm.tcl.getIsslInfoDate(Vvod.zapVr.id_pvizit))
+			{	for (P_isl_ld issl : MainForm.tcl.getIsslInfoDate(tblPos.getSelectedItem().id))
 					issinfo.add(new IsslInfoTreeNode(issl));
 			}
 			
