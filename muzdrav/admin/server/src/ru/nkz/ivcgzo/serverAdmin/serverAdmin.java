@@ -370,8 +370,8 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public List<IntegerClassifier> get_n_p0s13() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_p0s WHERE pcod BETWEEN 1 AND 3 ")) {
+	public List<IntegerClassifier> get_n_p0s15() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_p0s WHERE pcod BETWEEN 1 AND 5 ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
