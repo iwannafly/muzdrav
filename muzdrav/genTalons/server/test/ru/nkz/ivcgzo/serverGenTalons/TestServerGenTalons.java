@@ -224,7 +224,7 @@ public class TestServerGenTalons {
     public final void updateNrasp_IsActuallyUpdated() throws KmiacServerException, TException {
         List<Nrasp> testList = new ArrayList<>();
         testList.add(new Nrasp(6, 1, 1, 0, 0, 0,
-                "9", 200004, 3, true, 0, 0));
+                "9", 200004, 3, true, 0, 0, 0, 0));
         testServer.updateNrasp(testList);
     }
 
