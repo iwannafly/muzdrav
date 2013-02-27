@@ -2496,7 +2496,7 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
         	public void actionPerformed(ActionEvent e) {
                 if (curPatientId != 0 && tbl_priem.getSelectedItem() != null){
             		curGospId = tbl_priem.getSelectedItem().id;
-        			MainForm.conMan.showDiaryForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId);
+        			MainForm.conMan.showDiaryForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId, true);
         		}else
         			JOptionPane.showMessageDialog(tbl_priem, "Отсутствуют обращения пациента.");
         	}
