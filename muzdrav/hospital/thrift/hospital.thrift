@@ -12,7 +12,7 @@ struct TSimplePatient{
 	6:optional i64 birthDate;
 	7:optional i64 arrivalDate;
 	8:optional i32 departmentCod;
-	9:optional i32 npal;
+	9:optional string npal;
 	10:optional i32 nist;
 }
 
@@ -29,7 +29,7 @@ struct TPatient{
 	10:string oms;
 	11:string dms;
 	12:string job;
-	13:i32 chamber;
+	13:string chamber;
 	14:string registrationAddress;
 	15:string realAddress;
 	16:i32 ngosp;

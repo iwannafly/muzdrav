@@ -55,7 +55,8 @@ public class ClientDiary extends Client<ThriftDiary.Client> {
         try {
         	modalDialog = prepareModal(parent);
             diaryFrame.fillPatient((int) params[0], (String) params[1],
-                    (String) params[2], (String) params[3], (int) params[4]);
+            	(String) params[2], (String) params[3], (int) params[4],
+            	(boolean) params[5]);
             modalDialog.setVisible(true);
         } catch (RuntimeException re) { }
         disposeModal();
