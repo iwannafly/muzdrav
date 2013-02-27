@@ -311,19 +311,19 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final TPatient getPatientPersonalInfo(final int idGosp)
             throws PatientNotFoundException, KmiacServerException {
-        String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.datar, patient.fam, "
-                + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, n_t00.pcod as sgrp, "
-                + "(patient.poms_ser||patient.poms_nom) as poms, "
-                + "(patient.pdms_ser || patient.pdms_nom) as pdms, "
+        String sqlQuery = "SELECT p.npasp, c_otd.id_gosp, p.datar, p.fam, "
+                + "p.im, p.ot, n_z30.name as pol, c_otd.nist, n_t00.pcod as sgrp, "
+                + "(p.poms_ser || p.poms_nom) as poms, "
+                + "(p.pdms_ser || p.pdms_nom) as pdms, "
                 + "n_z43.name_s as mrab, c_otd.npal, "
                 + "(adp_gorod || ', ' || adp_ul || ', ' || adp_dom) as reg_add, "
                 + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add, "
                 + "c_gosp.ngosp "
-                + "FROM patient JOIN c_gosp ON c_gosp.npasp = patient.npasp "
-                + "JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
-                + "LEFT JOIN n_t00 ON n_t00.pcod = c_otd.cprof "
-                + "LEFT JOIN n_z30 ON n_z30.pcod = patient.pol "
-                + "LEFT JOIN n_z43 ON n_z43.pcod = patient.mrab "
+                + "FROM patient p JOIN c_gosp ON (c_gosp.npasp = p.npasp) "
+                + "JOIN  c_otd ON (c_gosp.id = c_otd.id_gosp) "
+                + "LEFT JOIN n_t00 ON (n_t00.pcod = c_otd.cprof) "
+                + "LEFT JOIN n_z30 ON (n_z30.pcod = p.pol) "
+                + "LEFT JOIN n_z43 ON (n_z43.pcod = p.mrab) "
                 + "WHERE (c_otd.id_gosp = ?);"; // тут был еще npasp, но он лишний
         ResultSet rs = null;
 
