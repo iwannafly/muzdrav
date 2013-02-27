@@ -1212,8 +1212,10 @@ public class MainFrame extends JFrame {
 
     private void setMedicalHistoryTableScrollPane() {
         spMedHist = new JScrollPane();
+        spMedHist.setMaximumSize(new Dimension(32767, 150));
+        spMedHist.setMinimumSize(new Dimension(23, 150));
         spMedHist.setBorder(new MatteBorder(0, 0, 0, 1, (Color) new Color(0, 0, 0)));
-        spMedHist.setPreferredSize(new Dimension(300, 250));
+        spMedHist.setPreferredSize(new Dimension(300, 150));
         hbMedicalHistoryTableControls.add(spMedHist);
 
         addMedicalHistoryTable();
@@ -1425,11 +1427,11 @@ public class MainFrame extends JFrame {
                 .addComponent(spFiz, GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
         );
         
-        taStatusPraence = new JTextArea();
-        taStatusPraence.setWrapStyleWord(true);
-        taStatusPraence.setLineWrap(true);
-        taStatusPraence.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        spFiz.setViewportView(taStatusPraence);
+        taStatusLocalis = new JTextArea();
+        taStatusLocalis.setWrapStyleWord(true);
+        taStatusLocalis.setLineWrap(true);
+        taStatusLocalis.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        spFiz.setViewportView(taStatusLocalis);
         pnlFiz.setLayout(gl_pnlFiz);
         
         JPanel pnlLoc = new JPanel();
@@ -1555,10 +1557,16 @@ public class MainFrame extends JFrame {
                 medHist.setTimez(System.currentTimeMillis());
                 medHist.setPcodVrach(doctorAuth.getPcod());
                 medHist.setIdGosp(patient.getGospitalCod());
+                medHist.setPcod_added(doctorAuth.getPcod());
+                medHist.setCpodr(doctorAuth.getCpodr());
                 medHist.setId(ClientHospital.tcl.addMedicalHistory(medHist));
                 tbMedHist.addItem(medHist);
                 tbMedHist.setData(
                         ClientHospital.tcl.getMedicalHistory(patient.getGospitalCod()));
+                if (tbMedHist.getRowCount() > 0) {
+                    tbMedHist.setRowSelectionInterval(tbMedHist.getRowCount() - 1,
+                        tbMedHist.getRowCount() - 1);
+                }
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();

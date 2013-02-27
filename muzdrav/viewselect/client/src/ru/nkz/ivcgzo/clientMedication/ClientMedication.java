@@ -1,5 +1,7 @@
 package ru.nkz.ivcgzo.clientMedication;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JDialog;
@@ -51,10 +53,22 @@ public class ClientMedication extends Client<ThriftMedication.Client> {
 //        medicationFrame.setTitle(String.format("%s %s %s",
 //            (String) params[1], (String) params[2], (String) params[3]));
         medicationFrame.setTitle("Медицинские назначения");
-        JDialog dialog = prepareModal(parent);
+        final JDialog dialog = prepareModal(parent);
         medicationFrame.fillPatient((int) params[0], (String) params[1],
             (String) params[2], (String) params[3], (int) params[4]);
         medicationFrame.prepareFrame();
+        dialog.addWindowListener(new WindowAdapter() {
+        	@Override
+        	public void windowOpened(WindowEvent e) {
+        		((MainFrame)getFrame()).btnAddClick();
+        	}
+		});
+        ((MainFrame)getFrame()).frmMedicationCatalog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+            	dialog.dispatchEvent(new WindowEvent(dialog, WindowEvent.WINDOW_CLOSING));
+            }
+        });
         dialog.setVisible(true);
         disposeModal();
         return null;

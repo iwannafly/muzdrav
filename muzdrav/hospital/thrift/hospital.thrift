@@ -65,6 +65,8 @@ struct TMedicalHistory{
 	8:optional i32 pcodVrach;
 	9:optional i64 dataz;
 	10:optional i64 timez;
+	11:optional i32 pcod_added;
+	12:optional i32 cpodr;
 }
 
 struct TLifeHistory{
@@ -345,23 +347,10 @@ struct TMedication {
 	15: optional i64 datao;
 	16: optional i32 vracho;
 	17: optional i64 dataz;
-}
-
-struct TDiagnostic {
-	1: optional i32 nisl;
-	2: optional i32 cisl;
-	3: optional string name_cisl;
-	4: optional string pokaz;
-	5: optional string pokaz_name;
-	6: optional string rez;
-	7: optional i64 datan;
-	8: optional i64 datap;
-	9: optional i64 datav;
-	10: optional i32 vrach;
-	11: optional i32 kodvr;
-	12: optional string diag;
-	13: optional string op_name;
-	14: optional string rez_name;
+	18: optional string ed_name;
+	19: optional string sposv_name;
+	20: optional string vrach_name;
+	21: optional string vracho_name;
 }
 
 struct TDiagnostic {
@@ -369,15 +358,24 @@ struct TDiagnostic {
 	2: optional string cpok;
 	3: optional string cpok_name;
 	4: optional string result;
-	5: optional i64 datav;
-	6: optional string op_name;
-	7: optional string rez_name;
+	5: optional i64 datan;
+	6: optional i64 datav;
+	7: optional string op_name;
+	8: optional string rez_name;
 }
 
 struct TDiet {
+	1: optional bool type;
+	2: optional i32 num;
+	3: optional i64 datan;
+	4: optional i64 datao;
 }
 
 struct TProcedures {
+	1: optional string name;
+	2: optional i64 datan;
+	3: optional i64 datao;
+	4: optional i32 kol;
 }
 
 /**

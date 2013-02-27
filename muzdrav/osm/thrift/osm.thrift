@@ -733,7 +733,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
-	list<P_isl_ld> getIsslInfoDate(1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
+	list<P_isl_ld> getIsslInfoDate(1: i32 id_pvizitAmb) throws (1: kmiacServer.KmiacServerException kse);
 	list<IsslInfo> getIsslInfoPokaz(1: i32 nisl) throws (1: kmiacServer.KmiacServerException kse);
 	IsslInfo getIsslInfoPokazId(1: i32 id_issl) throws (1: kmiacServer.KmiacServerException kse);
 
