@@ -18,8 +18,6 @@ import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
 
 import org.apache.thrift.TException;
@@ -44,7 +42,7 @@ public class MainFrame extends JFrame {
     private JButton btnAdd;
 //    private JButton btnUpdate;
     private JButton btnDelete;
-    private MedicationCatalogFrame frmMedicationCatalog;
+    protected MedicationCatalogFrame frmMedicationCatalog;
     private ThriftIntegerClassifierList lMedication;
     private JScrollPane spMedicationList;
     private JPanel pMedicationInfo;
@@ -82,6 +80,11 @@ public class MainFrame extends JFrame {
         addMedicationPanels();
 //        addTableScrollPane();
         addButtonPanel();
+    }
+    
+    public void btnAddClick() {
+        frmMedicationCatalog.prepareForm(patient);
+        frmMedicationCatalog.setVisible(true);
     }
 
     private void addMedicationPanels() {
@@ -265,8 +268,7 @@ public class MainFrame extends JFrame {
         btnAdd = new JButton("Добавить");
         btnAdd.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                frmMedicationCatalog.prepareForm(patient);
-                frmMedicationCatalog.setVisible(true);
+            	btnAddClick();
             }
         });
         pButtons.add(btnAdd);
@@ -309,12 +311,14 @@ public class MainFrame extends JFrame {
 
     private void createModalFrames(Patient patient) {
         frmMedicationCatalog = new MedicationCatalogFrame();
+        /*
         frmMedicationCatalog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
                 prepareFrame();
             }
         });
+        */
         frmMedicationCatalog.pack();
     }
 
