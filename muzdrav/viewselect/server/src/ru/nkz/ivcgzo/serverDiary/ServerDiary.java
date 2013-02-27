@@ -50,7 +50,9 @@ public class ServerDiary extends Server implements Iface {
     //  id             id_gosp       jalob         morbi          st_praesense  status_localis
         Integer.class, Integer.class, String.class, String.class, String.class, String.class,
     //  fisical_obs   pcod_vrach		dataz		timez		cpodr			pcod_added
-        String.class, Integer.class,	Date.class,	Time.class,	Integer.class,	Integer.class
+        String.class, Integer.class,	Date.class,	Time.class,	Integer.class,	Integer.class,
+    //  is_po
+        Boolean.class
     };
 
     public ServerDiary(final ISqlSelectExecutor sse, final ITransactedSqlExecutor tse) {
