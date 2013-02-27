@@ -29,7 +29,7 @@ struct TPatient{
 	10:string oms;
 	11:string dms;
 	12:string job;
-	13:i32 chamber;
+	13:string chamber;
 	14:string registrationAddress;
 	15:string realAddress;
 	16:i32 ngosp;
