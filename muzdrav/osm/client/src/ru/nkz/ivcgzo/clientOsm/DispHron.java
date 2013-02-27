@@ -80,7 +80,7 @@ public class DispHron extends JFrame{
 					pmer.setNpasp(Vvod.zapVr.getNpasp());
 					pmer.setDiag(cmbDiag.getSelectedPcod());
 					pmer.setCpol(MainForm.authInfo.getCpodr());
-					pmer.setId_obr(Vvod.tblObr.getSelectedItem().getId());
+					pmer.setId_obr(Vvod.zapVr.id_pvizit);
 					pmer.setDataz(System.currentTimeMillis());
 					pmer.setCdol(MainForm.authInfo.getCdol());
 					pmer.setCod_sp(MainForm.authInfo.getPcod());
@@ -184,7 +184,7 @@ public class DispHron extends JFrame{
 				obostr.setCod_sp(MainForm.authInfo.getPcod());
 				obostr.setCdol(MainForm.authInfo.getCdol());
 				obostr.setDataz(System.currentTimeMillis());
-				obostr.setId_obr(Vvod.tblObr.getSelectedItem().getId());
+				obostr.setId_obr(Vvod.zapVr.id_pvizit);
 				
 				try {
 					if (cmbDiag.getSelectedPcod()!=null){

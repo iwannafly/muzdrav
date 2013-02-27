@@ -94,10 +94,10 @@ public class OutputInfo extends Server implements Iface {
 	}
 
 	@Override
-	public List<VrachTabel> getVrachTabel(int pcod) throws VTException,
+	public List<VrachTabel> getVrachTabel(int pcod, String cdol) throws VTException,
 			KmiacServerException, TException {
 		serverVrachInfo svi = new serverVrachInfo (sse, tse);
-		return svi.getVrachTabel(pcod);
+		return svi.getVrachTabel(pcod,cdol);
 	}
 
 	@Override

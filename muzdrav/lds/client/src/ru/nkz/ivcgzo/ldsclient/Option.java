@@ -246,7 +246,8 @@ public class Option {
 						if (tn_ldi.getSelectedColumn()==3){
 							if (tn_ldi.getSelectedItem().vibor){
 								
-								S_ot01 s01 = new S_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, "00.00.000",n_nz1.getSelectedPcod());
+								//S_ot01 s01 = new S_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, "00.00.000",n_nz1.getSelectedPcod());
+								S_ot01 s01 = new S_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, tmetod.getData().get(0).c_obst,n_nz1.getSelectedPcod());
 								MainForm.ltc.AddS_ot01(s01);
 								ts_ot01.addItem(s01);
 								

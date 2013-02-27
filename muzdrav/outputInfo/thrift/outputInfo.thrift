@@ -78,11 +78,14 @@ struct InputStructPosAuth {
 	1: optional i32 userId;
 	2: optional string cpodr_name;
 	3: optional string clpu_name;
+    4: optional i32 cpodr;
+    5: optional i32 clpu;
 }
 
 struct InputStructPos {
     1: string date1;
     2: string date2;
+	3: string dateChange;
 }
 
 /*
@@ -110,7 +113,7 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
      /**
      * Возвращает время работы врачей
      */
-    list<VrachTabel> getVrachTabel(1:i32 pcod) throws (1: kmiacServer.KmiacServerException kse);
+    list<VrachTabel> getVrachTabel(1:i32 pcod, 2: string cdol) throws (1: kmiacServer.KmiacServerException kse);
 		
 		
     /**

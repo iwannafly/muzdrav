@@ -900,6 +900,12 @@ public class ServerOsm extends Server implements Iface {
 		}
 	}
 
+	//После двух дней мозгойопства с либре офисом выявлено следующее:
+	//высоту для таблиц необходимо выставлять в пикселях
+	//для корректного отображения вложенных таблиц необходимо
+	//в каждом тэге <td> перед любыми данными ставить неразрывный пробел &nbsp;
+	//для работы тэга @page нельзя в таблицах использовать стиль
+	//style="page-break-after: auto" и ему подобные
 	@Override
 	public String printIsslMetod(IsslMet im) throws KmiacServerException, TException {
 		String path;
@@ -925,9 +931,10 @@ public class ServerOsm extends Server implements Iface {
 				
 				sb = new StringBuilder(0x10000);
 				
-				sb.append("<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"100%\">");
+				sb.append("<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"460\">");
 				sb.append("<tr valign=\"top\">");
 					sb.append("<td width=\"50%\" style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px; font: 11px times new roman;\">");
+						sb.append("&nbsp;");
 						sb.append("<b>Информация для пациента:</b><br><br>");
 						
 						iAcrs = sse.execPreparedQuery("select n_m00.name_s, n_lds.name from n_lds inner join n_m00 on (n_m00.pcod=n_lds.clpu) where n_lds.pcod = ? ", kod_lab);
@@ -935,9 +942,9 @@ public class ServerOsm extends Server implements Iface {
 							name_clpu = iAcrs.getResultSet().getString(1);
 							name_lab = iAcrs.getResultSet().getString(2);
 						}
-						sb.append("<b>Дата:</b><br />");
-						sb.append("<b>Время:</b><br />");
-						sb.append("<b>Подготовка:</b><br />");
+						sb.append("<b>Дата:</b><br>");
+						sb.append("<b>Время:</b><br>");
+						sb.append("<b>Подготовка:</b><br>");
 					sb.append("</td>");
 					
 					iAcrs.close();
@@ -945,24 +952,24 @@ public class ServerOsm extends Server implements Iface {
 					if (iAcrs.getResultSet().next()) {
 						vrInfo = String.format("%s %s %s", iAcrs.getResultSet().getString(1), iAcrs.getResultSet().getString(2), iAcrs.getResultSet().getString(3));
 						sb.append("<td width=\"50%\" style=\"border: 1px solid black; padding: 5px; font: 11px times new roman;\">");
-						sb.append(String.format("<b>%s</b><br /><br>", name_clpu));
-						sb.append("<b>Направление на исследование</b><br /><br>");
-						sb.append(String.format("<b>Лаборатория: %s</b><br><br />", name_lab));
+						sb.append("&nbsp;");
+						sb.append(String.format("<b>%s</b><br><br>", name_clpu));
+						sb.append("<b>Направление на исследование</b><br><br>");
+						sb.append(String.format("<b>Лаборатория: %s</b><br><br>", name_lab));
 					}
 					iAcrs.close();
 					
 					iAcrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom, poms_ser, poms_nom FROM patient WHERE npasp = ? ", im.getNpasp());
 					if (iAcrs.getResultSet().next()) {
-						sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br />", iAcrs.getResultSet().getString(1), iAcrs.getResultSet().getString(2), iAcrs.getResultSet().getString(3)));
-						if (iAcrs.getResultSet().getString(7)!=null)sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br />", iAcrs.getResultSet().getString(7), iAcrs.getResultSet().getString(8)));
-						if (iAcrs.getResultSet().getString(7)==null)sb.append(String.format("<b>Номер полиса:</b> %s<br />", iAcrs.getResultSet().getString(8)));
-						sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br />", iAcrs.getResultSet().getDate(4)));
+						sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br>", iAcrs.getResultSet().getString(1), iAcrs.getResultSet().getString(2), iAcrs.getResultSet().getString(3)));
+						if (iAcrs.getResultSet().getString(7)!=null)sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br>", iAcrs.getResultSet().getString(8)));
+						sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br>", iAcrs.getResultSet().getDate(4)));
 						if (iAcrs.getResultSet().getString(5)!=null)
-						sb.append(String.format("<b>Адрес:</b> %s, %s<br />", iAcrs.getResultSet().getString(5), iAcrs.getResultSet().getString(6)));
+						sb.append(String.format("<b>Адрес:</b> %s, %s<br>", iAcrs.getResultSet().getString(5), iAcrs.getResultSet().getString(6)));
 					}
 					sb.append("<b>Диагноз: </b>");
 					sb.append(String.format("%s <br>", diag));
-					sb.append(String.format("<b>Врач:</b> %s<br /><br>", vrInfo));
+					sb.append(String.format("<b>Врач:</b> %s<br><br>", vrInfo));
 					sb.append("<b>Наименование исследований:</b>");
 					sb.append("<ol>");
 					iAcrs.close();
@@ -985,9 +992,9 @@ public class ServerOsm extends Server implements Iface {
 					}	
 
 					sb.append("</ol>");
-					sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
-					sb.append(String.format("<b>Планируемая дата выполнения:</b> %1$td.%1$tm.%1$tY<br />", data_post));
-					sb.append("<b>Подпись врача:</b><br />");
+					sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br>", data_napr));
+					sb.append(String.format("<b>Планируемая дата выполнения:</b> %1$td.%1$tm.%1$tY<br>", data_post));
+					sb.append("<b>Подпись врача:</b><br>");
 					sb.append("</td>");
 				sb.append("</tr>");
 				sb.append("</table>");
@@ -1003,30 +1010,21 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<head>");
 			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
 			sb.append("<title>Направление на…</title>");
-			sb.append("<style type=\"text/css\" media=\"print\">");
-			sb.append("<!--");
-			sb.append("@media print {");
-			sb.append("table { page-break-after:auto }");
-			sb.append("tr    { page-break-inside:avoid; page-break-after:auto }");
-			sb.append("td    { page-break-inside:avoid; page-break-after:auto }");
-			sb.append("thead { display:table-header-group }");
-			sb.append("tfoot { display:table-footer-group } }");
+			sb.append("<style type=\"text/css\">");
 			sb.append("@page { size: 21cm 29.7cm; margin: 1cm }");
-			sb.append("-->");
 			sb.append("</style>");
 			sb.append("</head>");
 			sb.append("<body>");
 			
-			for (int i = 0; i < mts.size(); i++) {
-				if (i > (mts.size() - 2))
-					sb.append("<table cellpadding=\"5\" cellspacing=\"8\" width=\"50%\" style=\"page-break-after: auto\">");
-				else
-					sb.append("<table cellpadding=\"5\" cellspacing=\"8\" width=\"100%\" style=\"page-break-after: auto\">");
+			for (int i = 0; i < mts.size(); ) {
+				sb.append("<table cellpadding=\"5\" cellspacing=\"8\" width=\"100%\" height=\"460\">");
 				for (int j = 0; (j < 1) && (i != mts.size()); j++) {
 					sb.append("<tr>");
-					for (int k = 0; (k < 2) && (i != mts.size()); k++) {
-						sb.append("<td width=\"50%\" height=\"480\" style=\"border: none; padding: 0cm\">");
-						sb.append(mts.get(i++));
+					for (int k = 0; k < 2; k++) {
+						sb.append("<td width=\"50%\" style=\"border: none; padding: 0cm\"><br>");
+						sb.append("&nbsp;");
+						if (i < mts.size())
+							sb.append(mts.get(i++));
 						sb.append("</td>");
 					}
 					sb.append("</tr>");
@@ -3161,9 +3159,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public List<P_isl_ld> getIsslInfoDate(int id_pvizit)
+	public List<P_isl_ld> getIsslInfoDate(int id_pvizitAmb)
 			throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_isl_ld.*, n_nz1.name as name_pcisl from p_isl_ld inner join n_nz1 on (p_isl_ld.pcisl=n_nz1.pcod) where p_isl_ld.pvizit_id = ? ", id_pvizit)) 
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_isl_ld.*, n_nz1.name as name_pcisl from p_isl_ld inner join n_nz1 on (p_isl_ld.pcisl=n_nz1.pcod) where p_isl_ld.id_pos = ? ", id_pvizitAmb)) 
 		{
 			return rsmPislld.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
