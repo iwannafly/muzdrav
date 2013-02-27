@@ -1951,7 +1951,7 @@ public class Vvod extends JFrame {
 								String cliPath;
 								cliPath = MainForm.conMan.createReport("направление на исследование");
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
-       						MainForm.conMan.openFileInDefaultViewer(cliPath);
+       						MainForm.conMan.openFileInTextProcessor(cliPath, false);
 
 							} catch (KmiacServerException e1) {
 								// TODO Auto-generated catch block
