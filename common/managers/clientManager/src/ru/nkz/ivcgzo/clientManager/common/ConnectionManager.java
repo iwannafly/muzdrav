@@ -759,9 +759,10 @@ public class ConnectionManager {
      * @param im - имя
      * @param ot - отчество
      * @param idGosp - идентификатор госпитализации
+     * @param is_po - признак приёмного отделения
      */
-    public void showDiaryForm(int npasp, String fam, String im, String ot, int idGosp) {
-        viewClient.showModal(client, 28, npasp, fam, im, ot, idGosp);
+    public void showDiaryForm(int npasp, String fam, String im, String ot, int idGosp, boolean is_po) {
+        viewClient.showModal(client, 28, npasp, fam, im, ot, idGosp, is_po);
     }
 
 	/**
