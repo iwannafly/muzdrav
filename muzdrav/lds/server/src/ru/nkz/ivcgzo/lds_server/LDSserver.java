@@ -190,7 +190,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<DiagIsl> GetDiagIsl(int nisl) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_rez_d where nisl = ? order by kodisl", nisl)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_rez_d where nisl = ? order by id, kodisl", nisl)) {
 			return rsmDiIs.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -199,7 +199,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public DiagIsl GetDIsl(int nisl) throws TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_rez_d WHERE nisl = ? order by kodisl", nisl)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_rez_d WHERE nisl = ? order by id, kodisl", nisl)) {
 			if (acrs.getResultSet().next())
 				return rsmDiIs.map(acrs.getResultSet());
 			else
@@ -282,7 +282,7 @@ public class LDSserver extends Server implements Iface {
 	
 	@Override
 	public List<LabIsl> GetLabIsl(int nisl, String c_nz1) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_rez_l.cpok, n_ldi.name, p_rez_l.zpok, n_ldi.norma, p_rez_l.stoim, p_rez_l.pcod_m, n_nsi_obst.nameobst, p_rez_l.id from p_rez_l JOIN n_ldi ON (p_rez_l.cpok = n_ldi.pcod) Left Join n_nsi_obst ON (p_rez_l.pcod_m = n_nsi_obst.obst) where (nisl = ?)and(c_nz1 = ?) ", nisl, c_nz1)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select distinct p_rez_l.cpok, n_ldi.name, p_rez_l.zpok, n_ldi.norma, p_rez_l.stoim, p_rez_l.pcod_m, n_nsi_obst.nameobst, p_rez_l.id from p_rez_l JOIN n_ldi ON (p_rez_l.cpok = n_ldi.pcod) Left Join n_nsi_obst ON (p_rez_l.pcod_m = n_nsi_obst.obst) where (nisl = ?)and(c_nz1 = ?) ", nisl, c_nz1)) {
 			return rsmLabIs.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -291,7 +291,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public LabIsl GetLIsl(int nisl, String c_nz1) throws TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_rez_l.cpok, n_ldi.name, p_rez_l.zpok, n_ldi.norma, p_rez_l.stoim, p_rez_l.pcod_m, n_nsi_obst.nameobst, p_rez_l.id from p_rez_l JOIN n_ldi ON (p_rez_l.cpok = n_ldi.pcod) Left Join n_nsi_obst ON(p_rez_l.pcod_m = n_nsi_obst.obst) WHERE (nisl = ?)and(c_nz1 = ?) ", nisl, c_nz1)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select distinct p_rez_l.cpok, n_ldi.name, p_rez_l.zpok, n_ldi.norma, p_rez_l.stoim, p_rez_l.pcod_m, n_nsi_obst.nameobst, p_rez_l.id from p_rez_l JOIN n_ldi ON (p_rez_l.cpok = n_ldi.pcod) Left Join n_nsi_obst ON(p_rez_l.pcod_m = n_nsi_obst.obst) WHERE (nisl = ?)and(c_nz1 = ?) ", nisl, c_nz1)) {
 			if (acrs.getResultSet().next())
 				return rsmLabIs.map(acrs.getResultSet());
 			else
@@ -514,7 +514,7 @@ public class LDSserver extends Server implements Iface {
 	public List<Metod> getMetod(int c_p0e1, String pcod, String pcod_m)
 			throws MetodNotFoundException, TException {
 		//try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_stoim.c_obst, n_nsi_obst.nameobst, n_stoim.stoim FROM n_stoim left JOIN n_nsi_obst ON (n_stoim.c_obst = n_nsi_obst.obst) where (n_stoim.c_p0e1 = ?) and (n_stoim.pcod = ?) and((n_stoim.c_obst like ?)or(n_stoim.c_obst is null))", c_p0e1, pcod, pcod_m)) {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_stoim.c_obst, n_nsi_obst.nameobst as name, n_stoim.stoim FROM n_stoim left JOIN n_nsi_obst ON (n_stoim.c_obst = n_nsi_obst.obst) where (n_stoim.c_p0e1 = ?) and (n_stoim.pcod = ?)", c_p0e1, pcod)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_stoim.c_obst, n_nsi_obst.nameobst as name, n_stoim.stoim FROM n_stoim left JOIN n_nsi_obst ON (n_stoim.c_obst = n_nsi_obst.obst) where (n_stoim.c_p0e1 = ?) and (n_stoim.pcod = ?) order by n_stoim.c_obst ", c_p0e1, pcod)) {
 		return rmsMetod.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -931,7 +931,7 @@ public class LDSserver extends Server implements Iface {
 				
 				
 				
-				System.out.println(sqlNamPol);
+				//System.out.println(sqlNamPol);
 				//kpol = bisl.getResultSet().getRow()+3; // кол-во исследований
 				/*bisl.getResultSet().first();
 			
