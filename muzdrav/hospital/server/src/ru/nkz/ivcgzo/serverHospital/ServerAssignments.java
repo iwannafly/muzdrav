@@ -111,7 +111,8 @@ public final class ServerAssignments {
 		"LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) " +
 		"WHERE (p_isl_ld.id_gosp = ?);";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp, idGosp)) {
-            return rsmDiagnostic.mapToList(acrs.getResultSet());
+        	List<TDiagnostic> list2 = rsmDiagnostic.mapToList(acrs.getResultSet());
+            return list2;
         } catch (SQLException e) {
         	ServerHospital.log.log(Level.ERROR, "Exception (getDiagnostics): ", e);
             throw new KmiacServerException();

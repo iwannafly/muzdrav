@@ -88,7 +88,7 @@ public class MainFrame extends JFrame {
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbPcodOsm;
     private Patient patient;
     private int ticcbOtdSelIndex = -1;
-    private boolean isAsked, isAdding;
+    private boolean isAsked, isAdding, isPO;
     
     public MainFrame() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -493,6 +493,7 @@ public class MainFrame extends JFrame {
 	            newMedHist.setTimez(System.currentTimeMillis());
 	            newMedHist.setPcodAdded(ClientDiary.authInfo.getPcod());
 	            newMedHist.setIdGosp(patient.getIdGosp());
+	            newMedHist.setIs_po(this.isPO);
 	            //Добавление информации об осмотре в БД:
 	            newMedHist.setId(ClientDiary.tcl.addMedicalHistory(newMedHist));
 	            //Заполнение таблицы:
@@ -578,10 +579,12 @@ public class MainFrame extends JFrame {
     	TMedicalHistory curMedHist = tblMedHist.getSelectedItem();
     	if (curMedHist == null)
     		return;
+    	//FIXME:
+		ticcbOtd.setSelectedItem(null);
     	if (curMedHist.isSetCpodr())
-    		ticcbOtd.setSelectedPcod(curMedHist.getCpodr());
-    	else
-    		ticcbOtd.setSelectedItem(null);
+    		try {
+    			ticcbOtd.setSelectedPcod(curMedHist.getCpodr());
+    		} catch (Exception e) {}
 		ticcbPcodOsm.setSelectedItem(null);
     	if (curMedHist.isSetPcodVrach())
     		try {
@@ -886,13 +889,15 @@ public class MainFrame extends JFrame {
     }
 
     public void fillPatient(final int id, final String surname,
-            final String name, final String middlename, final int idGosp) {
+            final String name, final String middlename, final int idGosp,
+            final boolean isPriemOtd) {
         patient = new Patient();
         patient.setId(id);
         patient.setSurname(surname);
         patient.setName(name);
         patient.setMiddlename(middlename);
         patient.setIdGosp(idGosp);
+        this.isPO = isPriemOtd; 
         
         clearMedicalHistory();
         fillMedHistoryTable();

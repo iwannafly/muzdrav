@@ -41,7 +41,7 @@ public class ServerDiary extends Server implements Iface {
     
     private static final String[] MEDICAL_HISTORY_FIELD_NAMES = {
         "id", "id_gosp", "jalob", "morbi", "status_praesense", "status_localis",
-        "fisical_obs", "pcod_vrach", "dataz", "timez", "cpodr", "pcod_added"
+        "fisical_obs", "pcod_vrach", "dataz", "timez", "cpodr", "pcod_added", "is_po"
     };
     private static final String[] INT_CLAS_FIELD_NAMES = {
         "pcod", "name"
@@ -137,11 +137,11 @@ public class ServerDiary extends Server implements Iface {
     @Override
     public final int addMedicalHistory(final TMedicalHistory medHist)
             throws KmiacServerException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         final String sqlQuery = "INSERT INTO c_osmotr (id_gosp, jalob, "
             + "morbi, status_praesense, status_localis, "
-            + "fisical_obs, pcod_vrach, dataz, timez, cpodr, pcod_added) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            + "fisical_obs, pcod_vrach, dataz, timez, cpodr, pcod_added, is_po) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, true, medHist, MEDICAL_HISTORY_TYPES, indexes);
             int id = sme.getGeneratedKeys().getInt("id");
@@ -160,7 +160,9 @@ public class ServerDiary extends Server implements Iface {
     	if (!isMedicalHistoryExist(medHist.getId()))
     		throw new MedicalHistoryNotFoundException();
         final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 9, 10, 0};
-        //Изменить номер номер истории болезни нельзя (в списке параметров не присутствует):
+        //Изменить номер номер истории болезни, код добавившего врача и
+        //признак проведения осмотра в приёмном отделении нельзя
+        //(в списке параметров не присутствуют):
         final String sqlQuery = "UPDATE c_osmotr SET jalob = ?, "
             + "morbi = ?, status_praesense = ?, status_localis = ?, "
             + "fisical_obs = ?, pcod_vrach = ?, dataz = ?, timez = ?, cpodr = ? "
