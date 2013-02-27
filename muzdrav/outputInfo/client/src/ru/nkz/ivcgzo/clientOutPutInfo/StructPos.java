@@ -16,7 +16,6 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputStructPos;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputStructPosAuth;
-import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
 
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -26,15 +25,20 @@ import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ImageIcon;
 
 public class StructPos extends JPanel {
 	
 	private CustomDateEditor Date1;
 	private CustomDateEditor Date2;
 	private final ButtonGroup butGroup = new ButtonGroup();
+	private int cpol = 0;
 	
 	public StructPos() {
+		cpol = MainForm.authInfo.cpodr;
+		
 		JLabel label = new JLabel("Сведения о структуре посещений и использования рабочего времени");
+		label.setFont(new Font("Tahoma", Font.BOLD, 15));
 				
 		final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		
@@ -43,21 +47,23 @@ public class StructPos extends JPanel {
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(114)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel, GroupLayout.PREFERRED_SIZE, 303, GroupLayout.PREFERRED_SIZE)
-						.addComponent(label))
-					.addContainerGap(129, Short.MAX_VALUE))
+				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+					.addGap(143)
+					.addComponent(label)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+					.addGap(231)
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 380, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(69, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(label)
-					.addGap(37)
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 392, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(46, Short.MAX_VALUE))
+					.addGap(130)
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(179, Short.MAX_VALUE))
 		);
 		
 		JLabel label_1 = new JLabel("Период формирования:");
@@ -68,9 +74,8 @@ public class StructPos extends JPanel {
 		Date2 = new CustomDateEditor();
 		Date2.setText("11102012");
 		
-		JButton button = new JButton("Выполнить");
-		
-		JButton button_1 = new JButton("Закрыть");
+		JButton button = new JButton("");
+		button.setIcon(new ImageIcon(StructPos.class.getResource("/ru/nkz/ivcgzo/clientOutPutInfo/resources/1341981970_Accept.png")));
 				
 				JLabel label_2 = new JLabel("С");
 		
@@ -83,65 +88,67 @@ public class StructPos extends JPanel {
 				gl_panel.setHorizontalGroup(
 					gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(64)
-							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
-								.addGroup(gl_panel.createSequentialGroup()
-									.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-										.addComponent(label_3)
-										.addComponent(label_2))
-									.addGap(10)
+							.addContainerGap()
+							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+								.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
 									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
-										.addGroup(gl_panel.createSequentialGroup()
-											.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
-												.addComponent(Date2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(Date1, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE))
-											.addPreferredGap(ComponentPlacement.UNRELATED)
-											.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
-												.addComponent(button_1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(button, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
 										.addComponent(rbutP)
 										.addComponent(rbutB))
-									.addGap(30))
+									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+										.addGroup(gl_panel.createSequentialGroup()
+											.addGap(24)
+											.addComponent(label_2))
+										.addGroup(gl_panel.createSequentialGroup()
+											.addGap(18)
+											.addComponent(label_3)))
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
+										.addComponent(Date2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(Date1, GroupLayout.DEFAULT_SIZE, 85, Short.MAX_VALUE))
+									.addGap(18)
+									.addComponent(button, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+									.addContainerGap())
 								.addGroup(gl_panel.createSequentialGroup()
 									.addComponent(label_1)
-									.addGap(195))))
+									.addGap(99))))
 				);
 				gl_panel.setVerticalGroup(
 					gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(label_1)
-							.addGap(53)
-							.addComponent(rbutP)
-							.addGap(18)
-							.addComponent(rbutB)
-							.addGap(38)
-							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(Date1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(label_2)
-								.addComponent(button))
-							.addGap(18)
+							.addGap(30)
 							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-								.addComponent(label_3)
-								.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-									.addComponent(Date2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addComponent(button_1)))
-							.addContainerGap(145, Short.MAX_VALUE))
+								.addComponent(button, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_panel.createSequentialGroup()
+									.addComponent(label_1)
+									.addGap(47)
+									.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+										.addComponent(rbutP)
+										.addComponent(label_2)
+										.addComponent(Date1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+									.addGap(13)
+									.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+										.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+											.addComponent(rbutB)
+											.addComponent(label_3))
+										.addComponent(Date2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+							.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 				);
 				panel.setLayout(gl_panel);
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
 				InputStructPos isp = new InputStructPos();	
-			
+				if (rbutP.isSelected()) isp.setDateChange("a.datap");
+				else if (rbutB.isSelected()) isp.setDateChange("a.dataz");
+				
 				isp.setDate1(sdf.format(Date1.getDate()));
 				isp.setDate2(sdf.format(Date2.getDate()));
-				
+							
 					InputStructPosAuth ispa = new InputStructPosAuth();
 					ispa.setUserId(MainForm.authInfo.getUser_id());
 					ispa.setCpodr_name(MainForm.authInfo.getCpodr_name());
 					ispa.setClpu_name(MainForm.authInfo.getClpu_name());
-									
+					ispa.setCpodr(MainForm.authInfo.getCpodr());
 				
 					String servPath = MainForm.tcl.printStructPos(ispa,isp);
 					String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();

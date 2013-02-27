@@ -1355,9 +1355,8 @@ public class ServerRegPatient extends Server implements Iface {
     public final List<IntegerClassifier> getO00() throws KmiacServerException {
 //        final String sqlQuery = "SELECT n_o00.pcod, (n_m00.name_s || ', ' || n_o00.name) as name "
 //            + "FROM n_o00 INNER JOIN n_m00 ON n_m00.pcod = n_o00.clpu;";
-        final String sqlQuery = "SELECT pcod, name_u as name "
-                + "FROM n_o00 "
-                + "ORDER BY pcod;";
+        final String sqlQuery = "SELECT pcod, name_u as name FROM n_o00 "+
+                "WHERE (clpu = 20 OR clpu = 21 OR clpu = 22 OR clpu = 23 OR clpu = 24 OR clpu = 25 OR clpu = 26 OR clpu = 27 OR clpu = 30 OR clpu = 41 OR clpu = 45 OR clpu = 47 OR clpu = 62 OR clpu = 63 OR clpu = 64 OR clpu = 83 OR clpu = 93) ORDER BY clpu, name_u ";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
             new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {

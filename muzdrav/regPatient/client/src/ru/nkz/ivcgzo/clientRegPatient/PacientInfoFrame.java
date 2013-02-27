@@ -2496,16 +2496,11 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
         	public void actionPerformed(ActionEvent e) {
                 if (curPatientId != 0 && tbl_priem.getSelectedItem() != null){
             		curGospId = tbl_priem.getSelectedItem().id;
-        			MainForm.conMan.showDiaryForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId);
+        			MainForm.conMan.showDiaryForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId, true);
         		}else
         			JOptionPane.showMessageDialog(tbl_priem, "Отсутствуют обращения пациента.");
         	}
         });
-//      btnAnam.addActionListener(new ActionListener() {
-//  	  	public void actionPerformed(ActionEvent e) {
-//     		azfrm.showAnamnezForm();
-//	    	}
-//      });
         
         JButton btnDel_priem = new JButton("Удалить");
         btnDel_priem.setToolTipText("Удалить обращение");
@@ -3281,7 +3276,8 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
 
     public void onConnect() {
         try {
-            cmb_cotd.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.clpu));
+//            cmb_cotd.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.clpu));
+            cmb_cotd.setData(MainForm.tcl.getO00());
             cmb_org.setSelectedItem(null);
             cmb_ishod.setData(MainForm.tcl.getABB());
 //            cmb_adm_obl.setData(null);

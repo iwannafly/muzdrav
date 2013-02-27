@@ -96,14 +96,14 @@ public final class ServerAssignments {
 
 	public List<TDiagnostic> getDiagnostics(int idGosp) throws KmiacServerException {
         String sqlQuery = 
-		"SELECT DISTINCT p_isl_ld.nisl, n_ldi.pcod AS cpok, n_ldi.name_n AS cpok_name, " +
+		"SELECT DISTINCT p_isl_ld.nisl, p_rez_l.cpok AS cpok, n_ldi.name_n AS cpok_name, " +
 			"p_rez_l.zpok AS result, p_isl_ld.datan, p_isl_ld.datav, '' AS op_name, '' AS rez_name " +
 		"FROM p_isl_ld " +
 		"JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) " +
 		"JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " +
 		"WHERE (p_isl_ld.id_gosp = ?) " +
 		"UNION " +
-		"SELECT DISTINCT p_isl_ld.nisl, n_ldi.pcod AS cpok, n_ldi.name_n AS cpok_name, " +
+		"SELECT DISTINCT p_isl_ld.nisl, p_rez_d.kodisl AS cpok, n_ldi.name_n AS cpok_name, " +
 			"n_arez.name AS result, p_isl_ld.datan, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name " +
 		"FROM p_isl_ld " +
 		"JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) " +
@@ -111,7 +111,8 @@ public final class ServerAssignments {
 		"LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) " +
 		"WHERE (p_isl_ld.id_gosp = ?);";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp, idGosp)) {
-            return rsmDiagnostic.mapToList(acrs.getResultSet());
+        	List<TDiagnostic> list2 = rsmDiagnostic.mapToList(acrs.getResultSet());
+            return list2;
         } catch (SQLException e) {
         	ServerHospital.log.log(Level.ERROR, "Exception (getDiagnostics): ", e);
             throw new KmiacServerException();

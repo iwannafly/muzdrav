@@ -16,6 +16,7 @@ struct TMedicalHistory{
 	10: optional i64 timez;
 	11: optional i32 cpodr;
 	12: optional i32 pcodAdded;
+	13: optional bool is_po;
 }
 
 struct Patient {
