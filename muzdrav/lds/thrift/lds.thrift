@@ -54,6 +54,7 @@ struct LabIsl {
 	 7: optional double stoim;
 	 8: string pcod_m;
 	 9: string name_m;
+	10: i32 id;
 }
 
 struct S_ot01{
@@ -246,7 +247,7 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	LabIsl GetLIsl(1: i32 nisl; 2: string c_nz1)throws (1: LIslNotFoundException line);
 	void AddLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void UpdLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
-	void DelLIsl(1: i32 nisl, 2: string cpok);
+	void DelLIsl(1: i32 nisl, 2: string cpok, 3: i32 id);
 	void DelLIslD(1: i32 nisl);
 
 
