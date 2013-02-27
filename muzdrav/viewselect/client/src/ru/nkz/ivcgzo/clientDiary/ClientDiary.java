@@ -51,10 +51,13 @@ public class ClientDiary extends Client<ThriftDiary.Client> {
 //        labFrame.setTitle(String.format("%s %s %s",
 //            (String) params[1], (String) params[2], (String) params[3]));
         diaryFrame.setTitle("Дневник осмотров");
-        JDialog dialog = prepareModal(parent);
-        diaryFrame.fillPatient((int) params[0], (String) params[1],
-            (String) params[2], (String) params[3], (int) params[4]);
-        dialog.setVisible(true);
+        JDialog modalDialog = null;
+        try {
+        	modalDialog = prepareModal(parent);
+            diaryFrame.fillPatient((int) params[0], (String) params[1],
+                    (String) params[2], (String) params[3], (int) params[4]);
+            modalDialog.setVisible(true);
+        } catch (RuntimeException re) { }
         disposeModal();
         return null;
     }
