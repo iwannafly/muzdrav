@@ -78,8 +78,6 @@ public class MainFrame extends JFrame {
     private JTextArea taStatusPraence;
     private JTextArea taFisicalObs;
     private JTextArea taStatusLocalis;
-    private JTextArea[] arrTextAreas = new JTextArea[]
-    		{taJalob, taDesiaseHistory, taStatusPraence, taFisicalObs, taStatusLocalis};
     private JLabel lblMedicalHistioryShablonHeader;
     private CustomTextField tfMedHShablonFilter;
     private CustomTable<TMedicalHistory, TMedicalHistory._Fields> tblMedHist;
@@ -584,10 +582,11 @@ public class MainFrame extends JFrame {
     		ticcbOtd.setSelectedPcod(curMedHist.getCpodr());
     	else
     		ticcbOtd.setSelectedItem(null);
+		ticcbPcodOsm.setSelectedItem(null);
     	if (curMedHist.isSetPcodVrach())
-    		ticcbPcodOsm.setSelectedPcod(curMedHist.getPcodVrach());
-    	else
-    		ticcbPcodOsm.setSelectedItem(null);
+    		try {
+    			ticcbPcodOsm.setSelectedPcod(curMedHist.getPcodVrach());
+    		} catch (Exception e) {}
         if (taJalob != null)
             taJalob.setText(curMedHist.getJalob());
         if (taDesiaseHistory != null)
@@ -767,13 +766,18 @@ public class MainFrame extends JFrame {
             return;
         //Индексы соответствия номера группы шаблона и текстовых полей:
         int[] arrIndexes = new int[] {-1, 0, 1, -1, -1, -1, 2, 3, 4};
+        JTextArea[] arrTextAreas = new JTextArea[]
+        		{taJalob, taDesiaseHistory, taStatusPraence, taFisicalObs, taStatusLocalis};
         isAsked = false;
         isAdding = false;
 
         for (ShablonText shText : shablon.textList) {
+        	if (shText == null)
+        		continue;
         	int curGroup = shText.getGrupId();	//Номер текущей группы шаблона
         	if ((curGroup >= 0) && (curGroup < arrIndexes.length) && 
-        		(arrIndexes[curGroup] >= 0))
+        		(arrIndexes[curGroup] >= 0) &&
+        		(arrTextAreas[arrIndexes[curGroup]] != null))
         		pasteShablonInField(arrTextAreas[arrIndexes[curGroup]], shText);
         }
     }
