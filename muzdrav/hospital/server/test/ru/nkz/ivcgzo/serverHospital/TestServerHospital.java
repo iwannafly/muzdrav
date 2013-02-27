@@ -119,7 +119,7 @@ public class TestServerHospital {
     @Test
     public final void updatePatientChamberNumber_isActuallyUpdated() throws TException {
         final int gospId = 4;
-        final int chamberNum = 108;
+        final String chamberNum = "БОКС 108";
         final int profPcod = 123;
         final int nist = 1;
         testServer.updatePatientChamberNumber(gospId, chamberNum, profPcod, nist);

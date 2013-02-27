@@ -379,7 +379,7 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final void updatePatientChamberNumber(final int gospId, final int chamberNum,
+    public final void updatePatientChamberNumber(final int gospId, final String chamberNum,
             final int profPcod, final int nist) throws KmiacServerException {
         final String sqlQuery = "UPDATE c_otd SET npal = ?, cprof = ?, nist = ? WHERE (id_gosp = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {

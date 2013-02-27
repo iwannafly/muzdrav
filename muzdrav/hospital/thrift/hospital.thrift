@@ -12,7 +12,7 @@ struct TSimplePatient{
 	6:optional i64 birthDate;
 	7:optional i64 arrivalDate;
 	8:optional i32 departmentCod;
-	9:optional i32 npal;
+	9:optional string npal;
 	10:optional i32 nist;
 }
 
@@ -29,7 +29,7 @@ struct TPatient{
 	10:string oms;
 	11:string dms;
 	12:string job;
-	13:i32 chamber;
+	13:string chamber;
 	14:string registrationAddress;
 	15:string realAddress;
 	16:i32 ngosp;
@@ -444,7 +444,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		2:kmiacServer.KmiacServerException kse);
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
-	void updatePatientChamberNumber(1:i32 gospId, 2:i32 chamberNum, 3:i32 profPcod, 4:i32 nist)
+	void updatePatientChamberNumber(1:i32 gospId, 2:string chamberNum, 3:i32 profPcod, 4:i32 nist)
 		throws (1:kmiacServer.KmiacServerException kse);
 	
 	TLifeHistory getLifeHistory(1:i32 patientId) throws (1:LifeHistoryNotFoundException lhnfe,

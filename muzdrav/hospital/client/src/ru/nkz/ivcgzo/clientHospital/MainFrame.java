@@ -1030,7 +1030,7 @@ public class MainFrame extends JFrame {
                     try {
                         ClientHospital.tcl.updatePatientChamberNumber(
                             patient.gospitalCod,
-                            Integer.parseInt(tfChamber.getText()),
+                            tfChamber.getText(),
                             tfStatus.getSelectedPcod(),
                             Integer.parseInt(tfNumberOfDesiaseHistory.getText()));
                         JOptionPane.showMessageDialog(MainFrame.this,

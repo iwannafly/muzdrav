@@ -9,6 +9,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.configuration;
 
+import ru.nkz.ivcgzo.clientHospital.controllers.MainController;
+import ru.nkz.ivcgzo.clientHospital.model.HospitalModel;
+import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -17,8 +20,10 @@ import ru.nkz.ivcgzo.thriftHospital.ThriftHospital;
 public class ClientHospital extends Client<ThriftHospital.Client> {
 
     public static ThriftHospital.Client tcl;
-    private MainFrame mainFrame;
+//    private MainFrame mainFrame;
     public static Client<ThriftHospital.Client> instance;
+    private IHospitalModel model;
+    private MainController controller;
 
     public ClientHospital(final ConnectionManager conMan, final UserAuthInfo authInfo,
             final int accessParam) throws IllegalAccessException, NoSuchMethodException,
@@ -35,9 +40,12 @@ public class ClientHospital extends Client<ThriftHospital.Client> {
             ClassNotFoundException, InstantiationException, IllegalAccessException,
             UnsupportedLookAndFeelException, TException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        mainFrame = new MainFrame(authInfo);
-        mainFrame.pack();
-        setFrame(mainFrame);
+        this.model = new HospitalModel();
+        this.controller = new MainController(model);
+//        mainFrame = new MainFrame(authInfo);
+//        mainFrame.pack();
+//        setFrame(mainFrame);
+        setFrame(controller.getFrame());
     }
 
     @Override
@@ -51,7 +59,8 @@ public class ClientHospital extends Client<ThriftHospital.Client> {
         super.onConnect(conn);
         if (conn instanceof ThriftHospital.Client) {
             tcl = thrClient;
-            mainFrame.onConnect();
+            controller.onConnect();
+//            mainFrame.onConnect();
         }
     }
 }
