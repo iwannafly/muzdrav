@@ -233,7 +233,7 @@ public class Vvod extends JFrame {
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbKonsMesto;
 	private JLabel lblVidStacionar;
 	private JLabel lblKonsMesto;
-	public static CustomTable<Pvizit, Pvizit._Fields> tblObr;
+	public CustomTable<Pvizit, Pvizit._Fields> tblObr;
 	private JButton btnObrDel;
 	private JButton btnObrSave;
 	private JButton btnObrAdd;
@@ -1936,7 +1936,7 @@ public class Vvod extends JFrame {
 							
 								servPath = MainForm.tcl.printIsslMetod(isslmet);
 								String cliPath;
-								cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+								cliPath = MainForm.conMan.createReestr("направление на исследование");
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
        						MainForm.conMan.openFileInEditor(cliPath, false);
 
@@ -2832,6 +2832,23 @@ public class Vvod extends JFrame {
 		});
 		btnObrSave.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
 		btnObrSave.setToolTipText("Сохранение изменений");
+		
+		JButton btnRefresh = new JButton("");
+		btnRefresh.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					tblObr.setData(MainForm.tcl.getPvizitList(zapVr.npasp));
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnRefresh.setToolTipText("Обновить");
+		btnRefresh.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/refresh.png")));
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.TRAILING)
@@ -2842,8 +2859,10 @@ public class Vvod extends JFrame {
 						.addComponent(btnObrAdd, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnObrDel, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnObrSave, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE))
-					.addGap(42)
-					.addComponent(spPos, GroupLayout.DEFAULT_SIZE, 815, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnRefresh, GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(spPos, GroupLayout.PREFERRED_SIZE, 541, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 						.addComponent(btnPosAdd, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
@@ -2853,15 +2872,17 @@ public class Vvod extends JFrame {
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-						.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+							.addComponent(spPos, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
+							.addComponent(btnRefresh, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel.createSequentialGroup()
 							.addComponent(btnObrAdd, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
 							.addGap(6)
 							.addComponent(btnObrDel, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 							.addComponent(btnObrSave, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE))
-						.addComponent(spObr, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
-						.addComponent(spPos, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
+						.addComponent(spObr, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
 						.addGroup(gl_panel.createSequentialGroup()
 							.addComponent(btnPosAdd, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -2883,11 +2904,11 @@ public class Vvod extends JFrame {
 					if (tblObr.getSelectedItem() != null) {
 						zapVr.setId_pvizit(tblObr.getSelectedItem().id);
 						tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.getId_pvizit()));
-						treeRezIssl.setModel(new DefaultTreeModel(createNodes()));
+						//treeRezIssl.setModel(new DefaultTreeModel(createNodes()));
 						checkZapVrNext();
 					} else {
 						tblPos.setData(new ArrayList<PvizitAmb>());
-						treeRezIssl.setModel(null);
+						//treeRezIssl.setModel(null);
 					}
 				} catch (KmiacServerException e1) {
 					JOptionPane.showMessageDialog(Vvod.this, "Не удалось загрузить список посещений.", "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -2905,7 +2926,7 @@ public class Vvod extends JFrame {
 		tblPos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
-			if (!arg0.getValueIsAdjusting()){
+			if (!arg0.getValueIsAdjusting() && (tblPos.getSelectedItem() != null)){
 				pvizitAmb = new PvizitAmb();
 				priem = new Priem();
 				anamZab = new AnamZab();
