@@ -758,12 +758,6 @@ public class Vvod extends JFrame {
 				.addGap(0, 45, Short.MAX_VALUE)
 				.addComponent(spJal, GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
 		);
-		
-		tbJal = new JTextArea();
-		tbJal.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		tbJal.setLineWrap(true);
-		tbJal.setWrapStyleWord(true);
-		spJal.setViewportView(tbJal);
 		pnlJal.setLayout(gl_pnlJal);
 		
 		JPanel pnlAnam = new JPanel();
@@ -1032,6 +1026,12 @@ public class Vvod extends JFrame {
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		pnlOsmOsm.setLayout(gl_pnlOsmOsm);
+		
+		tbJal = new JTextArea();
+		spOsm.setColumnHeaderView(tbJal);
+		tbJal.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		tbJal.setLineWrap(true);
+		tbJal.setWrapStyleWord(true);
 		pnlOsm.setLayout(gl_pnlOsm);
 		
 		JPanel pnlDiag = new JPanel();
