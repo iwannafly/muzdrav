@@ -1056,7 +1056,7 @@ public class PIslForm {
 								Pus = MainForm.ltc.GetKlasPrvO00(MainForm.authInfo.clpu, Integer.valueOf(tFnaprotd.getText()));
 						
 							if (Pus.size()==0){
-								System.out.println(Pus.size());
+								//System.out.println(Pus.size());
 								ch = false;
 							}
 						
@@ -1065,7 +1065,7 @@ public class PIslForm {
 								List <IntegerClassifier> Pus = MainForm.ltc.GetKlasPrvN00(Integer.valueOf(tFnaprotd.getText()));
 							
 								if (Pus.size()==0){
-									System.out.println(Pus.size());
+									//System.out.println(Pus.size());
 									ch = false;
 								}	
 							}else{
@@ -1655,8 +1655,9 @@ public class PIslForm {
 					} 
 								
 				}
-				 	//System.out.print(upDisl);			
+				 				
 				try {
+					//System.out.println(upDisl);
 					MainForm.ltc.UpdDIsl(upDisl);
 				} catch (DIslExistsException e) {
 					// TODO Auto-generated catch block
