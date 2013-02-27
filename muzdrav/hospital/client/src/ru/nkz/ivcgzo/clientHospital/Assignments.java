@@ -512,8 +512,8 @@ public final class Assignments extends JPanel {
 		this.tblDiet = new CustomTable<TDiet, TDiet._Fields>(
 				false, false, TDiet.class, 0, "Тип",
 				1, "№", 2, "Дата назначения", 3, "Дата отмены");
-		this.tblDiagnostics.setDateField(2);
-		this.tblDiagnostics.setDateField(3);
+		this.tblDiet.setDateField(2);
+		this.tblDiet.setDateField(3);
 		this.spDiet.setViewportView(this.tblDiet);
 	}
 
@@ -527,8 +527,8 @@ public final class Assignments extends JPanel {
 				false, false, TProcedures.class,
 				0, "Наименование процедуры", 1, "Дата начала", 
 				2, "Дата окончания", 3, "Кол-во проведённых процедур");
-		this.tblDiagnostics.setDateField(1);
-		this.tblDiagnostics.setDateField(2);
+		this.tblProcedures.setDateField(1);
+		this.tblProcedures.setDateField(2);
 		this.spProcedures.setViewportView(this.tblProcedures);
 	}
 

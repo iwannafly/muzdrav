@@ -10,9 +10,7 @@ import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -43,10 +41,8 @@ import ru.nkz.ivcgzo.thriftHospital.RdDinStruct;
 import ru.nkz.ivcgzo.thriftHospital.RdSlStruct;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
-import ru.nkz.ivcgzo.thriftHospital.TBirthPlace;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnostic;
-import ru.nkz.ivcgzo.thriftHospital.TInfoLPU;
 import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedication;
@@ -1781,7 +1777,7 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 	}
 
 	@Override
-	public List<TDiagnostic> getDiagnostics(int idGosp) throws KmiacServerException {
+	public List<TDiagnostic> getDiagnostics(final int idGosp) throws KmiacServerException {
 		return serverAssignments.getDiagnostics(idGosp);
 	}
 
