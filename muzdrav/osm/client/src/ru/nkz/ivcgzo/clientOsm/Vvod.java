@@ -1042,10 +1042,10 @@ public class Vvod extends JFrame {
 		pnlOsmOsm.setLayout(gl_pnlOsmOsm);
 		
 		tbJal = new JTextArea();
-		spOsm.setColumnHeaderView(tbJal);
 		tbJal.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbJal.setLineWrap(true);
 		tbJal.setWrapStyleWord(true);
+		spJal.setViewportView(tbJal);
 		pnlOsm.setLayout(gl_pnlOsm);
 		
 		JPanel pnlDiag = new JPanel();
