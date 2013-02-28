@@ -3276,8 +3276,8 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
 
     public void onConnect() {
         try {
-//            cmb_cotd.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.clpu));
-            cmb_cotd.setData(MainForm.tcl.getO00());
+            cmb_cotd.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.clpu));
+//            cmb_cotd.setData(MainForm.tcl.getO00());
             cmb_org.setSelectedItem(null);
             cmb_ishod.setData(MainForm.tcl.getABB());
 //            cmb_adm_obl.setData(null);
@@ -3687,7 +3687,8 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
     private void selectAllPatientPriemInfo(int PatId){
       try{
         tbl_priem.setData(new ArrayList<AllGosp>());
-        AllGospInfo = MainForm.tcl.getAllGosp(PatId);
+//        AllGospInfo = MainForm.tcl.getAllGosp(PatId);
+        AllGospInfo = MainForm.tcl.getAllGospForCurrentLpu(PatId, MainForm.authInfo.getClpu());
         tbl_priem.setData(AllGospInfo);
       } catch (GospNotFoundException gnfe) {
 //            System.out.println("Обращений нет.");

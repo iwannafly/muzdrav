@@ -750,6 +750,26 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+	@Override
+	public List<AllGosp> getAllGospForCurrentLpu(int npasp, int clpu)
+			throws GospNotFoundException, KmiacServerException, TException {
+        String sqlQuery = "SELECT id, ngosp, npasp, nist, datap, cotd, diag_p, named_p "+
+                "FROM c_gosp g JOIN n_o00 o00 ON (g.cotd = o00.pcod) " +
+                "WHERE npasp = ? AND o00.clpu = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp, clpu)) {
+            ResultSet rs = acrs.getResultSet();
+            List<AllGosp> allGosp = rsmAllGosp.mapToList(rs);
+            if (allGosp.size() > 0) {
+                return allGosp;
+            } else {
+                throw new GospNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+	}
+
     @Override
     public final Gosp getGosp(final int id) throws GospNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT * FROM c_gosp WHERE id = ?;";
@@ -1370,7 +1390,7 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final List<IntegerClassifier> getOtdForCurrentLpu(final int lpuId)
             throws KmiacServerException {
-        final String sqlQuery = "SELECT pcod, name FROM n_o00 WHERE clpu = ?";
+        final String sqlQuery = "SELECT pcod, name FROM n_o00 WHERE clpu = ? ORDER BY name ";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, lpuId)) {
