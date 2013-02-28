@@ -3172,9 +3172,9 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
                         lgot = "";
                     }
                     servPath = MainForm.tcl.printMedCart(NambInfo, PersonalInfo, MainForm.authInfo, docInfo, omsOrg, lgot);
-                    String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+                    String cliPath = MainForm.conMan.createReport("Амбулаторн._карта");
                     MainForm.conMan.transferFileFromServer(servPath, cliPath);
-                    MainForm.conMan.openFileInEditor(cliPath, false);
+                    MainForm.conMan.openFileInTextProcessor(cliPath, false);
                 } catch (TException e) {
                     MainForm.conMan.reconnect((TException) e);
                     e.printStackTrace();
