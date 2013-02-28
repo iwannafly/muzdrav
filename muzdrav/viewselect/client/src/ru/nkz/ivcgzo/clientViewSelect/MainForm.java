@@ -563,7 +563,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					}
 					
 				case 28:
-	                diaryFrm.showModal(parent, params[1], params[2], params[3], params[4], params[5]);
+	                diaryFrm.showModal(parent, params[1], params[2], params[3], params[4], params[5], params[6]);
 	                break;
                 }
 				
