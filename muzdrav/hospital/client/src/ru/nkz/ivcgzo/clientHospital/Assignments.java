@@ -472,8 +472,8 @@ public final class Assignments extends JPanel {
 		this.tblMedications = new CustomTable<TMedication, TMedication._Fields>(
 				false, false, TMedication.class, 0, "Наименование",
 				4, "Дата назначения", 12, "Дата окончания", 14, "Дата отмены",
-				18, "Способ введения", 10, "Схема приёма", 11, "Кол-во в день",
-				7, "Разовая доза", 17, "ед.");
+				20, "Способ введения", 10, "Схема приёма", 11, "Кол-во в день",
+				7, "Разовая доза", 19, "ед.");
 		tblMedications.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {

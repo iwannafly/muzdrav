@@ -65,7 +65,7 @@ public class ClientMedication extends Client<ThriftMedication.Client> {
 		});
         ((MainFrame)getFrame()).frmMedicationCatalog.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
+            public void windowClosing(WindowEvent e) {
             	dialog.dispatchEvent(new WindowEvent(dialog, WindowEvent.WINDOW_CLOSING));
             }
         });

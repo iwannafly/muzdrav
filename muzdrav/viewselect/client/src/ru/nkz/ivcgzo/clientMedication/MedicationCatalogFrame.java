@@ -138,9 +138,35 @@ public class MedicationCatalogFrame extends JDialog{
 
         addMedicationList();
     }
+    
+    private void changeSelectedMedication() {
+        if ((lMedicationForms != null) && (lMedications.getSelectedValue() != null)) {
+            try {
+                lMedicationForms.setData(
+                    ClientMedication.tcl.getMedicationForms(
+                        lMedications.getSelectedPcod()));
+            } catch (KmiacServerException e1) {
+                lMedicationForms.setData(Collections.<IntegerClassifier>emptyList());
+            } catch (TException e1) {
+                lMedicationForms.setData(Collections.<IntegerClassifier>emptyList());
+                ClientMedication.conMan.reconnect(e1);
+            }
+        } else {
+        	if((lMedicationForms != null))
+        		lMedicationForms.setData(Collections.<IntegerClassifier>emptyList());
+        }
+    }
 
     private void addMedicationList() {
         lMedications = new ThriftIntegerClassifierList();
+        lMedications.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                	changeSelectedMedication();
+                }
+            }
+        });
         try {
             lMedications.setData(ClientMedication.tcl.getMedications());
         } catch (KmiacServerException e) {
@@ -149,27 +175,6 @@ public class MedicationCatalogFrame extends JDialog{
             lMedications.setData(Collections.<IntegerClassifier>emptyList());
             ClientMedication.conMan.reconnect(e);
         }
-        lMedications.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    if ((lMedicationForms != null) && (lMedications.getSelectedValue() != null)) {
-                        try {
-                            lMedicationForms.setData(
-                                ClientMedication.tcl.getMedicationForms(
-                                    lMedications.getSelectedPcod()));
-                        } catch (KmiacServerException e1) {
-                            lMedicationForms.setData(Collections.<IntegerClassifier>emptyList());
-                        } catch (TException e1) {
-                            lMedicationForms.setData(Collections.<IntegerClassifier>emptyList());
-                            ClientMedication.conMan.reconnect(e1);
-                        }
-                    } else {
-                        lMedicationForms.setData(Collections.<IntegerClassifier>emptyList());
-                    }
-                }
-            }
-        });
         spMedicationList.setViewportView(lMedications);
     }
 
@@ -190,6 +195,7 @@ public class MedicationCatalogFrame extends JDialog{
     private void addMedicationFormsList() {
         lMedicationForms = new ThriftIntegerClassifierList();
         spMedicationFormList.setViewportView(lMedicationForms);
+        changeSelectedMedication();
     }
 
     private void addButtonPanel() {
