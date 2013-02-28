@@ -40,17 +40,21 @@ public class MedicationCatalogFrame extends JDialog{
 
     private static final long serialVersionUID = -4086993922032539356L;
     private JTextField tfMedicationName;
+    private JTextField tfMedicationCustomName, tfMedicationCustomForm;
     private JPanel pMedicationButtons;
+    private JButton btnSelectMedication;
     private JButton btnAddMedication;
     private JButton btnCancel;
-    private JPanel pMain;
+    private JPanel pMain, pCustomMed;
     private JLabel lblMedicationHeader;
-    private JScrollPane spMedicationList;
+    private JLabel lblMedicationSearchHeader;
     private JLabel lblMedicationFormHeader;
+    private JLabel lblMedicationCustomNameHeader;
+    private JLabel lblMedicationCustomFormHeader;
+    private JScrollPane spMedicationList;
     private JScrollPane spMedicationFormList;
     private ThriftIntegerClassifierList lMedications;
     private ThriftIntegerClassifierList lMedicationForms;
-    private JLabel lblMedicationSearchHeader;
     private ShablonSearchListener medicationSearchListener;
     private MedicationOptionsFrame frmMedicationOptions;
     private Patient patient;
@@ -107,6 +111,21 @@ public class MedicationCatalogFrame extends JDialog{
         addMedicationFormHeader();
         addMedicationFormScrollPane();
         addButtonPanel();
+        addCustomMedPanel();
+    }
+    
+    private void addCustomMedPanel() {
+        pCustomMed = new JPanel();
+        pCustomMed.setBorder(new EtchedBorder(
+                EtchedBorder.RAISED, new Color(0, 0, 0), new Color(102, 102, 102)));
+        pCustomMed.setLayout(new BoxLayout(pCustomMed, BoxLayout.Y_AXIS));
+        pCustomMed.setMaximumSize(new Dimension(32767, 100));
+        pMain.add(pCustomMed);
+        addMedicationCustomNameHeader();
+        addMedicationCustomName();
+        addMedicationCustomFormHeader();
+        addMedicationCustomForm();
+        addAddButton();
     }
 
     private void addMedicationSearchHeader() {
@@ -138,9 +157,35 @@ public class MedicationCatalogFrame extends JDialog{
 
         addMedicationList();
     }
+    
+    private void changeSelectedMedication() {
+        if ((lMedicationForms != null) && (lMedications.getSelectedValue() != null)) {
+            try {
+                lMedicationForms.setData(
+                    ClientMedication.tcl.getMedicationForms(
+                        lMedications.getSelectedPcod()));
+            } catch (KmiacServerException e1) {
+                lMedicationForms.setData(Collections.<IntegerClassifier>emptyList());
+            } catch (TException e1) {
+                lMedicationForms.setData(Collections.<IntegerClassifier>emptyList());
+                ClientMedication.conMan.reconnect(e1);
+            }
+        } else {
+        	if((lMedicationForms != null))
+        		lMedicationForms.setData(Collections.<IntegerClassifier>emptyList());
+        }
+    }
 
     private void addMedicationList() {
         lMedications = new ThriftIntegerClassifierList();
+        lMedications.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                	changeSelectedMedication();
+                }
+            }
+        });
         try {
             lMedications.setData(ClientMedication.tcl.getMedications());
         } catch (KmiacServerException e) {
@@ -149,27 +194,6 @@ public class MedicationCatalogFrame extends JDialog{
             lMedications.setData(Collections.<IntegerClassifier>emptyList());
             ClientMedication.conMan.reconnect(e);
         }
-        lMedications.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    if ((lMedicationForms != null) && (lMedications.getSelectedValue() != null)) {
-                        try {
-                            lMedicationForms.setData(
-                                ClientMedication.tcl.getMedicationForms(
-                                    lMedications.getSelectedPcod()));
-                        } catch (KmiacServerException e1) {
-                            lMedicationForms.setData(Collections.<IntegerClassifier>emptyList());
-                        } catch (TException e1) {
-                            lMedicationForms.setData(Collections.<IntegerClassifier>emptyList());
-                            ClientMedication.conMan.reconnect(e1);
-                        }
-                    } else {
-                        lMedicationForms.setData(Collections.<IntegerClassifier>emptyList());
-                    }
-                }
-            }
-        });
         spMedicationList.setViewportView(lMedications);
     }
 
@@ -190,6 +214,33 @@ public class MedicationCatalogFrame extends JDialog{
     private void addMedicationFormsList() {
         lMedicationForms = new ThriftIntegerClassifierList();
         spMedicationFormList.setViewportView(lMedicationForms);
+        changeSelectedMedication();
+    }
+
+    private void addMedicationCustomNameHeader() {
+        lblMedicationCustomNameHeader = new JLabel("Название медикамента:");
+        pCustomMed.add(lblMedicationCustomNameHeader);
+    }
+    
+    private void addMedicationCustomName() {
+    	tfMedicationCustomName = new JTextField();
+    	tfMedicationCustomName.setBorder(new LineBorder(new Color(0, 0, 0), 1));
+    	tfMedicationCustomName.setMaximumSize(new Dimension(2147483647, 100));
+    	tfMedicationCustomName.setColumns(10);
+    	pCustomMed.add(tfMedicationCustomName);
+    }
+
+    private void addMedicationCustomFormHeader() {
+        lblMedicationCustomFormHeader = new JLabel("Форма выпуска:");
+        pCustomMed.add(lblMedicationCustomFormHeader);
+    }
+    
+    private void addMedicationCustomForm() {
+    	tfMedicationCustomForm = new JTextField();
+    	tfMedicationCustomForm.setBorder(new LineBorder(new Color(0, 0, 0), 1));
+    	tfMedicationCustomForm.setMaximumSize(new Dimension(2147483647, 100));
+    	tfMedicationCustomForm.setColumns(10);
+    	pCustomMed.add(tfMedicationCustomForm);
     }
 
     private void addButtonPanel() {
@@ -197,18 +248,16 @@ public class MedicationCatalogFrame extends JDialog{
         pMain.add(pMedicationButtons);
         pMedicationButtons.setMaximumSize(new Dimension(32767, 100));
 
-        addAddButton();
+        addSelButton();
         addCancelButton();
     }
 
-    private void addAddButton() {
-        btnAddMedication = new JButton("Выбрать медикамент");
-        btnAddMedication.addActionListener(new ActionListener() {
+    private void addSelButton() {
+        btnSelectMedication = new JButton("Выбрать медикамент");
+        btnSelectMedication.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
-//                MedicationCatalogFrame.this.dispatchEvent(new WindowEvent(
-//                    MedicationCatalogFrame.this, WindowEvent.WINDOW_CLOSING));
                 if (lMedications.getSelectedValue() != null) {
                     if (lMedicationForms.getData().size() > 0) {
                         frmMedicationOptions.prepareForm(lMedications.getSelectedValue(),
@@ -221,7 +270,32 @@ public class MedicationCatalogFrame extends JDialog{
                 frmMedicationOptions.setVisible(true);
             }
         });
-        pMedicationButtons.add(btnAddMedication);
+        pMedicationButtons.add(btnSelectMedication);
+    }    
+    
+    private void addAddButton() {
+    	btnAddMedication = new JButton("Добавить медикамент");
+    	btnAddMedication.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	String newMedName = tfMedicationCustomName.getText();
+            	String newMedForm = tfMedicationCustomForm.getText();
+                if ((newMedName != null) && (newMedName.length() > 0)) {
+                    setVisible(false);
+                    if ((newMedForm == null) || (newMedForm.length() == 0))
+                    	newMedForm = "форма выпуска неизвестна";
+                    frmMedicationOptions.prepareForm(
+                    	new IntegerClassifier(-1, newMedName),
+                        new IntegerClassifier(-1, newMedForm), patient);
+                    frmMedicationOptions.setVisible(true);
+                } else {
+                	JOptionPane.showMessageDialog(getContentPane(),
+                		"Название медикамента не может быть пустым", "Ошибка",
+                		JOptionPane.OK_OPTION);
+                }
+            }
+        });
+    	pCustomMed.add(btnAddMedication);
     }
 
     private void addCancelButton() {

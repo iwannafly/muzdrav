@@ -43,7 +43,8 @@ public class ServerMedication extends Server implements Iface {
     };
     private static final String[] LEK_FIELD_NAMES = {
         "nlek", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed", "sposv",
-        "spriem", "pereod", "datae", "komm", "datao", "vracho", "dataz"
+        "spriem", "pereod", "datae", "komm", "datao", "vracho", "dataz", "lek_name",
+        "id_kap", "id_inj"
     };
     private static final String[] LEK_PRIEM_FIELD_NAMES = {
         "id", "nlek", "datap", "timep", "status"
@@ -51,18 +52,20 @@ public class ServerMedication extends Server implements Iface {
 
     @SuppressWarnings("unused")
     private static final Class<?>[] INT_CLAS_TYPES = {
-    //  pcod          name
-        Integer.class, String.class
+    //  pcod			name
+        Integer.class,	String.class
     };
     private static final Class<?>[] LEK_TYPES = {
     //  nlek           id_gosp        vrach          datan       klek
         Integer.class, Integer.class, Integer.class, Date.class, Integer.class,
     //  flek          doza           ed             sposv
         String.class, Integer.class, Integer.class, Integer.class,
-    //  spriem         pereod         datae         komm
-        Integer.class, Integer.class, Date.class, String.class,
-    //  datao       vracho         dataz
-        Date.class, Integer.class, Date.class
+    //  spriem         pereod         datae			komm
+        Integer.class, Integer.class, Date.class,	String.class,
+    //  datao       vracho         dataz		lek_name
+        Date.class, Integer.class, Date.class,	String.class,
+    //	id_kap			id_inj
+        Integer.class,	Integer.class
     };
     @SuppressWarnings("unused")
     private static final Class<?>[] LEK_PRIEM_TYPES = {
@@ -163,12 +166,12 @@ public class ServerMedication extends Server implements Iface {
     @Override
     public List<IntegerClassifier> getMedicationForms(int medId)
             throws KmiacServerException {
-        String sqlQuery = "SELECT pcod, name FROM n_frw WHERE c_med = ?";
+        String sqlQuery = "SELECT pcod, name FROM n_frw WHERE (c_med = ?);";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, medId)) {
             List<IntegerClassifier> medicationForms =
                 rsmMedicationForms.mapToList(acrs.getResultSet());
             if (medicationForms.size() == 0) {
-                log.log(Level.INFO, "Medication forms not found exception");
+                log.log(Level.INFO, "Medication forms not found");
             }
             return medicationForms;
         } catch (SQLException e) {
@@ -184,7 +187,7 @@ public class ServerMedication extends Server implements Iface {
             List<LekPriem> lekPriems =
                 rsmLekPriem.mapToList(acrs.getResultSet());
             if (lekPriems.size() == 0) {
-                log.log(Level.INFO, "lekPriem not found exception");
+                log.log(Level.INFO, "lekPriem not found");
             }
             return lekPriems;
         } catch (SQLException e) {
@@ -195,12 +198,12 @@ public class ServerMedication extends Server implements Iface {
 
     @Override
     public Lek getLek(int nlek) throws KmiacServerException {
-        String sqlQuery = "SELECT * FROM c_lek WHERE nlek = ?";
+        String sqlQuery = "SELECT * FROM c_lek WHERE (nlek = ?);";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, nlek)) {
             if (acrs.getResultSet().next()) {
                 return rsmLek.map(acrs.getResultSet());
             } else {
-                log.log(Level.INFO, "Lek not found exception");
+                log.log(Level.INFO, "Lek not found");
                 throw new KmiacServerException();
             }
         } catch (SQLException e) {
@@ -237,10 +240,11 @@ public class ServerMedication extends Server implements Iface {
 
     @Override
     public int addLek(Lek lek) throws KmiacServerException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
         final String sqlQuery = "INSERT INTO c_lek (id_gosp, vrach, datan, klek,"
-            + "flek, doza, ed, sposv, spriem, pereod, datae, komm, datao, vracho, dataz) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            + "flek, doza, ed, sposv, spriem, pereod, datae, komm, datao, vracho, "
+            + "dataz, lek_name, id_kap, id_inj) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, true, lek,
                  LEK_TYPES, indexes);
@@ -255,7 +259,7 @@ public class ServerMedication extends Server implements Iface {
 
     @Override
     public void deleteLek(int nlek) throws KmiacServerException  {
-        final String sqlQuery = "DELETE FROM c_lek WHERE (nlek = ?)";
+        final String sqlQuery = "DELETE FROM c_lek WHERE (nlek = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared(sqlQuery, false, nlek);
             sme.setCommit();
@@ -269,8 +273,9 @@ public class ServerMedication extends Server implements Iface {
     public List<IntegerClassifier> getLekShortList(int idGosp)
             throws KmiacServerException {
         String sqlQuery = "SELECT c_lek.nlek as pcod, n_med.name as name "
-            + "FROM c_lek INNER JOIN n_med ON c_lek.klek = n_med.pcod "
-            + "WHERE c_lek.id_gosp = ?;";
+            + "FROM c_lek "
+            + "INNER JOIN n_med ON (c_lek.klek = n_med.pcod) "
+            + "WHERE (c_lek.id_gosp = ?);";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
             List<IntegerClassifier> lekShortList = rsmLekShortList.mapToList(acrs.getResultSet());
             if (lekShortList.size() == 0) {

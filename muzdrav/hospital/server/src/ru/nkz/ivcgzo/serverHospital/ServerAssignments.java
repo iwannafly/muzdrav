@@ -29,8 +29,8 @@ public final class ServerAssignments {
     private static final String[] MEDICATION_FIELD_NAMES = {
         "name", "nlek", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed",
         "sposv", "spriem", "pereod", "datae", "komm", "datao", "vracho", "dataz",
-        "ed_name", "sposv_name", "vrach_name", "vracho_name"
-    };    
+        "id_kap", "id_inj", "ed_name", "sposv_name", "vrach_name", "vracho_name"
+    };
     private static final String[] DIAGNOSTIC_FIELD_NAMES = {
         "nisl", "cpok", "cpok_name", "result", "datan", "datav", "op_name", "rez_name"
     };
@@ -45,17 +45,37 @@ public final class ServerAssignments {
 	
 	public List<TMedication> getMedications(final int idGosp)
 			throws KmiacServerException {
-        String sqlQuery = "SELECT n_med.name AS name, c_lek.*, n_edd.name AS ed_name, " +
-        		"n_svl.name AS sposv_name, (v.fam || ' ' || v.im || ' ' || v.ot) AS vrach_name, " +
-        		"(vo.fam || ' ' || vo.im || ' ' || vo.ot) AS vracho_name " +
-                "FROM c_lek " +
-                "JOIN n_med ON (c_lek.klek = n_med.pcod) " +
-                "JOIN s_vrach v ON (c_lek.vrach = v.pcod) " +
-                "LEFT JOIN s_vrach vo ON (c_lek.vracho = vo.pcod) " +
-                "LEFT JOIN n_edd ON (c_lek.ed = n_edd.pcod) " +
-                "LEFT JOIN n_svl ON (c_lek.sposv = n_svl.pcod) " +
-                "WHERE (c_lek.id_gosp = ?);";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
+        String sqlQuery =
+        		"SELECT n_med.name AS name, l.nlek, l.id_gosp, " +
+	        		"l.vrach, l.datan, l.klek, l.flek, l.doza, l.ed, l.sposv, " +
+	        		"l.spriem, l.pereod, l.datae, l.komm, l.datao, l.vracho, " +
+	        		"l.dataz, l.id_kap, l.id_inj, " +
+	        		"n_edd.name AS ed_name, n_svl.name AS sposv_name, " +
+	        		"(v.fam || ' ' || v.im || ' ' || v.ot) AS vrach_name, " +
+	        		"(vo.fam || ' ' || vo.im || ' ' || vo.ot) AS vracho_name " +
+                "FROM c_lek l " +
+	                "JOIN n_med ON (l.klek = n_med.pcod) " +
+	                "JOIN s_vrach v ON (l.vrach = v.pcod) " +
+	                "LEFT JOIN s_vrach vo ON (l.vracho = vo.pcod) " +
+	                "LEFT JOIN n_edd ON (l.ed = n_edd.pcod) " +
+	                "LEFT JOIN n_svl ON (l.sposv = n_svl.pcod) " +
+                "WHERE (l.id_gosp = ?) AND (l.klek IS NOT NULL) " +
+                "UNION " +
+                "SELECT l.lek_name AS name, l.nlek, l.id_gosp, " +
+	        		"l.vrach, l.datan, l.klek, l.flek, l.doza, l.ed, l.sposv, " +
+	        		"l.spriem, l.pereod, l.datae, l.komm, l.datao, l.vracho, " +
+	        		"l.dataz, l.id_kap, l.id_inj, " +
+	                "n_edd.name AS ed_name, " +
+	        		"n_svl.name AS sposv_name, " +
+	        		"(v.fam || ' ' || v.im || ' ' || v.ot) AS vrach_name, " +
+	        		"(vo.fam || ' ' || vo.im || ' ' || vo.ot) AS vracho_name " +
+                "FROM c_lek l " +
+	                "JOIN s_vrach v ON (l.vrach = v.pcod) " +
+	                "LEFT JOIN s_vrach vo ON (l.vracho = vo.pcod) " +
+	                "LEFT JOIN n_edd ON (l.ed = n_edd.pcod) " +
+	                "LEFT JOIN n_svl ON (l.sposv = n_svl.pcod) " +
+                "WHERE (l.id_gosp = ?) AND (l.klek IS NULL)";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp, idGosp)) {
             return rsmMedication.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
         	ServerHospital.log.log(Level.ERROR, "Exception (getMedications): ", e);
@@ -64,10 +84,10 @@ public final class ServerAssignments {
 	}
 
 	public void updateMedication(final TMedication med) throws KmiacServerException {
-        final String sqlQuery = "UPDATE c_lek " +
-        						"SET doza = ?, spriem = ?, pereod = ?, datao = ?, " +
-        						"vracho = ? " +
-        						"WHERE (nlek = ?);";
+        final String sqlQuery =
+        		"UPDATE c_lek " +
+        		"SET doza = ?, spriem = ?, pereod = ?, datao = ?, vracho = ? " +
+        		"WHERE (nlek = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared(sqlQuery, false,
             		(med.isSetDoza()) ? med.getDoza() : null,
@@ -78,7 +98,8 @@ public final class ServerAssignments {
             		med.getNlek());
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-        	ServerHospital.log.log(Level.ERROR, "SQLException | InterruptedException (updateMedication): ", e);
+        	ServerHospital.log.log(Level.ERROR,
+        			"SQLException | InterruptedException (updateMedication): ", e);
             throw new KmiacServerException();
         }
 		
@@ -89,26 +110,31 @@ public final class ServerAssignments {
 			sme.execPrepared("DELETE FROM c_lek WHERE (nlek = ?);", false, nlek);
 			sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-        	ServerHospital.log.log(Level.ERROR, "SQLException | InterruptedException (deleteMedication): ", e);
+        	ServerHospital.log.log(Level.ERROR,
+        			"SQLException | InterruptedException (deleteMedication): ", e);
             throw new KmiacServerException();
         }
 	}
 
 	public List<TDiagnostic> getDiagnostics(int idGosp) throws KmiacServerException {
         String sqlQuery = 
-		"SELECT DISTINCT p_isl_ld.nisl, p_rez_l.cpok AS cpok, n_ldi.name_n AS cpok_name, " +
-			"p_rez_l.zpok AS result, p_isl_ld.datan, p_isl_ld.datav, '' AS op_name, '' AS rez_name " +
+		"SELECT DISTINCT p_isl_ld.nisl, p_rez_l.cpok AS cpok, " +
+			"n_ldi.name_n AS cpok_name, " +
+			"p_rez_l.zpok AS result, p_isl_ld.datan, p_isl_ld.datav, " +
+			"'' AS op_name, '' AS rez_name " +
 		"FROM p_isl_ld " +
-		"JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) " +
-		"JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " +
+			"JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) " +
+			"JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " +
 		"WHERE (p_isl_ld.id_gosp = ?) " +
 		"UNION " +
-		"SELECT DISTINCT p_isl_ld.nisl, p_rez_d.kodisl AS cpok, n_ldi.name_n AS cpok_name, " +
-			"n_arez.name AS result, p_isl_ld.datan, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name " +
+		"SELECT DISTINCT p_isl_ld.nisl, p_rez_d.kodisl AS cpok, " +
+			"n_ldi.name_n AS cpok_name, " +
+			"n_arez.name AS result, p_isl_ld.datan, p_isl_ld.datav, " +
+			"p_rez_d.op_name, p_rez_d.rez_name " +
 		"FROM p_isl_ld " +
-		"JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) " +
-		"JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) " +
-		"LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) " +
+			"JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) " +
+			"JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) " +
+			"LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) " +
 		"WHERE (p_isl_ld.id_gosp = ?);";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp, idGosp)) {
         	List<TDiagnostic> list2 = rsmDiagnostic.mapToList(acrs.getResultSet());
