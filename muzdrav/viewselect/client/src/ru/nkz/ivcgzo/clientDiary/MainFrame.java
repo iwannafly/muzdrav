@@ -186,6 +186,7 @@ public class MainFrame extends JFrame {
         });
         btnMedHistAdd.setIcon(new ImageIcon(MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientViewSelect/resources/1331789242_Add.png")));
+        btnMedHistAdd.setToolTipText("Добавить осмотр");
     }
 
     private void addMedicalHistoryDeleteButton() {
@@ -200,6 +201,7 @@ public class MainFrame extends JFrame {
         });
         btnMedHistDel.setIcon(new ImageIcon(MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientViewSelect/resources/1331789259_Delete.png")));
+        btnMedHistDel.setToolTipText("Удалить осмотр");
     }
 
     private void addMedicalHistoryUpdateButton() {
@@ -214,6 +216,7 @@ public class MainFrame extends JFrame {
         });
         btnMedHistUpd.setIcon(new ImageIcon(MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientViewSelect/resources/1341981970_Accept.png")));
+        btnMedHistUpd.setToolTipText("Сохранить осмотр");
     }
 
 
@@ -462,14 +465,12 @@ public class MainFrame extends JFrame {
         try {
         	TMedicalHistory curHist = tblMedHist.getSelectedItem();
             if (curHist != null) {
-            	if (getUserAnswer("Обновить информацию о диагнозе?")) {
-                	//При обновлении записи нельзя изменять номер
-                	//отделения и врачей, проводившего осмотр и добавившего запись:
-                	getMedicalMedicalHistoryText(curHist);
-                    ClientDiary.tcl.updateMedicalHistory(curHist);
-                    //Заполнение таблицы:
-                	fillMedHistoryTable();
-                }
+            	//При обновлении записи нельзя изменять номер
+            	//отделения и врачей, проводившего осмотр и добавившего запись:
+            	getMedicalMedicalHistoryText(curHist);
+                ClientDiary.tcl.updateMedicalHistory(curHist);
+                //Заполнение таблицы:
+            	fillMedHistoryTable();
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();

@@ -28,6 +28,9 @@ struct Lek {
 	14: optional i64 datao;
 	15: optional i32 vracho;
 	16: optional i64 dataz;
+	17: optional string lek_name;
+	18: optional i32 id_kap;
+	19: optional i32 id_inj;
 }
 
 struct LekPriem {
