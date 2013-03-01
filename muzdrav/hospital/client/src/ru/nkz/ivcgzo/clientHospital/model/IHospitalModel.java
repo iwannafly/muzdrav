@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.clientHospital.model;
 import java.util.List;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 
@@ -17,6 +18,8 @@ public interface IHospitalModel {
     void removePatientObserver(IPatientObserver obs);
 
     TPriemInfo getPriemInfo();
+
+    TMedicalHistory getPerOsmotr();
 
     void setPriemInfo();
 

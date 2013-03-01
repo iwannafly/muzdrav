@@ -31,6 +31,7 @@ public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
     private PersonalInfoController controller;
 
     private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy");
+    private static final SimpleDateFormat DEFAULT_TIME_FORMAT = new SimpleDateFormat("hh:mm");
     private static final String TOOLTIP_TEXT =
             "<html><b>Панель персональной информации</b> - позволяет просматривать: "
             + "<ul><li>паспортные данные выбранного пациента стационара,"
@@ -134,30 +135,38 @@ public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
     private void fillReceptionPanel() {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("<html>");
-        strBuilder.append("<b><u>Информация о пациенте из приёмного отделения:</u></b><br> \n\n");
+        strBuilder.append(fillPriemInfo());
+        strBuilder.append(fillPervOsmotr());
+        strBuilder.append("</html>");
+        textPane.setText(strBuilder.toString());
+    }
+
+    private String fillPriemInfo() {
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("<b><u>Информация о пациенте из приёмного отделения:</u></b><br>");
         if (model.getPriemInfo() != null) {
             if (model.getPriemInfo().getPl_extr() != null) {
                 strBuilder.append(
-                    String.format("<br><b>Форма обращения в приёмное отделение:</b> %s \n",
+                    String.format("<br><b>Форма обращения в приёмное отделение:</b> %s",
                         model.getPriemInfo().getPl_extr())
                 );
             }
             if (model.getPriemInfo().getDatap() != 0) {
                 strBuilder.append(
-                    String.format("<br><b>Дата поступления:</b> %s \n",
+                    String.format("<br><b>Дата поступления:</b> %s",
                         DEFAULT_DATE_FORMAT.format(model.getPriemInfo().getDatap()))
                 );
             }
             if (model.getPriemInfo().getDataosm() != 0) {
                 strBuilder.append(
-                    String.format("<br><b>Дата осмотра:</b> %s \n",
+                    String.format("<br><b>Дата осмотра:</b> %s",
                         DEFAULT_DATE_FORMAT.format(model.getPriemInfo().getDataosm()))
                 );
             }
             if ((model.getPriemInfo().getNaprav() != null)
                     && (model.getPriemInfo().getNOrg() != null)) {
                 strBuilder.append(
-                    String.format("<br><b>Кем направлен:</b> %s %s \n",
+                    String.format("<br><b>Кем направлен:</b> %s %s",
                         model.getPriemInfo().getNaprav(),
                         model.getPriemInfo().getNOrg())
                 );
@@ -165,7 +174,7 @@ public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
             if ((model.getPriemInfo().getDiagN() != null)
                     && (model.getPriemInfo().getDiagNtext() != null)) {
                 strBuilder.append(
-                    String.format("<br><b>Диагноз напр. учреждения:</b> %s %s \n",
+                    String.format("<br><b>Диагноз напр. учреждения:</b> %s %s",
                         model.getPriemInfo().getDiagN(),
                         model.getPriemInfo().getDiagNtext())
                 );
@@ -173,24 +182,79 @@ public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
             if ((model.getPriemInfo().getDiagP() != null)
                     && (model.getPriemInfo().getDiagPtext() != null)) {
                 strBuilder.append(
-                    String.format("<br><b>Диагноз приёмного отделения:</b> %s %s \n",
+                    String.format("<br><b>Диагноз приёмного отделения:</b> %s %s",
                         model.getPriemInfo().getDiagP(),
                         model.getPriemInfo().getDiagPtext())
                 );
             }
             if (model.getPriemInfo().getT0c() != null) {
                 strBuilder.append(
-                    String.format("<br><b>Температура:</b> %s \n", model.getPriemInfo().getT0c())
+                    String.format("<br><b>Температура:</b> %s", model.getPriemInfo().getT0c())
                 );
             }
             if (model.getPriemInfo().getAd() != null) {
                 strBuilder.append(
-                    String.format("<br><b>Давление:</b> %s \n", model.getPriemInfo().getAd())
+                    String.format("<br><b>Давление:</b> %s <br>", model.getPriemInfo().getAd())
                 );
             }
-            strBuilder.append("</html>");
+        } else {
+            strBuilder.append("<b>Нет доступной информации</b>");
         }
-        textPane.setText(strBuilder.toString());
+        return strBuilder.toString();
+    }
+
+
+
+    private String fillPervOsmotr() {
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("<br><br><b><u>Первичный осмотр в приемном отделении:</u></b><br>");
+        if (model.getPerOsmotr() != null) {
+            if (model.getPerOsmotr().getMorbi() != null) {
+                strBuilder.append(
+                    String.format("<br><b>История болезни:</b> %s",
+                        model.getPerOsmotr().getMorbi())
+                );
+            }
+            if (model.getPerOsmotr().getJalob() != null) {
+                strBuilder.append(
+                    String.format("<br><b>Жалобы:</b> %s",
+                            model.getPerOsmotr().getJalob())
+                );
+            }
+            if (model.getPerOsmotr().getStatusPraesense() != null) {
+                strBuilder.append(
+                    String.format("<br><b>Объективный статус:</b> %s",
+                        model.getPerOsmotr().getStatusPraesense())
+                );
+            }
+            if (model.getPerOsmotr().getStatusLocalis() != null) {
+                strBuilder.append(
+                    String.format("<br><b>Локальный статус:</b> %s",
+                        model.getPerOsmotr().getStatusLocalis())
+                );
+            }
+            if (model.getPerOsmotr().getFisicalObs() != null) {
+                strBuilder.append(
+                    String.format("<br><b>Физикальное обследование:</b> %s",
+                        model.getPerOsmotr().getFisicalObs())
+                );
+            }
+            if (model.getPerOsmotr().getDataz() != 0) {
+                strBuilder.append(
+                    String.format("<br><b>Дата осмотра:</b> %s",
+                        DEFAULT_DATE_FORMAT.format(model.getPerOsmotr().getDataz()))
+                );
+            }
+            if (model.getPerOsmotr().getTimez() != 0) {
+                strBuilder.append(
+                    String.format("<br><b>Время осмотра:</b> %s",
+                        DEFAULT_TIME_FORMAT.format(model.getPerOsmotr().getTimez()))
+                );
+            }
+        } else {
+            strBuilder.append("<b>Нет доступной информации</b>");
+        }
+        return strBuilder.toString();
     }
 
     public final void setOtdProfList(final List<IntegerClassifier> otdProfList) {

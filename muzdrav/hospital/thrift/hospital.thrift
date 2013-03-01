@@ -35,6 +35,21 @@ struct TPatient{
 	16:i32 ngosp;
 }
 
+struct TMedicalHistory{
+    1:i32 id;
+	2:i32 idGosp;
+	3:optional string jalob;
+	4:optional string morbi;
+	5:optional string statusPraesense;
+	6:optional string statusLocalis;
+	7:optional string fisicalObs;
+	8:optional i32 pcodVrach;
+	9:optional i64 dataz;
+	10:optional i64 timez;
+	11:optional i32 pcod_added;
+	12:optional i32 cpodr;
+}
+
 struct TPriemInfo {
 	1:string pl_extr;
 	2:i64 datap;
@@ -52,21 +67,6 @@ struct TPriemInfo {
 	14:string alkg;
 	15:string vid_tran;
 	16:string jalob;
-}
-
-struct TMedicalHistory{
-    1:i32 id;
-	2:i32 idGosp;
-	3:optional string jalob;
-	4:optional string morbi;
-	5:optional string statusPraesense;
-	6:optional string statusLocalis;
-	7:optional string fisicalObs;
-	8:optional i32 pcodVrach;
-	9:optional i64 dataz;
-	10:optional i64 timez;
-	11:optional i32 pcod_added;
-	12:optional i32 cpodr;
 }
 
 struct TLifeHistory{
@@ -444,6 +444,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		2:kmiacServer.KmiacServerException kse);
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
+	TMedicalHistory getPriemOsmotr(1:i32 idGosp) throws (1: kmiacServer.KmiacServerException kse);
 	void updatePatientChamberNumber(1:i32 gospId, 2:string chamberNum, 3:i32 profPcod, 4:i32 nist)
 		throws (1:kmiacServer.KmiacServerException kse);
 	

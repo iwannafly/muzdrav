@@ -19,6 +19,7 @@ public class HospitalModel implements IHospitalModel {
     private List<IPatientObserver> patientObservers = new ArrayList<IPatientObserver>();
     private TPatient patient;
     private TPriemInfo priemInfo;
+    private TMedicalHistory perOsmotr;
     @SuppressWarnings("unused")
     private List<TMedicalHistory> diaryList;
 
@@ -32,18 +33,20 @@ public class HospitalModel implements IHospitalModel {
         try {
             patient = ClientHospital.tcl.getPatientPersonalInfo(patientGospId);
             setPriemInfo();
+            setPerOsmotr();
         } catch (PatientNotFoundException e) {
             patient = null;
             priemInfo = null;
-        } catch (PriemInfoNotFoundException e) {
-            priemInfo = null;
+            perOsmotr = null;
         } catch (KmiacServerException e) {
             patient = null;
             priemInfo = null;
+            perOsmotr = null;
             e.printStackTrace();
         } catch (TException e) {
             patient = null;
             priemInfo = null;
+            perOsmotr = null;
             ClientHospital.conMan.reconnect(e);
         } finally {
             notifyPatientObservers();
@@ -56,17 +59,38 @@ public class HospitalModel implements IHospitalModel {
     }
 
     @Override
+    public final TMedicalHistory getPerOsmotr() {
+        return this.perOsmotr;
+    }
+
+    private void setPerOsmotr() {
+        if (patient != null) {
+            try {
+                perOsmotr = ClientHospital.tcl.getPriemOsmotr(patient.getGospitalCod());
+            } catch (KmiacServerException e) {
+                perOsmotr = null;
+                e.printStackTrace();
+            } catch (TException e) {
+                perOsmotr = null;
+                ClientHospital.conMan.reconnect(e);
+            }
+        }
+    }
+
+    @Override
     public final void setPriemInfo() {
-        try {
-            priemInfo = ClientHospital.tcl.getPriemInfo(patient.getGospitalCod());
-        } catch (PriemInfoNotFoundException e) {
-            priemInfo = null;
-        } catch (KmiacServerException e) {
-            priemInfo = null;
-            e.printStackTrace();
-        } catch (TException e) {
-            priemInfo = null;
-            ClientHospital.conMan.reconnect(e);
+        if (patient != null) {
+            try {
+                priemInfo = ClientHospital.tcl.getPriemInfo(patient.getGospitalCod());
+            } catch (PriemInfoNotFoundException e) {
+                priemInfo = null;
+            } catch (KmiacServerException e) {
+                priemInfo = null;
+                e.printStackTrace();
+            } catch (TException e) {
+                priemInfo = null;
+                ClientHospital.conMan.reconnect(e);
+            }
         }
     }
 
