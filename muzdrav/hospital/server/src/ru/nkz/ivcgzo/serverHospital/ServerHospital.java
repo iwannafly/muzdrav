@@ -390,11 +390,15 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final void updatePatientChamberNumber(final int gospId, final String chamberNum,
-            final int profPcod, final int nist) throws KmiacServerException {
-        final String sqlQuery = "UPDATE c_otd SET npal = ?, cprof = ?, nist = ?"
+            final int profPcod, final int nist, final String surname,
+            final String name, final String middlename) throws KmiacServerException {
+        final String otdInfoQuery = "UPDATE c_otd SET npal = ?, cprof = ?, nist = ?"
+                + "WHERE (id_gosp = ?);";
+        final String patientInfoQuery = "UPDATE patient SET fam = ?, im = ?, ot = ?"
                 + "WHERE (id_gosp = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, chamberNum, profPcod, nist, gospId);
+            sme.execPrepared(otdInfoQuery, false, chamberNum, profPcod, nist, gospId);
+            sme.execPrepared(patientInfoQuery, false, surname, name, middlename, gospId);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new KmiacServerException();
@@ -578,27 +582,6 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final List<IntegerClassifier> getDopShablonNames(final int nShablon,
-            final String srcText) throws KmiacServerException {
-        String sql = "SELECT id as pcod, name "
-                + "FROM sh_dop WHERE id_n_shablon = ? ";
-
-        if (srcText != null) {
-            sql += "AND ((name LIKE ?) OR (text LIKE ?)) ";
-        }
-
-        sql += "ORDER BY name ";
-        try (AutoCloseableResultSet acrs = (srcText == null)
-                ? sse.execPreparedQuery(sql, nShablon)
-                : sse.execPreparedQuery(sql, nShablon, srcText, srcText)) {
-            return rsmIntClas.mapToList(acrs.getResultSet());
-        } catch (SQLException e) {
-            System.err.println(e.getCause());
-            throw new KmiacServerException("Error searching template");
-        }
-    }
-
-    @Override
     public final Shablon getShablon(final int idSh) throws KmiacServerException {
         final String sqlQuery = "SELECT sho.id, nd.name, sho.next, nsh.pcod,nsh.name, sht.sh_text "
             + "FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) "
@@ -624,24 +607,6 @@ public class ServerHospital extends Server implements Iface {
         }
     }
 
-    @Override
-    public final DopShablon getDopShablon(final int idSh) throws KmiacServerException {
-        final String sqlQuery = "SELECT id, id_n_shablon, name, text "
-            + "FROM sh_dop WHERE id = ?";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idSh)) {
-            if (acrs.getResultSet().next()) {
-                DopShablon sho = new DopShablon(acrs.getResultSet().getInt(1),
-                        acrs.getResultSet().getInt(2), acrs.getResultSet().getString(3),
-                        acrs.getResultSet().getString(4));
-                return sho;
-            } else {
-                throw new SQLException("No templates with this id");
-            }
-        } catch (SQLException e) {
-            System.err.println(e.getCause());
-            throw new KmiacServerException("Error loading template by its id");
-        }
-    }
 
     @Override
     public final List<TMedicalHistory> getMedicalHistory(final int idGosp)
@@ -690,65 +655,6 @@ public class ServerHospital extends Server implements Iface {
             sme.setCommit();
         } catch (SqlExecutorException | InterruptedException e) {
             log.log(Level.ERROR, "SqlException", e);
-            throw new KmiacServerException();
-        }
-    }
-
-    @Override
-    public final TLifeHistory getLifeHistory(final int patientId)
-            throws LifeHistoryNotFoundException, KmiacServerException {
-        final String sqlQuery = "SELECT npasp, allerg, farmkol, vitae "
-                + "FROM p_sign WHERE npasp = ?;";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, patientId)) {
-            if (acrs.getResultSet().next()) {
-                return rsmLifeHistory.map(acrs.getResultSet());
-            } else {
-                throw new LifeHistoryNotFoundException();
-            }
-        } catch (SQLException e) {
-            log.log(Level.ERROR, "SqlException", e);
-            throw new KmiacServerException();
-        }
-    }
-
-    @Override
-    public final void updateLifeHistory(final TLifeHistory lifeHist)
-            throws KmiacServerException {
-        final int[] indexes = {1, 2, 3, 0};
-        String sqlQuery = null;
-        if (isLifeHistoryExist(lifeHist.getId())) {
-            sqlQuery = "UPDATE p_sign SET allerg = ?, farmkol = ?, vitae = ? WHERE npasp = ?";
-        } else {
-            sqlQuery = "INSERT INTO p_sign (allerg, farmkol, vitae, npasp) VALUES (?, ?, ?, ?);";
-        }
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT(sqlQuery, false, lifeHist, LIFE_HISTORY_TYPES, indexes);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            log.log(Level.ERROR, "SqlException", e);
-            throw new KmiacServerException();
-        }
-    }
-
-    private boolean isLifeHistoryExist(final int patientId) throws KmiacServerException {
-        final String sqlQuery = "SELECT npasp FROM p_sign WHERE npasp = ?";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, patientId)) {
-            return acrs.getResultSet().next();
-        } catch (SQLException e) {
-            log.log(Level.ERROR, "SqlException", e);
-            throw new KmiacServerException();
-        }
-    }
-
-    @Override
-    public final void disharge(final int idGosp) throws KmiacServerException {
-        final String sqlQuery = "UPDATE c_otd SET vrach = ? "
-                + "WHERE id_gosp = ?";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, null, idGosp);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
     }

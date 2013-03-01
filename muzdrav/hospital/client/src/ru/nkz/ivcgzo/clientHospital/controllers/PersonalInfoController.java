@@ -43,8 +43,9 @@ public class PersonalInfoController implements IComponentController {
         model.setPriemInfo();
     }
 
-    public final void updatePatient(final String chamber, final int otdProf) {
-        model.updatePatient(chamber, otdProf);
+    public final void updatePatient(final String chamber, final int otdProf,
+            final String surname, final String name, final String middlename) {
+        model.updatePatient(chamber, otdProf, surname, name, middlename);
     }
 
 }

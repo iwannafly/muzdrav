@@ -125,11 +125,13 @@ public class HospitalModel implements IHospitalModel {
     }
 
     @Override
-    public final void updatePatient(final String chamber, final int otdProf) {
+    public final void updatePatient(final String chamber, final int otdProf,
+            final String surname, final String name, final String middlename) {
         if (patient != null) {
             try {
                 ClientHospital.tcl.updatePatientChamberNumber(
-                        patient.getGospitalCod(), chamber, otdProf, patient.getNist());
+                    patient.getGospitalCod(), chamber, otdProf, patient.getNist(),
+                    surname, name, middlename);
             } catch (KmiacServerException e) {
                 e.printStackTrace();
             } catch (TException e) {

@@ -418,8 +418,10 @@ exception MesNotFoundException {
 
 exception PrdIshodNotFoundException{
 }
+
 exception PrdDinNotFoundException{
 }
+
 exception PrdSlNotFoundException{
 }
 
@@ -436,64 +438,182 @@ exception ChildbirthNotFoundException{
 }
 
 service ThriftHospital extends kmiacServer.KmiacServer{
+
+/* Методы выбора и добавления пациентов */
+
+	/**
+	 * Выбор всех пациентов, закрепленных за данным врачом
+	 */
 	list<TSimplePatient> getAllPatientForDoctor(1:i32 doctorId, 2:i32 otdNum) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Выбор всех пациентов, поступивших в данное отделение
+	 */
 	list<TSimplePatient> getAllPatientFromOtd(1:i32 otdNum) throws (1:PatientNotFoundException pnfe,
-		2:kmiacServer.KmiacServerException kse);	
+		2:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Закрепление пациента за авторизованным в системе врачом
+	 */		
+	void addPatientToDoctor(1:i32 gospId, 2:i32 doctorId, 3:i32 stationType)
+		throws (1:PatientNotFoundException pnfe,
+		2:kmiacServer.KmiacServerException kse);
+
+/* Персональная информация */
+
+	/**
+	 * Выбор всех пациентов, поступивших в данное отделение
+	 */		
 	TPatient getPatientPersonalInfo(1:i32 idGosp) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Выбор пациента отделения по полю id таблицы c_otd -  костыль для выбора 
+	 * пациента при переходе из модуля просмотра реестров
+	 */
 	TPatient getPatientPersonalInfoByCotd(1:i32 idCotd) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Обновление персональной информации текущего пациента
+	 */
+	void updatePatientChamberNumber(1:i32 gospId, 2:string chamberNum, 3:i32 profPcod, 4:i32 nist,
+		5:string surname, 6: string name, 7: string middelname)
+		throws (1:kmiacServer.KmiacServerException kse);
+
+/* Информация из приёмного отделения */
+
+	/**
+	 * Выбор информации из приемного отделения
+	 */
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
-	TMedicalHistory getPriemOsmotr(1:i32 idGosp) throws (1: kmiacServer.KmiacServerException kse);
-	void updatePatientChamberNumber(1:i32 gospId, 2:string chamberNum, 3:i32 profPcod, 4:i32 nist)
-		throws (1:kmiacServer.KmiacServerException kse);
-	
-	TLifeHistory getLifeHistory(1:i32 patientId) throws (1:LifeHistoryNotFoundException lhnfe,
-		2:kmiacServer.KmiacServerException kse);
-	void updateLifeHistory(1:TLifeHistory lifeHist) throws (1:kmiacServer.KmiacServerException kse);
 
+	/**
+	 * Выбор первичного осмотра
+	 */
+	TMedicalHistory getPriemOsmotr(1:i32 idGosp) throws (1: kmiacServer.KmiacServerException kse);
+
+/* Работа с шаблонами  */
+
+	/**
+	 * Выбор наименований шалонов (по специализации отделения)
+	 */
 	list<classifier.IntegerClassifier> getShablonNames(1:i32 cspec, 2:i32 cslu, 3:string srcText)
 		throws (1:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Выбор шаблона
+	 */
 	Shablon getShablon(1:i32 idSh) throws (1:kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> getDopShablonNames(1:i32 nShablon, 2:string srcText)
-		throws (1:kmiacServer.KmiacServerException kse);
-	DopShablon getDopShablon(1:i32 idSh) throws (1:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * FIXME хз что это, возможно следует удалить
+	 */
 	list<classifier.StringClassifier> getShablonDiagnosis(1:i32 cspec, 2:i32 cslu, 3:string srcText)
 		throws (1:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * FIXME хз что это, возможно следует удалить
+	 */
 	list<classifier.IntegerClassifier> getShablonBySelectedDiagnosis(
 		1:i32 cspec, 2:i32 cslu, 3:string diag, 4:string srcText) throws (1:kmiacServer.KmiacServerException kse);
 
+/* Дневник */
+
+	/**
+	 * Получение всех записей дневника
+	 */
 	list<TMedicalHistory> getMedicalHistory(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse,
 		2: MedicalHistoryNotFoundException mhnfe);
-	i32 addMedicalHistory(1:TMedicalHistory medHist) throws (1:kmiacServer.KmiacServerException kse);
-	void updateMedicalHistory(1:TMedicalHistory medHist) throws (1:kmiacServer.KmiacServerException kse);
-	void deleteMedicalHistory(1:i32 id) throws (1:kmiacServer.KmiacServerException kse);
-	
-	void addPatientToDoctor(1:i32 gospId, 2:i32 doctorId, 3:i32 stationType) throws (1:PatientNotFoundException pnfe,
-		2:kmiacServer.KmiacServerException kse);
 
+	/**
+	 * Добавление новой записи в дневник
+	 */	
+	i32 addMedicalHistory(1:TMedicalHistory medHist) throws (1:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Изменение текущей записи в дневнике
+	 */
+	void updateMedicalHistory(1:TMedicalHistory medHist) throws (1:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Удаление текущей записи из дневника
+	 */
+	void deleteMedicalHistory(1:i32 id) throws (1:kmiacServer.KmiacServerException kse);
+
+/* Диагнозы */
+
+	/**
+	 * Получение списка всех установленных диагнозов для текущей записи госпитализации
+	 */
     list<TDiagnosis> getDiagnosis(1:i32 gospId) throws (1:DiagnosisNotFoundException dnfe
 		2:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Добавление нового диагноза
+	 */
     i32 addDiagnosis(1:TDiagnosis inDiagnos) throws (1:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Изменение текущего диагноза
+	 */
     void updateDiagnosis(1:TDiagnosis inDiagnos) throws (1:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Удаление текущего диагноза
+	 */
     void deleteDiagnosis(1:i32 id) throws (1:kmiacServer.KmiacServerException kse);
 
-	void disharge(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
-	void addZakl(1:Zakl zakl, 2:i32 otd) throws (1:kmiacServer.KmiacServerException kse);
+/* Этапы лечения */
 
+	/**
+	 * Получение списка всех этапов лечния для текущей записи госпитализации
+	 */
 	list<TStage> getStage(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	 * Добавление нового этапа лечения
+	 */
 	i32 addStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse,
 		2: MesNotFoundException mnfe);
+
+	/**
+	 * Изменение текущего этапа лечения
+	 */
 	void updateStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse,
 		2: MesNotFoundException mnfe);
+
+	/**
+	 * Удаление текущего этапа лечения
+	 */
 	void deleteStage(1:i32 idStage) throws (1:kmiacServer.KmiacServerException kse);
 
+
+/* Заключение */
+
+	/**
+	 * Добавление информации о заключении лечения в данном отделении стационара
+	 */
+	void addZakl(1:Zakl zakl, 2:i32 otd) throws (1:kmiacServer.KmiacServerException kse);
+
+/* Печатные формы */
+
+	/**
+	 * Печать дневника 
+	 */
 	string printHospitalDiary(1: i32 idGosp, 2: i64 dateStart, 3: i64 dateEnd)
 		throws (1:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Печать посмертного эпикриза 
+	 */
 	string printHospitalDeathSummary(1: i32 idGosp, 2: string lpuInfo, 3: TPatient patient)
-		throws (1:kmiacServer.KmiacServerException kse);		
+		throws (1:kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Печать выписного эпикриза
+	 */		
 	string printHospitalSummary(1: i32 idGosp, 2: string lpuInfo, 3: TPatient patient)
 		throws (1:kmiacServer.KmiacServerException kse);
 
@@ -678,7 +798,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	list<TDiagnostic> getDiagnostics(1: i32 idGosp)
 		throws (1: kmiacServer.KmiacServerException kse);
 
-/*DispBer*/
+/* Диспансеризация беременных */
 	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp)
 		throws (1:PrdIshodNotFoundException pinfe, 2:kmiacServer.KmiacServerException kse);
     i32 addRdIshod(1:TRdIshod rdIs) throws (1:kmiacServer.KmiacServerException kse);

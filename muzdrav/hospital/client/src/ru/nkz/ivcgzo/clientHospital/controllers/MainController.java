@@ -45,6 +45,10 @@ public class MainController {
         diagnosisController = new DiagnosisController(model);
         addComponentInTabbedPane(diagnosisController);
 
+        if (isRd()) {
+            //TODO показать вкладки для роддомов
+        }
+
         stageController = new StageController(model);
         addComponentInTabbedPane(stageController);
 
@@ -59,6 +63,18 @@ public class MainController {
             controller.getIconURL(),
             controller.getPanelTooltipText()
         );
+    }
+
+    private boolean isRd() {
+        return (ClientHospital.authInfo.getClpu() == 62)
+                || (ClientHospital.authInfo.getClpu() == 63)
+                || (ClientHospital.authInfo.getClpu() == 64)
+                || (ClientHospital.authInfo.getCpodr() == 2407)
+                || (ClientHospital.authInfo.getCpodr() == 2409)
+                || (ClientHospital.authInfo.getCpodr() == 2411)
+                || (ClientHospital.authInfo.getCpodr() == 2412)
+                || (ClientHospital.authInfo.getCpodr() == 8301)
+                || (ClientHospital.authInfo.getCpodr() == 8305);
     }
 
     public final void selectPatient(final TSimplePatient selectedPatient) {

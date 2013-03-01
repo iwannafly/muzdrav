@@ -1032,7 +1032,10 @@ public class MainFrame extends JFrame {
                             patient.gospitalCod,
                             tfChamber.getText(),
                             tfStatus.getSelectedPcod(),
-                            Integer.parseInt(tfNumberOfDesiaseHistory.getText()));
+                            Integer.parseInt(tfNumberOfDesiaseHistory.getText()),
+                            patient.surname,
+                            patient.name,
+                            patient.middlename);
                         JOptionPane.showMessageDialog(MainFrame.this,
                                 "Информация успешно сохранена!", "Сохранение завершено!",
                                 JOptionPane.INFORMATION_MESSAGE);

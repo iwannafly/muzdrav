@@ -25,7 +25,8 @@ public interface IHospitalModel {
 
     List<IntegerClassifier> getOtdProfs();
 
-    void updatePatient(String chamber, int otdProf);
+    void updatePatient(String chamber, int otdProf, String surname,
+        String name, String middlename);
 
     List<IntegerClassifier> loadMedicalHistoryShablons();
 }

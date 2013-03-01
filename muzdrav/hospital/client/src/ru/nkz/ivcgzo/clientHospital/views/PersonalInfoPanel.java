@@ -276,15 +276,15 @@ public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
         addPatientInfoHorizontalBox("Номер истории болезни", tfNumberOfDesiaseHistory);
 
         tfSurname = new JTextField();
-        tfSurname.setEditable(false);
+//        tfSurname.setEditable(false);
         addPatientInfoHorizontalBox("Фамилия", tfSurname);
 
         tfName = new JTextField();
-        tfName.setEditable(false);
+//        tfName.setEditable(false);
         addPatientInfoHorizontalBox("Имя", tfName);
 
         tfMiddlename = new JTextField();
-        tfMiddlename.setEditable(false);
+//        tfMiddlename.setEditable(false);
         addPatientInfoHorizontalBox("Отчество", tfMiddlename);
 
         tfGender = new JTextField();
@@ -327,8 +327,11 @@ public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 controller.updatePatient(
-                      tfChamber.getText(),
-                      cbxOtdProf.getSelectedPcod()
+                    tfChamber.getText(),
+                    cbxOtdProf.getSelectedPcod(),
+                    tfSurname.getText(),
+                    tfName.getText(),
+                    tfMiddlename.getText()
                 );
             }
         });

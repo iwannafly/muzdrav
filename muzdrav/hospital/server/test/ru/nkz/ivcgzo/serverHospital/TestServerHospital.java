@@ -122,7 +122,8 @@ public class TestServerHospital {
         final String chamberNum = "БОКС 108";
         final int profPcod = 123;
         final int nist = 1;
-        testServer.updatePatientChamberNumber(gospId, chamberNum, profPcod, nist);
+        testServer.updatePatientChamberNumber(gospId, chamberNum, profPcod, nist,
+                chamberNum, chamberNum, chamberNum);
     }
 
     @Test
