@@ -1508,64 +1508,13 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public final String printMedCart(final Nambk nambk, final PatientFullInfo pat,
-            final UserAuthInfo uai, final String docInfo, final String omsOrg,
-            final String lgot) throws KmiacServerException {
-        final String path;
-        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
-                path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT c_ogrn "
-                    + "FROM n_m00 WHERE pcod = ?", uai.getClpu());
-            String ogrn = "";
-            while (acrs.getResultSet().next()) {
-                if (acrs.getResultSet().getString(1) != null) {
-                    ogrn = acrs.getResultSet().getString(1);
-                }
-            }
-            acrs.close();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-            String gender;
-            if (pat.getPol() == 1) {
-                gender = "мужской";
-            } else if (pat.getPol() == 2) {
-                gender = "женский";
-            } else {
-                gender = "";
-            }
-            HtmTemplate htmTemplate = new HtmTemplate(
-                    new File(this.getClass().getProtectionDomain().getCodeSource()
-                    .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
-                    + "\\plugin\\reports\\MedCardAmbPriem.htm");
-            htmTemplate.replaceLabels(true,
-                uai.getClpu_name(),
-                ogrn,
-                nambk.getNambk(),
-                omsOrg,
-                pat.getPolis_oms().getSer() + pat.getPolis_oms().getNom(),
-                pat.getSnils(),
-                "",
-                lgot,
-                pat.getFam(),
-                pat.getIm(),
-                pat.getOt(),
-                gender,
-                dateFormat.format(new Date(pat.getDatar())),
-                pat.getAdmAddress().getCity()
-                    + "," + pat.getAdmAddress().getStreet() + " "
-                    + pat.getAdmAddress().getHouse()
-                    + " - " + pat.getAdmAddress().getFlat(),
-                pat.getAdpAddress().getCity()
-                    + "," + pat.getAdpAddress().getStreet() + " "
-                    + pat.getAdpAddress().getHouse()
-                    + " - " + pat.getAdpAddress().getFlat(),
-                pat.getTel(),
-                docInfo
-            );
-            osw.write(htmTemplate.getTemplateText());
-            return path;
-        } catch (Exception e) {
-            throw new  KmiacServerException(); // тут должен быть кмиац сервер иксепшн
-        }
+    public final String printMedCart(int npasp, int clpu, int cpol) throws KmiacServerException {
+    	try {
+			return (String) serverManager.instance.getServerById(21).executeServerMethod(2102, npasp, clpu, cpol);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
     }
 
     @Override
