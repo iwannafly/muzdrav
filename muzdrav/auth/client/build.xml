@@ -35,7 +35,6 @@
 	<!-- Очистка директорий -->	
 	<target name="clean" description = "Очистка директорий">
 	        <delete dir="${build.dir}"/>
-	        <delete dir="${launcher.dir}/bin"/>
 	</target>
 	
 	<!-- Создание директорий -->
@@ -104,6 +103,7 @@
 	</target>
 	
 	<target name="compileLauncher" unless="${debug.build}">
+        <delete dir="${launcher.dir}/bin/ru"/>
 		<property name="replaceSrc.str" value="clientAuthType = &quot;unspecified&quot;" />
 		<replace file="${launcher.dir}/src/ru/nkz/ivcgzo/Launcher.java" token="${replaceSrc.str}" value="${replaceDst.str}" failOnNoReplacements="true" />
 		<javac includeantruntime="false" srcdir="${launcher.dir}/src" destdir="${launcher.dir}/bin" encoding="utf-8" debug="false" />
@@ -127,9 +127,20 @@
 		<replace file="${client_manager.dir}/src/ru/nkz/ivcgzo/clientManager/common/Client.java" token="//frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);" value="frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);" failOnNoReplacements="true" />
 	</target>
 	
+	<target name="replaceStringsBack" unless="${debug.build}">
+		<replace file="${client_auth.dir}/src/ru/nkz/ivcgzo/clientAuth/MainForm.java" failOnNoReplacements="true">
+			  <replacefilter token="private ModulesUpdater modUpd;" value="//private ModulesUpdater modUpd;" />
+			  <replacefilter token="modUpd = new ModulesUpdater(conMan);" value="//modUpd = new ModulesUpdater(conMan);" />
+			  <replacefilter token="modUpd.checkAndUpdate(CustomFrame.authInfo.pdost);" value="//modUpd.checkAndUpdate(CustomFrame.authInfo.pdost);" />
+		</replace>
+		
+		<replace file="${client_manager.dir}/src/ru/nkz/ivcgzo/clientManager/common/Client.java" token="frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);" value="//frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);" failOnNoReplacements="true" />
+	</target>
+	
 	<target name="main" description="Компиляция всех клиентских модулей">
 		<antcall target="replaceStrings" />
 		<antcall target="jar" />
+		<antcall target="replaceStringsBack" />
 		
 		<subant>
 			<fileset dir="${muzdrav.dir}" includes="**/client/build.xml" excludes="auth/client/build.xml"/>

@@ -25,8 +25,10 @@
 		<table srcName="AO0" dstName="n_ao0" />
 		<table srcName="AP0" dstName="n_ap0" />
 		<table srcName="AQ0" dstName="n_aq0" />
+		<table srcName="AQ1" dstName="n_aq1" />
 		<table srcName="AREZ" dstName="n_arez" />
 		<table srcName="AZ0" dstName="n_az0" />
+		<table srcName="AZ1" dstName="n_az1" />
 		<table srcName="AZ9" dstName="n_az9" />
 		<table srcName="AZ51" dstName="n_az51" />
 		<table srcName="AZT" dstName="n_azt" />

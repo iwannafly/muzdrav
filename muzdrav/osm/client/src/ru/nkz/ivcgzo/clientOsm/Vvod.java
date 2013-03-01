@@ -1057,10 +1057,10 @@ public class Vvod extends JFrame {
 		pnlOsmOsm.setLayout(gl_pnlOsmOsm);
 		
 		tbJal = new JTextArea();
-		spOsm.setColumnHeaderView(tbJal);
 		tbJal.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbJal.setLineWrap(true);
 		tbJal.setWrapStyleWord(true);
+		spJal.setViewportView(tbJal);
 		pnlOsm.setLayout(gl_pnlOsm);
 		
 		JPanel pnlDiag = new JPanel();
@@ -1966,7 +1966,7 @@ public class Vvod extends JFrame {
 								String cliPath;
 								cliPath = MainForm.conMan.createReport("направление на исследование");
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
-       						MainForm.conMan.openFileInDefaultViewer(cliPath);
+       						MainForm.conMan.openFileInTextProcessor(cliPath, false);
 
 							} catch (KmiacServerException e1) {
 								// TODO Auto-generated catch block
@@ -2945,7 +2945,7 @@ public class Vvod extends JFrame {
 		JLabel lblRez = new JLabel("Результат");
 		lblRez.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
-		cmbRez = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_aq0);
+		cmbRez = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_aq1);
 		
 		JLabel lblMobs = new JLabel("Место обс.");
 		lblMobs.setFont(new Font("Tahoma", Font.PLAIN, 11));

@@ -963,7 +963,9 @@ public class ServerOsm extends Server implements Iface {
 					iAcrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom, poms_ser, poms_nom FROM patient WHERE npasp = ? ", im.getNpasp());
 					if (iAcrs.getResultSet().next()) {
 						sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br>", iAcrs.getResultSet().getString(1), iAcrs.getResultSet().getString(2), iAcrs.getResultSet().getString(3)));
-						if (iAcrs.getResultSet().getString(7)!=null)sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br>", iAcrs.getResultSet().getString(8)));
+						if (iAcrs.getResultSet().getString(7)==null)sb.append(String.format("<b>Серия и номер полиса:</b> %s <br>", iAcrs.getResultSet().getString(8)));
+						if (iAcrs.getResultSet().getString(8)==null)sb.append(String.format("<b>Серия и номер полиса:</b> %s <br>", iAcrs.getResultSet().getString(7)));
+						if ((iAcrs.getResultSet().getString(8)!=null) && (iAcrs.getResultSet().getString(7)!=null)) sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br>", iAcrs.getResultSet().getString(7), iAcrs.getResultSet().getString(8)));
 						sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br>", iAcrs.getResultSet().getDate(4)));
 						if (iAcrs.getResultSet().getString(5)!=null)
 						sb.append(String.format("<b>Адрес:</b> %s, %s<br>", iAcrs.getResultSet().getString(5), iAcrs.getResultSet().getString(6)));
@@ -994,7 +996,7 @@ public class ServerOsm extends Server implements Iface {
 
 					sb.append("</ol>");
 					sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br>", data_napr));
-					sb.append(String.format("<b>Планируемая дата выполнения:</b> %1$td.%1$tm.%1$tY<br>", data_post));
+					if (data_post!=null) sb.append(String.format("<b>Планируемая дата выполнения:</b> %1$td.%1$tm.%1$tY<br>", data_post));
 					sb.append("<b>Подпись врача:</b><br>");
 					sb.append("</td>");
 				sb.append("</tr>");
