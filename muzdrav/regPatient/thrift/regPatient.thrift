@@ -450,6 +450,16 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 		2:kmiacServer.KmiacServerException kse);
 	
     /**
+     * Возвращает записи о госпитализациях пациента с указанным персональным номером
+     * @param npasp - персональный номер пациента
+     * @param id - персональный номер пациента
+     * @return список thrift-объектов, содержащих информацию о госпитализациях пациента
+     * @throws GospNotFoundException
+     */
+    list<AllGosp> getAllGospForCurrentLpu(1:i32 npasp, 2:i32 clpu) throws (1: GospNotFoundException gnfe,
+		2:kmiacServer.KmiacServerException kse);
+	
+    /**
      * Возвращает запись госпитализации пациента с указанным идентификатором
      * госпитализации
      * @param id - уникальный идентификатор госпитализации

@@ -85,7 +85,6 @@ import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmorfNotFoundException;
-import javax.swing.JTextField;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -1013,7 +1012,6 @@ public class PacientInfoFrame extends JFrame {
 	        tf_Snils = new JFormattedTextField(mf);
 	        tf_Snils.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
         tf_Snils.setColumns(10);
@@ -3224,7 +3222,7 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
                                 vidTrans, grBl, rezus);
                         String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
                         MainForm.conMan.transferFileFromServer(servPath, cliPath);
-                        MainForm.conMan.openFileInEditor(cliPath, false);
+                        MainForm.conMan.openFileInTextProcessor(cliPath, false);
                     } catch (TException e) {
                         MainForm.conMan.reconnect((TException) e);
                         e.printStackTrace();
@@ -3276,8 +3274,8 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
 
     public void onConnect() {
         try {
-//            cmb_cotd.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.clpu));
-            cmb_cotd.setData(MainForm.tcl.getO00());
+            cmb_cotd.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.clpu));
+//            cmb_cotd.setData(MainForm.tcl.getO00());
             cmb_org.setSelectedItem(null);
             cmb_ishod.setData(MainForm.tcl.getABB());
 //            cmb_adm_obl.setData(null);
@@ -3361,7 +3359,7 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
           }
     };
 
-    //TODO просмотр  информации о пациенте
+    //просмотр  информации о пациенте
     private void changePatientPersonalInfo(int PatId){
         try {
             if (PatId == 0)
@@ -3635,9 +3633,9 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
     }
 
     // обновление информации сигн отм
-    private void changePatientSignInfo(int PatId){
+//    private void changePatientSignInfo(int PatId){
 //        try {
-            NewSign();
+//            NewSign();
 //            SignInfo = MainForm.tcl.getSign(PatId);
 //            if (SignInfo.getGrup() != null){
 ////                rbtn_gk1.setSelected(SignInfo.grup.charAt(0) == '1');
@@ -3668,9 +3666,9 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-    }
-    private void NewSign(){
-        try {
+//    }
+//    private void NewSign(){
+//        try {
 //            btnGroup_gk.clearSelection();
 //            btnGroup_rf.clearSelection();
 //            rbtn_vp1.setSelected(false);
@@ -3679,15 +3677,16 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
 //            ta_allerg.setText(null);
 //            ta_farm.setText(null);
 //            ta_vitae.setText(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
     // просмотр всех обращений
     private void selectAllPatientPriemInfo(int PatId){
       try{
         tbl_priem.setData(new ArrayList<AllGosp>());
-        AllGospInfo = MainForm.tcl.getAllGosp(PatId);
+//        AllGospInfo = MainForm.tcl.getAllGosp(PatId);
+        AllGospInfo = MainForm.tcl.getAllGospForCurrentLpu(PatId, MainForm.authInfo.getClpu());
         tbl_priem.setData(AllGospInfo);
       } catch (GospNotFoundException gnfe) {
 //            System.out.println("Обращений нет.");
