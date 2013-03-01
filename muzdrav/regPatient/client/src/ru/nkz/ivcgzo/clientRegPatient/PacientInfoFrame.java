@@ -3169,7 +3169,7 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
                     } else {
                         lgot = "";
                     }
-                    servPath = MainForm.tcl.printMedCart(NambInfo, PersonalInfo, MainForm.authInfo, docInfo, omsOrg, lgot);
+                    servPath = MainForm.tcl.printMedCart(PersonalInfo.npasp, MainForm.authInfo.clpu, MainForm.authInfo.cpodr);
                     String cliPath = MainForm.conMan.createReport("Амбулаторн._карта");
                     MainForm.conMan.transferFileFromServer(servPath, cliPath);
                     MainForm.conMan.openFileInTextProcessor(cliPath, false);
