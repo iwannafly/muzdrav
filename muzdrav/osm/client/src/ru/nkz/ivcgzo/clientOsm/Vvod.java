@@ -2842,7 +2842,7 @@ public class Vvod extends JFrame {
 		JLabel lblRez = new JLabel("Результат");
 		lblRez.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
-		cmbRez = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_aq0);
+		cmbRez = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_aq1);
 		
 		JLabel lblMobs = new JLabel("Место обс.");
 		lblMobs.setFont(new Font("Tahoma", Font.PLAIN, 11));
