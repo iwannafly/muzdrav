@@ -22,6 +22,7 @@ import org.apache.thrift.TException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 //import ru.nkz.ivcgzo.thriftOsm.InputSvodVed;
+import ru.nkz.ivcgzo.clientManager.common.DocumentPrinter;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import javax.swing.JComboBox;
@@ -79,10 +80,12 @@ public class PasUch extends JPanel {
 				iaf.setClpu_name(MainForm.authInfo.getClpu_name());
 				iaf.setCpodr(MainForm.authInfo.getCpodr());
 								
-				
+				//DocumentPrinter dp = new DocumentPrinter;
 				//OutputTest ot = new OutputTest();
 				String servPath = MainForm.tcl.printPasUch(iaf,ipu);
-				String cliPath = new File("C://Outputtest", ".htm").getAbsolutePath();
+				//String cliPath = new File("C://Outputtest", ".htm").getAbsolutePath();
+				//String cliPath = new DocumentPrinter.createReportFile("paspu");
+				String cliPath = DocumentPrinter.createReportFile("paspu");
 				MainForm.conMan.transferFileFromServer(servPath, cliPath);
 				MainForm.conMan.openFileInEditor(cliPath, false);
 				//catch (TException e1) {
