@@ -105,7 +105,7 @@ exception TemplateExistsException {
 
 service ThriftServerAdmin extends kmiacServer.KmiacServer {
 
-	list<classifier.IntegerClassifier> get_n_p0s13();
+	list<classifier.IntegerClassifier> get_n_p0s15();
 	list<classifier.IntegerClassifier> get_n_o00(1: i32 clpu);
 	list<classifier.IntegerClassifier> get_n_n00(1: i32 clpu);
 	list<classifier.IntegerClassifier> get_n_lds(1: i32 clpu);

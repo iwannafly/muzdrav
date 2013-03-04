@@ -93,14 +93,14 @@ public class serverStructPos {
 			
 			final String sqlQueryBok = "SELECT DISTINCT ON (a.cod_sp) a.datap, b.pcod, b.fam " +
 					"FROM p_vizit_amb a, s_vrach b " +
-					"WHERE a.cod_sp=b.pcod AND a.datap BETWEEN ?::date AND ?::date " +
+					"WHERE a.cod_sp=b.pcod AND a.cpol=? AND a.datap BETWEEN ?::date AND ?::date " +
 					"ORDER BY a.cod_sp";
 			
 			final String sqlQuerySpat = "SELECT a.cod_sp, a.mobs, a.datap, a.id_obr, a.stoim, a.npasp, b.cobr, b.id, c.id_obr, c.datad, d.npasp, d.ter_liv " +
 					"FROM p_vizit_amb a, p_vizit b, p_diag_amb c, patient d " +
 					"WHERE a.id_obr=b.id AND a.id_obr=c.id_obr AND a.npasp=d.npasp AND a.datap BETWEEN ?::date AND ?::date " +  
 					"ORDER BY a.cod_sp";
-			//AND cpol=?
+			//
 			
 			final String sqlQueryTabel = "SELECT timep, timed, timeprf, timepr, pcod, cdol FROM s_tabel";
 			

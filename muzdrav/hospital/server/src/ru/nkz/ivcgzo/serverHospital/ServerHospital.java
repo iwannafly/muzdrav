@@ -45,9 +45,11 @@ import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 import ru.nkz.ivcgzo.thriftHospital.TBirthPlace;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
+import ru.nkz.ivcgzo.thriftHospital.TDiagnostic;
 import ru.nkz.ivcgzo.thriftHospital.TInfoLPU;
 import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
+import ru.nkz.ivcgzo.thriftHospital.TMedication;
 import ru.nkz.ivcgzo.thriftHospital.TPatientCommonInfo;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.TRdIshod;
@@ -90,6 +92,8 @@ public class ServerHospital extends Server implements Iface {
 	private TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
 	private TResultSetMapper<TBirthPlace, TBirthPlace._Fields> rsmBirthPlace;
 	private TResultSetMapper<TInfoLPU, TInfoLPU._Fields> rsmInfoLPU;
+	private TResultSetMapper<TMedication, TMedication._Fields> rsmMedication;
+	private TResultSetMapper<TDiagnostic, TDiagnostic._Fields> rsmDiagnostic;
 
     private static final String[] SIMPLE_PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "fam", "im", "ot", "datar", "datap", "cotd", "npal", "nist"
@@ -103,7 +107,7 @@ public class ServerHospital extends Server implements Iface {
     };
     private static final String[] MEDICAL_HISTORY_FIELD_NAMES = {
         "id", "id_gosp", "jalob", "morbi", "status_praesense", "status_localis",
-        "fisical_obs", "pcod_vrach", "dataz", "timez"
+        "fisical_obs", "pcod_vrach", "dataz", "timez", "pcod_added", "cpodr"
     };
     private static final String[] PRIEM_INFO_FIELD_NAMES = {
         "pl_extr", "datap", "dataosm", "naprav",
@@ -149,6 +153,14 @@ public class ServerHospital extends Server implements Iface {
     private static final String[] BIRTHPLACE_FIELD_NAMES = {
         "region", "city", "type"
     };
+    private static final String[] MEDICATION_FIELD_NAMES = {
+        "name", "nlek", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed", "sposv",
+        "spriem", "pereod", "datae", "komm", "datao", "vracho", "dataz"
+    };    
+    private static final String[] DIAGNOSTIC_FIELD_NAMES = {
+        "nisl", "cpok", "cpok_name", "result", "datav", "op_name", "rez_name"
+    };
+    
     private static final Class<?>[] RdIshodtipes = new Class<?>[] {
 //    	   "npasp",      "ngosp",   "id_berem",         "id",	   "serdm",     "mesto", 
      Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,
@@ -195,8 +207,8 @@ public class ServerHospital extends Server implements Iface {
     private static final Class<?>[] MEDICAL_HISTORY_TYPES = {
     //  id             id_gosp       jalob         morbi          st_praesense  status_localis
         Integer.class, Integer.class, String.class, String.class, String.class, String.class,
-    //  fisical_obs   pcod_vrach    dataz       timez
-        String.class, Integer.class, Date.class, Time.class
+    //  fisical_obs   pcod_vrach     dataz       timez       pcod_added     cpodr
+        String.class, Integer.class, Date.class, Time.class, Integer.class, Integer.class 
     };
     private static final Class<?>[] LIFE_HISTORY_TYPES = {
     //  npasp          allerg        farmkol       vitae
@@ -257,6 +269,8 @@ public class ServerHospital extends Server implements Iface {
                 COMMON_PATIENT_FIELD_NAMES);
         rsmBirthPlace = new TResultSetMapper<>(TBirthPlace.class, BIRTHPLACE_FIELD_NAMES);
         rsmInfoLPU = new TResultSetMapper<>(TInfoLPU.class, LPU_FIELD_NAMES);
+        rsmMedication = new TResultSetMapper<>(TMedication.class, MEDICATION_FIELD_NAMES);
+        rsmDiagnostic = new TResultSetMapper<>(TDiagnostic.class, DIAGNOSTIC_FIELD_NAMES);
     }
 
     @Override
@@ -283,6 +297,21 @@ public class ServerHospital extends Server implements Iface {
         // TODO Тест соединения. ХЗ что тут должно быть
     }
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
     @Override
     public void saveUserConfig(final int id, final String config) throws TException {
         // TODO Сохранение конфигурации пользователя. ХЗ что тут должно быть.
@@ -689,11 +718,11 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final int addMedicalHistory(final TMedicalHistory medHist)
             throws KmiacServerException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
         final String sqlQuery = "INSERT INTO c_osmotr (id_gosp, jalob, "
             + "morbi, status_praesense, "
-            + "status_localis, fisical_obs, pcod_vrach, dataz, timez) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            + "status_localis, fisical_obs, pcod_vrach, dataz, timez, pcod_added, cpodr) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, true, medHist, MEDICAL_HISTORY_TYPES, indexes);
             int id = sme.getGeneratedKeys().getInt("id");
@@ -2200,12 +2229,55 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         }
 	}
 	
-	private String setNormalName(final String sourceStr) {
+	/**
+	 * Получение строки в заданном регистре (только первый символ заглавный)
+	 * @param sourceStr Строка для преобразования
+	 * @return Возвращает преобразованную строку, либо
+	 * <code>null</code> в случае пустой строки
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	private String setNormalNameReg(final String sourceStr) {
 		if (sourceStr == null)
 			return null;
+		if (sourceStr.length() == 0)
+			return sourceStr;
 		if (sourceStr.length() == 1)
 			return sourceStr.toUpperCase();
 		return (sourceStr.substring(0, 1).toUpperCase()).concat(sourceStr.substring(1).toLowerCase());
+	}
+	
+	/**
+	 * Получение из строки содержащихся в ней слов в установленном регистре
+	 * (только первый символ каждого слова заглавный)
+	 * @param sourceStr Исходная строка
+	 * @return Возвращает слова в виде массива строк, либо
+	 * <code>null</code> в случае пустой строки
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	private String[] getNormalRegWords(final String sourceStr) {
+		if ((sourceStr == null) || (sourceStr.length() == 0))
+			return null;
+		String[] retArr = sourceStr.split(" ");
+        for(int i = 0; i < retArr.length; i++)
+        	retArr[i] = setNormalNameReg(retArr[i]);
+        return retArr;
+	}
+
+	/**
+	 * Получение из массива строк одной строки с заданным разделителем
+	 * @param sourceStrArr Исходный массив строк
+	 * @param sepStr Разделитель
+	 * @return Возвращает полученную строку
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	private String getConcatStrFromAray(final String[] sourceStrArr, final String sepStr) {
+		if ((sourceStrArr == null) || (sourceStrArr.length == 0))
+			return "";
+		String retStr = "";
+        for(int i = 0; i < sourceStrArr.length - 1; i++)
+        	retStr += sourceStrArr[i] + sepStr;
+        retStr += sourceStrArr[sourceStrArr.length - 1];
+        return retStr;
 	}
 
 	@Override
@@ -2297,9 +2369,7 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
                 	}
             }
             //Полное имя матери:
-            String[] motherNameArr = motherInfo.getFull_name().split(" ");
-            for(int i = 0; i < motherNameArr.length; i++)
-            	motherNameArr[i] = setNormalName(motherNameArr[i]);
+            String[] motherNameArr = getNormalRegWords(motherInfo.getFull_name());
             final String motherMiddleName = motherNameArr[1].concat(" ".concat(motherNameArr[2]));
             //Время рождения:
             final String childBirthTime = (childBirthInfo.isSetTimeon()) ? childBirthInfo.getTimeon() : "";
@@ -2395,10 +2465,10 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
             }
             //Место регистрации матери:
             String[] motherRegPlace = new String[] {
-        		(motherInfo.isSetAdp_obl()) ? setNormalName(motherInfo.getAdp_obl()) : "",
+        		(motherInfo.isSetAdp_obl()) ? setNormalNameReg(motherInfo.getAdp_obl()) : "",
         		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
-        		(motherInfo.isSetAdp_gorod()) ? setNormalName(motherInfo.getAdp_gorod()) : "",
-				(motherInfo.isSetAdp_ul()) ? setNormalName(motherInfo.getAdp_ul()) : "",
+        		(motherInfo.isSetAdp_gorod()) ? setNormalNameReg(motherInfo.getAdp_gorod()) : "",
+				(motherInfo.isSetAdp_ul()) ? setNormalNameReg(motherInfo.getAdp_ul()) : "",
 				(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
 				(motherInfo.isSetAdp_korp()) ? " ".concat(motherInfo.getAdp_korp()) : "",
 				(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
@@ -2411,13 +2481,13 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		sdfDay.format(childDoc.getDateoff()), months[dateOff.get(GregorianCalendar.MONTH)],
         		sdfYear.format(childDoc.getDateoff()),
         		//Ребенок родился:
-        		sdfDay.format(childInfo.getDatar()), sdfMonth.format(childInfo.getDatar()).toUpperCase(),
+        		sdfDay.format(childInfo.getDatar()), sdfMonth.format(childInfo.getDatar()),
         		sdfYear.format(childInfo.getDatar()),
         		childBirthHour, childBirthMinute,
         		//Фамилия, имя, отчество матери:
         		motherNameArr[0].concat(" ".concat(motherMiddleName)),
         		//Дата рождения матери:
-        		sdfDay.format(motherInfo.getDatar()), sdfMonth.format(motherInfo.getDatar()).toUpperCase(),
+        		sdfDay.format(motherInfo.getDatar()), sdfMonth.format(motherInfo.getDatar()),
         		sdfYear.format(motherInfo.getDatar()),
         		//Место регистрации матери:
         		motherRegPlace[0],
@@ -2442,13 +2512,13 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		sdfYear.format(childDoc.getDateoff()),
         		//Ребенок родился:
         		sdfDay.format(childInfo.getDatar()),
-        		sdfMonth.format(childInfo.getDatar()).toUpperCase(),
+        		sdfMonth.format(childInfo.getDatar()),
         		sdfYear.format(childInfo.getDatar()),
         		childBirthHour, childBirthMinute,
         		//Фамилия, имя, отчество матери:
         		motherNameArr[0], motherMiddleName,
         		//Фамилия ребёнка:
-        		setNormalName(childDoc.getFamreb()),
+        		setNormalNameReg(childDoc.getFamreb()),
         		//Дата рождения матери:
         		sdfDay.format(motherInfo.getDatar()).substring(0, 1),
         		sdfDay.format(motherInfo.getDatar()).substring(1, 2),
@@ -2472,9 +2542,9 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		motherStatus[2], motherStatus[3],
         		motherStatus[4], motherStatus[5],
         		//Место рождения:
-        		setNormalName(birthPlaceRegion),
+        		setNormalNameReg(birthPlaceRegion),
         		"",	//РАЙОН РОЖДЕНИЯ
-        		setNormalName(birthPlaceTown),
+        		setNormalNameReg(birthPlaceTown),
         		//Местность рождения:
     			cityChild1, cityChild2,
     			countryChild1, countryChild2,
@@ -2491,8 +2561,8 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
     			birthHappen[4], birthHappen[5],
     			birthHappen[6], birthHappen[7],
         		//Должность и имя врача, выдавшего свидетельство:
-        		(doctorGiveDoc != null) ? setNormalName(doctorWriteDoc.get(1)) : "",
-        		(doctorGiveDoc != null) ? doctorWriteDoc.get(0) : "",
+        		(doctorGiveDoc != null) ? setNormalNameReg(doctorGiveDoc.get(1)) : "",
+        		(doctorGiveDoc != null) ? getConcatStrFromAray(getNormalRegWords(doctorGiveDoc.get(0)), " ") : "",
         		//Образование матери:
         		motherEduc[0], motherEduc[1],
         		motherEduc[2], motherEduc[3],
@@ -2531,8 +2601,8 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
         		whoGetChild[2], whoGetChild[3],
         		whoGetChild[4], whoGetChild[5],
         		//Должность и имя врача, заполнившего свидетельство:
-        		(doctorWriteDoc != null) ? setNormalName(doctorWriteDoc.get(1)) : "",
-        		(doctorWriteDoc != null) ? doctorWriteDoc.get(0) : "",
+        		(doctorWriteDoc != null) ? setNormalNameReg(doctorWriteDoc.get(1)) : "",
+        		(doctorWriteDoc != null) ? getConcatStrFromAray(getNormalRegWords(doctorWriteDoc.get(0)), " ") : "",
         		//Имя руководителя организации:
         		(infoLPU.isSetZaved()) ? infoLPU.getZaved() : ""
         		);
@@ -2580,15 +2650,85 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 	public void DeleteRdSl(int id_pvizit, int npasp)
 			throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-		sme.execPrepared("DELETE FROM p_rd_sl WHERE id_pvizit = ? and npasp = ?", false, id_pvizit, npasp);
-		sme.setCommit();
-	} catch (SQLException e) {
-		((SQLException) e.getCause()).printStackTrace();
-		throw new KmiacServerException();
-	} catch (InterruptedException e1) {
-		e1.printStackTrace();
-		throw new KmiacServerException();
+			sme.execPrepared("DELETE FROM p_rd_sl WHERE id_pvizit = ? and npasp = ?", false, id_pvizit, npasp);
+			sme.setCommit();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
 	}
+
+	@Override
+	public List<TMedication> getMedications(final int idGosp)
+			throws KmiacServerException {
+        String sqlQuery = "SELECT n_med.name as name, c_lek.* " +
+                "FROM c_lek " +
+                "INNER JOIN n_med ON (c_lek.klek = n_med.pcod) " +
+                "WHERE (c_lek.id_gosp = ?);";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
+            return rsmMedication.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception (getMedications): ", e);
+            throw new KmiacServerException();
+        }
+	}
+
+	@Override
+	public void updateMedication(final TMedication med) throws KmiacServerException {
+        final String sqlQuery = "UPDATE c_lek " +
+        						"SET doza = ?, spriem = ?, pereod = ?, datao = ?, " +
+        						"vracho = ? " +
+        						"WHERE (nlek = ?);";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, med.getDoza(), med.getSpriem(), med.getPereod(),
+            		(med.isSetDatao()) ? new Date(med.getDatao()) : null,
+            		(med.isSetVracho()) ? med.getVracho() : null,
+            		med.getNlek());
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQLException | InterruptedException (updateMedication): ", e);
+            throw new KmiacServerException();
+        }
+		
+	}
+
+	@Override
+	public void deleteMedication(final int nlek) throws KmiacServerException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM c_lek WHERE (nlek = ?);", false, nlek);
+			sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQLException | InterruptedException (deleteMedication): ", e);
+            throw new KmiacServerException();
+        }
+	}
+
+	@Override
+	public List<TDiagnostic> getDiagnostics(int idGosp) throws KmiacServerException {
+        String sqlQuery = 
+		"SELECT DISTINCT p_isl_ld.nisl, n_ldi.pcod AS cpok, n_ldi.name_n AS cpok_name, " +
+				"p_rez_l.zpok AS result, p_isl_ld.datav, '' AS op_name, '' AS rez_name " +
+		"FROM p_isl_ld " +
+		"JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) " +
+		"JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " +
+		"WHERE (p_isl_ld.id_gosp = ?) " +
+		"UNION " +
+		"SELECT DISTINCT p_isl_ld.nisl, n_ldi.pcod AS cpok, n_ldi.name_n AS cpok_name, " +
+			"n_arez.name AS result, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name " +
+		"FROM p_isl_ld " +
+		"JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) " +
+		"JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) " +
+		"LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) " +
+		"WHERE (p_isl_ld.id_gosp = ?);";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp, idGosp)) {
+            return rsmDiagnostic.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception (getDiagnostics): ", e);
+            throw new KmiacServerException();
+        }
 	}
 
 //	public void addRdIshod(int npasp, int ngosp) throws KmiacServerException,

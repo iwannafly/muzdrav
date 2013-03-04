@@ -93,7 +93,7 @@ public class ServerGenTalons extends Server implements Iface {
     };
     private static final String[] NRASP_FIELD_NAMES = {
         "pcod", "denn", "vidp", "time_n", "time_k",
-        "cxema", "cdol", "cpol", "id", "pfd", "timep_n", "timep_k"
+        "cxema", "cdol", "cpol", "id", "pfd", "timep_n", "timep_k", "time_int_n", "time_int_k"
     };
     private static final String[] RASP_FIELD_NAMES = {
         "nrasp", "pcod", "nned", "denn", "datap", "time_n",
@@ -102,7 +102,7 @@ public class ServerGenTalons extends Server implements Iface {
     private static final String[] TALON_FIELD_NAMES = {
         "id", "ntalon", "nrasp", "pcod_sp", "cdol",
         "cdol_kem", "vidp", "timepn", "timepk", "datapt",
-        "datap", "timep", "cpol"
+        "datap", "timep", "cpol", "prv"
     };
     private static final String[] VIDP_FIELD_NAMES = {
         "pcod", "name"
@@ -127,8 +127,8 @@ public class ServerGenTalons extends Server implements Iface {
         Integer.class, Integer.class, Integer.class, Time.class,
     //  time_k       cxema          cdol          cpol
         Time.class,  Integer.class, String.class, Integer.class,
-    //  id             pfd            timep_n     timep_k
-        Integer.class, Boolean.class, Time.class, Time.class
+    //  id             pfd            timep_n     timep_k	  time_int_n     time_int_k
+        Integer.class, Boolean.class, Time.class, Time.class, Time.class, Time.class
     };
     private static final Class<?>[] RASP_TYPES = new Class<?>[] {
     //  nrasp          pcod           nned           denn
@@ -145,8 +145,8 @@ public class ServerGenTalons extends Server implements Iface {
         String.class, Integer.class, Integer.class, Time.class,
     //  timepk      datapt      datap       timep
         Time.class, Timestamp.class, Date.class, Time.class,
-    //  cpol
-        Integer.class
+    //  cpol			prv
+        Integer.class, Integer.class
     };
 
 ////////////////////////////////////////////////////////////////////////
@@ -241,6 +241,21 @@ public class ServerGenTalons extends Server implements Iface {
 //                       Public Methods                               //
 ////////////////////////////////////////////////////////////////////////
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
 //////////////////////// Start/Stop Methods ////////////////////////////////////
 
     @Override
@@ -373,7 +388,7 @@ public class ServerGenTalons extends Server implements Iface {
     public final List<Nrasp> getNrasp(final int cpodr, final int pcodvrach, final String cdol,
             final int cxema) throws KmiacServerException, NraspNotFoundException {
         final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
-            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k "
+            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k, time_int_n, time_int_k "
             + "FROM e_nrasp WHERE cpol=? AND pcod =? AND cdol =? "
             + "AND cxema =? ORDER BY denn, vidp, time_n";
         try (AutoCloseableResultSet acrs =
@@ -414,7 +429,7 @@ public class ServerGenTalons extends Server implements Iface {
     public final List<Talon> getTalon(final int cpodr, final int pcodvrach, final String cdol,
             final long datap) throws KmiacServerException, TalonNotFoundException {
         final String  sqlQuery = "SELECT id, ntalon, nrasp, pcod_sp, cdol, cdol_kem, "
-            + "vidp, timepn, timepk, datapt, datap , timep, cpol "
+            + "vidp, timepn, timepk, datapt, datap , timep, cpol, prv "
             + "FROM e_talon WHERE cpol=? AND pcod_sp =? AND cdol =? AND datap =? "
             + "ORDER BY datap, timepn, timepk, vidp";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
@@ -453,7 +468,7 @@ public class ServerGenTalons extends Server implements Iface {
     public final List<Nrasp> getNraspCpodr(final int cpodr) throws KmiacServerException,
             NraspNotFoundException {
         final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
-            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp "
+            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k, time_int_n, time_int_k FROM e_nrasp "
             + "WHERE cpol =? "
             + "ORDER BY pcod";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr)) {
@@ -473,7 +488,7 @@ public class ServerGenTalons extends Server implements Iface {
     public final List<Nrasp> getNraspCdol(final int cpodr, final String cdol)
             throws KmiacServerException, NraspNotFoundException {
         final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
-            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp "
+            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k, time_int_n, time_int_k FROM e_nrasp "
             + "WHERE cpol =? AND cdol =? "
             + "ORDER BY pcod";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr, cdol)) {
@@ -493,7 +508,7 @@ public class ServerGenTalons extends Server implements Iface {
     public final List<Nrasp> getNraspVrach(final int cpodr, final int pcodvrach, final String cdol)
             throws KmiacServerException, NraspNotFoundException {
         final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
-                + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp "
+                + "cxema, cdol, cpol, id, pfd, timep_n, timep_k, time_int_n, time_int_n FROM e_nrasp "
                 + "WHERE cpol =? AND pcod = ? AND cdol =? "
                 + "ORDER BY pcod";
         try (AutoCloseableResultSet acrs =
@@ -608,12 +623,12 @@ public class ServerGenTalons extends Server implements Iface {
     
     @Override
     public final void addNrasp(final List<Nrasp> nrasp) throws KmiacServerException {
-        final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11};
+        final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Nrasp elemNrasp : nrasp) {
                 sme.execPreparedT("INSERT INTO e_nrasp (pcod, denn, vidp, time_n, time_k, "
-                    + "cxema, cdol, cpol, pfd, timep_n, timep_k) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                    + "cxema, cdol, cpol, pfd, timep_n, timep_k, time_int_n, time_int_k) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
                     false, elemNrasp, NRASP_TYPES, indexes);
             }
             sme.setCommit();
@@ -655,12 +670,12 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final void addTalons(final List<Talon> talon) throws KmiacServerException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Talon elemTalon : talon) {
                 sme.execPreparedT("INSERT INTO e_talon (ntalon, nrasp, pcod_sp, cdol, "
-                    + "cdol_kem, vidp, timepn, timepk, datapt, datap, timep, cpol) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                    + "cdol_kem, vidp, timepn, timepk, datapt, datap, timep, cpol, prv) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
                     false, elemTalon, TALON_TYPES, indexes);
             }
             sme.setCommit();
@@ -674,12 +689,12 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final void updateNrasp(final List<Nrasp> nrasp) throws KmiacServerException {
-        final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 8};
+        final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 8};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Nrasp elemNrasp : nrasp) {
                 sme.execPreparedT("UPDATE e_nrasp SET "
                     + "pcod = ?, denn = ?, vidp = ?, time_n = ?, time_k = ?, "
-                    + "cxema = ?, cdol = ?, cpol = ?, pfd = ?, timep_n = ?, timep_k = ? "
+                    + "cxema = ?, cdol = ?, cpol = ?, pfd = ?, timep_n = ?, timep_k = ?, time_int_n = ?, time_int_k = ? "
                     + "WHERE id = ?;",
                     false, elemNrasp, NRASP_TYPES, indexes);
             }
@@ -856,7 +871,6 @@ public class ServerGenTalons extends Server implements Iface {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 		SimpleDateFormat stf = new SimpleDateFormat("HH:mm");
 		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("napr", ".htm").getAbsolutePath()), "utf-8")) {
-			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
 			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -929,55 +943,27 @@ public class ServerGenTalons extends Server implements Iface {
 				break;        
 
 	        case 1: 
-				sb.append("<p align=\"center\" >Количество занятых и свободных талонов");
+				sb.append("<p align=\"center\" >Количество неиспользованных талонов");
 				sb.append(String.format(" %1$td.%1$tm.%1$tY <br>", new Date(rep.getDatan())));
-				try {
-					AutoCloseableResultSet acr = sse.execPreparedQuery("select v.fam ||' '|| v.im ||' '|| v.ot as fio, s.name as cdol from s_vrach v JOIN s_mrab m ON (v.pcod = m.pcod) LEFT JOIN n_s00 s ON (s.pcod = m.cdol) where v.pcod = ? AND s.pcod = ?", rep.getPcod(), rep.getCdol());
-					if (acr.getResultSet().next()){
-						sb.append(String.format("%s, %s <br>", acr.getResultSet().getString("fio"), acr.getResultSet().getString("cdol")));
-					}
-				} catch (SQLException e) {
-					((SQLException) e.getCause()).printStackTrace();
-					throw new KmiacServerException();
-				}
 				sb.append("</p>");
-				sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">№ п/п</th><th>ФИО пациента, Д.р.</th><th>№ амб.карты, № уч.</th><th>Адрес, тел.</th><th>Время приема</th><th>Прием</th><th>Записан</th></tr>");
-//				sb.append("<p align=\"left\"></p>");
+				sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 12px times new roman;\">ФИО врача, специальность</th><th>Всего талонов</th><th>Неиспользовано талонов</th></tr>");
 				try {
 					AutoCloseableResultSet acr = sse.execPreparedQuery(
-							"SELECT (CASE p.npasp<>-1 WHEN TRUE THEN p.fam ||' '|| p.im ||' '|| p.ot ELSE e.fed_fio END) as fio, "+ 
-							"p.datar, p.adm_ul ||' '|| p.adm_dom ||' - '|| p.adm_kv as adres, "+
-							"p.tel, e.timep::char(10), v.name as priem, n.nambk, n.nuch, "+
-							"(CASE e.prv=0 OR e.prv=1 WHEN TRUE THEN 'интернет' ELSE (CASE e.prv=2 WHEN TRUE THEN 'регистратура' ELSE (CASE e.prv=3 WHEN TRUE THEN 'инфомат' ELSE (CASE e.prv=4 WHEN TRUE THEN 'нет приема' ELSE NULL END) END) END) END)as zap " +
-							"FROM e_talon e LEFT JOIN patient p ON (e.npasp = p.npasp) " +
-							"LEFT JOIN e_vidp v ON (e.vidp = v.pcod) " +
-							"LEFT JOIN p_nambk n ON (n.npasp = p.npasp and n.cpol = e.cpol) " +
-							"WHERE e.npasp<>0 AND e.cpol=? AND pcod_sp=? AND e.cdol=? AND e.datap=?" +
-							"ORDER BY e.timep",
-						    rep.getCpol(), rep.getPcod(), rep.getCdol(), new Date(rep.getDatan()));
+							"SELECT e.pcod_sp, e.cdol, get_short_fio(v.fam, v.im, v.ot) as fio, s.name as name, count(*) as kol "+
+							"FROM e_talon e LEFT JOIN s_vrach v ON (e.pcod_sp = v.pcod) "+ 
+							"LEFT JOIN n_s00 s ON (s.pcod = e.cdol) "+
+							"WHERE e.cpol = ? AND datap = ? "+
+							"GROUP BY e.pcod_sp, fio, e.cdol, s.name "+
+							"ORDER BY e.cdol, e.pcod_sp", rep.getCpol(), new Date(rep.getDatan()));
 					if (acr.getResultSet().next()){
 						do {
-							String date_birthay = "";
-							String nambk = "";
-							String nuch = "";
-							String adres = "";
-							String telefon = "";
-							if (acr.getResultSet().getDate("datar") != null) date_birthay = ", Д.р. "+sdf.format(new Date(acr.getResultSet().getDate("datar").getTime()));
-							if (acr.getResultSet().getString("nambk") != null) nambk = "№ амб. "+acr.getResultSet().getString("nambk");
-							if (acr.getResultSet().getInt("nuch") != 0) nuch = ", № уч. "+acr.getResultSet().getString("nuch");
-							if (acr.getResultSet().getString("adres") != null) adres = acr.getResultSet().getString("adres");
-							if (acr.getResultSet().getString("tel") != null) telefon = ", тел. "+acr.getResultSet().getString("tel");
 							sb.append("<tr bgcolor=\"white\">");
-							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getRow()));
-							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("fio")+date_birthay));
-							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", nambk+nuch ));
-							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", adres+telefon ));
-							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("timep") ));
-							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("priem") ));
-							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("zap"))); 
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("fio")+", "+acr.getResultSet().getString("name").toLowerCase()));
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getInt("kol")));
+							AutoCloseableResultSet acrs1 = sse.execPreparedQuery("select count(*) as kol from e_talon where npasp = 0 AND cpol = ? AND datap = ? AND pcod_sp = ? AND cdol = ?", rep.getCpol(), new Date(rep.getDatan()), acr.getResultSet().getInt("pcod_sp"), acr.getResultSet().getString("cdol"));
+							if (acrs1.getResultSet().next())
+								sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acrs1.getResultSet().getInt("kol"))); 
 							sb.append("</tr>");
-							
-							//sb.append(String.format("<tr bgcolor=\"white\"><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td><td style=\"font: 12px times new roman;\"> %s </td></tr>", acr.getResultSet().getRow(), acr.getResultSet().getString("fio"), acr.getResultSet().getString("nambk")+", "+acr.getResultSet().getString("nuch"), acr.getResultSet().getString("adres")+", "+acr.getResultSet().getString("tel"), acr.getResultSet().getString("timep"), acr.getResultSet().getString("priem"), acr.getResultSet().getString("zap")));
 						}
 						while (acr.getResultSet().next());
 					}
@@ -1099,67 +1085,47 @@ public class ServerGenTalons extends Server implements Iface {
 
 	        case 4:
 				sb.append("<p align=\"center\" >Расписание работы врачей ");
-//				sb.append(String.format("с  %1$td.%1$tm.%1$tY ", new Date(rep.getDatan())));
-//				sb.append(String.format(" по  %1$td.%1$tm.%1$tY <br>", new Date(rep.getDatak())));
 				sb.append("</p>");
 				sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 12px times new roman;\">ФИО врача</th><th>Пн.</th><th>Вт.</th><th>Ср.</th><th>Чт.</th><th>Птн.</th></tr>");
 				try {
 					AutoCloseableResultSet acr = sse.execPreparedQuery(
-							"SELECT get_short_fio(v.fam, v.im, v.ot) as fio, s.name as cdol, e.denn, min(time_n) as min_time, max(time_k) as max_time " +
+							"SELECT distinct(e.pcod), e.cdol, get_short_fio(v.fam, v.im, v.ot) as fio, s.name as name, e.cxema " +
 							"FROM e_nrasp e LEFT JOIN s_vrach v ON (e.pcod = v.pcod) " +
 							"LEFT JOIN n_s00 s ON (s.pcod = e.cdol) " +
-							"WHERE e.cpol=? AND e.cxema = 0 AND e.time_n <> '00:00:00' " +
-							"GROUP BY e.cdol, s.name, fio, e.denn " +
-							"ORDER BY e.cdol, fio, e.denn", rep.getCpol());
-					while (acr.getResultSet().next()){
-//lab1:
-						sb.append("<tr bgcolor=\"white\">");
-						sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("fio")));
-//						String vrach = acr.getResultSet().getString("fio"); 
-
-						for(int i=1; i<6; i++){
-							String mint= "";
-							String maxt= "";
-							if(i == acr.getResultSet().getInt("denn")){
-								mint= stf.format(new Time(acr.getResultSet().getTime("min_time").getTime()));
-								maxt= stf.format(new Time(acr.getResultSet().getTime("max_time").getTime()));
-								acr.getResultSet().next();
+							"WHERE e.cpol=? AND time_n != '00:00:00'" +
+							"ORDER BY e.cdol, e.pcod, e.cxema", rep.getCpol());
+					if (acr.getResultSet().next()){
+						do{
+							sb.append("<tr bgcolor=\"white\">");
+							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("fio")+", "+acr.getResultSet().getString("name").toLowerCase()));
+							for(int idn=1; idn<6; idn++){
+								String mint= "";
+								String maxt= "";
+//TODO запрос возвращает одну строку, даже если этой строки нет 
+								AutoCloseableResultSet acrs1 = sse.execPreparedQuery("select min(time_n) as min_time, max(time_k) as max_time from e_nrasp where denn = ? AND cpol = ? AND cxema = ? AND pcod = ? AND cdol = ? AND time_n != '00:00:00'", idn, rep.getCpol(), acr.getResultSet().getInt("cxema"), acr.getResultSet().getInt("pcod"), acr.getResultSet().getString("cdol"));
+//								AutoCloseableResultSet acrs1 = sse.execPreparedQuery("select min(time_n) as min_time, max(time_k) as max_time from e_nrasp where denn = ? AND cpol = ? AND cxema = ? AND pcod = ? AND cdol = ? AND time_n != '00:00:00' GROUP BY time_n, time_k ORDER BY time_n", idn, rep.getCpol(), acr.getResultSet().getInt("cxema"), acr.getResultSet().getInt("pcod"), acr.getResultSet().getString("cdol"));
+						        String cxema = "";
+								if (acrs1.getResultSet().next()){
+									if (acrs1.getResultSet().getTime("min_time") != null || acrs1.getResultSet().getTime("max_time") != null){
+										if (acrs1.getResultSet().getTime("min_time") != null)mint= stf.format(new Time(acrs1.getResultSet().getTime("min_time").getTime()));
+										if (acrs1.getResultSet().getTime("max_time") != null)maxt= stf.format(new Time(acrs1.getResultSet().getTime("max_time").getTime()));
+										switch (acr.getResultSet().getInt("cxema")) {
+							        		case 1:
+							        			cxema += "чет. ";
+							        			break;
+							        		case 2:
+							        			cxema += "нечет. ";
+							        			break;
+							        		default:
+							        			break;
+								        }
+									}
+								}
+								sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", cxema+mint+"-"+maxt));
 							}
-			        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", mint+"-"+maxt));
-//							if (vrach != acr.getResultSet().getString("fio")) acr.getResultSet().previous();
-//			        		continue;
-						}
-						acr.getResultSet().previous();
-						sb.append("</tr>");
+							sb.append("</tr>");
+						}while (acr.getResultSet().next());
 					}
-//					if (acr.getResultSet().next()){
-//						do {
-//							sb.append("<tr bgcolor=\"white\">");
-//							sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("fio")));
-//							String mint= "";
-//							String maxt= "";
-//					        switch (acr.getResultSet().getInt("denn")) {
-//					        	case 1:
-//									mint= stf.format(new Date(acr.getResultSet().getDate("min_time").getTime()));
-//									maxt= stf.format(new Date(acr.getResultSet().getDate("max_time").getTime()));
-//					        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", mint+"-"+maxt));
-//					        		break;
-//					        	case 2:
-//					        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", kol_int));
-//					        		break;
-//					        	case 3:
-//									sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("zap")));
-//					        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getInt("kol_reg"))); 
-//					        		break;
-//					        	case 4:
-//									sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getString("zap")));
-//					        		sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s </td>", acr.getResultSet().getInt("kol_inf"))); 
-//					        		break;
-//					        }
-//					        sb.append("</tr>");
-//						}
-//						while (acr.getResultSet().next());
-//					}
 				} catch (SQLException e) {
 					((SQLException) e.getCause()).printStackTrace();
 					throw new KmiacServerException();
@@ -1167,6 +1133,42 @@ public class ServerGenTalons extends Server implements Iface {
 				sb.append("</table><br>");
 				break;        
 	        
+	        case 5: 
+				sb.append("<p align=\"center\" >Печать талонов на прием к врачу");
+				sb.append("</p>");
+				sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> ");
+				try {
+					AutoCloseableResultSet acr = sse.execPreparedQuery(
+							"SELECT (v.fam||' '|| v.im||' '|| v.ot) as fio, s.name as name, e.timep, e.datap "+
+							"FROM e_talon e LEFT JOIN s_vrach v ON (e.pcod_sp = v.pcod) "+ 
+							"LEFT JOIN n_s00 s ON (s.pcod = e.cdol) "+
+							"WHERE e.cpol = ? AND e.datap = ? AND e.pcod_sp = ? AND e.cdol = ? AND e.vidp != 3  "+
+							"ORDER BY e.datap, e.timep", rep.getCpol(), new Date(rep.getDatan()), rep.getPcod(), rep.getCdol());
+					if (acr.getResultSet().next()){
+						do {
+							sb.append("<tr bgcolor=\"white\">");
+							for (int i=0; i <= 1; i++) {
+								sb.append("<td style=\"font: 12px times new roman;\"> ");
+								sb.append(String.format(" Талон на посещение "));
+								sb.append(String.format(" %1$td.%1$tm.%1$tY <br>", new Date(acr.getResultSet().getDate("datap").getTime())));
+								sb.append(String.format(" %s <br>", acr.getResultSet().getString("name")));
+								sb.append(String.format(" Время: %s <br>", stf.format(new Time(acr.getResultSet().getTime("timep").getTime()))));
+								sb.append(String.format(" Врач: %s <br>", acr.getResultSet().getString("fio")));
+								sb.append("Каб. <br>");
+								sb.append("</td>");
+								if (i % 2 == 0) acr.getResultSet().next();
+							}
+							sb.append("</tr>");
+						}
+						while (acr.getResultSet().next());
+					}
+				} catch (SQLException e) {
+					((SQLException) e.getCause()).printStackTrace();
+					throw new KmiacServerException();
+				}
+				sb.append("</table><br>");
+	        	break;        
+
 	        default: 
 	        	break;
 	        }

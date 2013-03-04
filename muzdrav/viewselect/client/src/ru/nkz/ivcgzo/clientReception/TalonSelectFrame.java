@@ -8,6 +8,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
@@ -78,6 +80,7 @@ public class TalonSelectFrame extends JFrame {
     // Panes
     private JSplitPane splitPane;
     private JTabbedPane tbpTalonOperations;
+    private ChangeListener lstTalonOperations;
     private JScrollPane pnTalonSelect;
     private JScrollPane pnTalonDelete;
     // Layouts
@@ -92,7 +95,6 @@ public class TalonSelectFrame extends JFrame {
     private JLabel lblPerv;
     private JLabel lblPovt;
     private JLabel lblHome;
-    private JLabel lblConsult;
     private JLabel lblAppointmentTypeHeader;
 
     public TalonSelectFrame(final UserAuthInfo authInfo) {
@@ -120,22 +122,25 @@ public class TalonSelectFrame extends JFrame {
         tbpTalonOperations = new JTabbedPane(JTabbedPane.TOP);
         fillTalonTabbedPane();
         splitPane.setRightComponent(tbpTalonOperations);
-        tbpTalonOperations.addChangeListener(new ChangeListener() {
-
+        lstTalonOperations = new ChangeListener() {
             @Override
             public void stateChanged(final ChangeEvent e) {
                 switch (tbpTalonOperations.getSelectedIndex()) {
                     case 0:
                         refreshTalonTableModel();
+                        setPrevNextEnabled();
                         break;
                     case 1:
+                		btnBackward.setEnabled(false);
+                		btnForward.setEnabled(false);
                         refreshReservedTalonTableModel();
                         break;
                     default:
                         break;
                 }
             }
-        });
+        };
+        tbpTalonOperations.addChangeListener(lstTalonOperations);
     }
 
     private void fillInformationPanel() {
@@ -257,7 +262,6 @@ public class TalonSelectFrame extends JFrame {
                     e1.printStackTrace();
                     MainForm.conMan.reconnect(e1);
                 } catch (RuntimeException re) {
-                    re.printStackTrace();
                     cbxSpeciality.setSelectedIndex(0);
                 }
             }
@@ -297,11 +301,8 @@ public class TalonSelectFrame extends JFrame {
         cbxDoctor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                if (cbxDoctor.getSelectedItem() != null) {
-                    refreshTalonTableModel();
-                }
                 if ((cbxDoctor.getSelectedItem() != null) && (curPatient != null))  {
-                    refreshReservedTalonTableModel();
+                	lstTalonOperations.stateChanged(new ChangeEvent(tbpTalonOperations));
                 }
             }
         });
@@ -313,6 +314,7 @@ public class TalonSelectFrame extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 ((TalonTableModel) tbTalonSelect.getModel()).setPrevWeek();
+                setPrevNextEnabled();
                 tbTalonSelect.repaint();
                 updateSelectTableHeaders();
             }
@@ -323,10 +325,25 @@ public class TalonSelectFrame extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 ((TalonTableModel) tbTalonSelect.getModel()).setNextWeek();
+                setPrevNextEnabled();
                 tbTalonSelect.repaint();
                 updateSelectTableHeaders();
             }
         });
+    }
+
+    private void setPrevNextEnabled() {
+    	TalonList tl = ((TalonTableModel) tbTalonSelect.getModel()).getTalonList();
+    	List<Talon> atl = tl.getAllTalonList();
+    	Date[] ds = tl.getWeekDays();
+    	
+    	if ((atl != null) && (atl.size() != 0)) {
+    		btnBackward.setEnabled(atl.get(0).datap < ds[0].getTime());
+    		btnForward.setEnabled(atl.get(atl.size() - 1).datap > ds[ds.length - 1].getTime());
+    	} else {
+    		btnBackward.setEnabled(false);
+    		btnForward.setEnabled(false);
+    	}
     }
 
     private void setAppointmentTypeLabels() {
@@ -346,11 +363,6 @@ public class TalonSelectFrame extends JFrame {
         lblHome.setBackground(Color.pink);
         lblHome.setHorizontalAlignment(SwingConstants.CENTER);
         lblHome.setOpaque(true);
-
-        lblConsult = new JLabel("Консультация");
-        lblConsult.setBackground(Color.magenta);
-        lblConsult.setHorizontalAlignment(SwingConstants.CENTER);
-        lblConsult.setOpaque(true);
     }
 
     private void fillTalonTypeGroupLayout() {
@@ -381,10 +393,6 @@ public class TalonSelectFrame extends JFrame {
                             .addGroup(glPnTalonType.createParallelGroup(Alignment.LEADING, false)
                                 .addGroup(glPnTalonType.createSequentialGroup()
                                     .addComponent(lblHome, GroupLayout.PREFERRED_SIZE,
-                                            84, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(ComponentPlacement.RELATED,
-                                            GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(lblConsult, GroupLayout.PREFERRED_SIZE,
                                             84, GroupLayout.PREFERRED_SIZE))
                                 .addComponent(btnForward, GroupLayout.PREFERRED_SIZE, 173,
                                         GroupLayout.PREFERRED_SIZE)))
@@ -420,8 +428,7 @@ public class TalonSelectFrame extends JFrame {
                     .addGroup(glPnTalonType.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblPerv)
                         .addComponent(lblPovt)
-                        .addComponent(lblHome)
-                        .addComponent(lblConsult))
+                        .addComponent(lblHome))
                     .addContainerGap())
         );
     }
@@ -441,13 +448,14 @@ public class TalonSelectFrame extends JFrame {
             TalonTableModel tbtModel = new TalonTableModel(
                     cbxPoliclinic.getSelectedItem().getPcod(),
                     cbxSpeciality.getSelectedItem().getPcod(),
-                    cbxDoctor.getSelectedItem().getPcod()
-            );
+                    cbxDoctor.getSelectedItem().getPcod(),
+                    curPatient.getId(),
+            		curPatient.getIdPvizit() > 0);
             tbTalonSelect.setModel(tbtModel);
         } else {
             tbTalonSelect.setModel(new TalonTableModel());
         }
-        //updateSelectTableHeaders();
+        setPrevNextEnabled();
     }
 
     private void fillTalonSelectPane() {
@@ -456,37 +464,44 @@ public class TalonSelectFrame extends JFrame {
         tbTalonSelect.setRowHeight(50);
         tbTalonSelect.addMouseListener(new MouseAdapter() {
             public void mouseClicked(final MouseEvent e) { //TODO отрефакторить
-                JTable curTable = (JTable) e.getSource();
+            	if (curPatient == null) {
+                    JOptionPane.showMessageDialog(
+                        TalonSelectFrame.this.getContentPane(), "Пациент не выбран",
+                        "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+            	JTable curTable = (JTable) e.getSource();
                 final int curRow = curTable.getSelectedRow();
                 final int curColumn = curTable.getSelectedColumn();
-                final int indexOfSelectedOption = JOptionPane.showConfirmDialog(
+                final Talon curTalon = ((TalonTableModel) curTable.getModel()).getTalonList()
+                        .getTalonByDay(curRow, curColumn);
+                final int indexOfSelectedOption = (curTalon == null) ? -1 : 
+                		JOptionPane.showConfirmDialog(
                         TalonSelectFrame.this.getContentPane(),
                         String.format("Записать на приём %s?", curTable.getColumnName(curColumn)),
                         "Выбор талона", JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
                 if (indexOfSelectedOption  == 0) {
-                    Talon curTalon = ((TalonTableModel) curTable.getModel()).getTalonList()
-                        .getTalonByDay(curRow, curColumn);
                     try {
-                        if ((curTalon != null) && (curPatient != null)) {
-                            MainForm.tcl.reserveTalon(curPatient, curTalon);
-                            refreshTalonTableModel();
-                        } else if (curPatient == null) {
-                            JOptionPane.showMessageDialog(
-                                TalonSelectFrame.this.getContentPane(), "Пациент не выбран",
-                                "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
-                        }
+                        MainForm.tcl.reserveTalon(curPatient, curTalon);
+                        refreshTalonTableModel();
                     } catch (PatientHasSomeReservedTalonsOnThisDay e1) {
                         JOptionPane.showMessageDialog(
                                 TalonSelectFrame.this.getContentPane(),
                                 "Пациент уже записан на выбранную дату к выбранному врачу",
                                 "Ошибка!", JOptionPane.ERROR_MESSAGE);
-                    } catch (TException e1) {
-                        MainForm.conMan.reconnect(e1);
-                    }
+                    } catch (KmiacServerException e1) {
+                        JOptionPane.showMessageDialog(
+                                TalonSelectFrame.this.getContentPane(),
+                                "Запись на прием не удалась",
+                                "Ошибка!", JOptionPane.ERROR_MESSAGE);
+					} catch (TException e1) {
+						MainForm.conMan.reconnect(e1);
+					}
                 }
             }
         });
+        tbTalonSelect.getTableHeader().setReorderingAllowed(false);
         pnTalonSelect.setViewportView(tbTalonSelect);
     }
 
@@ -547,6 +562,7 @@ public class TalonSelectFrame extends JFrame {
                 }
             }
         });
+        tbTalonDelete.getTableHeader().setReorderingAllowed(false);
         pnTalonDelete.setViewportView(tbTalonDelete);
     }
 
@@ -556,9 +572,12 @@ public class TalonSelectFrame extends JFrame {
         lblSurname.setText(patientSurname);
         lblName.setText(patientName);
         lblMiddlename.setText(patientMiddlename);
-        curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename,
-                idPvizit);
-        tbpTalonOperations.setSelectedIndex(0);
+        curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename, idPvizit);
+        try {
+			cbxPoliclinic.setSelectedPcod(curDoctorInfo.getCpodr());
+		} catch (RuntimeException e) {
+			cbxPoliclinic.setSelectedIndex(0);
+		}
     }
 
     public final void onConnect() {
@@ -568,7 +587,6 @@ public class TalonSelectFrame extends JFrame {
     private void fillTalonTypeComboboxes() {
         try {
             cbxPoliclinic.setData(MainForm.tcl.getPoliclinic());
-            cbxPoliclinic.setSelectedPcod(curDoctorInfo.getCpodr());
         } catch (PoliclinicNotFoundException e) {
             cbxPoliclinic.setData(Collections.<IntegerClassifier>emptyList());
         } catch (KmiacServerException e) {

@@ -75,6 +75,21 @@ public class GenReestr extends Server implements Iface {
 			log.info("Stop serverGenReestr");
 }
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
 	public GenReestr(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		rsmPaspError = new TResultSetMapper<>(PaspErrorInfo.class);

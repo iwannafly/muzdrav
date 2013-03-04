@@ -31,26 +31,24 @@ struct InputPasUch {
 }
 
 struct VrachInfo {
-	1: i32 pcod;
-	2: string fam;
-	3: string im;
-	4: string ot;
-	5: string cdol;
+	1: string fam;
+	2: string im;
+	3: string ot;
+	4: string cdol;
+	5: i32 pcod;
 } 
 
 struct VrachTabel {
-	1: i32 pcod;
-	2: string cdol;
-	3: i64 datav;
-	4: double timep;
-	5: double timed;
-	6: double timeda;
-	7: double timeprf;
-	8: double timepr;
-	9: string nuch1;
-	10: string nuch2;
-	11: string nuch3;
-	12: i32 id;
+	1: i64 datav;
+	2: double timep;
+	3: double timed;
+	4: double timeda;
+	5: double timeprf;
+	6: double timepr;
+	7: i32 pcod;
+	8: i32 cpodr;
+	9: string cdol;
+	10: i32 id;
 }
 
 struct UchastokInfo {
@@ -87,19 +85,6 @@ struct InputStructPos {
     2: string date2;
 }
 
-
-/**
- * No information
- */
-exception VINotFoundException {
-}
-
-/**
- * Already exists
- */
-exception VTDuplException {
-}
-
 /*
  * No information
  */
@@ -119,22 +104,19 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
      * @param pcod - Уникальный код специалиста
      * @return список thrift-объектов, содержащих информацию о врачах
      */
-    list<VrachInfo> getVrachTableInfo(1:i32 cpodr) throws (1: VINotFoundException vinfe,
-		2:kmiacServer.KmiacServerException kse);
+    list<VrachInfo> getVrachTableInfo(1:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
     
 
      /**
      * Возвращает время работы врачей
      */
-    list<VrachTabel> getVrachTabel(1:i32 pcod) throws (1: VTException vte, 2:VTDuplException vtde,
-		3:kmiacServer.KmiacServerException kse);
+    list<VrachTabel> getVrachTabel(1:i32 pcod, 2: string cdol) throws (1: kmiacServer.KmiacServerException kse);
 		
 		
     /**
      * Добавляет информацию о враче
      */
-    i32 addVT(1:VrachTabel vt) throws (1: VTException vte, 2:VTDuplException vtde,
-		3:kmiacServer.KmiacServerException kse);
+    i32 addVT(1:VrachTabel vt, 2: i32 pcod, 3: string cdol, 4: i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 
     /**
      * Обновляет информацию о враче
@@ -178,4 +160,3 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
 
     string nagrvr(1:i32 cpol)  throws (1: kmiacServer.KmiacServerException kse); 
 }
-

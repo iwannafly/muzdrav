@@ -40,10 +40,10 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
-import ru.nkz.ivcgzo.thriftCommon.fileTransfer.fileTransferConstants;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileTransfer;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
+import ru.nkz.ivcgzo.thriftCommon.fileTransfer.fileTransferConstants;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 
@@ -307,9 +307,7 @@ public class ConnectionManager {
 							while (!checkAll()) {
 								try {
 									if (!connecting) {
-										notify();
-										mainForm.dispatchEvent(new WindowEvent(mainForm, WindowEvent.WINDOW_CLOSING));
-										break;
+										System.exit(3);
 									}
 									Thread.sleep(500);
 								} catch (InterruptedException e) {
@@ -341,7 +339,7 @@ public class ConnectionManager {
 		JButton btnClose = new JButton("Закрыть");
 		btnClose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				reconnectForm.dispatchEvent(new WindowEvent(reconnectForm, WindowEvent.WINDOW_CLOSING));
+				closeReconnectForm();
 			}
 		});
 		GroupLayout groupLayout = new GroupLayout(reconnectForm.getContentPane());
@@ -368,16 +366,8 @@ public class ConnectionManager {
 		reconnectForm.addWindowListener(new WindowAdapter() {
 			@Override
 			public synchronized void windowClosing(WindowEvent e) {
-				try {
-					synchronized (reconnectThread) {
-						if (connecting) {
-							super.windowClosing(e);
-							connecting = false;
-							wait();
-						}
-					}
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
+				if (connecting) {
+					connecting = false;
 				}
 			}
 		});
@@ -506,6 +496,21 @@ public class ConnectionManager {
 	}
 	
 	/**
+	 * Показ формы с произвольным классификатором, в котором код - число.
+	 * @param lst - классификатор
+	 * @return выбранное значение или <code>null</code>, если
+	 * пользователь закрыл форму
+	 */
+	public IntegerClassifier showIntegerClassifierSelector(List<IntegerClassifier> lst) {
+		Object res = viewClient.showModal(client, 29, lst);
+		
+		if (res != null)
+			return (IntegerClassifier) res;
+		
+		return null;
+	}
+	
+	/**
 	 * Показ формы с отсортированным классификатором, в котором код - строка.
 	 * @param cls - название классификатора
 	 * @param ord - порядок сортировки
@@ -530,6 +535,21 @@ public class ConnectionManager {
 	 */
 	public StringClassifier showStringClassifierSelector(StringClassifiers cls) {
 		Object res = viewClient.showModal(client, 10, cls);
+		
+		if (res != null)
+			return (StringClassifier) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Показ формы с произвольным классификатором, в котором код - строка.
+	 * @param lst - классификатор
+	 * @return выбранное значение или <code>null</code>, если
+	 * пользователь закрыл форму
+	 */
+	public StringClassifier showStringClassifierSelector(List<StringClassifier> lst) {
+		Object res = viewClient.showModal(client, 30, lst);
 		
 		if (res != null)
 			return (StringClassifier) res;

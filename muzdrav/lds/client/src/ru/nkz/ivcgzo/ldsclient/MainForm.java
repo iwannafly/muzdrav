@@ -189,7 +189,7 @@ public class MainForm extends Client<LDSThrift.Client> {
 					winPat.cBrez.setData(ltc.GetKlasArez());
 					winPat.cBSvrach.setData(ltc.GetKlasSvrach(authInfo.cpodr));
 					winPat.cBCuser.setData(ltc.GetKlasAllSvrach(authInfo.cpodr));
-				
+					//winPat.cBKod_ter.setData(ltc.GetKlasKod_ter());
 				
 					if (PostPer.tip.equals("Л")){
 						winOpt.p0e1.setData(ltc.GetKlasP0e1(1));

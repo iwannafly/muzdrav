@@ -59,7 +59,9 @@ struct Nrasp{
 	9:i32 id,
 	10:bool pfd,
 	11:i64 timep_n,
-	12:i64 timep_k
+	12:i64 timep_k,
+	13:i64 time_int_n,
+	14:i64 time_int_k
 }
 
 struct Rasp{
@@ -96,7 +98,8 @@ struct Talon{
 	10:optional i64 datapt,
 	11:optional i64 datap,
 	12:optional i64 timep,
-	13:i32 cpol
+	13:i32 cpol,
+	14:i32 prv
 }
 
 struct RepStruct{

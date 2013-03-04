@@ -2,6 +2,12 @@
 ////////////TODO Рефакторить, рефакторить, рефакторить... /////////////////////
 package ru.nkz.ivcgzo.clientHospital;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -10,6 +16,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.ContainerAdapter;
+import java.awt.event.ContainerEvent;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +26,46 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JMenuBar;
+import javax.swing.JRadioButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
+import javax.swing.JSplitPane;
+import javax.swing.JPanel;
+import javax.swing.GroupLayout;
+import javax.swing.Timer;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JLabel;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JTextField;
+import javax.swing.BoxLayout;
+import javax.swing.JTextPane;
+import javax.swing.JButton;
+import javax.swing.UIManager;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import javax.swing.JCheckBox;
+import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
@@ -45,75 +94,24 @@ import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.TStage;
 import ru.nkz.ivcgzo.thriftHospital.Zakl;
 import ru.nkz.ivcgzo.thriftHospital.TRdIshod;
-import ru.nkz.ivcgzo.clientHospital.Children;
 import ru.nkz.ivcgzo.thriftHospital.RdDinStruct;
 import ru.nkz.ivcgzo.thriftHospital.RdSlStruct;
-
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JSplitPane;
-import javax.swing.JPanel;
-import javax.swing.GroupLayout;
-import javax.swing.Timer;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JTextField;
-import javax.swing.BoxLayout;
-import javax.swing.JTextPane;
-import javax.swing.JButton;
-import javax.swing.UIManager;
-
-import org.apache.thrift.TException;
-import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
-import javax.swing.border.LineBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Toolkit;
-
-import javax.swing.JRadioButton;
-import java.awt.Component;
-import javax.swing.Box;
-import java.awt.Dimension;
-
-import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.JToolBar;
-import java.awt.BorderLayout;
-import java.io.File;
-import java.io.IOException;
-
-import javax.swing.JCheckBox;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import java.awt.event.ContainerAdapter;
-import java.awt.event.ContainerEvent;
 
 public class MainFrame extends JFrame {
 
     private static final long serialVersionUID = 3513837719265529744L;
     private static final String WINDOW_HEADER = "Врач стационара";
     private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy");
+    private UserAuthInfo doctorAuth;
+    private TPatient patient;
+    private TPriemInfo priemInfo;
+    private Children pChildren;
+    private Assignments pAssignments;
     private JMenuBar mbMain;
     private JMenu mnPatientOperation;
     private JMenuItem mntmSelectPatient;
     private JMenuItem mntmReception;
     private JTabbedPane tabbedPane;
-    private Children pChildren;
     private JSplitPane spPatientInfo;
     private JPanel pPersonalInfo;
     private JPanel pReceptionInfo;
@@ -145,9 +143,6 @@ public class MainFrame extends JFrame {
     private JLabel lblRealAddress;
     private JTextField tfRealAddress;
     private JTextPane textPane;
-    private UserAuthInfo doctorAuth;
-    private TPatient patient;
-    private TPriemInfo priemInfo;
     private JPanel pMedicalHistory;
     private JTabbedPane tbpMedicalHistory;
     private CustomTextField tfMedHShablonFilter;
@@ -288,7 +283,6 @@ public class MainFrame extends JFrame {
     private JTextField tfPatalogoAnDiagPcod;
     private JPanel panel;
     private JButton btnShowPatientInfo;
-    private JButton btnMedication;
     private JButton btnIssled;
     private JToolBar toolBar;
     private JTextField tfZaklDiagPcod;
@@ -324,13 +318,13 @@ public class MainFrame extends JFrame {
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBAkush;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPosled;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBVrash;
-	private JSpinner Soj;
-	private JSpinner Shdm;
-	private JSpinner Schcc;
-	private JSpinner SKrov;
-	private JSpinner SVes;
-	private JSpinner SDlina;
-	private JSpinner SSRok;
+	private JTextField Soj;
+	private JTextField Shdm;
+	private JTextField Schcc;
+	private JTextField SKrov;
+	private JTextField SVes;
+	private JTextField SDlina;
+	private JTextField SSRok;
 	private JTextField TGde;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBEff;
 	private JTextField TDet;
@@ -343,14 +337,14 @@ public class MainFrame extends JFrame {
     private JRadioButton rdbtnZaklDiagTT;
     private CustomDateEditor Tdatam;
     private CustomDateEditor Tdataosl;
-	private JSpinner Sber;
-	private JSpinner Srod;
-	private JSpinner Sdtr;
-	private JSpinner Stvera;
-	private JSpinner Sdcr;
-	private JSpinner Scdiag;
-	private JSpinner Sdsp;
-	private JSpinner Scext;
+	private JTextField Sber;
+	private JTextField Srod;
+	private JTextField Sdtr;
+	private JTextField Stvera;
+	private JTextField Sdcr;
+	private JTextField Scdiag;
+	private JTextField Sdsp;
+	private JTextField Scext;
 	private JCheckBox ChBpsi;
 	private JScrollPane spJalob;
 	private JScrollPane spDesiaseHistory;
@@ -421,6 +415,7 @@ public class MainFrame extends JFrame {
         } else {	//Скрытие вкладки "Роды":
             tabbedPane.removeTabAt(4);
         }
+        setAssignmentsPanel();
         setZaklPanel();
     }
 
@@ -462,6 +457,10 @@ public class MainFrame extends JFrame {
         clearMedicalHistory();
         clearDiagnosisText();
         clearZaklText();
+        if (pChildren != null)
+        	pChildren.setPatient(null);
+        if (pAssignments != null)
+        	pAssignments.setPatient(null);
     }
 
     private class ShablonSearchListener implements DocumentListener {
@@ -573,6 +572,8 @@ public class MainFrame extends JFrame {
                     fillStageTable();
                     if (pChildren != null)
                     	pChildren.setPatient(patient);
+                    if (pAssignments != null)
+                    	pAssignments.setPatient(patient);
 
         			try {
 						trdIshod = ClientHospital.tcl.getRdIshodInfo(
@@ -605,11 +606,11 @@ public class MainFrame extends JFrame {
             			rddin = ClientHospital.tcl.getRdDinInfo(patient.getPatientId(), patient.gospitalCod);
 
 						System.out.println(rddin);		
-         			SVes.setValue(rddin.getVes());
-            			Soj.setValue(rddin.getOj());
-            			Shdm.setValue(rddin.getHdm());
-                        Schcc.setValue(rddin.getChcc());
-                        SSRok.setValue(rddin.getSrok());
+         			SVes.setText(String.valueOf(rddin.getVes()));
+            			Soj.setText(String.valueOf(rddin.getOj()));
+            			Shdm.setText(String.valueOf(rddin.getHdm()));
+                        Schcc.setText(String.valueOf(rddin.getChcc()));
+                        SSRok.setText(String.valueOf(rddin.getSrok()));
  //           			if ((rddin.isSetPozpl())||(rddin.getPozpl() != 0))
                    		if (rddin.getPozpl() != 0)
             			CBPoz.setSelectedPcod(rddin.getPozpl());
@@ -659,14 +660,14 @@ public class MainFrame extends JFrame {
             			Tdatam.setDate(rdsl.getDataM());
             			if (rdsl.getDataM() == 0)
             			Tdatam.setText(null);
-            			Srod.setValue(rdsl.getKolrod());
-            			Sber.setValue(rdsl.getShet());
-            			Sdtr.setValue(rdsl.getDTroch());
-            			Stvera.setValue(rdsl.getCvera());
-            			Sdcr.setValue(rdsl.getDsp());
-            			Scdiag.setValue(rdsl.getCdiagt());
-            			Sdsp.setValue(rdsl.getDsr());
-            			Scext.setValue(rdsl.getCext());
+            			Srod.setText(String.valueOf(rdsl.getKolrod()));
+            			Sber.setText(String.valueOf(rdsl.getShet()));
+            			Sdtr.setText(String.valueOf(rdsl.getDTroch()));
+            			Stvera.setText(String.valueOf(rdsl.getCvera()));
+            			Sdcr.setText(String.valueOf(rdsl.getDsp()));
+            			Scdiag.setText(String.valueOf(rdsl.getCdiagt()));
+            			Sdsp.setText(String.valueOf(rdsl.getDsr()));
+            			Scext.setText(String.valueOf(rdsl.getCext()));
             		} catch (KmiacServerException e2) {
             			// TODO Auto-generated catch block
             			e2.printStackTrace();
@@ -880,26 +881,6 @@ public class MainFrame extends JFrame {
             "/ru/nkz/ivcgzo/clientHospital/resources/issled.png")));
         btnIssled.setRequestFocusEnabled(false);
 
-        btnMedication = new JButton();
-        btnMedication.setToolTipText("Лекарственные назначения");
-        toolBar.add(btnMedication);
-        btnMedication.setMaximumSize(new Dimension(35, 35));
-        btnMedication.setMinimumSize(new Dimension(35, 35));
-        btnMedication.setPreferredSize(new Dimension(35, 35));
-        btnMedication.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                if (patient != null) {
-                    ClientHospital.conMan.showMedicationForm(patient.getPatientId(),
-                        patient.getSurname(), patient.getName(), patient.getMiddlename(),
-                        patient.getGospitalCod());
-                }
-            }
-        });
-        btnMedication.setBorder(null);
-        btnMedication.setIcon(new ImageIcon(MainFrame.class.getResource(
-            "/ru/nkz/ivcgzo/clientHospital/resources/medication.png")));
-        btnMedication.setRequestFocusEnabled(false);
-
         btnOperation = new JButton();
         btnOperation.setToolTipText("Операции");
 //        btnOperation.setVisible(false);
@@ -951,9 +932,10 @@ public class MainFrame extends JFrame {
                     fillMedHistoryTable();
                     fillDiagnosisTable();
                     fillStageTable();
-                    if (pChildren != null) {
+                    if (pChildren != null)
                         pChildren.setPatient(patient);
-                    }
+                    if (pAssignments != null)
+                    	pAssignments.setPatient(patient);
                 }
             }
         });
@@ -1230,8 +1212,10 @@ public class MainFrame extends JFrame {
 
     private void setMedicalHistoryTableScrollPane() {
         spMedHist = new JScrollPane();
+        spMedHist.setMaximumSize(new Dimension(32767, 150));
+        spMedHist.setMinimumSize(new Dimension(23, 150));
         spMedHist.setBorder(new MatteBorder(0, 0, 0, 1, (Color) new Color(0, 0, 0)));
-        spMedHist.setPreferredSize(new Dimension(300, 250));
+        spMedHist.setPreferredSize(new Dimension(300, 150));
         hbMedicalHistoryTableControls.add(spMedHist);
 
         addMedicalHistoryTable();
@@ -1443,11 +1427,11 @@ public class MainFrame extends JFrame {
                 .addComponent(spFiz, GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
         );
         
-        taStatusPraence = new JTextArea();
-        taStatusPraence.setWrapStyleWord(true);
-        taStatusPraence.setLineWrap(true);
-        taStatusPraence.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        spFiz.setViewportView(taStatusPraence);
+        taStatusLocalis = new JTextArea();
+        taStatusLocalis.setWrapStyleWord(true);
+        taStatusLocalis.setLineWrap(true);
+        taStatusLocalis.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        spFiz.setViewportView(taStatusLocalis);
         pnlFiz.setLayout(gl_pnlFiz);
         
         JPanel pnlLoc = new JPanel();
@@ -1573,10 +1557,16 @@ public class MainFrame extends JFrame {
                 medHist.setTimez(System.currentTimeMillis());
                 medHist.setPcodVrach(doctorAuth.getPcod());
                 medHist.setIdGosp(patient.getGospitalCod());
+                medHist.setPcod_added(doctorAuth.getPcod());
+                medHist.setCpodr(doctorAuth.getCpodr());
                 medHist.setId(ClientHospital.tcl.addMedicalHistory(medHist));
                 tbMedHist.addItem(medHist);
                 tbMedHist.setData(
                         ClientHospital.tcl.getMedicalHistory(patient.getGospitalCod()));
+                if (tbMedHist.getRowCount() > 0) {
+                    tbMedHist.setRowSelectionInterval(tbMedHist.getRowCount() - 1,
+                        tbMedHist.getRowCount() - 1);
+                }
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
@@ -2590,8 +2580,8 @@ public class MainFrame extends JFrame {
 	private void setDefaultValues() {
 	try {
 		System.out.println("начальные значения");		
-		SDlina.setValue(trdIshod.getLpupov());
-		SKrov.setValue(trdIshod.getKrov());
+		SDlina.setText(String.valueOf(trdIshod.getLpupov()));
+		SKrov.setText(String.valueOf(trdIshod.getKrov()));
 		if (trdIshod.getObvit() == null)
 		Obvit.setText(""); else
 		Obvit.setText(trdIshod.getObvit());
@@ -2687,23 +2677,6 @@ public class MainFrame extends JFrame {
 		JOptionPane.showMessageDialog(MainFrame.this, e.getLocalizedMessage(), "Ошибка создания записи", JOptionPane.ERROR_MESSAGE);
 	}
 	
-	}
-
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////Новорожденный//////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Установка панели информации о новорождённом
-	 * @author Балабаев Никита Дмитриевич
-	 */
-    private void setChildrenPanel() {
-    	this.pChildren = new Children(this.doctorAuth, this.patient);
-        tabbedPane.addTab("Новорождённый",
-        		new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")),
-        		pChildren,
-        		null);
 	}
     
     /**
@@ -3048,12 +3021,10 @@ public class MainFrame extends JFrame {
         JLabel lblNewLabel_10 = new JLabel("Предполагаемый вес");
         lblNewLabel_10.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
-        Soj = new JSpinner();
-        Soj.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
+        Soj = new JTextField();
         Soj.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        Shdm = new JSpinner();
-        Shdm.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
+        Shdm = new JTextField();
         Shdm.setFont(new Font("Tahoma", Font.BOLD, 12));
         
 		CBPolpl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
@@ -3075,7 +3046,7 @@ public class MainFrame extends JFrame {
 		CBPred = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db2);
 		CBPred.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
-		Schcc = new JSpinner();
+		Schcc = new JTextField();
 		Schcc.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		TVes = new JTextField();
@@ -3089,8 +3060,7 @@ public class MainFrame extends JFrame {
 		JLabel lblNewLabel_33 = new JLabel("Вес женщины");
 		lblNewLabel_33.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		SVes = new JSpinner();
-		SVes.setModel(new SpinnerNumberModel(new Double(0), new Double(0), null, new Double(5)));
+		SVes = new JTextField();
 		SVes.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		TRod = new JTextField();
@@ -3118,22 +3088,22 @@ public class MainFrame extends JFrame {
 		JLabel lblNewLabel_43 = new JLabel("T vera");
 		lblNewLabel_43.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		Sdtr = new JSpinner();
+		Sdtr = new JTextField();
 		Sdtr.setFont(new Font("Dialog", Font.BOLD, 12));
 		
-		Stvera = new JSpinner();
+		Stvera = new JTextField();
 		Stvera.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
-		Sdcr = new JSpinner();
+		Sdcr = new JTextField();
 		Sdcr.setFont(new Font("Dialog", Font.BOLD, 12));
 		
-		Scdiag = new JSpinner();
+		Scdiag = new JTextField();
 		Scdiag.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
-		Sdsp = new JSpinner();
+		Sdsp = new JTextField();
 		Sdsp.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
-		Scext = new JSpinner();
+		Scext = new JTextField();
 		Scext.setFont(new Font("Tahoma", Font.BOLD, 12));
 		GroupLayout gl_panel_6 = new GroupLayout(panel_6);
 		gl_panel_6.setHorizontalGroup(
@@ -3212,13 +3182,13 @@ public class MainFrame extends JFrame {
 		JLabel lblNewLabel_34 = new JLabel("Которая беременность");
 		lblNewLabel_34.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		Sber = new JSpinner();
+		Sber = new JTextField();
 		Sber.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		JLabel lblNewLabel_35 = new JLabel(" роды");
 		lblNewLabel_35.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		Srod = new JSpinner();
+		Srod = new JTextField();
 		Srod.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		JLabel lblNewLabel_17 = new JLabel("Детское место");
@@ -3416,7 +3386,7 @@ public class MainFrame extends JFrame {
 					.addContainerGap(87, Short.MAX_VALUE))
 		);
 		
-		SDlina = new JSpinner();
+		SDlina = new JTextField();
 		SDlina.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		JLabel lblNewLabel_20 = new JLabel("Обвитие вокруг");
@@ -3436,13 +3406,13 @@ public class MainFrame extends JFrame {
 		JLabel lblNewLabel_22 = new JLabel("Кровопотеря мл.");
 		lblNewLabel_22.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		SKrov = new JSpinner();
+		SKrov = new JTextField();
 		SKrov.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		JLabel lblNewLabel_45 = new JLabel("Срок:");
 		lblNewLabel_45.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		SSRok = new JSpinner();
+		SSRok = new JTextField();
 		SSRok.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		JButton btnNewButton = new JButton("");
@@ -3539,7 +3509,7 @@ public class MainFrame extends JFrame {
 						trdIshod.setEff(CBEff.getSelectedPcod());
 						else trdIshod.unsetEff();
 		      		trdIshod.setKashetv(TKash.getText());
-		      		trdIshod.setKrov((int) SKrov.getModel().getValue());
+		      		trdIshod.setKrov(Integer.valueOf(SKrov.getText()));
 		      		trdIshod.setMesto(TDet.getText());
 		      		trdIshod.setObezb(TMed.getText());
 		 		   	trdIshod.setObol(TObol.getText());
@@ -3547,7 +3517,7 @@ public class MainFrame extends JFrame {
 		      		trdIshod.setOsobp(TOsob.getText());
 		 			if (TPoln.getDate() != null)
 		 				trdIshod.setPolnd(TPoln.getDate().getTime());
-		      		trdIshod.setLpupov ((int) SDlina.getModel().getValue());
+		      		trdIshod.setLpupov (Integer.valueOf(SDlina.getText()));
 		 			if (TShvat.getDate() != null)
 		 				trdIshod.setShvatd(TShvat.getDate().getTime());
 		 			if (TVod.getDate() != null)
@@ -3585,11 +3555,11 @@ public class MainFrame extends JFrame {
 					else trdIshod.unsetOsmposl();
 			  		trdIshod.setDetmesto(TDet.getText());
 			 		System.out.println(trdIshod);	
-			      	rddin.setChcc( (int) Schcc.getModel().getValue());
-			      	rddin.setSrok((int) SSRok.getModel().getValue());
-			  		rddin.setVes((double) SVes.getModel().getValue());
-			  		rddin.setOj((int) Soj.getModel().getValue());
-			  		rddin.setHdm((int) Shdm.getModel().getValue());
+			      	rddin.setChcc(Integer.valueOf(Schcc.getText()));
+			      	rddin.setSrok(Integer.valueOf(SSRok.getText()));
+			  		rddin.setVes(Double.valueOf(SVes.getText()));
+			  		rddin.setOj(Integer.valueOf(Soj.getText()));
+			  		rddin.setHdm(Integer.valueOf(Shdm.getText()));
 					if (CBVid.getSelectedPcod() != null)
 						rddin.setVidpl(CBVid.getSelectedPcod());
 						else rddin.unsetVidpl();
@@ -3609,17 +3579,17 @@ public class MainFrame extends JFrame {
 						rddin.setPozpl(CBPoz.getSelectedPcod());
 						else rddin.unsetPozpl();
 			 		System.out.println(rddin);	
-					rdsl.setShet((int) Sber.getModel().getValue());
-					rdsl.setKolrod((int) Srod.getModel().getValue());
-					rdsl.setDTroch((int) Sdtr.getModel().getValue());
-					rdsl.setCvera((int) Stvera.getModel().getValue());
-					rdsl.setDsr((int) Sdcr.getModel().getValue());
-					rdsl.setCdiagt((int)Scdiag.getModel().getValue());
-					rdsl.setDsp((int) Sdsp.getModel().getValue());
-					rdsl.setCext((int) Scext.getModel().getValue());
+					rdsl.setShet(Integer.valueOf(Sber.getText()));
+					rdsl.setKolrod(Integer.valueOf(Srod.getText()));
+					rdsl.setDTroch(Integer.valueOf(Sdtr.getText()));
+					rdsl.setCvera(Integer.valueOf(Stvera.getText()));
+					rdsl.setDsr(Integer.valueOf(Sdcr.getText()));
+					rdsl.setCdiagt(Integer.valueOf(Scdiag.getText()));
+					rdsl.setDsp(Integer.valueOf(Sdsp.getText()));
+					rdsl.setCext(Integer.valueOf(Scext.getText()));
 					rddin.setNpasp(patient.getPatientId());
 					if (rdsl.getYavka1() == 0)
-					rdsl.setYavka1((int) SSRok.getModel().getValue());
+					rdsl.setYavka1(Integer.valueOf(SSRok.getText()));
 					rddin.setNgosp(patient.gospitalCod);
 					if (CBishod.getSelectedPcod() != null)
 						rdsl.setIshod(CBishod.getSelectedPcod());
@@ -3680,19 +3650,22 @@ public class MainFrame extends JFrame {
 							.addGap(186))
 						.addGroup(gl_panel_3.createSequentialGroup()
 							.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblNewLabel_5)
-								.addComponent(lblNewLabel_8)
+								.addGroup(gl_panel_3.createSequentialGroup()
+									.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
+										.addComponent(lblNewLabel_5)
+										.addComponent(lblNewLabel_8))
+									.addGap(10)
+									.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING)
+										.addComponent(CBPred, GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+										.addComponent(CBSerd, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 156, GroupLayout.PREFERRED_SIZE))
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(CBSerd1, GroupLayout.PREFERRED_SIZE, 122, Short.MAX_VALUE)
+									.addGap(18)
+									.addComponent(lblNewLabel_7)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(Schcc, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE))
 								.addComponent(lblNewLabel_6))
-							.addGap(10)
-							.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING)
-								.addComponent(CBPred, GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
-								.addComponent(CBSerd, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 156, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(CBSerd1, GroupLayout.PREFERRED_SIZE, 122, Short.MAX_VALUE)
-							.addGap(18)
-							.addComponent(lblNewLabel_7)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(Schcc, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE))))
+							.addContainerGap())))
 				.addGroup(gl_panel_3.createSequentialGroup()
 					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_3.createSequentialGroup()
@@ -3904,6 +3877,37 @@ public class MainFrame extends JFrame {
 		panel_3.setLayout(gl_panel_3);
 		pChildbirth.setLayout(gl_pChildbirth);
     }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////Новорождённый//////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	* Установка панели информации о новорождённом
+	* @author Балабаев Никита Дмитриевич
+	*/
+	private void setChildrenPanel() {
+		this.pChildren = new Children(this.doctorAuth, this.patient);
+		this.tabbedPane.addTab("Новорождённый",
+				new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/children.png")),
+				this.pChildren,
+				null);
+	}
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////Назначения//////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	* Установка панели учёта назначений
+	* @author Балабаев Никита Дмитриевич
+	*/
+	private void setAssignmentsPanel() {
+		this.pAssignments = new Assignments(this.doctorAuth, this.patient);
+		this.tabbedPane.addTab("Назначения",
+				new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/medication.png")),
+				this.pAssignments,
+				null);
+	}
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////// Заключение ///////////////////////////////////////////////////

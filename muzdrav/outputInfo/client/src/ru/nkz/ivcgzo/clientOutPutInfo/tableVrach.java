@@ -8,7 +8,6 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftOutputInfo.VTDuplException;
 import ru.nkz.ivcgzo.thriftOutputInfo.VTException;
 import ru.nkz.ivcgzo.thriftOutputInfo.VrachInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.VrachTabel;
@@ -18,7 +17,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JPanel;
-import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import org.apache.thrift.TException;
@@ -27,6 +25,7 @@ import org.apache.thrift.transport.TTransportException;
 import java.util.List;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import javax.swing.ImageIcon;
 
 public class tableVrach extends JPanel {
 	
@@ -36,60 +35,35 @@ public class tableVrach extends JPanel {
 	private List<VrachTabel> tabel;
 	private int codPodr = 0;
 	private int pcod = 0;
-	private int vt = 0;
 	private int id = 0;
-
-/**public static void main(String[] args) {
-	EventQueue.invokeLater(new Runnable() { 
-		public void run() {
-			try {
-				//tableVrach window = new tableVrach();
-				//window.frameVr.setVisible(true);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	});
-}*/
+	private String cdol = null;
 
 public tableVrach(){
 	addComponentListener(new ComponentAdapter() {
-		@Override
 		public void componentShown(ComponentEvent arg0) {
 			try {
 			    vrach = MainForm.tcl.getVrachTableInfo(codPodr);
 			    tableVrachInfo.setData(vrach);
-			} catch (TException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-		    }
+			} catch (TException e) {e.printStackTrace();}
 		}
 	});
-	
-	JScrollPane scrollPane = new JScrollPane();
 	initialize();
 }
 
 public void initialize() {
-
 	JScrollPane vrPane = new JScrollPane();
-
 	codPodr = MainForm.authInfo.cpodr;
-	
-	tableVrachInfo = new CustomTable<>(false, true, VrachInfo.class, 0, "Код врача", 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Должность");
+	tableVrachInfo = new CustomTable<>(false, true, VrachInfo.class, 0, "Фамилия", 1, "Имя", 2, "Отчество", 3, "Долж.");
 	tableVrachInfo.addMouseListener(new MouseAdapter() {
-		@Override
 		public void mouseClicked(MouseEvent arg0) {
 		    try {
 		    	pcod = tableVrachInfo.getSelectedItem().pcod;
-		    	tabel = MainForm.tcl.getVrachTabel(pcod);
-		    	tableVrachTabel.setData(tabel);
-		    } catch (VTDuplException e) {
-		    	JOptionPane.showMessageDialog(tableVrach.this, "Clone", "error", JOptionPane.ERROR_MESSAGE);
-		    } catch (VTException e) {
+		    	cdol = tableVrachInfo.getSelectedItem().cdol;
+		    	tableVrachTabel.setData(MainForm.tcl.getVrachTabel(pcod, cdol));
+		    }  catch (VTException e) {
 		    	JOptionPane.showMessageDialog(tableVrach.this, "tableVrach error", "error", JOptionPane.ERROR_MESSAGE);
 		    } catch (KmiacServerException e) {
-		    	JOptionPane.showMessageDialog(tableVrach.this, "Server error", "error", JOptionPane.ERROR_MESSAGE);
+		    	JOptionPane.showMessageDialog(tableVrach.this, "Ошибка сервера", "Ошибка", JOptionPane.ERROR_MESSAGE);
 			} catch (TException e) {
 				e.printStackTrace();
 				MainForm.conMan.reconnect(e);
@@ -100,18 +74,13 @@ public void initialize() {
 	tableVrachInfo.getRowSorter().toggleSortOrder(0);
 	tableVrachInfo.setFillsViewportHeight(true);
 	tableVrachInfo.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-	tableVrachInfo.getColumnModel().getColumn(0).setMaxWidth(70);
+	tableVrachInfo.getColumnModel().getColumn(3).setMaxWidth(40);
 	vrPane.setViewportView(tableVrachInfo);
-	
 	JScrollPane timePane = new JScrollPane();
-	
-	tableVrachTabel = new CustomTable<>(true, true, VrachTabel.class, 0, "Код врача", 1, "Должность", 2, "Дата приема", 3, "В поликлинике", 4, "На дому", 5, "На дому актив", 6, "Проф.осмотр", 7, "Прочие", 8, "№1 участка", 9, "№2 участка", 10, "№3 участка");
-	tableVrachTabel.setAutoCreateRowSorter(true);
-	tableVrachTabel.setDateField(2);
-	tableVrachTabel.getRowSorter().toggleSortOrder(0);
+	tableVrachTabel = new CustomTable<>(true, true, VrachTabel.class, 0, "Дата приема", 1, "В поликлинике", 2, "На дому", 3, "На дому актив", 4, "Проф.осмотр", 5, "Прочие");
+	tableVrachTabel.setDateField(0);
 	tableVrachTabel.setFillsViewportHeight(true);
 	tableVrachTabel.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-	tableVrachTabel.getColumnModel().getColumn(0).setMaxWidth(70);
 	tableVrachTabel.isEditable();
 	timePane.setViewportView(tableVrachTabel);
 	
@@ -134,7 +103,7 @@ public void initialize() {
 		public boolean doAction(CustomTableItemChangeEvent<VrachTabel> event) {
 			try {
 				VrachTabel item = event.getItem();
-				item.setPcod(MainForm.tcl.addVT(event.getItem()));
+				item.setPcod(MainForm.tcl.addVT(event.getItem(), tableVrachInfo.getSelectedItem().pcod, tableVrachInfo.getSelectedItem().cdol, MainForm.authInfo.cpodr));
 				int cnt = 0;
 				for (int i = 0; i < tableVrachTabel.getData().size(); i++) {
 					if ((tableVrachTabel.getData().get(i).pcod == event.getItem().pcod) && (++cnt == 2))
@@ -168,11 +137,9 @@ public void initialize() {
     });
 	
 	JPanel butPanel = new JPanel();
-		butPanel.setLayout(new GridLayout(1, 3, 5, 0) );
-		
-		JButton butCreate = new JButton("Добавить");
+		JButton butCreate = new JButton("");
+		butCreate.setIcon(new ImageIcon(tableVrach.class.getResource("/ru/nkz/ivcgzo/clientOutPutInfo/resources/1331789242_Add.png")));
 		butCreate.addMouseListener(new MouseAdapter() {
-			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				try{
 					tableVrachTabel.requestFocus();
@@ -182,9 +149,55 @@ public void initialize() {
                 }
 			}
 		});
-		butPanel.add(butCreate);
 		
-		JButton butDelete = new JButton("Удалить");
+		JButton butSave = new JButton("");
+		butSave.setIcon(new ImageIcon(tableVrach.class.getResource("/ru/nkz/ivcgzo/clientOutPutInfo/resources/1341981970_Accept.png")));
+		butSave.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent arg0) {
+                try{
+                    tableVrachTabel.updateSelectedItem();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+		
+		try {
+			vrach = MainForm.tcl.getVrachTableInfo(codPodr);
+			tableVrachInfo.setData(vrach);
+		} catch (KmiacServerException e1) {
+			e1.printStackTrace();
+		} catch (TException e1) {
+			e1.printStackTrace();
+		}
+		
+		GroupLayout groupLayout = new GroupLayout(this);
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(vrPane, GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(timePane, GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE))
+						.addComponent(butPanel, GroupLayout.PREFERRED_SIZE, 167, GroupLayout.PREFERRED_SIZE))
+					.addGap(5))
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(butPanel, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(vrPane, GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
+						.addComponent(timePane, GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE))
+					.addContainerGap())
+		);
+		
+		JButton butDelete = new JButton("");
+		butDelete.setIcon(new ImageIcon(tableVrach.class.getResource("/ru/nkz/ivcgzo/clientOutPutInfo/resources/1331789259_Delete.png")));
 		butDelete.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent arg0) {
                 try{
@@ -195,42 +208,27 @@ public void initialize() {
                 }
             }
         });
-		butPanel.add(butDelete);
-		
-		JButton butSave = new JButton("Сохранить");
-		butSave.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-                try{
-                    tableVrachTabel.updateSelectedItem();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-		
-		
-		
-		butPanel.add(butSave);
-		
-		GroupLayout groupLayout = new GroupLayout(this);
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addComponent(vrPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(butPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-				.addComponent(timePane, GroupLayout.DEFAULT_SIZE, 764, Short.MAX_VALUE)
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(butPanel, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
-						.addComponent(vrPane, GroupLayout.PREFERRED_SIZE, 151, GroupLayout.PREFERRED_SIZE))
+		GroupLayout gl_butPanel = new GroupLayout(butPanel);
+		gl_butPanel.setHorizontalGroup(
+			gl_butPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_butPanel.createSequentialGroup()
+					.addComponent(butCreate, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(timePane, GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE))
+					.addComponent(butSave, 50, 50, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(butDelete, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+					.addGap(79))
 		);
+		gl_butPanel.setVerticalGroup(
+			gl_butPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_butPanel.createSequentialGroup()
+					.addGroup(gl_butPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(butCreate, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+						.addComponent(butSave, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+						.addComponent(butDelete, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(112, Short.MAX_VALUE))
+		);
+		butPanel.setLayout(gl_butPanel);
 		setLayout(groupLayout);
 }
 }

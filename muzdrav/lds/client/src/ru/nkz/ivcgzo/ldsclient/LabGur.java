@@ -15,12 +15,20 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 
+import org.apache.thrift.TException;
+
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.ldsThrift.InputLG;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class LabGur extends JFrame {
@@ -80,17 +88,33 @@ public class LabGur extends JFrame {
 		JButton btnNewButton = new JButton("Выполнить");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				try {
+					InputLG ilabgur = new InputLG();
 				
-				InputLG ilabgur = new InputLG();
+					ilabgur.setDaten(tFdvn.getDate().getTime());
+					ilabgur.setDatek(tFdvk.getDate().getTime());
+					//ilabgur.setDatek(Date.parse(String.valueOf(tFdvk.getDate())));
 				
-				ilabgur.setDaten(Date.parse(String.valueOf(tFdvn.getDate())));
-				ilabgur.setDatek(Date.parse(String.valueOf(tFdvk.getDate())));
-				
-				ilabgur.setC_nz1(cBpcislLG.getSelectedPcod());
-				ilabgur.setKotd(MainForm.authInfo.cpodr);
-				
-				
-				
+					ilabgur.setC_nz1(cBpcislLG.getSelectedPcod());
+					ilabgur.setKotd(MainForm.authInfo.cpodr);
+					//OutputTest ot = new OutputTest();
+					String servPath;
+					
+					servPath = MainForm.ltc.printLabGur(ilabgur);
+					
+					System.out.println(ilabgur);
+					System.out.println(servPath);
+					
+					String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
+					MainForm.conMan.transferFileFromServer(servPath, cliPath);
+					MainForm.conMan.openFileInEditor(cliPath, true);
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				
 			}
 		});

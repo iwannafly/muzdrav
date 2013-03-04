@@ -19,7 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
@@ -89,16 +89,16 @@ public class FormRdDin extends JFrame {
 	private JCheckBox ChBot3;
 	private JCheckBox ChBot4;
 	private int oslrod;
-    JSpinner SSrok ;
-	JSpinner SVes;
-	JSpinner SOkrj;
-	JSpinner SVdm;
-	JSpinner SPsad;
-	JSpinner SLdad;
-	JSpinner SLsad;
-	JSpinner STolP;
-	JSpinner SChcc;
-	JSpinner SPdad;
+	private JTextField SSrok ;
+	private JTextField SVes;
+	private JTextField SOkrj;
+	private JTextField SVdm;
+	private JTextField SPsad;
+	private JTextField SLdad;
+	private JTextField SLsad;
+	private JTextField STolP;
+	private JTextField SChcc;
+	private JTextField SPdad;
 	
 
 	/**
@@ -151,9 +151,8 @@ public class FormRdDin extends JFrame {
 		JLabel LSerd = new JLabel("Сердцебиение плода");
 		LSerd.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		SChcc = new JSpinner();
+		SChcc = new JTextField();
 		SChcc.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SChcc.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
  		
 		CBPolPl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
 		CBPolPl.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -170,36 +169,28 @@ public class FormRdDin extends JFrame {
 		SDataPos = new CustomDateEditor();
 		SDataPos.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
-        SSrok = new JSpinner();
+        SSrok = new JTextField();
         SSrok.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SSrok.setModel(new SpinnerNumberModel(0, 0, 42, 1));
 		
-		SVes = new JSpinner();
+		SVes = new JTextField();
 		SVes.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SVes.setModel(new SpinnerNumberModel(new Double(0), new Double(0), null, new Double(1)));
 		
-		SOkrj = new JSpinner();
+		SOkrj = new JTextField();
 		SOkrj.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SOkrj.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
 		
-		SVdm = new JSpinner();
+		SVdm = new JTextField();
 		SVdm.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SVdm.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
 		
-		SPsad = new JSpinner();
+		SPsad = new JTextField();
 		SPsad.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SPsad.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
 		
-		SLdad = new JSpinner();
+		SLdad = new JTextField();
 		SLdad.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SLdad.setModel(new SpinnerNumberModel(0, 0, 220, 1));
 		
-		SLsad = new JSpinner();
+		SLsad = new JTextField();
 		SLsad.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SLsad.setModel(new SpinnerNumberModel(0, 0, 120, 1));
 		
-		STolP = new JSpinner();
-		STolP.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
+		STolP = new JTextField();
 		setBounds(100, 100, 810, 600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -215,9 +206,8 @@ public class FormRdDin extends JFrame {
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
-		SPdad = new JSpinner();
+		SPdad = new JTextField();
 		SPdad.setFont(new Font("Tahoma", Font.BOLD, 12));
-		SPdad.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -289,26 +279,16 @@ public class FormRdDin extends JFrame {
 				rddin.setGrr(0);
 				rddin.setBall(0);
 				rddin.setOteki(oslrod);
-				rddin.setArt1((int) SPdad.getModel().getValue());
-				if ( (int) SPdad.getModel().getValue() == 0) rddin.setArt1(120);
-				rddin.setArt2((int) SPsad.getModel().getValue());
-				if ( (int) SLdad.getModel().getValue() == 0) rddin.setArt2(80);
-				rddin.setArt3((int) SLdad.getModel().getValue());
-				if ( (int) SLdad.getModel().getValue() == 0) rddin.setArt3(120);
-				rddin.setArt4((int) SLsad.getModel().getValue());
-				if ( (int) SLdad.getModel().getValue() == 0) rddin.setArt4(80);
-				rddin.setChcc((int) SChcc.getModel().getValue());
-				if ( (int) SChcc.getModel().getValue() == 0) rddin.setChcc(0);
-				rddin.setHdm((int) SVdm.getModel().getValue());
-				if ( (int) SVdm.getModel().getValue() == 0) rddin.setHdm(20);
-				rddin.setOj((int) SOkrj.getModel().getValue());
-				if ( (int) SOkrj.getModel().getValue() == 0) rddin.setOj(100);
-  		        rddin.setSpl((int) STolP.getModel().getValue());
-				if ( (int) STolP.getModel().getValue() == 0) rddin.setSpl(2);
-			    rddin.setSrok((int) SSrok.getModel().getValue());
-				if ( (int) SSrok.getModel().getValue() == 0) rddin.setSrok(4);
-				rddin.setVes((double) SVes.getModel().getValue());
-				if ( (double) SVes.getModel().getValue() == 0) rddin.setVes(60);
+				rddin.setArt1(Integer.valueOf(SPdad.getText()));
+				rddin.setArt2(Integer.valueOf(SPsad.getText()));
+				rddin.setArt3(Integer.valueOf(SLdad.getText()));
+				rddin.setArt4(Integer.valueOf(SLsad.getText()));
+				rddin.setChcc(Integer.valueOf(SChcc.getText()));
+				rddin.setHdm(Integer.valueOf(SVdm.getText()));
+				rddin.setOj(Integer.valueOf(SOkrj.getText()));
+  		        rddin.setSpl(Integer.valueOf(STolP.getText()));
+			    rddin.setSrok(Integer.valueOf(SSrok.getText()));
+				rddin.setVes(Double.valueOf(SVes.getText()));
 				if (CBPredPl.getSelectedPcod() != null)
 					rddin.setPredpl(CBPredPl.getSelectedPcod());
 					else rddin.unsetPredpl();
@@ -371,17 +351,17 @@ try {
 			if (mes == 1) br = br+1;
 			if (mes == 2) br = br+1;
 			if (mes == 12) br = br+1;
-			rddin.setArt1((int) SPdad.getModel().getValue());
-			rddin.setArt2((int) SPsad.getModel().getValue());
-			rddin.setArt3((int) SLdad.getModel().getValue());
-			rddin.setArt4((int) SLsad.getModel().getValue());
-			rddin.setChcc((int) SChcc.getModel().getValue());
-			rddin.setHdm((int) SVdm.getModel().getValue());
-			rddin.setOj((int) SOkrj.getModel().getValue());
-			rddin.setSpl((int) STolP.getModel().getValue());
-			rddin.setSrok((int) SSrok.getModel().getValue());
-			rddin.setVes((double) SVes.getModel().getValue());
-			ves = (double) SVes.getModel().getValue();
+			rddin.setArt1(Integer.valueOf(SPdad.getText()));
+			rddin.setArt2(Integer.valueOf(SPsad.getText()));
+			rddin.setArt3(Integer.valueOf(SLdad.getText()));
+			rddin.setArt4(Integer.valueOf(SLsad.getText()));
+			rddin.setChcc(Integer.valueOf(SChcc.getText()));
+			rddin.setHdm(Integer.valueOf(SVdm.getText()));
+			rddin.setOj(Integer.valueOf(SOkrj.getText()));
+			rddin.setSpl(Integer.valueOf(STolP.getText()));
+			rddin.setSrok(Integer.valueOf(SSrok.getText()));
+			rddin.setVes(Double.valueOf(SVes.getText()));
+			ves = Double.valueOf(SVes.getText());
 			rddin.setGrr(0);
 		if (CBPredPl.getSelectedPcod() != null)
 			rddin.setPredpl(CBPredPl.getSelectedPcod());
@@ -687,16 +667,16 @@ try {
 //					tablePos.setRequestFocusEnabled(false);
 //					tablePos.setRowMargin(tablePos.getRowCount() -1);
 					SDataPos.setDate(rddin.getDatap());
-					SSrok.setValue(rddin.getSrok());
-					SVes.setValue(rddin.getVes());
-					SOkrj.setValue(rddin.getOj());
-					SVdm.setValue(rddin.getHdm());
-					SPdad.setValue(rddin.getArt1());
-					SPsad.setValue(rddin.getArt2());
-					SLdad.setValue(rddin.getArt3());
-					SLsad.setValue(rddin.getArt4());
-					SChcc.setValue(rddin.getChcc());
-					STolP.setValue(rddin.getSpl());
+					SSrok.setText(String.valueOf(rddin.getSrok()));
+					SVes.setText(String.valueOf(rddin.getVes()));
+					SOkrj.setText(String.valueOf(rddin.getOj()));
+					SVdm.setText(String.valueOf(rddin.getHdm()));
+					SPdad.setText(String.valueOf(rddin.getArt1()));
+					SPsad.setText(String.valueOf(rddin.getArt2()));
+					SLdad.setText(String.valueOf(rddin.getArt3()));
+					SLsad.setText(String.valueOf(rddin.getArt4()));
+					SChcc.setText(String.valueOf(rddin.getChcc()));
+					STolP.setText(String.valueOf(rddin.getSpl()));
 					
 					if (rddin.isSetPredpl())
 						CBPredPl.setSelectedPcod(rddin.getPredpl());
@@ -754,25 +734,25 @@ try {
 //		rddin.setNpasp(Vvod.pvizitAmb.npasp);
 //		rddin.setId_pos(Vvod.pvizitAmb.id);
 //		rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
-	ves = (double) SVes.getModel().getValue();
+	ves = Double.valueOf(SVes.getText());
 	if (ves == 0) ves = 60; 
-	chcc = (int) SChcc.getModel().getValue();
+	chcc = Integer.valueOf(SChcc.getText());
 	if (chcc == 0) chcc = 110; 
-	hdm = (int) SVdm.getModel().getValue();
+	hdm = Integer.valueOf(SVdm.getText());
 	if (hdm == 0) hdm = 20;
-	oj = (int) SOkrj.getModel().getValue();
+	oj = Integer.valueOf(SOkrj.getText());
 	if (oj == 0) oj = 90; 
-	spl = (int) STolP.getModel().getValue();
+	spl = Integer.valueOf(STolP.getText());
 	if (spl == 0) spl = 2;
-	srok = (int) SSrok.getModel().getValue();
+	srok = Integer.valueOf(SSrok.getText());
 	if (srok == 0)srok = 8;
-	iw1 = (int) SLdad.getModel().getValue();
+	iw1 = Integer.valueOf(SLdad.getText());
 	if (iw1 == 0) iw1 = 120;
-	iw2 = (int) SLsad.getModel().getValue();
+	iw2 = Integer.valueOf(SLsad.getText());
 	if (iw2 == 0) iw2 = 80;
-	iw3 = (int) SPdad.getModel().getValue();
+	iw3 = Integer.valueOf(SPdad.getText());
 	if (iw3 == 0) iw3 = 120;
-	iw4 = (int) SPsad.getModel().getValue();
+	iw4 = Integer.valueOf(SPsad.getText());
 	if (iw4 == 0) iw4 = 80;
 //	polplname = rddin.getPolpl();
 //	predname = rddin.getPredpl();

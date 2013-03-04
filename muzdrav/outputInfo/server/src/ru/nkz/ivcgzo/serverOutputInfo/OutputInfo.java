@@ -1,22 +1,7 @@
 package ru.nkz.ivcgzo.serverOutputInfo;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.IntBuffer;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
@@ -24,16 +9,9 @@ import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
-import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
-import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
-import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
-import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
-import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputFacZd;
@@ -47,8 +25,6 @@ import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo.Iface;
 import ru.nkz.ivcgzo.thriftOutputInfo.UchException;
 import ru.nkz.ivcgzo.thriftOutputInfo.UchastokInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.UchastokNum;
-import ru.nkz.ivcgzo.thriftOutputInfo.VINotFoundException;
-import ru.nkz.ivcgzo.thriftOutputInfo.VTDuplException;
 import ru.nkz.ivcgzo.thriftOutputInfo.VTException;
 import ru.nkz.ivcgzo.thriftOutputInfo.VrachInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.VrachTabel;
@@ -110,21 +86,22 @@ public class OutputInfo extends Server implements Iface {
 	// Табель врача
 	@Override
 	public List<VrachInfo> getVrachTableInfo(int cpodr)
-			throws VINotFoundException, KmiacServerException, TException {
+		throws KmiacServerException, TException {
 		return new serverVrachInfo (sse, tse).getVrachTableInfo(cpodr);
 	}
 
 	@Override
-	public List<VrachTabel> getVrachTabel(int pcod) throws VTException,
-			VTDuplException, KmiacServerException, TException {
-		return new serverVrachInfo (sse, tse).getVrachTabel(pcod);
+	public List<VrachTabel> getVrachTabel(int pcod, String cdol) throws VTException,
+			KmiacServerException, TException {
+		serverVrachInfo svi = new serverVrachInfo (sse, tse);
+		return svi.getVrachTabel(pcod,cdol);
 	}
 
 	@Override
-	public int addVT(VrachTabel vt) throws VTException, VTDuplException,
+	public int addVT(VrachTabel vt, int pcod,String cdol, int cpodr) throws VTException,
 			KmiacServerException, TException {
 		serverVrachInfo svi = new serverVrachInfo (sse, tse);
-		return svi.addVT(vt);
+		return svi.addVT(vt, pcod, cdol, cpodr);
 	}
 
 	@Override
@@ -237,4 +214,36 @@ public class OutputInfo extends Server implements Iface {
 			thrServ.stop();
 	}
 
+	@Override
+	public int getId() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getPort() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+//	@Override
+//	public int getId() {
+//		return configuration.appId;
+//	}
+//	
+//	@Override
+//	public int getPort() {
+//		return configuration.thrPort;
+//	}
+//	
+//	@Override
+//	public String getName() {
+//		return configuration.appName;
+//	}
 }

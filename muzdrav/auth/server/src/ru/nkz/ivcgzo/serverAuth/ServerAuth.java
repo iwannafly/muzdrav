@@ -47,6 +47,21 @@ public class ServerAuth extends Server implements Iface {
 	}
 
 	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
+	@Override
 	public void start() throws Exception {
 		try {
 			remInst.startListen();
@@ -91,6 +106,11 @@ public class ServerAuth extends Server implements Iface {
 					break;
 				case 3:
 					cpodrTableName = "n_lds";
+					n00KategField = "''::character varying(1)";
+					break;
+				case 4:
+				case 5:
+					cpodrTableName = "n_t40";
 					n00KategField = "''::character varying(1)";
 					break;
 				default:

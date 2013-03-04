@@ -96,6 +96,7 @@ public class ReservedTalonsFrame extends InfomatFrame {
         tbTalons = new JTable();
         tbTalons.setDefaultRenderer(String.class, new ReservedTalonTableCellRenderer());
         tbTalons.setRowHeight(TABLE_ROW_HEIGHT);
+        tbTalons.getTableHeader().setReorderingAllowed(false);
         spTalon.setViewportView(tbTalons);
     }
 

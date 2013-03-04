@@ -2,10 +2,8 @@ package ru.nkz.ivcgzo.serverInfomat;
 
 import java.io.File;
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -18,6 +16,7 @@ import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.serverManager.serverManager;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
@@ -32,6 +31,7 @@ import ru.nkz.ivcgzo.thriftInfomat.OmsNotValidException;
 import ru.nkz.ivcgzo.thriftInfomat.PatientHasSomeReservedTalonsOnThisDay;
 import ru.nkz.ivcgzo.thriftInfomat.ReleaseTalonOperationFailedException;
 import ru.nkz.ivcgzo.thriftInfomat.ReserveTalonOperationFailedException;
+import ru.nkz.ivcgzo.thriftInfomat.SomebodyElseReservedThisTalon;
 import ru.nkz.ivcgzo.thriftInfomat.TPatient;
 import ru.nkz.ivcgzo.thriftInfomat.TSheduleDay;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
@@ -109,6 +109,21 @@ public class ServerInfomat extends Server implements Iface {
         // TODO Сохранение конфигурации пользователя. ХЗ что тут должно быть.
     }
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
 ////////////////////////      Start/Stop Methods    /////////////////////////////
 
     @Override
@@ -131,11 +146,12 @@ public class ServerInfomat extends Server implements Iface {
 ///////////////////////       Select Methods    //////////////////////////////////
 
     @Override
-    public final List<IntegerClassifier> getPoliclinics() throws KmiacServerException {
+    public final List<IntegerClassifier> getPoliclinicsTalon() throws KmiacServerException {
         final String sqlQuery = "SELECT DISTINCT ON (n_n00.pcod) n_n00.pcod, "
             + "(n_m00.name_s || ', ' || n_n00.name) as name "
             + "FROM n_n00 INNER JOIN n_m00 ON n_m00.pcod = n_n00.clpu "
-            + "INNER JOIN e_talon ON n_n00.pcod = e_talon.cpol;";
+            + "INNER JOIN e_talon e ON n_n00.pcod = e.cpol "
+            + "WHERE ((e.datap > CURRENT_DATE) OR (e.datap = CURRENT_DATE AND e.timep > CURRENT_TIME));";
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmIntClassifier.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
@@ -145,13 +161,14 @@ public class ServerInfomat extends Server implements Iface {
     }
 
     @Override
-    public final List<StringClassifier> getSpecialities(final int cpol)
+    public final List<StringClassifier> getSpecialitiesTalon(final int cpol)
             throws KmiacServerException {
         final String sqlQuery = "SELECT DISTINCT ON (n_s00.pcod) n_s00.pcod, n_s00.name "
                 + "FROM n_s00 "
-                + "INNER JOIN e_talon ON n_s00.pcod = e_talon.cdol "
-                + "WHERE e_talon.cpol = ? AND e_talon.prv = ? AND "
-                + "((e_talon.npasp = 0) OR (e_talon.npasp is null));";
+                + "INNER JOIN e_talon e ON n_s00.pcod = e.cdol "
+                + "WHERE e.cpol = ? AND e.prv = ? AND "
+                + "((e.npasp = 0) OR (e.npasp is null)) AND "
+                + "((e.datap > CURRENT_DATE) OR (e.datap = CURRENT_DATE AND e.timep > CURRENT_TIME));";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpol, 0)) {
             return rsmStrClassifier.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
@@ -161,23 +178,14 @@ public class ServerInfomat extends Server implements Iface {
     }
 
     @Override
-    public final List<IntegerClassifier> getDoctors(final int cpol, final String cdol)
+    public final List<IntegerClassifier> getDoctorsTalon(final int cpol, final String cdol)
             throws KmiacServerException {
-        final String sqlQuery = "SELECT DISTINCT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot "
-                + "FROM s_vrach INNER JOIN e_talon ON s_vrach.pcod = e_talon.pcod_sp "
-                + "WHERE e_talon.cpol = ? AND e_talon.cdol = ?;";
+        final String sqlQuery = "SELECT DISTINCT s_vrach.pcod, s_vrach.fam || ' ' || s_vrach.im || ' ' || s_vrach.ot AS name "
+                + "FROM s_vrach INNER JOIN e_talon e ON s_vrach.pcod = e.pcod_sp "
+                + "WHERE e.cpol = ? AND e.cdol = ? AND "
+                + "((e.datap > CURRENT_DATE) OR (e.datap = CURRENT_DATE AND e.timep > CURRENT_TIME));";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpol, cdol)) {
-            List<IntegerClassifier> tmpList = new ArrayList<IntegerClassifier>();
-            ResultSet rs = acrs.getResultSet();
-            while (rs.next()) {
-                tmpList.add(
-                    new IntegerClassifier(
-                        rs.getInt(1),
-                        String.format("%s %s %s", rs.getString(2), rs.getString(3), rs.getString(4))
-                    )
-                );
-            }
-            return tmpList;
+        	return rsmIntClassifier.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQL Exception: ", e);
             throw new KmiacServerException();
@@ -208,7 +216,7 @@ public class ServerInfomat extends Server implements Iface {
     @Override
     public final void reserveTalon(final TPatient pat, final TTalon talon)
             throws KmiacServerException, ReserveTalonOperationFailedException,
-            PatientHasSomeReservedTalonsOnThisDay {
+            PatientHasSomeReservedTalonsOnThisDay, SomebodyElseReservedThisTalon {
         final int prv = 3;
         // java.sql.Date не имеет нулевого конструктора, а preparedUpdate() не работает с
         // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
@@ -216,13 +224,16 @@ public class ServerInfomat extends Server implements Iface {
         final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, "
             + "prv = ?, id_pvizit = nextval('p_vizit_id_seq') "
             + "WHERE  id = ?;";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
+        try (SqlModifyExecutor sme = tse.startTransaction();
+        		AutoCloseableResultSet acrs = sme.execPreparedQuery("SELECT t.npasp FROM e_talon t WHERE t.id = ? AND t.npasp != 0 ", talon.id)) {
+        	if (acrs.getResultSet().next())
+        		throw new SomebodyElseReservedThisTalon();
             if (!isPatientAlreadyReserveTalonOnThisDay(pat, talon)) {
-                int numUpdated = 0;
-                numUpdated = sme.execPreparedUpdate(sqlQuery, false, pat.getId(),
+                int numUpdated = sme.execPreparedUpdate(sqlQuery, false, pat.getId(),
                     new Date(todayMillisec), prv, talon.getId());
                 if (numUpdated == 1) {
-                    sme.setCommit();
+                    sme.commitTransaction();
+                    serverManager.instance.getServerById(18).executeServerMethod(1801, talon.id);
                 } else {
                     sme.rollbackTransaction();
                     throw new ReserveTalonOperationFailedException();
@@ -233,7 +244,10 @@ public class ServerInfomat extends Server implements Iface {
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQL Exception: ", e);
             throw new KmiacServerException();
-        }
+        } catch (Exception e) {
+        	e.printStackTrace();
+            throw new KmiacServerException();
+		}
     }
 
     @Override
@@ -303,6 +317,7 @@ public class ServerInfomat extends Server implements Iface {
                 sqlQuery, false, defaultNpasp, null, defaultPrv, defaultIdPVizit, talon.getId());
             if (numUpdated == 1) {
                 sme.setCommit();
+                serverManager.instance.getServerById(18).executeServerMethod(1802, talon.id);
             } else {
                 sme.rollbackTransaction();
                 throw new ReleaseTalonOperationFailedException();
@@ -310,16 +325,71 @@ public class ServerInfomat extends Server implements Iface {
         } catch (SqlExecutorException | InterruptedException e) {
             log.log(Level.ERROR, "SQL Exception: ", e);
             throw new KmiacServerException();
-        }
+        } catch (Exception e) {
+        	e.printStackTrace();
+            throw new KmiacServerException();
+		}
     }
+
+	@Override
+	public List<IntegerClassifier> getPoliclinicsSchedule()
+			throws KmiacServerException, TException {
+        final String sqlQuery = "SELECT DISTINCT ON (n.pcod) n.pcod, (m.name_s || ', ' || n.name) AS name " +
+        		"FROM e_nrasp r " +
+        		"JOIN n_n00 n ON (n.pcod = r.cpol) " +
+        		"JOIN n_m00 m ON (m.pcod = n.clpu) " +
+        		"WHERE (r.time_n IS DISTINCT FROM '00:00:00' AND r.time_k IS DISTINCT FROM '00:00:00')" +
+        		"ORDER BY n.pcod ";
+            try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+                return rsmIntClassifier.mapToList(acrs.getResultSet());
+            } catch (SQLException e) {
+                log.log(Level.ERROR, "SQL Exception: ", e);
+                throw new KmiacServerException();
+            }
+	}
+
+	@Override
+	public List<StringClassifier> getSpecialitiesSchedule(int cpol)
+			throws KmiacServerException, TException {
+        final String sqlQuery = "SELECT DISTINCT s.pcod, s.name " +
+        		"FROM e_nrasp r JOIN n_s00 s ON (s.pcod = r.cdol) " +
+        		"WHERE (r.cpol = ?) AND (r.time_n IS DISTINCT FROM '00:00:00' AND r.time_k IS DISTINCT FROM '00:00:00') " +
+        		"ORDER BY s.name ";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpol)) {
+            return rsmStrClassifier.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
+        }
+	}
+
+	@Override
+	public List<IntegerClassifier> getDoctorsSchedule(int cpol, String cdol)
+			throws KmiacServerException, TException {
+        final String sqlQuery = "SELECT DISTINCT v.pcod, v.fam, v.im, v.ot, v.fam || ' ' || v.im || ' ' || v.ot AS name " +
+        		"FROM e_nrasp r " +
+        		"JOIN s_vrach v ON (v.pcod = r.pcod)" +
+        		" WHERE (r.cpol = ?) AND (r.cdol = ?) AND (r.time_n IS DISTINCT FROM '00:00:00' AND r.time_k IS DISTINCT FROM '00:00:00') " +
+        		"ORDER BY v.fam, v.im, v.ot ";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpol, cdol)) {
+        	return rsmIntClassifier.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
+        }
+	}
 
     @Override
     public final List<TSheduleDay> getShedule(final int pcod, final int cpol, final String cdol)
             throws KmiacServerException {
-        final String sqlQuery = "SELECT time_n, time_k, vidp, denn "
-            + "FROM e_nrasp WHERE pcod =? AND cpol = ? AND cdol = ? ORDER BY time_n";
+        final String sqlQuery = "WITH t AS ( " +
+            	"(SELECT DISTINCT ON (denn) id, denn, time_n, time_k FROM e_nrasp WHERE cpol = ? AND cdol = ? AND pcod = ? AND (time_n IS DISTINCT FROM '00:00:00' AND time_k IS DISTINCT FROM '00:00:00') ORDER BY denn, time_n) " +
+                "UNION ALL " +
+            	"(SELECT DISTINCT ON (denn) id, denn, time_n, time_k FROM e_nrasp WHERE cpol = ? AND cdol = ? AND pcod = ? AND (time_n IS DISTINCT FROM '00:00:00' AND time_k IS DISTINCT FROM '00:00:00') ORDER BY denn, time_k DESC) " +
+            	"ORDER BY denn) " +
+            	"SELECT denn, min(time_n) AS time_n, max(time_k) AS time_k, 0 AS vidp FROM t GROUP BY denn ORDER BY denn ";
         try (AutoCloseableResultSet acrs =
-                sse.execPreparedQuery(sqlQuery, pcod, cpol, cdol)) {
+                sse.execPreparedQuery(sqlQuery, cpol, cdol, pcod, cpol, cdol, pcod)) {
             return rsmSheduleDay.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQL Exception: ", e);

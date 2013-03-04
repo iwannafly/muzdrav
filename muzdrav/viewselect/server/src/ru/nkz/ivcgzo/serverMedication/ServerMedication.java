@@ -43,7 +43,7 @@ public class ServerMedication extends Server implements Iface {
     };
     private static final String[] LEK_FIELD_NAMES = {
         "nlek", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed", "sposv",
-        "spriem", "pereod", "dlitkl", "komm", "datao", "vracho", "dataz"
+        "spriem", "pereod", "datae", "komm", "datao", "vracho", "dataz"
     };
     private static final String[] LEK_PRIEM_FIELD_NAMES = {
         "id", "nlek", "datap", "timep", "status"
@@ -59,8 +59,8 @@ public class ServerMedication extends Server implements Iface {
         Integer.class, Integer.class, Integer.class, Date.class, Integer.class,
     //  flek          doza           ed             sposv
         String.class, Integer.class, Integer.class, Integer.class,
-    //  spriem         pereod         dlitkl         komm
-        Integer.class, Integer.class, Integer.class, String.class,
+    //  spriem         pereod         datae         komm
+        Integer.class, Integer.class, Date.class, String.class,
     //  datao       vracho         dataz
         Date.class, Integer.class, Date.class
     };
@@ -112,6 +112,21 @@ public class ServerMedication extends Server implements Iface {
         // TODO Auto-generated method stub
     }
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
     @Override
     public List<IntegerClassifier> getMedications() throws KmiacServerException {
         String sqlQuery = "SELECT pcod, name FROM n_med ORDER BY name;";
@@ -224,7 +239,7 @@ public class ServerMedication extends Server implements Iface {
     public int addLek(Lek lek) throws KmiacServerException {
         final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         final String sqlQuery = "INSERT INTO c_lek (id_gosp, vrach, datan, klek,"
-            + "flek, doza, ed, sposv, spriem, pereod, dlitkl, komm, datao, vracho, dataz) "
+            + "flek, doza, ed, sposv, spriem, pereod, datae, komm, datao, vracho, dataz) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, true, lek,
@@ -240,7 +255,7 @@ public class ServerMedication extends Server implements Iface {
 
     @Override
     public void deleteLek(int nlek) throws KmiacServerException  {
-        final String sqlQuery = "DELETE FROM c_lek WHERE nlek = ?";
+        final String sqlQuery = "DELETE FROM c_lek WHERE (nlek = ?)";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared(sqlQuery, false, nlek);
             sme.setCommit();

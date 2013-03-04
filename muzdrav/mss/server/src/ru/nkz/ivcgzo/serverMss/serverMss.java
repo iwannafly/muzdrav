@@ -144,6 +144,21 @@ public class serverMss extends Server implements Iface {
 	}
 
 	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return configuration.thrPort;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
+	@Override
 	public P_smert getPsmert(int npasp) throws MssNotFoundException, TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_smert WHERE npasp = ? ", npasp)) {
 			if (acrs.getResultSet().next())

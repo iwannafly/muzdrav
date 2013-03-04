@@ -176,7 +176,7 @@ public class PIslForm {
 				
 				
 			String path;
-			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = "c:\\1\\123.htm"), "utf-8")) {
+			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = "c:\\Протокол\\123.htm"), "utf-8")) {
 
 			//	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
 					//AutoCloseableResultSet acrs;
@@ -418,9 +418,9 @@ public class PIslForm {
 				pisl_ld.setVopl(2);
 				pisl_ld.setDataz(System.currentTimeMillis());				
 				pisl_ld.setCuser(MainForm.authInfo.pcod);
+				pisl_ld.setKod_ter(10);
 				
-				
-				//System.out.print(pisl_ld);
+				//System.out.println("Добавление = "+pisl_ld);
 				
 				pisl_ld.setNisl(MainForm.ltc.AddIsl(pisl_ld));
 				tn_ldi.addItem(pisl_ld);
@@ -450,7 +450,9 @@ public class PIslForm {
 					upnisl.setNprob(Integer.parseInt(tFnprob.getText()));
 				}
 				
-				upnisl.setTalon(tFTalon.getText());
+				if (tFTalon.getText() != null){
+					upnisl.setTalon(tFTalon.getText());
+				}
 				
 				upnisl.setPcisl(cBpcisl.getSelectedPcod());
 				
@@ -469,6 +471,8 @@ public class PIslForm {
 				if (cBnapravl.getSelectedPcod() != null){
 					upnisl.setNapravl(cBnapravl.getSelectedPcod());
 				}
+				
+				upnisl.setKod_ter(tn_ldi.getSelectedItem().kod_ter);
 				
 				if (tFnaprotd.getText() != null){	
 					upnisl.setNaprotd(Integer.parseInt(tFnaprotd.getText()));
@@ -491,7 +495,8 @@ public class PIslForm {
 				
 				upnisl.setCuser(cBCuser.getSelectedPcod());
 				
-				//System.out.print(upnisl);
+				//System.out.println("UPDATE = "+upnisl);
+				
 // , , , , , , , , , , , 				
 				MainForm.ltc.UpdIsl(upnisl);
 				
@@ -627,31 +632,46 @@ public class PIslForm {
 							
 							for ( int i = 0; i<sot01.size(); i++){
 								
-								addLbIsl.setNpasp(tn_ldi.getSelectedItem().npasp);
+								/*addLbIsl.setNpasp(tn_ldi.getSelectedItem().npasp);
 								addLbIsl.setNisl(tn_ldi.getSelectedItem().nisl);
-								addLbIsl.setCpok(sot01.get(i).pcod);
+								addLbIsl.setCpok(sot01.get(i).pcod);*/
 								
 								for (int j = 0; j<srS_ot01.size(); j++){
 									
 									if (sot01.get(i).pcod.equals(srS_ot01.get(j).pcod)){
 										//System.out.print(sot01.get(i).pcod+" == "+srS_ot01.get(j).pcod);
+										addLbIsl.setNpasp(tn_ldi.getSelectedItem().npasp);
+										addLbIsl.setNisl(tn_ldi.getSelectedItem().nisl);
+										addLbIsl.setCpok(sot01.get(i).pcod);
 										addLbIsl.setPcod_m(srS_ot01.get(j).c_obst);
 										addLbIsl.setStoim(srS_ot01.get(j).stoim);
-										break;
+	
+										try {
+											
+											MainForm.ltc.AddLIsl(addLbIsl);
+											
+										} catch (LIslExistsException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+										
+										if ((j < srS_ot01.size()-1)&&(!sot01.get(i).pcod.equals(srS_ot01.get(j+1).pcod))){
+											break;
+										} 
 									}
 									
 								}
 								
 								//System.out.print(addLbIsl);
 								//addLbIsl.setNpasp(tn_ldi.getSelectedItem().npasp);
-								try {
-			
+/*								try {
+	
 									MainForm.ltc.AddLIsl(addLbIsl);
 									
 								} catch (LIslExistsException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
-								}
+								}*/
 							}
 							lbIs = MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl,tn_ldi.getSelectedItem().pcisl);
 							
@@ -719,7 +739,7 @@ public class PIslForm {
 		);
 		panel_6.setLayout(gl_panel_6);
 		
-		tn_ldi = new CustomTable<>(false, true, ObInfIsl.class, 2, "Код отделения", 3, "№ пробы", 4, "Орган. и системы", 6, "Дата пост.", 7, "Дата выпол.", 8, "Причина", 9, "Обстоятельства", 10, "Направлен", 11, "Код направ. ЛПУ", 12, "ФИО направ. врача", 13, "Вид оплаты", 14, "Диагноз", 15, "Код врача", 16, "Дата за полнения");
+		tn_ldi = new CustomTable<>(false, true, ObInfIsl.class, 2, "Код отделения", 3, "№ пробы", 4, "Орган. и системы", 6, "Дата пост.", 7, "Дата выпол.", 8, "Причина", 9, "Обстоятельства", 10, "Направлен", 21, "Направлен из города", 11, "Код направ. ЛПУ", 12, "ФИО направ. врача", 13, "Вид оплаты", 14, "Диагноз", 15, "Код врача", 16, "Дата за полнения");
 		tn_ldi.setFillsViewportHeight(true);
 		
 		tn_ldi.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -764,8 +784,11 @@ public class PIslForm {
 					cBpopl.setSelectedItem(null);
 				}
 				
-				cBnapravl.setSelectedPcod(tn_ldi.getSelectedItem().napravl);
-				
+				if(tn_ldi.getSelectedItem().napravl !=0){
+					cBnapravl.setSelectedPcod(tn_ldi.getSelectedItem().napravl);
+				}else{
+					cBnapravl.setSelectedPcod(2);
+				}
 				//if (tn_ldi.getSelectedItem().naprotd != 0)
 				tFnaprotd.setText(String.valueOf(tn_ldi.getSelectedItem().naprotd));
 				
@@ -889,6 +912,7 @@ public class PIslForm {
 					tFnprob.setText(null);
 					tFdiag.setText(null);
 					
+					
 					if(PostPer.tip.equals("Л")){
 						List<LabIsl> nSpis = new ArrayList<>();
 						
@@ -919,7 +943,7 @@ public class PIslForm {
 		
 		tn_ldi.setDateField(3);
 		tn_ldi.setDateField(4);
-		tn_ldi.setDateField(13);
+		tn_ldi.setDateField(14);
 		
 		scrollPane_1.setViewportView(tn_ldi);
 		panel_5.setLayout(gl_panel_5);
@@ -1013,7 +1037,7 @@ public class PIslForm {
 			JLabel lblNewLabel_6 = new JLabel("Кем направлен");
 			lblNewLabel_6.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			
-			JLabel lblNewLabel_7 = new JLabel("Код направившего ЛПУ");
+			JLabel lblNewLabel_7 = new JLabel("Направившее ЛПУ");
 			lblNewLabel_7.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			
 			cBnapravl = new ThriftIntegerClassifierCombobox<>(true);
@@ -1161,10 +1185,27 @@ public class PIslForm {
 							if (res != null)
 								tFnaprotd.setText(String.valueOf(res.pcod));
 						}else{
-								IntegerClassifier res = MainForm.conMan.showIntegerClassifierSelector(IntegerClassifiers.n_m00);
-							
+								/*IntegerClassifier res = MainForm.conMan.showIntegerClassifierSelector(IntegerClassifiers.n_m00);
+								//IntegerClassifier res = MainForm.conMan.showIntegerClassifierSelector(MainForm.ltc.GetKlasNsipol(cBKod_ter.getSelectedPcod()));
 								if (res != null)
-									tFnaprotd.setText(String.valueOf(res.pcod));
+									tFnaprotd.setText(String.valueOf(res.pcod));*/
+							
+							
+		                	int[] res = null;
+		                	if (tFnaprotd.getText() != null )
+		                		res = MainForm.conMan.showPolpTreeForm("Классификатор подразделений ЛПУ", 0, 0, 0);
+		                	else
+		                		res = MainForm.conMan.showPolpTreeForm("Классификатор подразделений ЛПУ", 0, 0, 0);
+		                    if (res != null) {
+		                    	tFnaprotd.setText(Integer.toString(res[2]));
+		                    	//cBKod_ter.setSelectedPcod(res[0]);
+		                    	tn_ldi.getSelectedItem().setKod_ter(res[0]);
+		                    	
+		                    }
+							
+							
+							
+							
 						}
 						
 					}
@@ -1221,7 +1262,7 @@ public class PIslForm {
 			gl_panel_1.setHorizontalGroup(
 				gl_panel_1.createParallelGroup(Alignment.LEADING)
 					.addGroup(gl_panel_1.createSequentialGroup()
-						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 							.addGroup(gl_panel_1.createSequentialGroup()
 								.addGap(121)
 								.addComponent(lblNewLabel)
@@ -1258,12 +1299,13 @@ public class PIslForm {
 								.addComponent(lblNewLabel_6)
 								.addGap(10)
 								.addComponent(cBnapravl, GroupLayout.PREFERRED_SIZE, 217, GroupLayout.PREFERRED_SIZE)
-								.addGap(4)
-								.addComponent(lblNewLabel_7, GroupLayout.PREFERRED_SIZE, 144, GroupLayout.PREFERRED_SIZE)
-								.addGap(4)
-								.addComponent(tFnaprotd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addGap(6)
-								.addComponent(btnnaprotd, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(lblNewLabel_7)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(tFnaprotd, GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(btnnaprotd, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+								.addGap(84))
 							.addGroup(gl_panel_1.createSequentialGroup()
 								.addContainerGap()
 								.addComponent(lblNewLabel_8)
@@ -1272,7 +1314,7 @@ public class PIslForm {
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(lblNewLabel_9, GroupLayout.PREFERRED_SIZE, 76, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(cBvopl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+								.addComponent(cBvopl, GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE))
 							.addGroup(gl_panel_1.createSequentialGroup()
 								.addContainerGap()
 								.addComponent(lblNewLabel_10)
@@ -1285,7 +1327,7 @@ public class PIslForm {
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(label_2)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(cBCuser, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+								.addComponent(cBCuser, 0, 241, Short.MAX_VALUE)))
 						.addGap(50))
 			);
 			gl_panel_1.setVerticalGroup(
@@ -1332,15 +1374,12 @@ public class PIslForm {
 								.addComponent(lblNewLabel_6))
 							.addGroup(gl_panel_1.createSequentialGroup()
 								.addGap(1)
-								.addComponent(cBnapravl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addGroup(gl_panel_1.createSequentialGroup()
-								.addGap(4)
-								.addComponent(lblNewLabel_7))
-							.addGroup(gl_panel_1.createSequentialGroup()
-								.addGap(1)
-								.addComponent(tFnaprotd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addComponent(btnnaprotd))
-						.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+									.addComponent(cBnapravl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addComponent(lblNewLabel_7)
+									.addComponent(tFnaprotd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addComponent(btnnaprotd))))
+						.addGap(8)
 						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
 								.addGroup(gl_panel_1.createSequentialGroup()
@@ -1427,7 +1466,24 @@ public class PIslForm {
 
 				try {
 					if ((cBpcisl.getSelectedItem() != null) && (cBkodisl.getSelectedItem() != null)){
-						cBpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), cBkodisl.getSelectedPcod()));
+						int age = (int) ((tn_ldi.getSelectedItem().datav - tpatient.getSelectedItem().datar) / 31556952000L);
+						
+						
+						if (age < 18 ){
+							cBpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), cBkodisl.getSelectedPcod(),2));
+							
+							if (cBpcod_m.getItemCount()==0)
+								
+								cBpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), cBkodisl.getSelectedPcod(),3));
+						}else{
+							
+							cBpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), cBkodisl.getSelectedPcod(),1));
+							
+							if (cBpcod_m.getItemCount()==0)
+								
+								cBpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), cBkodisl.getSelectedPcod(),3));
+							
+						}
 						
 						//cBpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(2000004, cBpcisl.getSelectedPcod(), cBkodisl.getSelectedPcod()));
 						//System.out.print(cBpcisl.getSelectedPcod() + "  " + cBkodisl.getSelectedPcod());
@@ -1867,6 +1923,7 @@ public class PIslForm {
 		JPanel panel_3 = new JPanel();
 		
 		JPanel panel_8 = new JPanel();
+		panel_8.setVisible(false);
 		
 		JPanel panel_9 = new JPanel();
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
@@ -1989,29 +2046,44 @@ public class PIslForm {
 						
 						if (check == false){
 							
-							nLI.setNisl(tn_ldi.getSelectedItem().nisl);
+							/*nLI.setNisl(tn_ldi.getSelectedItem().nisl);
 							nLI.setNpasp(tn_ldi.getSelectedItem().npasp);
-							nLI.setCpok(dnli.get(i).pcod);
+							nLI.setCpok(dnli.get(i).pcod);*/
 							//nLI.setPcod_m(dnli.get(i).c_obst);
 							
 							for (int j = 0; j<dstoim.size(); j++){
 								
 								if (dnli.get(i).pcod.equals(dstoim.get(j).pcod)){
+									nLI.setNisl(tn_ldi.getSelectedItem().nisl);
+									nLI.setNpasp(tn_ldi.getSelectedItem().npasp);
+									nLI.setCpok(dnli.get(i).pcod);
 									nLI.setPcod_m(dstoim.get(j).c_obst);
 									nLI.setStoim(dstoim.get(j).stoim);
-									break;
+									
+									try {
+										
+										MainForm.ltc.AddLIsl(nLI);
+										
+									} catch (LIslExistsException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+
+									if ((j<dstoim.size()-1)&&(!dnli.get(i).pcod.equals(dstoim.get(j+1).pcod))){
+										break;
+									}
 								}
 								
 							}
 							
-							try {
+/*							try {
 								
 								MainForm.ltc.AddLIsl(nLI);
 								
 							} catch (LIslExistsException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
-							}
+							}*/
 						}
 						
 					}
@@ -2053,8 +2125,10 @@ public class PIslForm {
 		panel_9.setLayout(gl_panel_9);
 		
 		JLabel lblNewLabel_23 = new JLabel("Метод исследования");
+		lblNewLabel_23.setVisible(false);
 		
 		cBLpcod_m = new ThriftStringClassifierCombobox<>(true);
+		cBLpcod_m.setVisible(false);
 		cBLpcod_m.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 			
@@ -2210,8 +2284,27 @@ public class PIslForm {
 				
                 try {
                     if ((cBpcisl.getSelectedItem() != null) && (tlab_isl.getSelectedItem() !=null)){
-                        cBLpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), tlab_isl.getSelectedItem().cpok));
-                        if ((tlab_isl.getSelectedItem().pcod_m != null)&&( tlab_isl.getSelectedItem().pcod_m.trim() !="")){
+                       // cBLpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), tlab_isl.getSelectedItem().cpok));
+    					int age = (int) ((tn_ldi.getSelectedItem().datav - tpatient.getSelectedItem().datar) / 31556952000L);
+    						
+    						
+    					if (age < 18 ){
+    						cBLpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), tlab_isl.getSelectedItem().cpok,2));
+    							
+    						if (cBpcod_m.getItemCount()==0)
+    								
+    							cBLpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), tlab_isl.getSelectedItem().cpok,3));
+    					}else{
+    							
+    						cBpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), cBkodisl.getSelectedPcod(),1));
+    							
+    						if (cBpcod_m.getItemCount()==0)
+    								
+    							cBpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), cBkodisl.getSelectedPcod(),3));
+    							
+    					}
+    						
+                    	if ((tlab_isl.getSelectedItem().pcod_m != null)&&( tlab_isl.getSelectedItem().pcod_m.trim() !="")){
                         	try{
                         		cBLpcod_m.setSelectedPcod(tlab_isl.getSelectedItem().pcod_m);
                         	}catch (Exception e){
@@ -2290,7 +2383,7 @@ public class PIslForm {
 			//tpatient.setData(MainForm.ltc.getPatDat(new SimpleDateFormat("dd.MM.yyyy").parse("14.08.2012").getTime(), 2000004));
 				
 				//System.out.println(System.currentTimeMillis());
-				tpatient.setData(MainForm.ltc.getPatDat(MainForm.authInfo.cpodr));
+				tpatient.setData(MainForm.ltc.getPatDat(MainForm.authInfo.cpodr, System.currentTimeMillis()));
 			
 			//tn_ldi.setData(MainForm.ltc.GetObInfIslt( tpatient.getSelectedItem().npasp, 2000004));
 			if (tpatient.getSelectedItem()!= null){

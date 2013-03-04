@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.util.Properties;
 
+import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
@@ -15,23 +16,96 @@ import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 
 public class ServerAutoProc extends Server {
+	public static final boolean DEBUG = Boolean.valueOf(System.getProperty("isDebug", "true"));
 	private Properties prop;
+	private final JsonHttpTransport jtr;
+	PatientInfoUpdater piUpd;
+	TicketInfoUpdater tiUpd;
 	
 	public ServerAutoProc(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
+		
+		jtr = new JsonHttpTransport();
+		piUpd = new PatientInfoUpdater(jtr, sse, tse);
+		tiUpd = new TicketInfoUpdater(jtr, sse, tse);
+		
+		if (DEBUG)
+			System.out.println("ServerAutoProc DEBUG is set!!!");
 	}
 
+	@Override
+	public int getId() {
+		return configuration.appId;
+	}
+	
+	@Override
+	public int getPort() {
+		return -1;
+	}
+	
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
 	@Override
 	public void start() throws Exception {
 		prop = new Properties();
 		prop.put("charSet","Cp866");
 		Class.forName("com.hxtt.sql.dbf.DBFDriver");
+		
+		if (!ServerAutoProc.DEBUG) {
+			piUpd.start();
+			tiUpd.start();
+		}
 	}
 
 	@Override
 	public void stop() {
+		
 	}
 
+	@Override
+	public Object executeServerMethod(int id, Object... params) throws Exception {
+		String methodName = null;
+		
+		try {
+			switch (id) {
+			case 1801:
+				methodName = "addReceptionTicketToVr42";
+				addReceptionTicketToVr42((int) params[0]);
+				break;
+			case 1802:
+				methodName = "remReceptionTicketFromVr42";
+				remReceptionTicketFromVr42((int) params[0]);
+				break;
+			case 1803:
+				methodName = "addPatientInfoToVr42";
+				piUpd.sendPatientInfoToVr42((int) params[0]);
+				break;
+			default:
+				throw new Exception();
+			}
+			
+			return null;
+		} catch (Exception e) {
+			if (methodName != null)
+				throw new Exception(String.format("Error executing server method with id %d (%s).", id, methodName), e);
+			else
+				throw new Exception(String.format("Unknown server method id %d.", id));
+		}
+	}
+	
+	
+	public void addReceptionTicketToVr42(int etalonId) throws Exception {
+		tiUpd.sendReceptionTicketToVr42(etalonId, 1);
+	}
+	
+	public void remReceptionTicketFromVr42(int etalonId) throws Exception {
+		tiUpd.sendReceptionTicketToVr42(etalonId, 2);
+	}
+	
+	
 	public String getPL(String pl) {
 		String sqlpl;
 		String pathname;

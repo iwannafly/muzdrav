@@ -4,6 +4,7 @@
 	<!-- Создание свойств, используемых далее в текущем скрипте -->
 	<property name="src_server.dir" location="src" />
 	<property name="src_config.dir" location="../config" />
+	<property name="src_json.dir" location="../../../third/JSON-java" />
 	<property name="lib.dir" value="../../../../lib" />
 	<property name="bin_server_manager.dir" location="../../../common/managers/serverManager/bin" />
 	<property name="build.dir" location="bin" />
@@ -31,7 +32,7 @@
 
 	<!-- Компилирование  исходного кода -->
 	<target name="compile" depends="clean,makedir" description="Компиляция">
-		<javac includeantruntime="false" srcdir="${src_server.dir}; ${src_config.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
+		<javac includeantruntime="false" srcdir="${src_server.dir}; ${src_config.dir}; ${src_json.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
 			<classpath refid="build.classpath"/>
 		</javac>
 	</target>
