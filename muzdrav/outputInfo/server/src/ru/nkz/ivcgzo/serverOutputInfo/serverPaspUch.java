@@ -18,6 +18,7 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputPasUch;
+//import ru.nkz.ivcgzo.clientManager;
 
 public class serverPaspUch extends serverTemplate {
 	
@@ -98,7 +99,7 @@ public class serverPaspUch extends serverTemplate {
 		
 		
 		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("test", ".htm").getAbsolutePath()), "utf-8")) {
-			
+			//try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = createReportFile(false,'paspu'), "utf-8")) {	
 			StringBuilder sb = new StringBuilder(0x10000);
 			
 			// Титульный лист

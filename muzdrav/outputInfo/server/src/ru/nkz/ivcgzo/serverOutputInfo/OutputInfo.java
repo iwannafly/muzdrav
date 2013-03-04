@@ -28,6 +28,8 @@ import ru.nkz.ivcgzo.thriftOutputInfo.UchastokNum;
 import ru.nkz.ivcgzo.thriftOutputInfo.VTException;
 import ru.nkz.ivcgzo.thriftOutputInfo.VrachInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.VrachTabel;
+//import ru.nkz.ivcgzo.clientManager.common.DocumentPrinter;
+//import ru.nkz.ivcgzo.clientManager.common.DocumentPrinter;
 //import ru.nkz.ivcgzo.thriftOutputInfo.Input_info;
 
 
