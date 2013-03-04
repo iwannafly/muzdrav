@@ -58,13 +58,11 @@ public class FormRdDin extends JFrame {
 	public static RdInfStruct RdInfStruct;
 	public static RdSlStruct rdSlStruct;
 	private CustomTable<RdDinStruct, RdDinStruct._Fields> tablePos;
-//    private String oslname;
     private String oslcode;
     private int iw1;
     private int iw2;
     private int iw3;
     private int iw4;
-//    private int iw5;
     private int otname;
     private int polplname;
     private int predname;
@@ -107,30 +105,17 @@ public class FormRdDin extends JFrame {
 	public FormRdDin() {
 		setExtendedState(Frame.MAXIMIZED_BOTH);
 		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowOpened(WindowEvent arg0) {
-// 			    fam.setText(Vvod.zapVr.getFam());
-//				im.setText(Vvod.zapVr.getIm());
-//				ot.setText(Vvod.zapVr.getOth());
-//				RdDinStruct rddin = new RdDinStruct();
-//				setDefaultValues();
-//				System.out.println(rddin);
+//			@Override
+//			public void windowOpened(WindowEvent arg0) {
 //				try {
-//					MainForm.tcl.AddRdDin(rddin);
-//				} catch (KmiacServerException | TException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
+//					tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+//				} catch (KmiacServerException e) {
+//					e.printStackTrace();
+//				} catch (TException e) {
+//					MainForm.conMan.reconnect(e);
 //				}
-				try {
-//					SDataPos.setDate(Vvod.pvizitAmb.getDatap());
-					tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
-				} catch (KmiacServerException e) {
-					e.printStackTrace();
-				} catch (TException e) {
-					MainForm.conMan.reconnect(e);
-				}
-				
-			}
+//				
+//			}
 		});
 		setTitle("Динамика диспансерного наблюдения за беременной");
 		setTitle(String.format(" %s - %d, %s %s %s, %6$td.%6$tm.%6$tY ", getTitle(), Vvod.zapVr.getNpasp(), Vvod.zapVr.getFam(), Vvod.zapVr.getIm(), Vvod.zapVr.getOth(),  Vvod.zapVr.getDatar()));
@@ -272,7 +257,6 @@ public class FormRdDin extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 				RdDinStruct rddin = new RdDinStruct();
-				rddin.setDatap(Vvod.zapVr.datap);
 				rddin.setNpasp(Vvod.pvizitAmb.npasp);
 				rddin.setId_pos(Vvod.pvizitAmb.id);
 				rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
@@ -301,12 +285,6 @@ public class FormRdDin extends JFrame {
 				if (CBCerd.getSelectedPcod() != null)
 					rddin.setSerd(CBCerd.getSelectedPcod());
 					else rddin.unsetSerd();
-//				if (CBOteki.getSelectedPcod() != null)
-//					rddin.setOteki(CBOteki.getSelectedPcod());
-//					else rddin.unsetOteki();
-//				if (CBDiag.getSelectedPcod() != null)
-//					rddin.setDspos(CBDiag.getSelectedPcod());
-//					else rddin.setDspos("");
 			System.out.println(rddin);		
 				MainForm.tcl.AddRdDin(rddin);
 				} catch (KmiacServerException e1) {
@@ -316,14 +294,14 @@ public class FormRdDin extends JFrame {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-try {
-	tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
-	if (tablePos.getRowCount() > 0)
-		tablePos.setRowSelectionInterval(tablePos.getRowCount() - 1, tablePos.getRowCount() - 1);
-} catch (TException e1) {
-	// TODO Auto-generated catch block
-	e1.printStackTrace();
-}
+//try {
+//	tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+//	if (tablePos.getRowCount() > 0)
+//		tablePos.setRowSelectionInterval(tablePos.getRowCount() - 1, tablePos.getRowCount() - 1);
+//} catch (TException e1) {
+//	// TODO Auto-generated catch block
+//	e1.printStackTrace();
+//}
 			}
 
 			private void showMessage(RdDinStruct rddin) {
@@ -375,38 +353,20 @@ try {
 		if (CBCerd.getSelectedPcod() != null)
 			rddin.setSerd(CBCerd.getSelectedPcod());
 			else rddin.unsetSerd();
-//		if (CBOteki.getSelectedPcod() != null)
-//			rddin.setOteki(CBOteki.getSelectedPcod());
-//			else rddin.unsetOteki();
 		calcOteci();
 		rddin.setOteki(oslrod);
-//		if (CBDiag.getSelectedPcod() != null)
-//		{	rddin.setDspos(CBDiag.getSelectedPcod());
-//		rddin.setGrr(1);}
-//		    else rddin.setDspos("");
-//		rost = FormPostBer.rdSlStruct.getRost();	
-//		System.out.println(rost);
-//		if (rost<=154) br = br+1;
-//		if (FormRdInf.RdInfStruct.getObr() == 3)  br = br+1; 
-//		if (FormRdInf.RdInfStruct.getObr() == 5)  br = br+1; 
-//		if (FormRdInf.RdInfStruct.getSem() == 3)  br = br+1; 
-//		if (FormRdInf.RdInfStruct.getOsoco() >=1) br = br+1;
-//		if (rost != 0) 
-//		{ves = ves/rost/rost*10000;
-//		if (ves<17) br = br+1;
-//		if (ves>=32) br = br+1;}
 		rddin.setBall(br); 
 			MainForm.tcl.UpdateRdDin(rddin);
 		} catch (TException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 	}
-		try {
-			tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
-		} catch (TException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+//		try {
+//			tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+//		} catch (TException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
 			}
 		});
 		GroupLayout gl_panel = new GroupLayout(panel);
@@ -543,7 +503,6 @@ try {
 		
 		JLabel LtolPlac = new JLabel("Толщина плаценты");
 		LtolPlac.setFont(new Font("Tahoma", Font.PLAIN, 12));
-//		ot.setText(Vvod.zapVr.oth);
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -662,11 +621,6 @@ try {
 			public void valueChanged(ListSelectionEvent arg0) {
 				if (!arg0.getValueIsAdjusting() && tablePos.getSelectedItem() != null) {
 					rddin = tablePos.getSelectedItem();
-//					if (tablePos.getRowCount() > 0)
-//					tablePos.setRowSelectionInterval(0, tablePos.getRowCount() -1);
-//					tablePos.setRequestFocusEnabled(false);
-//					tablePos.setRowMargin(tablePos.getRowCount() -1);
-					SDataPos.setDate(rddin.getDatap());
 					SSrok.setText(String.valueOf(rddin.getSrok()));
 					SVes.setText(String.valueOf(rddin.getVes()));
 					SOkrj.setText(String.valueOf(rddin.getOj()));
@@ -694,12 +648,7 @@ try {
 						CBSerd1.setSelectedPcod(rddin.getSerd1());
 					else
 						CBSerd1.setSelectedItem(null);
-//					if (rddin.isSetOteki())
-//						CBOteki.setSelectedPcod(rddin.getOteki());
-//					else
-//						CBOteki.setSelectedItem(null);
                     oslrod = rddin.getOteki();
-//        			method2();
             		if ((oslrod-8)>=0)
             		{ChBot4.setSelected(true);   iw1=oslrod-8;}
             		else {iw1=oslrod;ChBot4.setSelected(false);}
@@ -710,32 +659,15 @@ try {
             		{ChBot2.setSelected(true);		iw1=iw1-2;}	
             		else  ChBot2.setSelected(false);   		
             		ChBot1.setSelected(iw1 ==1 );
-//					if (rddin.isSetDspos())
-//						CBDiag.setSelectedPcod(rddin.getDspos());
-//					else
-//						CBDiag.setSelectedItem(null);
 				}
 			}
 		});
 		scrollPane.setViewportView(tablePos);
 	}
-//	protected void method2() {
-//		if ((oslrod-8)>=0)
-//		{ChBot4.setSelected(true);   iw1=oslrod-8;}	
-//		if ((iw1-4)>=0)
-//		{ChBot3.setSelected(true);		iw1=iw1-4;}	
-//		if ((iw1-2)>=0)
-//		{ChBot2.setSelected(true);		iw1=iw1-2;}	
-//		ChBot1.setSelected(iw1 ==1 );
-//		
-//	}
 	protected void setDefaultValues() {
 		// TODO Auto-generated method stub
-//		rddin.setNpasp(Vvod.pvizitAmb.npasp);
-//		rddin.setId_pos(Vvod.pvizitAmb.id);
-//		rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
-	ves = Double.valueOf(SVes.getText());
-	if (ves == 0) ves = 60; 
+//	ves = Double.valueOf(SVes.getText());
+//	if (ves == 0) ves = 60; 
 	chcc = Integer.valueOf(SChcc.getText());
 	if (chcc == 0) chcc = 110; 
 	hdm = Integer.valueOf(SVdm.getText());
@@ -746,35 +678,14 @@ try {
 	if (spl == 0) spl = 2;
 	srok = Integer.valueOf(SSrok.getText());
 	if (srok == 0)srok = 8;
-	iw1 = Integer.valueOf(SLdad.getText());
-	if (iw1 == 0) iw1 = 120;
-	iw2 = Integer.valueOf(SLsad.getText());
-	if (iw2 == 0) iw2 = 80;
-	iw3 = Integer.valueOf(SPdad.getText());
-	if (iw3 == 0) iw3 = 120;
-	iw4 = Integer.valueOf(SPsad.getText());
-	if (iw4 == 0) iw4 = 80;
-//	polplname = rddin.getPolpl();
-//	predname = rddin.getPredpl();
-//	cerdname = rddin.getSerd();
-//	cerdname1 = rddin.getSerd1();
-//	otname = rddin.getOteki();
-	
-//	rddin.setArt1(iw1);
-//	rddin.setArt2(iw2);
-//	rddin.setArt3(iw3);
-//	rddin.setArt4(iw4);
-//	rddin.setChcc(chcc);
-//	rddin.setHdm(hdm);
-//	rddin.setOj(oj);
-//	rddin.setSpl(spl);
-//	rddin.setSrok(srok);
-//	rddin.setPolpl(polplname);
-//	rddin.setPredpl(predname);
-//	rddin.setSerd(cerdname);
-//	rddin.setSerd1(cerdname1);
-//	rddin.setOteki(otname);
-//	rddin.setDatap(Vvod.zapVr.datap);
+//	iw1 = Integer.valueOf(SLdad.getText());
+//	if (iw1 == 0) iw1 = 120;
+//	iw2 = Integer.valueOf(SLsad.getText());
+//	if (iw2 == 0) iw2 = 80;
+//	iw3 = Integer.valueOf(SPdad.getText());
+//	if (iw3 == 0) iw3 = 120;
+//	iw4 = Integer.valueOf(SPsad.getText());
+//	if (iw4 == 0) iw4 = 80;
 	}
 	public void onConnect() throws PatientNotFoundException {
 //		fam.setText(Vvod.zapVr.fam);

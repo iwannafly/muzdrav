@@ -508,7 +508,7 @@ public class ServerGenTalons extends Server implements Iface {
     public final List<Nrasp> getNraspVrach(final int cpodr, final int pcodvrach, final String cdol)
             throws KmiacServerException, NraspNotFoundException {
         final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
-                + "cxema, cdol, cpol, id, pfd, timep_n, timep_k, time_int_n, time_int_n FROM e_nrasp "
+                + "cxema, cdol, cpol, id, pfd, timep_n, timep_k, time_int_n, time_int_k FROM e_nrasp "
                 + "WHERE cpol =? AND pcod = ? AND cdol =? "
                 + "ORDER BY pcod";
         try (AutoCloseableResultSet acrs =

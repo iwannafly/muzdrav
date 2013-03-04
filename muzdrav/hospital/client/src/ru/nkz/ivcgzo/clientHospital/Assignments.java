@@ -1,5 +1,8 @@
 package ru.nkz.ivcgzo.clientHospital;
 
+//TODO: В ДНЕВНИКЕ ОСМОТРА ВЫВОДИТЬ ЗАПИСИ ПО ПРИЗНАКУ is_po
+//TODO: ДОБАВЛЕНИЕ МЕДИКАМЕНТА
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -68,7 +71,7 @@ public final class Assignments extends JPanel {
     private TMedication lastMedItem;
     private TDiagnostic lastDiagItem;
     private JButton btnAddMedication, btnSaveMedication, btnDelMedication;
-    private JButton btnAddDiagnostic, btnDelDiagnostic;
+    private JButton btnAddDiagnostic;
     private JButton btnAddDiet, btnDelDiet;
     private JButton btnAddProcedure, btnDelProcedure;
 
@@ -122,6 +125,7 @@ public final class Assignments extends JPanel {
 	 */
 	private void updatePanel() {
 		this.clearAllTables();
+		this.clearAllTextFields();
 		if (this.patient != null) {
 			this.fillTableMedications();
 			this.fillTableDiagnostics();
@@ -143,12 +147,21 @@ public final class Assignments extends JPanel {
 	}
 	
 	/**
+	 * Очистка всех текстовых полей
+	 */
+	private void clearAllTextFields() {
+		this.taMedicationsInfo.setText(null);
+		this.taDiagnosticsResult.setText(null);
+	}
+	
+	/**
 	 * Заполнение таблицы лекарственных назначений данными из БД
 	 */
 	private void fillTableMedications() {
 		if ((this.patient != null) && (ClientHospital.tcl != null))
 			try {
 				this.lastMedItem = null;
+				this.taMedicationsInfo.setText(null);
 				this.tblMedications.setData(
 						ClientHospital.tcl.getMedications(
 								this.patient.getGospitalCod()));
@@ -166,6 +179,7 @@ public final class Assignments extends JPanel {
 		if ((this.patient != null) && (ClientHospital.tcl != null))
 			try {
 				this.lastDiagItem = null;
+				this.taDiagnosticsResult.setText(null);
 				this.tblDiagnostics.setData(
 						ClientHospital.tcl.getDiagnostics(
 								this.patient.getGospitalCod()));
@@ -184,8 +198,14 @@ public final class Assignments extends JPanel {
 		if ((curItem == null) || (this.lastMedItem == curItem))
 			return;
 		this.lastMedItem = curItem;
-		//TODO: ПРОДОЛЖИТЬ
-		String strInfo = "Форма выпуска: " + curItem.getFlek();
+		String strInfo = "";
+		if (curItem.isSetFlek())
+			strInfo += "Лекарственая форма: " + curItem.getFlek() + '\n';
+		if (curItem.isSetKomm() && (curItem.getKomm().length() > 0))
+			strInfo += "Указания по приёму: " + curItem.getKomm() + '\n';
+		strInfo += "Назначивший врач: " + curItem.getVrach_name();
+		if (curItem.isSetVracho() && curItem.isSetVracho_name())
+			strInfo += '\n' + "Отменивший врач: " + curItem.getVracho_name();
 		this.taMedicationsInfo.setText(strInfo);
 	}
 	
@@ -203,21 +223,6 @@ public final class Assignments extends JPanel {
 		if (curItem.isSetRez_name())
 			strInfo += "Заключение: " + curItem.getRez_name();
 		this.taDiagnosticsResult.setText(strInfo);
-	}
-	
-	/**
-	 * Инициализация пользовательского интерфейса панели
-	 */
-	private void setInterface() {
-		this.addIcon = new ImageIcon(Assignments.addIconURL);
-		this.saveIcon = new ImageIcon(Assignments.saveIconURL);
-		this.delIcon = new ImageIcon(Assignments.delIconURL);
-		this.defaultDimension = new Dimension(50, 50);
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		this.setPanelMedications();
-		this.setPanelDiagnostics();
-		this.setPanelDiet();
-		this.setPanelProcedures();
 	}
 	
 	/**
@@ -301,7 +306,111 @@ public final class Assignments extends JPanel {
 	            this, msgText, "Ошибка",
 	            JOptionPane.ERROR_MESSAGE);
     }
+    
+    /**
+     * Событие нажатия на кнопку добавления лек. назначения
+     */
+    private void btnAddMedicationClick() {
+        if ((patient != null) && (ClientHospital.conMan != null)) {
+            ClientHospital.conMan.showMedicationForm(patient.getPatientId(),
+                patient.getSurname(), patient.getName(), patient.getMiddlename(),
+                patient.getGospitalCod());
+            fillTableMedications();
+        }
+    }
+    
+    /**
+     * Функция проверки лекарственного назначения на корректность
+     * @param med Проверяемое лекарственное назначение
+     * @return Возвращает <code>true</code>, если назначение корректно;
+	 * иначе - <code>false</code>
+     */
+    private boolean checkMedication(TMedication med) {
+		if (med.isSetDatao()) {
+			if ((med.getDatao() < med.getDatan()) ||
+				(med.getDatao() > med.getDatae())) {
+				showErrorDialog("Некорректная дата отмены");
+				return false;
+			}
+			if (!med.isSetVracho())
+				med.setVracho(userAuth.getPcod());
+		}
+		if (med.isSetDoza() && (med.getDoza() <= 0)) {
+			showErrorDialog("Некорректная разовая доза");
+			return false;
+		}
+		if (med.isSetPereod() && (med.getPereod() <= 0)) {
+			showErrorDialog("Некорректная периодичность приёма");
+			return false;
+		}
+		return true;
+    }
+
+    /**
+     * Событие нажатия на кнопку сохранения лек. назначения
+     */
+    private void btnSaveMedicationClick() {
+    	TMedication curItem = tblMedications.getSelectedItem();
+        if ((patient != null) && (ClientHospital.tcl != null) &&
+        	(curItem != null)) {
+        	if (!checkMedication(curItem))
+        		return;
+			try {
+				ClientHospital.tcl.updateMedication(curItem);
+                fillTableMedications();
+			} catch (TException e1) {
+				showErrorDialog("Ошибка при сохранении назначения");
+				e1.printStackTrace();
+			}
+        }
+    }
+    
+    /**
+     * Событие нажатия на кнопку удаления лек. назначения
+     */
+    private void btnDelMedicationClick() {
+    	TMedication curItem = tblMedications.getSelectedItem();
+        if ((patient != null) && (ClientHospital.tcl != null) &&
+            (curItem != null) &&
+        	getUserAnswer("Вы действительно хотите удалить назначение?"))
+			try {
+				ClientHospital.tcl.deleteMedication(curItem.getNlek());
+                fillTableMedications();
+			} catch (TException e1) {
+				showErrorDialog("Ошибка при удалении назначения");
+				e1.printStackTrace();
+			}
+    }
+    
+    /**
+     * Событие нажатия на кнопку добавления исследования
+     */
+    private void btnAddDiagnosticClick() {
+        if ((patient != null) && (ClientHospital.conMan != null)) {
+            ClientHospital.conMan.showLabRecordForm(patient.getPatientId(),
+                patient.getSurname(), patient.getName(), patient.getMiddlename(),
+                patient.getGospitalCod());
+        }
+    }
 	
+	/**
+	 * Инициализация пользовательского интерфейса панели
+	 */
+	private void setInterface() {
+		this.addIcon = new ImageIcon(Assignments.addIconURL);
+		this.saveIcon = new ImageIcon(Assignments.saveIconURL);
+		this.delIcon = new ImageIcon(Assignments.delIconURL);
+		this.defaultDimension = new Dimension(50, 50);
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.setPanelMedications();
+		this.setPanelDiagnostics();
+		this.setPanelDiet();
+		this.setPanelProcedures();
+	}
+	
+    /**
+     * Инициализация панели медицинских назначений
+     */
 	private void setPanelMedications() {
 		this.pnlMedications = new JPanel();
 		this.setCustomPanel(this, this.pnlMedications, "Лекарственные назначения");
@@ -314,25 +423,12 @@ public final class Assignments extends JPanel {
 		this.setButtonsMedication();
 	}
 	
-	private void setInfoMedication() {
-		this.spMedicationsInfo = new JScrollPane();
-		this.vbMedicationsTbl.add(this.spMedicationsInfo);
-		this.taMedicationsInfo = new JTextArea();
-		this.setCustomTextArea(this.taMedicationsInfo,
-				Assignments.defaultFont, this.spMedicationsInfo);
-	}
-	
-	private void setInfoDiagnostics() {
-		this.spDiagnosticsResult = new JScrollPane();
-		this.vbDiagnosticsTbl.add(this.spDiagnosticsResult);
-		this.taDiagnosticsResult = new JTextArea();
-		this.setCustomTextArea(this.taDiagnosticsResult,
-				Assignments.defaultFont, this.spDiagnosticsResult);
-	}
-	
+    /**
+     * Инициализация панели лабораторных и диагностических исследований
+     */
 	private void setPanelDiagnostics() {
 		this.pnlDiagnostics = new JPanel();
-		this.setCustomPanel(this, this.pnlDiagnostics, "Исследования");
+		this.setCustomPanel(this, this.pnlDiagnostics, "Лабораторные и диагностические исследования");
 		this.vbDiagnosticsTbl = Box.createVerticalBox();
 		this.pnlDiagnostics.add(this.vbDiagnosticsTbl);
 		this.setTableDiagnostics();
@@ -342,6 +438,9 @@ public final class Assignments extends JPanel {
 		this.setButtonsDiagnostics();
 	}
 	
+    /**
+     * Инициализация панели режимов и диет
+     */
 	private void setPanelDiet() {
 		this.pnlDiet = new JPanel();
 		this.setCustomPanel(this, this.pnlDiet, "Режим и диета");
@@ -353,6 +452,9 @@ public final class Assignments extends JPanel {
 		this.setButtonsDiet();
 	}
 	
+    /**
+     * Инициализация панели лечебных процедур
+     */
 	private void setPanelProcedures() {
 		this.pnlProcedures = new JPanel();
 		this.setCustomPanel(this, this.pnlProcedures, "Лечебные процедуры");
@@ -364,140 +466,149 @@ public final class Assignments extends JPanel {
 		this.setButtonsProcedures();
 	}
 	
+	/**
+     * Инициализация таблицы медицинских назначений
+     */
 	private void setTableMedication() {
 		this.spMedicationsTbl = new JScrollPane();
 		this.vbMedicationsTbl.add(this.spMedicationsTbl);
 		this.tblMedications = new CustomTable<TMedication, TMedication._Fields>(
-				false, false, TMedication.class, 0, "Наименование", 10, "Периодичность",
-				4, "Дата назначения", 12, "Дата окончания", 14, "Дата отмены");
+				false, false, TMedication.class, 0, "Наименование",
+				4, "Дата назначения", 12, "Дата окончания", 14, "Дата отмены",
+				20, "Способ введения", 10, "Схема приёма", 11, "Кол-во в день",
+				7, "Разовая доза", 19, "ед.");
 		tblMedications.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				updateMedicationsSelection();
 			}
 		});
-		this.tblMedications.setIntegerClassifierSelector(1, IntegerClassifiers.n_period);
+		this.tblMedications.setDateField(1);
 		this.tblMedications.setDateField(2);
 		this.tblMedications.setDateField(3);
-		this.tblMedications.setDateField(4);
-		//TODO: ПРОДОЛЖИТЬ
-		this.tblMedications.setEditableFields(true, 1, 4);
+		this.tblMedications.setIntegerClassifierSelector(5, IntegerClassifiers.n_period);
+		this.tblMedications.setEditableFields(true, 3, 5, 6, 7);
 		this.spMedicationsTbl.setViewportView(this.tblMedications);
 	}
-	
+
+	/**
+     * Инициализация таблицы лабораторных и диагностических исследований
+     */
 	private void setTableDiagnostics() {
 		this.spDiagnosticsTbl = new JScrollPane();
 		this.vbDiagnosticsTbl.add(this.spDiagnosticsTbl);
 		this.tblDiagnostics = new CustomTable<TDiagnostic, TDiagnostic._Fields>(
 				false, false, TDiagnostic.class, 1, "Код исследования",
-				2, "Наименование исследования", 3, "Результат", 4, "Дата выполнения");
+				2, "Наименование исследования", 3, "Результат",
+				4, "Дата назначения", 5, "Дата выполнения");
 		this.tblDiagnostics.setDateField(3);
+		this.tblDiagnostics.setDateField(4);
 		this.spDiagnosticsTbl.setViewportView(this.tblDiagnostics);
 	}
-	
+
+	/**
+     * Инициализация таблицы режимов и диет
+     */
 	private void setTableDiet() {
 		this.spDiet = new JScrollPane();
 		this.vbDietTbl.add(this.spDiet);
 		this.tblDiet = new CustomTable<TDiet, TDiet._Fields>(
-				false, false, TDiet.class);
+				false, false, TDiet.class, 0, "Тип",
+				1, "№", 2, "Дата назначения", 3, "Дата отмены");
+		this.tblDiet.setDateField(2);
+		this.tblDiet.setDateField(3);
 		this.spDiet.setViewportView(this.tblDiet);
 	}
-	
+
+	/**
+     * Инициализация таблицы лечебных процедур
+     */
 	private void setTableProcedures() {
 		this.spProcedures = new JScrollPane();
 		this.vbProceduresTbl.add(this.spProcedures);
 		this.tblProcedures = new CustomTable<TProcedures, TProcedures._Fields>(
-				false, false, TProcedures.class);
+				false, false, TProcedures.class,
+				0, "Наименование процедуры", 1, "Дата начала", 
+				2, "Дата окончания", 3, "Кол-во проведённых процедур");
+		this.tblProcedures.setDateField(1);
+		this.tblProcedures.setDateField(2);
 		this.spProcedures.setViewportView(this.tblProcedures);
 	}
-	
+
+	/**
+     * Инициализация поля информации о медицинских назначениях
+     */
+	private void setInfoMedication() {
+		this.spMedicationsInfo = new JScrollPane();
+		this.vbMedicationsTbl.add(this.spMedicationsInfo);
+		this.taMedicationsInfo = new JTextArea();
+		this.setCustomTextArea(this.taMedicationsInfo,
+				Assignments.defaultFont, this.spMedicationsInfo);
+	}
+
+	/**
+     * Инициализация поля информации о лабораторных и диагностических исследованиях
+     */
+	private void setInfoDiagnostics() {
+		this.spDiagnosticsResult = new JScrollPane();
+		this.vbDiagnosticsTbl.add(this.spDiagnosticsResult);
+		this.taDiagnosticsResult = new JTextArea();
+		this.setCustomTextArea(this.taDiagnosticsResult,
+				Assignments.defaultFont, this.spDiagnosticsResult);
+	}
+
+	/**
+     * Инициализация кнопок панели медицинских назначений
+     */
 	private void setButtonsMedication() {
 		this.btnAddMedication = new JButton();
 		this.setCustomButton(this.vbMedicationsBtn, this.btnAddMedication,
-				this.defaultDimension, this.addIcon, "Добавить назначение");
+				this.defaultDimension, this.addIcon,
+				"Добавить лекарственное назначение");
 		this.btnAddMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                if ((patient != null) && (ClientHospital.conMan != null)) {
-                    ClientHospital.conMan.showMedicationForm(patient.getPatientId(),
-                        patient.getSurname(), patient.getName(), patient.getMiddlename(),
-                        patient.getGospitalCod());
-                    fillTableMedications();
-                }
+            	btnAddMedicationClick();
             }
         });
 		
 		this.btnSaveMedication = new JButton();
 		this.setCustomButton(this.vbMedicationsBtn, this.btnSaveMedication,
-				this.defaultDimension, this.saveIcon, "Сохранить назначение");
+				this.defaultDimension, this.saveIcon,
+				"Сохранить лекарственное назначение");
 		this.btnSaveMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-            	TMedication curItem = tblMedications.getSelectedItem();
-                if ((patient != null) && (ClientHospital.tcl != null) &&
-                	(curItem != null)) {
-            		if (curItem.isSetDatao()) {
-            			if ((curItem.getDatao() < curItem.getDatan()) ||
-            				(curItem.getDatao() > curItem.getDatae())) {
-            				showErrorDialog("Некорректная дата отмены");
-            				return;
-            			}
-            			if (!curItem.isSetVracho())
-            				curItem.setVracho(userAuth.getPcod());
-            		}
-					try {
-						ClientHospital.tcl.updateMedication(curItem);
-	                    fillTableMedications();
-					} catch (TException e1) {
-						showErrorDialog("Ошибка при сохранении назначения");
-						e1.printStackTrace();
-					}
-                }
+            	btnSaveMedicationClick();
             }
         });
 
 		this.btnDelMedication = new JButton();
 		this.setCustomButton(this.vbMedicationsBtn, this.btnDelMedication,
-				this.defaultDimension, this.delIcon, "Удалить назначение");
+				this.defaultDimension, this.delIcon,
+				"Удалить лекарственное назначение");
 		this.btnDelMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-            	TMedication curItem = tblMedications.getSelectedItem();
-                if ((patient != null) && (ClientHospital.tcl != null) &&
-                    (curItem != null) &&
-                	getUserAnswer("Вы действительно хотите удалить назначение?"))
-					try {
-						ClientHospital.tcl.deleteMedication(curItem.getNlek());
-	                    fillTableMedications();
-					} catch (TException e1) {
-						showErrorDialog("Ошибка при удалении назначения");
-						e1.printStackTrace();
-					}
+            	btnDelMedicationClick();
             }
         });
 	}
-	
+
+	/**
+     * Инициализация кнопок панели лабораторных и диагностических исследований
+     */
 	private void setButtonsDiagnostics() {
 		this.btnAddDiagnostic = new JButton();
 		this.setCustomButton(this.vbDiagnosticsBtn, this.btnAddDiagnostic,
 				this.defaultDimension, this.addIcon, "Добавить исследование");
 		this.btnAddDiagnostic.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                if ((patient != null) && (ClientHospital.conMan != null)) {
-                    ClientHospital.conMan.showLabRecordForm(patient.getPatientId(),
-                        patient.getSurname(), patient.getName(), patient.getMiddlename(),
-                        patient.getGospitalCod());
-                }
-            }
-        });
-
-		this.btnDelDiagnostic = new JButton();
-		this.setCustomButton(this.vbDiagnosticsBtn, this.btnDelDiagnostic,
-				this.defaultDimension, this.delIcon, "Удалить исследование");
-		this.btnDelDiagnostic.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-            	//TODO
+            	btnAddDiagnosticClick();
             }
         });
 	}
-	
+
+	/**
+     * Инициализация кнопок панели режима и диеты
+     */
 	private void setButtonsDiet() {
 		this.btnAddDiet = new JButton();
 		this.setCustomButton(this.vbDietBtn, this.btnAddDiet,
@@ -517,7 +628,10 @@ public final class Assignments extends JPanel {
             }
         });
 	}
-	
+
+	/**
+     * Инициализация кнопок панели лечебных процедур
+     */
 	private void setButtonsProcedures() {
 		this.btnAddProcedure = new JButton();
 		this.setCustomButton(this.vbProceduresBtn, this.btnAddProcedure,

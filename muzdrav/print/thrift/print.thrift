@@ -3,6 +3,9 @@ namespace java ru.nkz.ivcgzo.thriftPrint
 include "../../../common/thrift/kmiacServer.thrift"
 
 
+
+
+
 service ThriftPrint extends kmiacServer.KmiacServer {
 
 
@@ -14,4 +17,11 @@ service ThriftPrint extends kmiacServer.KmiacServer {
 	 * Печать справки в бассейн
 	 */
 	string printSprBass(1: i32 npasp, 2: i32 pol) throws (1: kmiacServer.KmiacServerException kse);
+
+/**
+	 * Печать амбулаторный карты
+	 */
+	string printMedCart(1: i32 npasp, 2: i32 clpu, 3: i32 cpol) throws (1:kmiacServer.KmiacServerException kse);
+	
+
 }

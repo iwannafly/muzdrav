@@ -450,6 +450,16 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 		2:kmiacServer.KmiacServerException kse);
 	
     /**
+     * Возвращает записи о госпитализациях пациента с указанным персональным номером
+     * @param npasp - персональный номер пациента
+     * @param id - персональный номер пациента
+     * @return список thrift-объектов, содержащих информацию о госпитализациях пациента
+     * @throws GospNotFoundException
+     */
+    list<AllGosp> getAllGospForCurrentLpu(1:i32 npasp, 2:i32 clpu) throws (1: GospNotFoundException gnfe,
+		2:kmiacServer.KmiacServerException kse);
+	
+    /**
      * Возвращает запись госпитализации пациента с указанным идентификатором
      * госпитализации
      * @param id - уникальный идентификатор госпитализации
@@ -462,8 +472,7 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	/**
 	 * Печать амбулаторный карты
 	 */
-	string printMedCart(1: Nambk nambk, 2: PatientFullInfo pat, 3: kmiacServer.UserAuthInfo uai,
-		4: string docInfo, 5: string oms_org, 6: string lgot) throws (1:kmiacServer.KmiacServerException kse);
+	string printMedCart(1: i32 npasp, 2: i32 clpu, 3: i32 cpol) throws (1:kmiacServer.KmiacServerException kse);
 	
 	/**
 	 * Печать медицинской карты приемного отделения

@@ -69,7 +69,7 @@ public class ServerLab extends Server implements Iface {
     };
     private static final String[] PISL_FIELD_NAMES = {
         "nisl", "npasp", "cisl", "pcisl", "napravl", "naprotd", "datan", "vrach",
-        "diag", "dataz", "kodotd", "pvizit_id", "id_gosp"
+        "diag", "dataz", "kodotd", "pvizit_id", "id_gosp", "datap"
     };
     private static final String[] PREZ_D_FIELD_NAMES = {
         "id", "npasp", "nisl", "kodisl"
@@ -117,8 +117,8 @@ public class ServerLab extends Server implements Iface {
         Integer.class, Integer.class, Date.class, Integer.class,
     //  diag          dataz       kodotd         pvizit_id
         String.class, Date.class, Integer.class, Integer.class,
-    //  id_gosp
-        Integer.class
+    //  id_gosp        datap
+        Integer.class, Date.class
     };
     private static final Class<?>[] PREZ_D_TYPES = {
     //  id             npasp          nisl           kodisl
@@ -270,11 +270,11 @@ public class ServerLab extends Server implements Iface {
 
     @Override
     public final int addPisl(final Pisl npisl) throws KmiacServerException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, "
-                + "datan, vrach, diag, dataz, kodotd, pvizit_id, id_gosp) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
+                + "datan, vrach, diag, dataz, kodotd, pvizit_id, id_gosp, datap) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
                 true, npisl, PISL_TYPES, indexes);
             int id = sme.getGeneratedKeys().getInt("nisl");
             sme.setCommit();

@@ -60,6 +60,7 @@ struct Pisl {
 	11: optional i32 kodotd;
 	12: optional i32 pvizitId;
 	13: optional i32 idGosp;
+	14: optional i64 datap;
 }
 
 struct PrezD {

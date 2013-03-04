@@ -890,6 +890,9 @@ public class PIslForm {
 						
 						tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl,tn_ldi.getSelectedItem().pcisl));
 						
+						
+						
+						
 					} catch (TException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -1056,7 +1059,7 @@ public class PIslForm {
 								Pus = MainForm.ltc.GetKlasPrvO00(MainForm.authInfo.clpu, Integer.valueOf(tFnaprotd.getText()));
 						
 							if (Pus.size()==0){
-								System.out.println(Pus.size());
+								//System.out.println(Pus.size());
 								ch = false;
 							}
 						
@@ -1065,7 +1068,7 @@ public class PIslForm {
 								List <IntegerClassifier> Pus = MainForm.ltc.GetKlasPrvN00(Integer.valueOf(tFnaprotd.getText()));
 							
 								if (Pus.size()==0){
-									System.out.println(Pus.size());
+									//System.out.println(Pus.size());
 									ch = false;
 								}	
 							}else{
@@ -1655,8 +1658,9 @@ public class PIslForm {
 					} 
 								
 				}
-				 	//System.out.print(upDisl);			
+				 				
 				try {
+					//System.out.println(upDisl);
 					MainForm.ltc.UpdDIsl(upDisl);
 				} catch (DIslExistsException e) {
 					// TODO Auto-generated catch block
@@ -1959,8 +1963,9 @@ public class PIslForm {
 						uplab.setNpasp(tn_ldi.getSelectedItem().npasp);
 						uplab.setPcod_m(tlab_isl.getData().get(i).pcod_m);
 						uplab.setStoim(tlab_isl.getData().get(i).stoim);
-					
-						//System.out.print(uplab);
+						uplab.setId(tlab_isl.getData().get(i).id);
+						
+						System.out.print(uplab);
 						try {
 							MainForm.ltc.UpdLIsl(uplab);
 						} catch (LIslExistsException e) {
@@ -1977,7 +1982,7 @@ public class PIslForm {
 						if (((String.valueOf(tn_ldi.getSelectedItem().id_gosp)==null)||(tn_ldi.getSelectedItem().id_gosp==0))
 								&&(String.valueOf(tn_ldi.getSelectedItem().id_pos)==null)||(tn_ldi.getSelectedItem().id_pos==0)){
 							try {
-								MainForm.ltc.DelLIsl(tn_ldi.getSelectedItem().nisl, tlab_isl.getData().get(i).cpok);
+								MainForm.ltc.DelLIsl(tn_ldi.getSelectedItem().nisl, tlab_isl.getData().get(i).cpok, tlab_isl.getData().get(i).id);
 							} catch (TException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -2001,7 +2006,7 @@ public class PIslForm {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					
-					MainForm.ltc.DelLIsl(tn_ldi.getSelectedItem().nisl, tlab_isl.getSelectedItem().cpok);
+					MainForm.ltc.DelLIsl(tn_ldi.getSelectedItem().nisl, tlab_isl.getSelectedItem().cpok, tlab_isl.getSelectedItem().id);
 					
 				} catch (TException e) {
 					// TODO Auto-generated catch block

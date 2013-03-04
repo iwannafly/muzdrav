@@ -345,10 +345,9 @@ public class RaspisanieUnit {
 		cal2.setTimeInMillis(timen);
 		cal3.setTimeInMillis(timek);
 
-		while (cal2.compareTo(cal3)<0) {
-		if ((cal1.compareTo(cal2)>0 && cal1.compareTo(cal3)<0) || (cal1.compareTo(cal2)==0 || cal1.compareTo(cal3)==0))
-			return true;
-		}
+		if (cal2.compareTo(cal3)<0)
+			if ((cal1.compareTo(cal2)>0 && cal1.compareTo(cal3)<0) || (cal1.compareTo(cal2)==0 || cal1.compareTo(cal3)==0))
+				return true;
 		return false;
 	}
 
