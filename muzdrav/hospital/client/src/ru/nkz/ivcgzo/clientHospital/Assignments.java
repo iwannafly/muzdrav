@@ -1,5 +1,8 @@
 package ru.nkz.ivcgzo.clientHospital;
 
+//TODO: В ДНЕВНИКЕ ОСМОТРА ВЫВОДИТЬ ЗАПИСИ ПО ПРИЗНАКУ is_po
+//TODO: ДОБАВЛЕНИЕ МЕДИКАМЕНТА
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -472,8 +475,8 @@ public final class Assignments extends JPanel {
 		this.tblMedications = new CustomTable<TMedication, TMedication._Fields>(
 				false, false, TMedication.class, 0, "Наименование",
 				4, "Дата назначения", 12, "Дата окончания", 14, "Дата отмены",
-				18, "Способ введения", 10, "Схема приёма", 11, "Кол-во в день",
-				7, "Разовая доза", 17, "ед.");
+				20, "Способ введения", 10, "Схема приёма", 11, "Кол-во в день",
+				7, "Разовая доза", 19, "ед.");
 		tblMedications.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -512,8 +515,8 @@ public final class Assignments extends JPanel {
 		this.tblDiet = new CustomTable<TDiet, TDiet._Fields>(
 				false, false, TDiet.class, 0, "Тип",
 				1, "№", 2, "Дата назначения", 3, "Дата отмены");
-		this.tblDiagnostics.setDateField(2);
-		this.tblDiagnostics.setDateField(3);
+		this.tblDiet.setDateField(2);
+		this.tblDiet.setDateField(3);
 		this.spDiet.setViewportView(this.tblDiet);
 	}
 
@@ -527,8 +530,8 @@ public final class Assignments extends JPanel {
 				false, false, TProcedures.class,
 				0, "Наименование процедуры", 1, "Дата начала", 
 				2, "Дата окончания", 3, "Кол-во проведённых процедур");
-		this.tblDiagnostics.setDateField(1);
-		this.tblDiagnostics.setDateField(2);
+		this.tblProcedures.setDateField(1);
+		this.tblProcedures.setDateField(2);
 		this.spProcedures.setViewportView(this.tblProcedures);
 	}
 

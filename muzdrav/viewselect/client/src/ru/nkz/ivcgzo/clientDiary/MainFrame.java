@@ -88,7 +88,7 @@ public class MainFrame extends JFrame {
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbPcodOsm;
     private Patient patient;
     private int ticcbOtdSelIndex = -1;
-    private boolean isAsked, isAdding;
+    private boolean isAsked, isAdding, isPO;
     
     public MainFrame() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -186,6 +186,7 @@ public class MainFrame extends JFrame {
         });
         btnMedHistAdd.setIcon(new ImageIcon(MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientViewSelect/resources/1331789242_Add.png")));
+        btnMedHistAdd.setToolTipText("Добавить осмотр");
     }
 
     private void addMedicalHistoryDeleteButton() {
@@ -200,6 +201,7 @@ public class MainFrame extends JFrame {
         });
         btnMedHistDel.setIcon(new ImageIcon(MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientViewSelect/resources/1331789259_Delete.png")));
+        btnMedHistDel.setToolTipText("Удалить осмотр");
     }
 
     private void addMedicalHistoryUpdateButton() {
@@ -214,6 +216,7 @@ public class MainFrame extends JFrame {
         });
         btnMedHistUpd.setIcon(new ImageIcon(MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientViewSelect/resources/1341981970_Accept.png")));
+        btnMedHistUpd.setToolTipText("Сохранить осмотр");
     }
 
 
@@ -462,14 +465,12 @@ public class MainFrame extends JFrame {
         try {
         	TMedicalHistory curHist = tblMedHist.getSelectedItem();
             if (curHist != null) {
-            	if (getUserAnswer("Обновить информацию о диагнозе?")) {
-                	//При обновлении записи нельзя изменять номер
-                	//отделения и врачей, проводившего осмотр и добавившего запись:
-                	getMedicalMedicalHistoryText(curHist);
-                    ClientDiary.tcl.updateMedicalHistory(curHist);
-                    //Заполнение таблицы:
-                	fillMedHistoryTable();
-                }
+            	//При обновлении записи нельзя изменять номер
+            	//отделения и врачей, проводившего осмотр и добавившего запись:
+            	getMedicalMedicalHistoryText(curHist);
+                ClientDiary.tcl.updateMedicalHistory(curHist);
+                //Заполнение таблицы:
+            	fillMedHistoryTable();
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
@@ -493,6 +494,7 @@ public class MainFrame extends JFrame {
 	            newMedHist.setTimez(System.currentTimeMillis());
 	            newMedHist.setPcodAdded(ClientDiary.authInfo.getPcod());
 	            newMedHist.setIdGosp(patient.getIdGosp());
+	            newMedHist.setIs_po(this.isPO);
 	            //Добавление информации об осмотре в БД:
 	            newMedHist.setId(ClientDiary.tcl.addMedicalHistory(newMedHist));
 	            //Заполнение таблицы:
@@ -578,10 +580,12 @@ public class MainFrame extends JFrame {
     	TMedicalHistory curMedHist = tblMedHist.getSelectedItem();
     	if (curMedHist == null)
     		return;
+    	//FIXME:
+		ticcbOtd.setSelectedItem(null);
     	if (curMedHist.isSetCpodr())
-    		ticcbOtd.setSelectedPcod(curMedHist.getCpodr());
-    	else
-    		ticcbOtd.setSelectedItem(null);
+    		try {
+    			ticcbOtd.setSelectedPcod(curMedHist.getCpodr());
+    		} catch (Exception e) {}
 		ticcbPcodOsm.setSelectedItem(null);
     	if (curMedHist.isSetPcodVrach())
     		try {
@@ -886,13 +890,15 @@ public class MainFrame extends JFrame {
     }
 
     public void fillPatient(final int id, final String surname,
-            final String name, final String middlename, final int idGosp) {
+            final String name, final String middlename, final int idGosp,
+            final boolean isPriemOtd) {
         patient = new Patient();
         patient.setId(id);
         patient.setSurname(surname);
         patient.setName(name);
         patient.setMiddlename(middlename);
         patient.setIdGosp(idGosp);
+        this.isPO = isPriemOtd; 
         
         clearMedicalHistory();
         fillMedHistoryTable();

@@ -49,6 +49,7 @@ import ru.nkz.ivcgzo.thriftOsm.Pobost;
 import ru.nkz.ivcgzo.thriftOsm.Pokaz;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.PrdslNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.PrdDinNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
 import ru.nkz.ivcgzo.thriftOsm.Prez_l;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
@@ -215,8 +216,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmRdInf = new TResultSetMapper<>(RdInfStruct.class, "npasp",       "obr",        "sem",         "votec",       "grotec",     "photec",     "dataz",    "fiootec",    "mrotec",     "telotec",    "vredotec",    "osoco",       "uslpr",      "zotec");
 		rdInfTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, Date.class, String.class, String.class, String.class, Integer.class, Integer.class, Integer.class,String.class};
 
-		rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, "id_rd_sl",    "id_pvizit",   "npasp",       "srok",       "grr",          "ball",        "oj",          "hdm",         "dspos",     "art1",         "art2",        "art3",        "art4",        "spl",         "oteki",       "chcc",        "polpl",       "predpl",      "serd",        "serd1",       "id_pos",      "ves" ,     "datap"      );
-		rdDinTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Double.class,Date.class};
+		rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, "id_rd_sl",    "id_pvizit",   "npasp",       "srok",       "grr",          "ball",        "oj",          "hdm",         "dspos",     "art1",         "art2",        "art3",        "art4",        "spl",         "oteki",       "chcc",        "polpl",       "predpl",      "serd",        "serd1",       "id_pos",      "ves" );
+		rdDinTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Double.class};
 		
 		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid","npasp"      ,"fam"       ,"im"        ,"ot"        ,"datar"   ,"docser"    ,"docnum"    ,"tawn"       ,"street"    ,"house"     ,"flat"      ,"poms_ser"  ,"poms_nom"  ,"dog"       ,"stat"       ,"lpup"       ,"terp"       ,"ftawn"      ,"fstreet"   ,"fhouse"    ,"fflat"     ,"grk"       ,"rez"       ,"telm"      ,"vred"      ,"deti"       ,"datay"   ,"yavka1"     ,"datazs"  ,"famv"      ,"imv"       ,"otv"       ,"datasn"  ,"shet"       ,"kolrod"     ,"abort"      ,"vozmmen"    ,"prmen"      ,"datam"   ,"kont"       ,"dsp"        ,"dsr"        ,"dtroch"     ,"cext"       ,"indsol"     ,"vitae"     ,"allerg"    ,"ishod"      ,"prrod"     ,"oslrod"     ,"sem"        ,"rost"       ,"vesd"      ,"osoco"      ,"uslpr"      ,"dataz"   ,"polj"       ,"obr",       "fiootec",   "mrabotec",   "telotec",   "rgotec",   "photec",    "vredotec",   "vozotec",     "mrab",     "prof",       "eko",        "rub",        "predp",       "terpr",       "oblpr",      "diag",       "cvera",      "dataosl", "osp",       "zotec");
 		rdPatientTypes = new Class<?>[]{          Integer.class,Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Date.class,Integer.class,Date.class,String.class,String.class,String.class,Date.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Boolean.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,Integer.class,String.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Date.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,String.class,String.class,Boolean.class,Boolean.class,Boolean.class, Integer.class, Integer.class,Integer.class,Integer.class,Date.class,Integer.class,String.class};
@@ -647,17 +648,17 @@ public class ServerOsm extends Server implements Iface {
 			throw new KmiacServerException();
 		}
 	}
-	
-	@Override
-	public List<RdDinStruct> getRdDinInfo(int id_pvizit, int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select d.*,v.datap from p_rd_din d JOIN p_vizit_amb v on (d.id_pos = v.id) where d.id_pvizit = ? and d.npasp = ? order by v.datap", id_pvizit, npasp)) {
-			return rsmRdDin.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
-		}
-
-	}
+//	
+//	@Override
+//	public List<RdDinStruct> getRdDinInfo(int id_pvizit, int npasp) throws KmiacServerException, TException {
+//		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select d.*,v.datap from p_rd_din d JOIN p_vizit_amb v on (d.id_pos = v.id) where d.id_pvizit = ? and d.npasp = ? order by v.datap", id_pvizit, npasp)) {
+//			return rsmRdDin.mapToList(acrs.getResultSet());
+//		} catch (SQLException e) {
+//			((SQLException) e.getCause()).printStackTrace();
+//			throw new KmiacServerException();
+//		}
+//
+//	}
 
 	@Override
 	public RdInfStruct getRdInfInfo(int npasp) throws KmiacServerException, TException {
@@ -962,7 +963,9 @@ public class ServerOsm extends Server implements Iface {
 					iAcrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom, poms_ser, poms_nom FROM patient WHERE npasp = ? ", im.getNpasp());
 					if (iAcrs.getResultSet().next()) {
 						sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br>", iAcrs.getResultSet().getString(1), iAcrs.getResultSet().getString(2), iAcrs.getResultSet().getString(3)));
-						if (iAcrs.getResultSet().getString(7)!=null)sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br>", iAcrs.getResultSet().getString(8)));
+						if (iAcrs.getResultSet().getString(7)==null)sb.append(String.format("<b>Серия и номер полиса:</b> %s <br>", iAcrs.getResultSet().getString(8)));
+						if (iAcrs.getResultSet().getString(8)==null)sb.append(String.format("<b>Серия и номер полиса:</b> %s <br>", iAcrs.getResultSet().getString(7)));
+						if ((iAcrs.getResultSet().getString(8)!=null) && (iAcrs.getResultSet().getString(7)!=null)) sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br>", iAcrs.getResultSet().getString(7), iAcrs.getResultSet().getString(8)));
 						sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br>", iAcrs.getResultSet().getDate(4)));
 						if (iAcrs.getResultSet().getString(5)!=null)
 						sb.append(String.format("<b>Адрес:</b> %s, %s<br>", iAcrs.getResultSet().getString(5), iAcrs.getResultSet().getString(6)));
@@ -993,7 +996,7 @@ public class ServerOsm extends Server implements Iface {
 
 					sb.append("</ol>");
 					sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br>", data_napr));
-					sb.append(String.format("<b>Планируемая дата выполнения:</b> %1$td.%1$tm.%1$tY<br>", data_post));
+					if (data_post!=null) sb.append(String.format("<b>Планируемая дата выполнения:</b> %1$td.%1$tm.%1$tY<br>", data_post));
 					sb.append("<b>Подпись врача:</b><br>");
 					sb.append("</td>");
 				sb.append("</tr>");
@@ -3610,5 +3613,20 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				throw new KmiacServerException(); 
 			}
 			return mkb;
+	}
+
+	@Override
+	public RdDinStruct getRdDinInfo(int id_Pvizit, int npasp, int id_pos)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_rd_din  where id_pvizit = ? and npasp = ? and id_pos = ? ", id_Pvizit, npasp, id_pos)) {
+			if (acrs.getResultSet().next())
+			return rsmRdDin.map(acrs.getResultSet());
+			else
+				throw new PrdDinNotFoundException();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+
 	}
 }

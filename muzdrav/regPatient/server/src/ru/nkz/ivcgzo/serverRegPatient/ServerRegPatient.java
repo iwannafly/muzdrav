@@ -750,6 +750,26 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+	@Override
+	public List<AllGosp> getAllGospForCurrentLpu(int npasp, int clpu)
+			throws GospNotFoundException, KmiacServerException, TException {
+        String sqlQuery = "SELECT id, ngosp, npasp, nist, datap, cotd, diag_p, named_p "+
+                "FROM c_gosp g JOIN n_o00 o00 ON (g.cotd = o00.pcod) " +
+                "WHERE npasp = ? AND o00.clpu = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp, clpu)) {
+            ResultSet rs = acrs.getResultSet();
+            List<AllGosp> allGosp = rsmAllGosp.mapToList(rs);
+            if (allGosp.size() > 0) {
+                return allGosp;
+            } else {
+                throw new GospNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+	}
+
     @Override
     public final Gosp getGosp(final int id) throws GospNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT * FROM c_gosp WHERE id = ?;";
@@ -1355,9 +1375,8 @@ public class ServerRegPatient extends Server implements Iface {
     public final List<IntegerClassifier> getO00() throws KmiacServerException {
 //        final String sqlQuery = "SELECT n_o00.pcod, (n_m00.name_s || ', ' || n_o00.name) as name "
 //            + "FROM n_o00 INNER JOIN n_m00 ON n_m00.pcod = n_o00.clpu;";
-        final String sqlQuery = "SELECT pcod, name_u as name "
-                + "FROM n_o00 "
-                + "ORDER BY pcod;";
+        final String sqlQuery = "SELECT pcod, name_u as name FROM n_o00 "+
+                "WHERE (clpu = 20 OR clpu = 21 OR clpu = 22 OR clpu = 23 OR clpu = 24 OR clpu = 25 OR clpu = 26 OR clpu = 27 OR clpu = 30 OR clpu = 41 OR clpu = 45 OR clpu = 47 OR clpu = 62 OR clpu = 63 OR clpu = 64 OR clpu = 83 OR clpu = 93) ORDER BY clpu, name_u ";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
             new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
@@ -1371,7 +1390,7 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final List<IntegerClassifier> getOtdForCurrentLpu(final int lpuId)
             throws KmiacServerException {
-        final String sqlQuery = "SELECT pcod, name FROM n_o00 WHERE clpu = ?";
+        final String sqlQuery = "SELECT pcod, name FROM n_o00 WHERE clpu = ? ORDER BY name ";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, lpuId)) {
@@ -1489,64 +1508,13 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public final String printMedCart(final Nambk nambk, final PatientFullInfo pat,
-            final UserAuthInfo uai, final String docInfo, final String omsOrg,
-            final String lgot) throws KmiacServerException {
-        final String path;
-        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
-                path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT c_ogrn "
-                    + "FROM n_m00 WHERE pcod = ?", uai.getClpu());
-            String ogrn = "";
-            while (acrs.getResultSet().next()) {
-                if (acrs.getResultSet().getString(1) != null) {
-                    ogrn = acrs.getResultSet().getString(1);
-                }
-            }
-            acrs.close();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-            String gender;
-            if (pat.getPol() == 1) {
-                gender = "мужской";
-            } else if (pat.getPol() == 2) {
-                gender = "женский";
-            } else {
-                gender = "";
-            }
-            HtmTemplate htmTemplate = new HtmTemplate(
-                    new File(this.getClass().getProtectionDomain().getCodeSource()
-                    .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
-                    + "\\plugin\\reports\\MedCardAmbPriem.htm");
-            htmTemplate.replaceLabels(true,
-                uai.getClpu_name(),
-                ogrn,
-                nambk.getNambk(),
-                omsOrg,
-                pat.getPolis_oms().getSer() + pat.getPolis_oms().getNom(),
-                pat.getSnils(),
-                "",
-                lgot,
-                pat.getFam(),
-                pat.getIm(),
-                pat.getOt(),
-                gender,
-                dateFormat.format(new Date(pat.getDatar())),
-                pat.getAdmAddress().getCity()
-                    + "," + pat.getAdmAddress().getStreet() + " "
-                    + pat.getAdmAddress().getHouse()
-                    + " - " + pat.getAdmAddress().getFlat(),
-                pat.getAdpAddress().getCity()
-                    + "," + pat.getAdpAddress().getStreet() + " "
-                    + pat.getAdpAddress().getHouse()
-                    + " - " + pat.getAdpAddress().getFlat(),
-                pat.getTel(),
-                docInfo
-            );
-            osw.write(htmTemplate.getTemplateText());
-            return path;
-        } catch (Exception e) {
-            throw new  KmiacServerException(); // тут должен быть кмиац сервер иксепшн
-        }
+    public final String printMedCart(int npasp, int clpu, int cpol) throws KmiacServerException {
+    	try {
+			return (String) serverManager.instance.getServerById(21).executeServerMethod(2102, npasp, clpu, cpol);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
     }
 
     @Override
