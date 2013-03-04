@@ -831,7 +831,7 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public String printLabGur(InputLG ilg) throws KmiacServerException,
 			TException {
-		String svod = null;
+		String path = null;
 		
 		// Дата от ...
 		Date dn;
@@ -1009,8 +1009,7 @@ public class LDSserver extends Server implements Iface {
 					}
 				
 				}
-				
-				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(svod = File.createTempFile("test", ".htm").getAbsolutePath()), "utf-8")) {
+				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("test", ".htm").getAbsolutePath()), "utf-8")){
 					
 					
 					StringBuilder sb = new StringBuilder(0x10000);
@@ -1018,7 +1017,6 @@ public class LDSserver extends Server implements Iface {
 				  //sb.append(String.format("!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">"));
 				  sb.append(String.format("<HTML>"));
 				  sb.append(String.format("<HEAD>"));
-				  sb.append(String.format("	<META HTTP-EQUIV=\"CONTENT-TYPE\" CONTENT=\"text/html; charset=windows-1251\">"));
 				  sb.append(String.format("	<TITLE>Лабораторный журнал</TITLE>"));
 				  sb.append(String.format("	<META NAME=\"GENERATOR\" CONTENT=\"LibreOffice 3.5  (Windows)\">"));
 				  sb.append(String.format("	<META NAME=\"CREATED\" CONTENT=\"20121017;13540000\">"));
@@ -1030,7 +1028,7 @@ public class LDSserver extends Server implements Iface {
 				  sb.append(String.format("		P { margin-bottom: 0.21cm; direction: ltr; color: #000000; widows: 2; orphans: 2 }"));
 				  sb.append(String.format("		P.western { font-family: \"Times New Roman\", serif; font-size: 12pt; so-language: ru-RU }"));
 				  sb.append(String.format("		P.cjk { font-family: \"Times New Roman\", serif; font-size: 12pt }"));
-				  sb.append(String.format("		P.ctl { font-family: \"Times New Roman\", serif; font-size: 12pt; so-language: ar-SA }"));
+				  sb.append(String.format("		P.ctl { font-family: \"Times New Roman\", serif; font-size: 12pt; so-language: ru-RU }"));
 				  sb.append(String.format("	-->"));
 				  sb.append(String.format("	</STYLE>"));
 				  sb.append(String.format("</HEAD>"));
@@ -1065,7 +1063,7 @@ public class LDSserver extends Server implements Iface {
 					
 					osw.write(sb.toString());
 
-				 svod = sb.toString();
+				
 				 
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -1078,7 +1076,7 @@ public class LDSserver extends Server implements Iface {
 				e1.printStackTrace();
 			}			
 			
-		 return svod;
+		 return path;
 			
 			
 	}

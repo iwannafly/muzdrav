@@ -110,6 +110,8 @@ public class MainFrame extends JFrame {
     private JTextField tfDiagCode;
     private JTextField tfDiagName;
     private JButton btnAddDiag;
+    private JLabel lblLabDate;
+    private CustomDateEditor cdeLabDate;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuthInfo = authInfo;
@@ -257,6 +259,10 @@ public class MainFrame extends JFrame {
         lblCabinet = new JLabel("Кабинет");
         tfCabinet = new CustomTextField();
         tfCabinet.setColumns(10);
+
+        lblLabDate = new JLabel("Дата исследования");        
+        cdeLabDate = new CustomDateEditor();
+        cdeLabDate.setDate(System.currentTimeMillis());
     }
 
     private void setIssledButtons() {
@@ -372,6 +378,7 @@ public class MainFrame extends JFrame {
         pisl.setIdGosp(patient.idGosp);
         pisl.setDiag(tfDiagCode.getText());
 //        pisl.setPvizit_id(tblPos.getSelectedItem().getId_obr());
+        pisl.setDatap(cdeLabDate.getDate().getTime());
         pisl.setNisl(ClientLab.tcl.addPisl(pisl));
     }
 
@@ -733,33 +740,37 @@ public class MainFrame extends JFrame {
                 .addGroup(glPLabAndDiagIssled.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(glPLabAndDiagIssled.createParallelGroup(Alignment.LEADING)
-                        .addComponent(spIssled, GroupLayout.DEFAULT_SIZE, 564, Short.MAX_VALUE)
+                        .addComponent(spIssled, GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
                         .addComponent(btnPrintIssled, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblIssled, GroupLayout.DEFAULT_SIZE, 564, Short.MAX_VALUE)
+                        .addComponent(lblIssled, GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
                         .addGroup(glPLabAndDiagIssled.createSequentialGroup()
                             .addGroup(glPLabAndDiagIssled.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblLab, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(lblOrgAndSystem, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE))
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addGroup(glPLabAndDiagIssled.createParallelGroup(Alignment.LEADING)
-                                .addComponent(cbxOrgAndSystem, GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
-                                .addComponent(cbxLabs, 0, 425, Short.MAX_VALUE)))
+                                .addComponent(cbxOrgAndSystem, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
+                                .addComponent(cbxLabs, 0, 422, Short.MAX_VALUE)))
                         .addGroup(glPLabAndDiagIssled.createSequentialGroup()
                             .addComponent(lblParaotdLpu)
                             .addGap(118)
-                            .addComponent(cbxParaotdLpu, GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE))
+                            .addComponent(cbxParaotdLpu, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE))
                         .addGroup(glPLabAndDiagIssled.createSequentialGroup()
                             .addComponent(lblDiag)
                             .addGap(26)
                             .addComponent(tfDiagCode, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(tfDiagName, GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+                            .addComponent(tfDiagName, GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(btnAddDiag))
                         .addGroup(glPLabAndDiagIssled.createSequentialGroup()
                             .addComponent(lblCabinet, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(tfCabinet, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(tfCabinet, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.UNRELATED)
+                            .addComponent(lblLabDate)
+                            .addPreferredGap(ComponentPlacement.UNRELATED)
+                            .addComponent(cdeLabDate, GroupLayout.PREFERRED_SIZE, 122, GroupLayout.PREFERRED_SIZE)))
                     .addContainerGap())
         );
         glPLabAndDiagIssled.setVerticalGroup(
@@ -790,7 +801,9 @@ public class MainFrame extends JFrame {
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPLabAndDiagIssled.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblCabinet)
-                        .addComponent(tfCabinet, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(tfCabinet, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblLabDate)
+                        .addComponent(cdeLabDate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addGap(21)
                     .addComponent(btnPrintIssled)
                     .addContainerGap())

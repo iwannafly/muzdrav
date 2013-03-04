@@ -144,7 +144,7 @@ public class DocumentPrinter {
 				execCmd = new String[] {new File(openOfficePath, "swriter.exe").getAbsolutePath(), path};
 				break;
 			default:
-				execCmd = new String[] {new File(openOfficePath, "swriter").getAbsolutePath(), path};
+				execCmd = new String[] {new File(openOfficePath, "lowriter").getAbsolutePath(), path};
 				break;
 			}
 		if (msOfficePath.length() > 0)

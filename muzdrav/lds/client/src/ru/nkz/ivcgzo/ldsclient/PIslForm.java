@@ -26,6 +26,7 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.chainsaw.Main;
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.DocumentPrinter;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
@@ -176,10 +177,11 @@ public class PIslForm {
 				
 				
 			String path;
-			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = "c:\\Протокол\\123.htm"), "utf-8")) {
+			//try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = "c:\\Протокол\\123.htm"), "utf-8")) {
 
-			//	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
+				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = DocumentPrinter.createReportFile("pisl")), "utf-8")) {
 					//AutoCloseableResultSet acrs;
+					
 			
 			StringBuilder sb = new StringBuilder(0x10000);
 			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -261,6 +263,7 @@ public class PIslForm {
 			
 			
 			osw.write(sb.toString());
+			
 			MainForm.conMan.openFileInEditor(path, false);
 			//System.out.print(MainForm.authInfo.clpu_name);
 			//return path;
@@ -889,6 +892,9 @@ public class PIslForm {
 					try {
 						
 						tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl,tn_ldi.getSelectedItem().pcisl));
+						
+						//while(tlab_isl.get)
+						
 						
 					} catch (TException e) {
 						// TODO Auto-generated catch block
@@ -2033,6 +2039,7 @@ public class PIslForm {
 
 				try {
 					dnli = MainForm.ltc.GetKlasIsS_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcisl);
+					
 					
 					dstoim = MainForm.ltc.GetLabStoim(tn_ldi.getSelectedItem().pcisl, MainForm.authInfo.cpodr);
 					boolean check;
