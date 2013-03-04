@@ -221,6 +221,7 @@ struct RdDinStruct{
 	20: optional i32 serd1;
 	21: optional i32 id_pos;
 	22: optional double ves;
+        23: optional i32 tonus;
 }
 /*. Rd_Inf*/
 struct RdInfStruct{
