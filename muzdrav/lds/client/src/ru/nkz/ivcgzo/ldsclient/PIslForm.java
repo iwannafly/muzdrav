@@ -890,6 +890,9 @@ public class PIslForm {
 						
 						tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl,tn_ldi.getSelectedItem().pcisl));
 						
+						
+						
+						
 					} catch (TException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
