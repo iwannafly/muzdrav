@@ -255,6 +255,7 @@ public class Vvod extends JFrame {
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPredPl;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBCerd;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBSerd1;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBTonus;
 	private JPanel pnlOtek;
 	private JLabel lblOtek;
 	private int age;
@@ -2632,41 +2633,61 @@ public class Vvod extends JFrame {
 		pnlIzmer.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
 		JLabel lblSrokBer = new JLabel("Срок беременности");
+		lblSrokBer.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel lblOkrJiv = new JLabel("Окружность живота");
+		lblOkrJiv.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel lblVdm = new JLabel("ВДМ");
+		lblVdm.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel lblTolPl = new JLabel("Толщина плаценты");
+		lblTolPl.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		SSrok = new CustomTextField();
+		SSrok.setFont(new Font("Tahoma", Font.BOLD, 12));
 		SSrok.setColumns(10);
 		
 		 SOkrj = new CustomTextField();
+		 SOkrj.setFont(new Font("Tahoma", Font.BOLD, 12));
 		SOkrj.setColumns(10);
 		
 		 SVdm = new CustomTextField();
+		 SVdm.setFont(new Font("Tahoma", Font.ITALIC, 12));
 		SVdm.setColumns(10);
 		
 		 STolP = new CustomTextField();
+		 STolP.setFont(new Font("Tahoma", Font.BOLD, 12));
 		STolP.setColumns(10);
+		
+		JLabel lblNewLabel = new JLabel("Тонус матки");
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
+//не добавлен классификатор DB14!!!		
+		CBTonus = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db14);
+		CBTonus.setFont(new Font("Tahoma", Font.BOLD, 12));
 		GroupLayout gl_pnlIzmer = new GroupLayout(pnlIzmer);
 		gl_pnlIzmer.setHorizontalGroup(
 			gl_pnlIzmer.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlIzmer.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pnlIzmer.createParallelGroup(Alignment.LEADING)
-						.addComponent(lblSrokBer)
-						.addComponent(lblOkrJiv)
-						.addComponent(lblVdm)
-						.addComponent(lblTolPl))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_pnlIzmer.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(STolP, 0, 0, Short.MAX_VALUE)
-						.addComponent(SVdm, 0, 0, Short.MAX_VALUE)
-						.addComponent(SOkrj, 0, 0, Short.MAX_VALUE)
-						.addComponent(SSrok, GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE))
-					.addContainerGap(179, Short.MAX_VALUE))
+						.addGroup(gl_pnlIzmer.createSequentialGroup()
+							.addGroup(gl_pnlIzmer.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblSrokBer)
+								.addComponent(lblOkrJiv)
+								.addComponent(lblVdm)
+								.addComponent(lblTolPl))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_pnlIzmer.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(STolP, 0, 0, Short.MAX_VALUE)
+								.addComponent(SVdm, 0, 0, Short.MAX_VALUE)
+								.addComponent(SOkrj, 0, 0, Short.MAX_VALUE)
+								.addComponent(SSrok, GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)))
+						.addGroup(gl_pnlIzmer.createSequentialGroup()
+							.addComponent(lblNewLabel)
+							.addGap(28)
+							.addComponent(CBTonus, 0, 121, Short.MAX_VALUE)))
+					.addContainerGap())
 		);
 		gl_pnlIzmer.setVerticalGroup(
 			gl_pnlIzmer.createParallelGroup(Alignment.LEADING)
@@ -2687,7 +2708,11 @@ public class Vvod extends JFrame {
 					.addGroup(gl_pnlIzmer.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblTolPl)
 						.addComponent(STolP, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_pnlIzmer.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel)
+						.addComponent(CBTonus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(13, Short.MAX_VALUE))
 		);
 		pnlIzmer.setLayout(gl_pnlIzmer);
 		
@@ -2719,6 +2744,9 @@ public class Vvod extends JFrame {
 				if (CBCerd.getSelectedPcod() != null)
 					rddin.setSerd(CBCerd.getSelectedPcod());
 					else rddin.unsetSerd();
+				if (CBTonus.getSelectedPcod() != null)
+					rddin.setTonus(CBTonus.getSelectedPcod());
+				else rddin.unsetTonus();
 			System.out.println(rddin);		
 				MainForm.tcl.AddRdDin(rddin);
 				} catch (KmiacServerException e1) {
@@ -2767,6 +2795,9 @@ public class Vvod extends JFrame {
 				if (CBCerd.getSelectedPcod() != null)
 					rddin.setSerd(CBCerd.getSelectedPcod());
 					else rddin.unsetSerd();
+				if (CBTonus.getSelectedPcod() != null)
+					rddin.setTonus(CBTonus.getSelectedPcod());
+				else rddin.unsetTonus();
 				calcOteci();
 				rddin.setOteki(oslrod);
 				rddin.setBall(br); 
@@ -2792,17 +2823,15 @@ public class Vvod extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_pnlDinBer.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_pnlDinBer.createSequentialGroup()
-							.addComponent(pnlIzmer, GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
-							.addGap(18)
-							.addComponent(pnlPlod, GroupLayout.PREFERRED_SIZE, 354, GroupLayout.PREFERRED_SIZE)
-							.addGap(21))
-						.addGroup(gl_pnlDinBer.createSequentialGroup()
-							.addComponent(pnlOtek, GroupLayout.PREFERRED_SIZE, 162, GroupLayout.PREFERRED_SIZE)
+							.addComponent(pnlOtek, GroupLayout.PREFERRED_SIZE, 188, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addGroup(gl_pnlDinBer.createParallelGroup(Alignment.LEADING)
 								.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-								.addComponent(button, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE))
-							.addContainerGap(419, Short.MAX_VALUE))))
+								.addComponent(button, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)))
+						.addComponent(pnlIzmer, GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE))
+					.addGap(18)
+					.addComponent(pnlPlod, GroupLayout.PREFERRED_SIZE, 354, GroupLayout.PREFERRED_SIZE)
+					.addGap(21))
 		);
 		gl_pnlDinBer.setVerticalGroup(
 			gl_pnlDinBer.createParallelGroup(Alignment.LEADING)
@@ -2811,15 +2840,13 @@ public class Vvod extends JFrame {
 					.addGroup(gl_pnlDinBer.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(pnlIzmer, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(pnlPlod, GroupLayout.PREFERRED_SIZE, 149, Short.MAX_VALUE))
-					.addGroup(gl_pnlDinBer.createParallelGroup(Alignment.LEADING)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_pnlDinBer.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_pnlDinBer.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(pnlOtek, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE))
-						.addGroup(Alignment.TRAILING, gl_pnlDinBer.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(button, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE))
+						.addComponent(pnlOtek, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap(234, Short.MAX_VALUE))
 		);
 		
@@ -2827,26 +2854,29 @@ public class Vvod extends JFrame {
 		lblOtek.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 12));
 		
 		ChBot1 = new JCheckBox("Нижние конечности");
+		ChBot1.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		ChBot2 = new JCheckBox("Верхние конечности");
+		ChBot2.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		ChBot3 = new JCheckBox("Верхняя брюшная стенка");
+		ChBot3.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		ChBot4 = new JCheckBox("Генерализованные");
+		ChBot4.setFont(new Font("Tahoma", Font.BOLD, 12));
 		GroupLayout gl_pnlOtek = new GroupLayout(pnlOtek);
 		gl_pnlOtek.setHorizontalGroup(
-			gl_pnlOtek.createParallelGroup(Alignment.LEADING)
+			gl_pnlOtek.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_pnlOtek.createSequentialGroup()
 					.addGroup(gl_pnlOtek.createParallelGroup(Alignment.LEADING)
 						.addComponent(ChBot1)
 						.addComponent(ChBot2)
 						.addComponent(ChBot3)
-						.addComponent(ChBot4))
+						.addComponent(ChBot4)
+						.addGroup(gl_pnlOtek.createSequentialGroup()
+							.addGap(66)
+							.addComponent(lblOtek)))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-				.addGroup(Alignment.TRAILING, gl_pnlOtek.createSequentialGroup()
-					.addContainerGap(64, Short.MAX_VALUE)
-					.addComponent(lblOtek)
-					.addGap(57))
 		);
 		gl_pnlOtek.setVerticalGroup(
 			gl_pnlOtek.createParallelGroup(Alignment.LEADING)
@@ -2865,23 +2895,32 @@ public class Vvod extends JFrame {
 		pnlOtek.setLayout(gl_pnlOtek);
 		
 		JLabel lblChssPlod = new JLabel("Чсс плода");
+		lblChssPlod.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel lblPolojPlod = new JLabel("Положение плода");
+		lblPolojPlod.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel lblPredlejPlod = new JLabel("Предлежание плода");
+		lblPredlejPlod.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel lblSerdcePlod = new JLabel("Сердцебиение плода");
+		lblSerdcePlod.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		SChcc = new CustomTextField();
+		SChcc.setFont(new Font("Tahoma", Font.BOLD, 12));
 		SChcc.setColumns(10);
 		
 		 CBPolPl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
+		 CBPolPl.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		 CBPredPl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db2);
+		 CBPredPl.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		 CBCerd = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db3);
+		 CBCerd.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		 CBSerd1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db4);
+		 CBSerd1.setFont(new Font("Tahoma", Font.BOLD, 12));
 		 
 		GroupLayout gl_pnlPlod = new GroupLayout(pnlPlod);
 		gl_pnlPlod.setHorizontalGroup(
@@ -3301,11 +3340,21 @@ public class Vvod extends JFrame {
 					tblDiag.setData(new ArrayList<PdiagAmb>());
 				}
 				if(rddin !=null){	
+				if (rddin.getSrok() != 0)	
 				SSrok.setText(String.valueOf(rddin.getSrok()));
+				else SSrok.setText("");
+				if (rddin.getOj() !=0 )
 				SOkrj.setText(String.valueOf(rddin.getOj()));
+				else SOkrj.setText("");
+				if (rddin.getHdm() !=0 )
 				SVdm.setText(String.valueOf(rddin.getHdm()));
+				else SVdm.setText("");
+				if (rddin.getChcc() != 0)
 				SChcc.setText(String.valueOf(rddin.getChcc()));
+				else SChcc.setText("");
+				if (rddin.getSpl() != 0)
 				STolP.setText(String.valueOf(rddin.getSpl()));
+				else STolP.setText("");
 				
 				if (rddin.isSetPredpl())
 					CBPredPl.setSelectedPcod(rddin.getPredpl());
@@ -3323,6 +3372,10 @@ public class Vvod extends JFrame {
 					CBSerd1.setSelectedPcod(rddin.getSerd1());
 				else
 					CBSerd1.setSelectedItem(null);
+				if (rddin.isSetTonus())
+					CBTonus.setSelectedPcod(rddin.getTonus());
+				else
+					CBTonus.setSelectedItem(null);
                 oslrod = rddin.getOteki();
         		if ((oslrod-8)>=0)
         		{ChBot4.setSelected(true);   iw1=oslrod-8;}
@@ -3334,6 +3387,20 @@ public class Vvod extends JFrame {
         		{ChBot2.setSelected(true);		iw1=iw1-2;}	
         		else  ChBot2.setSelected(false);   		
         		ChBot1.setSelected(iw1 ==1 );
+}                 else {SSrok.setText("");
+                        SOkrj.setText("");
+                        SVdm.setText("");
+                        SChcc.setText("");
+                        STolP.setText("");
+                        CBPredPl.setSelectedItem(null);
+                        CBPolPl.setSelectedItem(null);
+                        CBCerd.setSelectedItem(null);
+                        CBSerd1.setSelectedItem(null);
+                        CBTonus.setSelectedItem(null);
+                        ChBot4.setSelected(false);
+                        ChBot3.setSelected(false);
+                        ChBot2.setSelected(false);
+                        ChBot1.setSelected(false);
 }
 				
 				if (pvizitAmb.isSetCpos()) {

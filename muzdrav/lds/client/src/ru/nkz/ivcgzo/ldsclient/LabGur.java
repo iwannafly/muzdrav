@@ -17,6 +17,7 @@ import javax.swing.JButton;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.DocumentPrinter;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.ldsThrift.InputLG;
@@ -98,16 +99,14 @@ public class LabGur extends JFrame {
 					ilabgur.setC_nz1(cBpcislLG.getSelectedPcod());
 					ilabgur.setKotd(MainForm.authInfo.cpodr);
 					//OutputTest ot = new OutputTest();
-					String servPath;
+					String servPath = MainForm.ltc.printLabGur(ilabgur);
 					
-					servPath = MainForm.ltc.printLabGur(ilabgur);
+					//System.out.println(ilabgur);
+					//System.out.println(servPath);
 					
-					System.out.println(ilabgur);
-					System.out.println(servPath);
-					
-					String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
+					String cliPath = DocumentPrinter.createReportFile("Lab_gur");
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
-					MainForm.conMan.openFileInEditor(cliPath, true);
+					MainForm.conMan.openFileInEditor(cliPath, false);
 				} catch (TException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
