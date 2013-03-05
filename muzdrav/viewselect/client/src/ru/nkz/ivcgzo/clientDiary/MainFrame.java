@@ -221,8 +221,7 @@ public class MainFrame extends JFrame {
 
 
     private void setMedicalHistoryTabPaneComponents() {
-        vsMedicalHistoryControlsDelim = Box.createVerticalStrut(20);
-        vsMedicalHistoryControlsDelim.setPreferredSize(new Dimension(0, 10));
+        vsMedicalHistoryControlsDelim = Box.createVerticalStrut(10);
         vbMedicalHistoryTextFields.add(vsMedicalHistoryControlsDelim);
 
         addMedicalHistoryTabbedPane();

@@ -82,11 +82,6 @@
 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/hospital.png</locationURI>
 		</link>
 		<link>
-			<name>src/ru/nkz/ivcgzo/clientHospital/resources/issled.png</name>
-			<type>1</type>
-			<locationURI>WORKSPACE_LOC/gitrep/common/resources/issled.png</locationURI>
-		</link>
-		<link>
 			<name>src/ru/nkz/ivcgzo/clientHospital/resources/lifeHistory.png</name>
 			<type>1</type>
 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/lifeHistory.png</locationURI>

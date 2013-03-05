@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.clientMedication;
 
+import javax.swing.Box;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.BoxLayout;
@@ -35,6 +36,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.thrift.TException;
+import java.awt.Component;
 
 public class MedicationCatalogFrame extends JDialog{
 
@@ -53,6 +55,8 @@ public class MedicationCatalogFrame extends JDialog{
     private JLabel lblMedicationCustomFormHeader;
     private JScrollPane spMedicationList;
     private JScrollPane spMedicationFormList;
+    private Component vsCustomPanelHeaderDelim;
+    private Component vsCustomPanelBtnDelimUpper, vsCustomPanelBtnDelimLower;
     private ThriftIntegerClassifierList lMedications;
     private ThriftIntegerClassifierList lMedicationForms;
     private ShablonSearchListener medicationSearchListener;
@@ -117,15 +121,20 @@ public class MedicationCatalogFrame extends JDialog{
     private void addCustomMedPanel() {
         pCustomMed = new JPanel();
         pCustomMed.setBorder(new EtchedBorder(
-                EtchedBorder.RAISED, new Color(0, 0, 0), new Color(102, 102, 102)));
+                EtchedBorder.RAISED, new Color(0, 0, 0), new Color(192, 102, 102)));
         pCustomMed.setLayout(new BoxLayout(pCustomMed, BoxLayout.Y_AXIS));
-        pCustomMed.setMaximumSize(new Dimension(32767, 100));
-        pMain.add(pCustomMed);
+        vsCustomPanelHeaderDelim = Box.createVerticalStrut(5);
+        pCustomMed.add(vsCustomPanelHeaderDelim);
         addMedicationCustomNameHeader();
         addMedicationCustomName();
         addMedicationCustomFormHeader();
         addMedicationCustomForm();
+        vsCustomPanelBtnDelimUpper = Box.createVerticalStrut(7);
+        pCustomMed.add(vsCustomPanelBtnDelimUpper);
         addAddButton();
+        vsCustomPanelBtnDelimLower = Box.createVerticalStrut(5);
+        pCustomMed.add(vsCustomPanelBtnDelimLower);
+        pMain.add(pCustomMed);
     }
 
     private void addMedicationSearchHeader() {
@@ -219,6 +228,7 @@ public class MedicationCatalogFrame extends JDialog{
 
     private void addMedicationCustomNameHeader() {
         lblMedicationCustomNameHeader = new JLabel("Название медикамента:");
+        lblMedicationCustomNameHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
         pCustomMed.add(lblMedicationCustomNameHeader);
     }
     
@@ -232,6 +242,7 @@ public class MedicationCatalogFrame extends JDialog{
 
     private void addMedicationCustomFormHeader() {
         lblMedicationCustomFormHeader = new JLabel("Форма выпуска:");
+        lblMedicationCustomFormHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
         pCustomMed.add(lblMedicationCustomFormHeader);
     }
     
@@ -275,6 +286,7 @@ public class MedicationCatalogFrame extends JDialog{
     
     private void addAddButton() {
     	btnAddMedication = new JButton("Добавить медикамент");
+    	btnAddMedication.setAlignmentX(Component.CENTER_ALIGNMENT);
     	btnAddMedication.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -288,6 +300,8 @@ public class MedicationCatalogFrame extends JDialog{
                     	new IntegerClassifier(-1, newMedName),
                         new IntegerClassifier(-1, newMedForm), patient);
                     frmMedicationOptions.setVisible(true);
+                    tfMedicationCustomName.setText(null);
+                    tfMedicationCustomForm.setText(null);
                 } else {
                 	JOptionPane.showMessageDialog(getContentPane(),
                 		"Название медикамента не может быть пустым", "Ошибка",

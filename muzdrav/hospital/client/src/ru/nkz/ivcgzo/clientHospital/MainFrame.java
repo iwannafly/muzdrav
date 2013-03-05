@@ -283,7 +283,6 @@ public class MainFrame extends JFrame {
     private JTextField tfPatalogoAnDiagPcod;
     private JPanel panel;
     private JButton btnShowPatientInfo;
-    private JButton btnIssled;
     private JToolBar toolBar;
     private JTextField tfZaklDiagPcod;
     private JTextField tfZaklDiagName;
@@ -643,8 +642,8 @@ public class MainFrame extends JFrame {
             		try {
             			trdIshod = ClientHospital.tcl.getRdIshodInfo(patient.getPatientId(), patient.gospitalCod);
             			System.out.println("начальные значения 11");		
-           			setDefaultValues();
-            			} catch (KmiacServerException e1) {
+            			setDefaultValues();
+        			} catch (KmiacServerException e1) {
             			// TODO Auto-generated catch block
             			e1.printStackTrace();
             		} catch (TException e1) {
@@ -860,26 +859,6 @@ public class MainFrame extends JFrame {
         btnShowPatientBolList.setRequestFocusEnabled(false);
 
         toolBar.add(new JToolBar.Separator());
-
-        btnIssled = new JButton();
-        btnIssled.setToolTipText("Лабораторные исследования");
-        toolBar.add(btnIssled);
-        btnIssled.setMaximumSize(new Dimension(35, 35));
-        btnIssled.setMinimumSize(new Dimension(35, 35));
-        btnIssled.setPreferredSize(new Dimension(35, 35));
-        btnIssled.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                if (patient != null) {
-                    ClientHospital.conMan.showLabRecordForm(patient.getPatientId(),
-                        patient.getSurname(), patient.getName(), patient.getMiddlename(),
-                        patient.getGospitalCod());
-                }
-            }
-        });
-        btnIssled.setBorder(null);
-        btnIssled.setIcon(new ImageIcon(MainFrame.class.getResource(
-            "/ru/nkz/ivcgzo/clientHospital/resources/issled.png")));
-        btnIssled.setRequestFocusEnabled(false);
 
         btnOperation = new JButton();
         btnOperation.setToolTipText("Операции");

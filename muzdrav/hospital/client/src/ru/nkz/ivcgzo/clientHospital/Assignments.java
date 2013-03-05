@@ -1,7 +1,6 @@
 package ru.nkz.ivcgzo.clientHospital;
 
-//TODO: В ДНЕВНИКЕ ОСМОТРА ВЫВОДИТЬ ЗАПИСИ ПО ПРИЗНАКУ is_po
-//TODO: ДОБАВЛЕНИЕ МЕДИКАМЕНТА
+//TODO: ДОБАВЛЕНИЕ КАПЕЛЬНИЦЫ И ИНЪЕКЦИЙ
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -199,6 +198,10 @@ public final class Assignments extends JPanel {
 			return;
 		this.lastMedItem = curItem;
 		String strInfo = "";
+		if (curItem.isSetOpl_name())
+			strInfo += "Средства оплаты: " + curItem.getOpl_name() + '\n';
+		if (curItem.isSetDiag_name())
+			strInfo += "Диагноз: " + curItem.getDiag_name() + '\n';
 		if (curItem.isSetFlek())
 			strInfo += "Лекарственая форма: " + curItem.getFlek() + '\n';
 		if (curItem.isSetKomm() && (curItem.getKomm().length() > 0))
@@ -475,8 +478,8 @@ public final class Assignments extends JPanel {
 		this.tblMedications = new CustomTable<TMedication, TMedication._Fields>(
 				false, false, TMedication.class, 0, "Наименование",
 				4, "Дата назначения", 12, "Дата окончания", 14, "Дата отмены",
-				20, "Способ введения", 10, "Схема приёма", 11, "Кол-во в день",
-				7, "Разовая доза", 19, "ед.");
+				22, "Способ введения", 10, "Схема приёма", 11, "Кол-во в день",
+				7, "Разовая доза", 21, "ед.");
 		tblMedications.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
