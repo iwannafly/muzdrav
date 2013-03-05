@@ -3,6 +3,8 @@ package ru.nkz.ivcgzo.clientHospital.controllers;
 import java.awt.Component;
 import java.net.URL;
 
+import javax.swing.JOptionPane;
+
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
 import ru.nkz.ivcgzo.clientHospital.views.PersonalInfoPanel;
 
@@ -45,7 +47,12 @@ public class PersonalInfoController implements IComponentController {
 
     public final void updatePatient(final String chamber, final int otdProf,
             final String surname, final String name, final String middlename) {
-        model.updatePatient(chamber, otdProf, surname, name, middlename);
+        try {
+            model.updatePatient(chamber, otdProf, surname, name, middlename);
+        } catch (HospitalDataTransferException e) {
+            JOptionPane.showMessageDialog(
+                view, e.getMessage(), "Ошибка!", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
 }

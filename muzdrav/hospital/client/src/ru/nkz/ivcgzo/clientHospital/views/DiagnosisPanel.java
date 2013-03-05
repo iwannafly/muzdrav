@@ -6,10 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.Box;
@@ -26,22 +23,19 @@ import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-import org.apache.thrift.TException;
-
-import ru.nkz.ivcgzo.clientHospital.ClientHospital;
-import ru.nkz.ivcgzo.clientHospital.MainFrame;
 import ru.nkz.ivcgzo.clientHospital.controllers.DiagnosisController;
+import ru.nkz.ivcgzo.clientHospital.model.IDiagnosisObserver;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
 import ru.nkz.ivcgzo.clientHospital.model.IPatientObserver;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis._Fields;
+import javax.swing.JCheckBox;
 
-public class DiagnosisPanel extends JPanel implements IPatientObserver {
+public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnosisObserver {
     private static final long serialVersionUID = -3813268997543431546L;
     private static final String TOOLTIP_TEXT =
             "<html><b>Панель диагнозов</b> - позволяет врачу стационара  "
@@ -50,7 +44,6 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver {
             "/ru/nkz/ivcgzo/clientHospital/resources/firstAid.png");
     private static final String TITLE = "Диагнозы";
 
-    @SuppressWarnings("unused")
     private DiagnosisController controller;
     private IHospitalModel model;
 
@@ -69,7 +62,6 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver {
     private Box vbDiagnosisTextFields;
     private JScrollPane spDiagnosisMedOp;
     private JLabel lblDiagMedOp;
-    private JPanel panel;
     private Component verticalStrut;
     private Component vsDiagnosisControlsDelimFirst;
     private JButton btnSaveDiag;
@@ -77,12 +69,15 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver {
     private JButton btnAddDiag;
     private JScrollPane spDiag;
     private Box hbDiagnosisTableControls;
+    private JCheckBox chbxPredv;
+    private Component verticalStrutFirst;
 
     public DiagnosisPanel(final DiagnosisController inController,
             final IHospitalModel inModel) {
         this.controller = inController;
         this.model = inModel;
         model.registerPatientObserver((IPatientObserver) this);
+        model.registerDiagnosisObserver((IDiagnosisObserver) this);
 
         setDiagnosisPanel();
     }
@@ -133,13 +128,13 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver {
 
     private void addDiagnosisTable() {
         tbDiag = new CustomTable<TDiagnosis, TDiagnosis._Fields>(
-                true, true, TDiagnosis.class, 4, "Дата", 2, "Код МКБ", 7, "Наименование диагноза");
-        tbDiag.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                if (tbDiag.getSelectedItem() != null) {
-                    setDiagPriznRdbtn();
-                    taDiagMedOp.setText(tbDiag.getSelectedItem().getMedOp());
+                true, false, TDiagnosis.class, 4, "Дата", 2, "Код МКБ", 7, "Наименование диагноза");
+        tbDiag.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(final ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    if (tbDiag.getSelectedItem() != null) {
+                        controller.setCurrentDiagnosisRecord(tbDiag.getSelectedItem());
+                    }
                 }
             }
         });
@@ -147,6 +142,22 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver {
         tbDiag.setEditableFields(false, 1);
         tbDiag.setEditableFields(false, 2);
         spDiag.setViewportView(tbDiag);
+    }
+
+    private void fillCurrentDiagInfo() {
+        setDiagPriznRdbtn();
+        setDiagChBx();
+        taDiagMedOp.setText(tbDiag.getSelectedItem().getMedOp());
+    }
+
+    private void setDiagChBx() {
+        if (!tbDiag.getSelectedItem().isSetPredv()) {
+            chbxPredv.setSelected(false);
+        } else if (tbDiag.getSelectedItem().isPredv()) {
+            chbxPredv.setSelected(true);
+        } else {
+            chbxPredv.setSelected(false);
+        }
     }
 
     private void setDiagnosisTableButtonsPanel() {
@@ -171,7 +182,11 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver {
         vbDiagnosisTableButtons.add(btnAddDiag);
         btnAddDiag.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                addDiagnosisToTable(ClientHospital.conMan.showMkbTreeForm("Диагноз", ""));
+                controller.addDiagnosis();
+                if (tbDiag.getRowCount() > 0) {
+                    tbDiag.setRowSelectionInterval(tbDiag.getRowCount() - 1,
+                        tbDiag.getRowCount() - 1);
+                }
             }
         });
         btnAddDiag.setIcon(new ImageIcon(MainFrame.class.getResource(
@@ -186,7 +201,18 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver {
         vbDiagnosisTableButtons.add(btnDelDiag);
         btnDelDiag.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                delDiagnosisFromTable();
+                if (tbDiag.getSelectedItem() != null) {
+                    int opResult = JOptionPane.showConfirmDialog(
+                        btnDelDiag, "Удалить диагноз?",
+                        "Удаление диагноза", JOptionPane.YES_NO_OPTION);
+                    if (opResult == JOptionPane.YES_OPTION) {
+                        controller.deleteDiagnosis(tbDiag.getSelectedItem());
+                    }
+                    if (tbDiag.getRowCount() > 0) {
+                        tbDiag.setRowSelectionInterval(tbDiag.getRowCount() - 1,
+                            tbDiag.getRowCount() - 1);
+                    }
+                }
             }
         });
         btnDelDiag.setIcon(new ImageIcon(MainFrame.class.getResource(
@@ -201,7 +227,34 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver {
         vbDiagnosisTableButtons.add(btnSaveDiag);
         btnSaveDiag.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                saveDiagnosisToTable();
+                if (tbDiag.getSelectedItem() != null) {
+                    int opResult = JOptionPane.showConfirmDialog(
+                        btnDelDiag, "Добавить информацию о диагнозе?",
+                        "Изменение диагноза", JOptionPane.YES_NO_OPTION);
+                    if (opResult == JOptionPane.YES_OPTION) {
+                        tbDiag.getSelectedItem().setMedOp(taDiagMedOp.getText());
+                        if (rdbtnMain.isSelected()) {
+                            tbDiag.getSelectedItem().setPrizn(1);
+                        }
+                        if (rdbtnSoput.isSelected()) {
+                            tbDiag.getSelectedItem().setPrizn(3);
+                        }
+                        if (rdbtnOsl.isSelected()) {
+                            tbDiag.getSelectedItem().setPrizn(2);
+                        }
+                        if (chbxPredv.isSelected()) {
+                            tbDiag.getSelectedItem().setPredv(true);
+                        }
+                        tbDiag.getSelectedItem().setIdGosp(model.getPatient().getGospitalCod());
+
+                        // сохраняем номер выделенной строки
+                        int selRowNumber = tbDiag.getSelectedRow();
+                        // передаем контроллеру строку для обновления
+                        controller.updateDiagnosis(tbDiag.getSelectedItem());
+                        // устанавливаем выделение на строку с сохраненным ранее номером
+                        tbDiag.setRowSelectionInterval(selRowNumber, selRowNumber);
+                    }
+                }
             }
         });
         btnSaveDiag.setIcon(new ImageIcon(MainFrame.class.getResource(
@@ -214,15 +267,22 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver {
 
         addDiagnosisRadioButtonsGroup();
 
-        panel = new JPanel();
-        vbDiagnosisTextFields.add(panel);
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        verticalStrutFirst = Box.createVerticalStrut(10);
+        vbDiagnosisTextFields.add(verticalStrutFirst);
+
+        addDiagnosisCheckBox();
 
         verticalStrut = Box.createVerticalStrut(10);
         vbDiagnosisTextFields.add(verticalStrut);
 
         addDiagnosisMedOpHeader();
         addDiagnosisMedOpScrollPane();
+    }
+
+    private void addDiagnosisCheckBox() {
+        chbxPredv = new JCheckBox("Предварительный диагноз");
+        chbxPredv.setAlignmentX(Component.CENTER_ALIGNMENT);
+        vbDiagnosisTextFields.add(chbxPredv);
     }
 
     private void addDiagnosisMedOpHeader() {
@@ -295,23 +355,6 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver {
         btgDiag.add(rdbtnOsl);
     }
 
-
-    private void fillDiagnosisTable() {
-        if (model.getPatient() != null) {
-            try {
-                tbDiag.setData(
-                    ClientHospital.tcl.getDiagnosis(model.getPatient().getGospitalCod()));
-                setDiagPriznRdbtn();
-            } catch (DiagnosisNotFoundException e) {
-                Collections.<TDiagnosis>emptyList();
-            } catch (KmiacServerException e) {
-                e.printStackTrace();
-            } catch (TException e) {
-                ClientHospital.conMan.reconnect(e);
-            }
-        }
-    }
-
     private void setDiagPriznRdbtn() {
         if (tbDiag.getSelectedItem() != null) {
             if (tbDiag.getSelectedItem().getPrizn() == 1) {
@@ -328,95 +371,13 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver {
         }
     }
 
-    private void delDiagnosisFromTable() {
-        try {
-            if (tbDiag.getSelectedItem() != null) {
-                int opResult = JOptionPane.showConfirmDialog(
-                    btnDelDiag, "Удалить диагноз?",
-                    "Удаление диагноза", JOptionPane.YES_NO_OPTION);
-                if (opResult == JOptionPane.YES_OPTION) {
-                    ClientHospital.tcl.deleteDiagnosis(tbDiag.getSelectedItem().getId());
-                    tbDiag.setData(
-                        ClientHospital.tcl.getDiagnosis(model.getPatient().getGospitalCod()));
-                }
-                if (tbDiag.getRowCount() > 0) {
-                    tbDiag.setRowSelectionInterval(tbDiag.getRowCount() - 1,
-                        tbDiag.getRowCount() - 1);
-                }
-                taDiagMedOp.setText("");
-            }
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
-        } catch (DiagnosisNotFoundException e1) {
-            tbDiag.setData(new ArrayList<TDiagnosis>());
-            //e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
-        }
-    }
-
-    private void saveDiagnosisToTable() {
-        try {
-            if (tbDiag.getSelectedItem() != null) {
-                int opResult = JOptionPane.showConfirmDialog(
-                    btnDelDiag, "Добавить информацию о диагнозе?",
-                    "Изменение диагноза", JOptionPane.YES_NO_OPTION);
-                if (opResult == JOptionPane.YES_OPTION) {
-                    tbDiag.getSelectedItem().setMedOp(taDiagMedOp.getText());
-                    if (rdbtnMain.isSelected()) {
-                        tbDiag.getSelectedItem().setPrizn(1);
-                    }
-                    if (rdbtnSoput.isSelected()) {
-                        tbDiag.getSelectedItem().setPrizn(3);
-                    }
-                    if (rdbtnOsl.isSelected()) {
-                        tbDiag.getSelectedItem().setPrizn(2);
-                    }
-                    tbDiag.getSelectedItem().setIdGosp(model.getPatient().getGospitalCod());
-                    ClientHospital.tcl.updateDiagnosis(tbDiag.getSelectedItem());
-                }
-            }
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
-        }
-    }
-
-    private void addDiagnosisToTable(final StringClassifier curDiagnosis) {
-        try {
-            if ((curDiagnosis != null) && (model.getPatient() != null)) {
-                TDiagnosis diag = new TDiagnosis();
-                diag.setIdGosp(model.getPatient().getGospitalCod());
-                diag.setCod(curDiagnosis.getPcod());
-                diag.setDateUstan(System.currentTimeMillis());
-                diag.setVrach(ClientHospital.authInfo.getPcod());
-                diag.setDiagName(curDiagnosis.getName());
-                diag.setId(ClientHospital.tcl.addDiagnosis(diag));
-                taDiagMedOp.setText(curDiagnosis.getName());
-//                tbDiag.addItem(diag);
-                tbDiag.setData(
-                    ClientHospital.tcl.getDiagnosis(model.getPatient().getGospitalCod()));
-                if (tbDiag.getRowCount() > 1) {
-                    tbDiag.setRowSelectionInterval(tbDiag.getRowCount() - 2,
-                        tbDiag.getRowCount() - 1);
-                }
-            }
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
-        } catch (DiagnosisNotFoundException e) {
-            tbDiag.setData(new ArrayList<TDiagnosis>());
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
-        }
-    }
-
     private void clearDiagnosisText() {
         tbDiag.setData(Collections.<TDiagnosis>emptyList());
         taDiagMedOp.setText(null);
         rdbtnMain.setSelected(false);
         rdbtnSoput.setSelected(false);
         rdbtnOsl.setSelected(false);
+        chbxPredv.setSelected(false);
     }
 
     public final Component getComponent() {
@@ -438,7 +399,17 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver {
     @Override
     public final void patientChanged() {
         clearDiagnosisText();
-        fillDiagnosisTable();
+        updateDiagonsisTable();
     }
 
+    @Override
+    public final void diagnosisChanged() {
+        fillCurrentDiagInfo();
+    }
+
+    public final void updateDiagonsisTable() {
+        if (model.getPatient() != null) {
+            tbDiag.setData(model.getDiagnosisList());
+        }
+    }
 }

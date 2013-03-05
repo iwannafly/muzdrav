@@ -86,6 +86,7 @@ struct TDiagnosis{
     7:optional i32 vrach;
 	/* Поле для customTable в swinge - в таблице Бд его нет*/
 	8:optional string diagName;
+	9:optional bool predv;
 }
 
 struct ShablonText {
@@ -522,13 +523,13 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	Shablon getShablon(1:i32 idSh) throws (1:kmiacServer.KmiacServerException kse);
 
 	/**
-	 * FIXME хз что это, возможно следует удалить
+	 * Загрузка списка диагнозов по котрым есть шаблоны
 	 */
 	list<classifier.StringClassifier> getShablonDiagnosis(1:i32 cspec, 2:i32 cslu, 3:string srcText)
 		throws (1:kmiacServer.KmiacServerException kse);
 
 	/**
-	 * FIXME хз что это, возможно следует удалить
+	 * Загрузка списка шаблонов по выбранному диагнозу
 	 */
 	list<classifier.IntegerClassifier> getShablonBySelectedDiagnosis(
 		1:i32 cspec, 2:i32 cslu, 3:string diag, 4:string srcText) throws (1:kmiacServer.KmiacServerException kse);

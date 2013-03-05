@@ -16,6 +16,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
+import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 
 import ru.nkz.ivcgzo.clientHospital.controllers.MainController;
@@ -86,6 +87,9 @@ public class MainFrame extends JFrame {
         setTitle("Врач стаицонара");
         pack();
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        UIManager.put("OptionPane.yesButtonText", "Да");
+        UIManager.put("OptionPane.noButtonText", "Нет");
     }
 
     private void setMainMenu() {

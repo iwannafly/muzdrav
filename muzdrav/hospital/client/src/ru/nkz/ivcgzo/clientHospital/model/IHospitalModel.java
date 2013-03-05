@@ -2,9 +2,12 @@ package ru.nkz.ivcgzo.clientHospital.model;
 
 import java.util.List;
 
+import ru.nkz.ivcgzo.clientHospital.controllers.HospitalDataTransferException;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
+import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
@@ -13,9 +16,11 @@ public interface IHospitalModel {
 
     TPatient getPatient();
 
-    void setPatient(int patientGospId);
+    void setPatient(int patientGospId) throws PatientNotFoundException,
+        HospitalDataTransferException;
 
-    void setPatientByCotd(int idCotd);
+    void setPatientByCotd(int idCotd) throws PatientNotFoundException,
+        HospitalDataTransferException;
 
     void registerPatientObserver(IPatientObserver obs);
 
@@ -30,7 +35,7 @@ public interface IHospitalModel {
     List<IntegerClassifier> getOtdProfs();
 
     void updatePatient(String chamber, int otdProf, String surname,
-        String name, String middlename);
+        String name, String middlename) throws HospitalDataTransferException;
 
     List<IntegerClassifier> loadMedicalHistoryShablons();
 
@@ -44,13 +49,11 @@ public interface IHospitalModel {
 
     List<TMedicalHistory> getDiaryList();
 
-    void setDiaryList();
+    void setDiaryList() throws HospitalDataTransferException;
 
     TMedicalHistory getMedicalHistory();
 
-    void updateMedicalHistory();
-
-    void deleteMedicalHistory(TMedicalHistory currentMedHist);
+    void deleteMedicalHistory(TMedicalHistory currentMedHist) throws HospitalDataTransferException;
 
     void removeDiaryRecordObserver(IDiaryRecordObserver obs);
 
@@ -58,5 +61,25 @@ public interface IHospitalModel {
 
     void setMedicalHistory(TMedicalHistory currentMedicalHistory);
 
-    void addMedicalHistory(TMedicalHistory newMedHist);
+    void addMedicalHistory(TMedicalHistory newMedHist) throws HospitalDataTransferException;
+
+    void updateMedicalHistory(TMedicalHistory currentMedHist) throws HospitalDataTransferException;
+
+    void removeDiagnosisObserver(IDiagnosisObserver obs);
+
+    void registerDiagnosisObserver(IDiagnosisObserver obs);
+
+    TDiagnosis getCurrentDiagnosis();
+
+    void addDiagnosis(TDiagnosis diagnosis) throws HospitalDataTransferException;
+
+    void deleteDiagnosis(TDiagnosis diagnosis) throws HospitalDataTransferException;
+
+    void updateDiagnosis(TDiagnosis diagnosis) throws HospitalDataTransferException;
+
+    void setDiagnosisList() throws HospitalDataTransferException;
+
+    List<TDiagnosis> getDiagnosisList();
+
+    void setCurrentDiagnosis(TDiagnosis inCurrentDiagnosis);
 }

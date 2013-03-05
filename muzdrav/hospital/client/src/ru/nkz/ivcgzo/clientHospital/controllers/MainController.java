@@ -1,10 +1,12 @@
 package ru.nkz.ivcgzo.clientHospital.controllers;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import ru.nkz.ivcgzo.clientHospital.ClientHospital;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
 import ru.nkz.ivcgzo.clientHospital.views.MainFrame;
+import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 
 public class MainController {
@@ -81,14 +83,19 @@ public class MainController {
         patSelectFrame.refreshModel();
         patSelectFrame.setVisible(true);
 
-        model.setPatient(selectedPatient.getIdGosp());
-        if (model.getPatient() != null) {
+        try {
+            model.setPatient(selectedPatient.getIdGosp());
             view.setFrameTitle(String.format("%s %s %s",
                     model.getPatient().getSurname(),
                     model.getPatient().getName(),
                     model.getPatient().getMiddlename())
             );
-        } else {
+        } catch (PatientNotFoundException e) {
+            JOptionPane.showMessageDialog(patSelectFrame, "Пациент не найден!");
+            view.setFrameTitle("Пациент не выбран");
+        } catch (HospitalDataTransferException e) {
+            JOptionPane.showMessageDialog(
+                    patSelectFrame, e.getMessage(), "Ошибка!", JOptionPane.ERROR_MESSAGE);
             view.setFrameTitle("Пациент не выбран");
         }
     }
@@ -149,7 +156,21 @@ public class MainController {
     public final void showExternalReestrFrame() {
         Integer result = ClientHospital.conMan.showMedStaErrorsForm();
         if (result != null) {
-            model.setPatientByCotd(result);
+            try {
+                model.setPatientByCotd(result);
+                view.setFrameTitle(String.format("%s %s %s",
+                    model.getPatient().getSurname(),
+                    model.getPatient().getName(),
+                    model.getPatient().getMiddlename())
+                );
+            } catch (PatientNotFoundException e) {
+                JOptionPane.showMessageDialog(view, "Пациент не найден!");
+                view.setFrameTitle("Пациент не выбран");
+            } catch (HospitalDataTransferException e) {
+                JOptionPane.showMessageDialog(
+                    view, e.getMessage(), "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                view.setFrameTitle("Пациент не выбран");
+            }
         }
     }
 

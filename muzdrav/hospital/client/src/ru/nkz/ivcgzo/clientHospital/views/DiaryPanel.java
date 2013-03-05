@@ -35,9 +35,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.thrift.TException;
-
-import ru.nkz.ivcgzo.clientHospital.ClientHospital;
 import ru.nkz.ivcgzo.clientHospital.MainFrame;
 import ru.nkz.ivcgzo.clientHospital.controllers.DiaryController;
 import ru.nkz.ivcgzo.clientHospital.model.IDiaryRecordObserver;
@@ -47,7 +44,6 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
@@ -162,7 +158,7 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
 
     private void addMedicalHistoryTable() {
         tbMedHist = new CustomTable<TMedicalHistory, TMedicalHistory._Fields>(
-            true, true, TMedicalHistory.class, 8, "Дата", 9, "Время");
+            true, false, TMedicalHistory.class, 8, "Дата", 9, "Время");
         spMedHist.setViewportView(tbMedHist);
         tbMedHist.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(final ListSelectionEvent e) {
@@ -364,7 +360,7 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
             glPnlStat.createParallelGroup(Alignment.LEADING).addComponent(spStatPraence));
         glPnlStat.setVerticalGroup(
             glPnlStat.createParallelGroup(Alignment.LEADING)
-            .addGroup(glPnlStat.createSequentialGroup()
+                .addGroup(glPnlStat.createSequentialGroup()
                     .addComponent(spStatPraence, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE))
         );
         spStatPraence.setViewportView(taStatusPraence);
@@ -422,45 +418,48 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
     private void deleteMedHistoryFormTable() {
         if (tbMedHist.getSelectedItem() != null) {
             int opResult = JOptionPane.showConfirmDialog(
-                btnMedHistDel, "Удалить запись?",
+                DiaryPanel.this, "Удалить запись?",
                 "Удаление записи", JOptionPane.YES_NO_OPTION);
             if (opResult == JOptionPane.YES_OPTION) {
-                controller.deleteMedicalHistory(tbMedHist.getSelectedItem());
+                controller.deleteDiaryRecord(tbMedHist.getSelectedItem());
+                clearMedicalHistoryTextAreas();
+                if (tbMedHist.getRowCount() > 0) {
+                    // очищаем выделение вручную (костыль для CustomTable)
+                    tbMedHist.clearSelection();
+                 // устанавливаем выделение на последнюю строку
+                    tbMedHist.setRowSelectionInterval(tbMedHist.getRowCount() - 1,
+                        tbMedHist.getRowCount() - 1);
+                }
             }
-            if (tbMedHist.getRowCount() > 0) {
-                tbMedHist.setRowSelectionInterval(tbMedHist.getRowCount() - 1,
-                    tbMedHist.getRowCount() - 1);
-            }
-            clearMedicalHistoryTextAreas();
         }
 
     }
 
     private void updateMedHistoryToTable() {
-        try {
-            if (tbMedHist.getSelectedItem() != null) {
-                int opResult = JOptionPane.showConfirmDialog(
-                    btnMedHistUpd, "Обновить информацию о диагнозе?",
-                    "Изменение диагноза", JOptionPane.YES_NO_OPTION);
-                if (opResult == JOptionPane.YES_OPTION) {
-                    tbMedHist.getSelectedItem().setFisicalObs(taFisicalObs.getText());
-                    tbMedHist.getSelectedItem().setJalob(taJalob.getText());
-                    tbMedHist.getSelectedItem().setMorbi(taDesiaseHistory.getText());
-                    tbMedHist.getSelectedItem().setStatusLocalis(taStatusLocalis.getText());
-                    tbMedHist.getSelectedItem().setStatusPraesense(taStatusPraence.getText());
-                    ClientHospital.tcl.updateMedicalHistory(tbMedHist.getSelectedItem());
-                }
-            }
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
+        if (tbMedHist.getSelectedItem() != null) {
+            tbMedHist.getSelectedItem().setFisicalObs(taFisicalObs.getText());
+            tbMedHist.getSelectedItem().setJalob(taJalob.getText());
+            tbMedHist.getSelectedItem().setMorbi(taDesiaseHistory.getText());
+            tbMedHist.getSelectedItem().setStatusLocalis(taStatusLocalis.getText());
+            tbMedHist.getSelectedItem().setStatusPraesense(taStatusPraence.getText());
+            // сохраняем номер выделенной строки
+            int selRowNumber = tbMedHist.getSelectedRow();
+            // передаем контроллеру строку для обновления
+            controller.updateDiaryRecord(tbMedHist.getSelectedItem());
+            // устанавливаем выделение на строку с сохраненным ранее номером
+            tbMedHist.setRowSelectionInterval(selRowNumber, selRowNumber);
         }
     }
 
     private void addMedHistoryToTable() {
         if (model.getPatient() != null) {
+            // передаем контроллеру запрос на добавление строки
             controller.addDiaryRecord();
+            // устанавливаем выделение на последнюю строку
+            if (tbMedHist.getRowCount() > 0) {
+                tbMedHist.setRowSelectionInterval(tbMedHist.getRowCount() - 1,
+                    tbMedHist.getRowCount() - 1);
+            }
         }
     }
 
@@ -469,16 +468,16 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
             taJalob.setText(model.getMedicalHistory().getJalob());
         }
         if (taDesiaseHistory != null) {
-            taDesiaseHistory.setText(model.getMedicalHistory().getJalob());
+            taDesiaseHistory.setText(model.getMedicalHistory().getMorbi());
         }
         if (taFisicalObs != null) {
-            taFisicalObs.setText(model.getMedicalHistory().getJalob());
+            taFisicalObs.setText(model.getMedicalHistory().getFisicalObs());
         }
         if (taStatusLocalis != null) {
-            taStatusLocalis.setText(model.getMedicalHistory().getJalob());
+            taStatusLocalis.setText(model.getMedicalHistory().getStatusLocalis());
         }
         if (taStatusPraence != null) {
-            taStatusPraence.setText(model.getMedicalHistory().getJalob());
+            taStatusPraence.setText(model.getMedicalHistory().getStatusPraesense());
         }
     }
 
@@ -574,12 +573,28 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
             public void mouseClicked(final MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     if (lMedicalHistoryShablonNames.getSelectedValue() != null) {
-                        pasteSelectedShablon(model.loadShablon(
-                            lMedicalHistoryShablonNames.getSelectedValue().pcod));
+                        Shablon selectedShablon = model.loadShablon(
+                                lMedicalHistoryShablonNames.getSelectedValue().pcod);
+                        smartPasteShablon(selectedShablon);
                     }
                 }
             }
         });
+    }
+
+    public final void smartPasteShablon(final Shablon selectedShablon) {
+        if (isAllTextFieldsEmpty()) {
+            pasteSelectedShablon(selectedShablon);
+        } else {
+            int opResult = JOptionPane.showConfirmDialog(DiaryPanel.this,
+                "Заменить набранный текст при вставке нового шаблона? ",
+                "Замена текста", JOptionPane.YES_NO_OPTION);
+            if (opResult == JOptionPane.YES_OPTION) {
+                pasteSelectedShablon(selectedShablon);
+            } else {
+                addSelectedShablon(selectedShablon);
+            }
+        }
     }
 
     private void setMedicalHistoryShablonListener() {
@@ -588,7 +603,15 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         tfMedHShablonFilter.getDocument().addDocumentListener(medHiSearchListener);
     }
 
-    public final void pasteSelectedShablon(final Shablon shablon) {
+    private boolean isAllTextFieldsEmpty() {
+        return ((taJalob.getText().isEmpty())
+            && (taDesiaseHistory.getText().isEmpty())
+            && (taStatusPraence.getText().isEmpty())
+            && (taFisicalObs.getText().isEmpty())
+            && (taStatusLocalis.getText().isEmpty()));
+    }
+
+    private void pasteSelectedShablon(final Shablon shablon) {
         if (shablon == null) {
             return;
         }
@@ -618,9 +641,39 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         }
     }
 
-    private void fillMedHistoryTable() {
-        if (model.getPatient() != null) {
-            tbMedHist.setData(model.getDiaryList());
+    private void addSelectedShablon(final Shablon shablon) {
+        if (shablon == null) {
+            return;
+        }
+
+        for (ShablonText shText : shablon.textList) {
+            switch (shText.grupId) {
+                case 1:
+                    addToExistingTextField(taJalob, shText.getText());
+                    break;
+                case 2:
+                    addToExistingTextField(taDesiaseHistory, shText.getText());
+                    break;
+                case 6:
+                    addToExistingTextField(taStatusPraence, shText.getText());
+                    break;
+                case 7:
+                    addToExistingTextField(taFisicalObs, shText.getText());
+                    break;
+                case 8:
+                    addToExistingTextField(taStatusLocalis, shText.getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void addToExistingTextField(final JTextArea tArea, final String text) {
+        if (tArea.getText().isEmpty()) {
+            tArea.setText(text);
+        } else {
+            tArea.setText(tArea.getText() + "\n" + text);
         }
     }
 
@@ -670,10 +723,10 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
 
     private void loadShablonList(final CustomTextField inCtf,
             final ThriftIntegerClassifierList inTicl) {
-            List<IntegerClassifier> intClassif = model.loadMedicalHistoryShablons(
-                (inCtf.getText().length() < 3)
-                ? null : '%' + inCtf.getText() + '%');
-            inTicl.setData(intClassif);
+        List<IntegerClassifier> intClassif = model.loadMedicalHistoryShablons(
+            (inCtf.getText().length() < 3)
+            ? null : '%' + inCtf.getText() + '%');
+        inTicl.setData(intClassif);
     }
 
     public final void syncShablonList(final String searchString, final Shablon shablon) {
@@ -697,7 +750,7 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
     @Override
     public final void patientChanged() {
         clearMedicalHistory();
-        fillMedHistoryTable();
+        updateDiaryTable();
     }
 
     public final void setMedicalHistoryShablons(
@@ -723,6 +776,8 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
     }
 
     public final void updateDiaryTable() {
-        model.getDiaryList();
+        if (model.getPatient() != null) {
+            tbMedHist.setData(model.getDiaryList());
+        }
     }
 }

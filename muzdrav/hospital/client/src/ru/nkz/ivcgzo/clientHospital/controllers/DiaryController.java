@@ -3,6 +3,8 @@ package ru.nkz.ivcgzo.clientHospital.controllers;
 import java.awt.Component;
 import java.net.URL;
 
+import javax.swing.JOptionPane;
+
 import ru.nkz.ivcgzo.clientHospital.ClientHospital;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
 import ru.nkz.ivcgzo.clientHospital.views.DiaryPanel;
@@ -46,7 +48,7 @@ public class DiaryController implements IComponentController {
     public final void showShablonForm(final String text, final IntegerClassifier value) {
         shForm.showShablonForm(text, value);
         view.syncShablonList(shForm.getSearchString(), shForm.getShablon());
-        view.pasteSelectedShablon(shForm.getShablon());
+        view.smartPasteShablon(shForm.getShablon());
     }
 
     public final void setCurrentDiaryRecord(final TMedicalHistory currentMedicalHistory) {
@@ -61,17 +63,44 @@ public class DiaryController implements IComponentController {
         medHist.setIdGosp(model.getPatient().getGospitalCod());
         medHist.setPcod_added(ClientHospital.authInfo.getPcod());
         medHist.setCpodr(ClientHospital.authInfo.getCpodr());
-        System.out.println(ClientHospital.authInfo.getCpodr());
-        System.out.println(ClientHospital.authInfo.getPcod());
-        model.addMedicalHistory(medHist);
 
-        model.setDiaryList();
-        view.updateDiaryTable();
+        try {
+            model.addMedicalHistory(medHist);
+        } catch (HospitalDataTransferException e) {
+            JOptionPane.showMessageDialog(
+                view, e.getMessage(), "Ошибка!", JOptionPane.ERROR_MESSAGE);
+        }
+
+        updateDiaryTable();
     }
 
-    public final void deleteMedicalHistory(final TMedicalHistory currentMedHist) {
-        model.deleteMedicalHistory(currentMedHist);
-        model.setDiaryList();
+    public final void deleteDiaryRecord(final TMedicalHistory currentMedHist) {
+        try {
+            model.deleteMedicalHistory(currentMedHist);
+        } catch (HospitalDataTransferException e) {
+            JOptionPane.showMessageDialog(
+                view, e.getMessage(), "Ошибка!", JOptionPane.ERROR_MESSAGE);
+        }
+        updateDiaryTable();
+    }
+
+    public final void updateDiaryRecord(final TMedicalHistory currentMedHist) {
+        try {
+            model.updateMedicalHistory(currentMedHist);
+        } catch (HospitalDataTransferException e) {
+            JOptionPane.showMessageDialog(
+                view, e.getMessage(), "Ошибка!", JOptionPane.ERROR_MESSAGE);
+        }
+        updateDiaryTable();
+    }
+
+    private void updateDiaryTable() {
+        try {
+            model.setDiaryList();
+        } catch (HospitalDataTransferException e) {
+            JOptionPane.showMessageDialog(
+                view, e.getMessage(), "Ошибка!", JOptionPane.ERROR_MESSAGE);
+        }
         view.updateDiaryTable();
     }
 
