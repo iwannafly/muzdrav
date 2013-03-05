@@ -29,7 +29,8 @@ public final class ServerAssignments {
     private static final String[] MEDICATION_FIELD_NAMES = {
         "name", "nlek", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed",
         "sposv", "spriem", "pereod", "datae", "komm", "datao", "vracho", "dataz",
-        "id_kap", "id_inj", "ed_name", "sposv_name", "vrach_name", "vracho_name"
+        "id_kap", "id_inj", "opl", "diag", "ed_name", "sposv_name", "vrach_name",
+        "vracho_name", "opl_name", "diag_name"
     };
     private static final String[] DIAGNOSTIC_FIELD_NAMES = {
         "nisl", "cpok", "cpok_name", "result", "datan", "datav", "op_name", "rez_name"
@@ -49,31 +50,37 @@ public final class ServerAssignments {
         		"SELECT n_med.name AS name, l.nlek, l.id_gosp, " +
 	        		"l.vrach, l.datan, l.klek, l.flek, l.doza, l.ed, l.sposv, " +
 	        		"l.spriem, l.pereod, l.datae, l.komm, l.datao, l.vracho, " +
-	        		"l.dataz, l.id_kap, l.id_inj, " +
+	        		"l.dataz, l.id_kap, l.id_inj, l.opl, l.diag, " +
 	        		"n_edd.name AS ed_name, n_svl.name AS sposv_name, " +
 	        		"(v.fam || ' ' || v.im || ' ' || v.ot) AS vrach_name, " +
-	        		"(vo.fam || ' ' || vo.im || ' ' || vo.ot) AS vracho_name " +
+	        		"(vo.fam || ' ' || vo.im || ' ' || vo.ot) AS vracho_name, " +
+	        		"n_opl1.name AS opl_name, n_c00.name AS diag_name " +
                 "FROM c_lek l " +
 	                "JOIN n_med ON (l.klek = n_med.pcod) " +
 	                "JOIN s_vrach v ON (l.vrach = v.pcod) " +
 	                "LEFT JOIN s_vrach vo ON (l.vracho = vo.pcod) " +
 	                "LEFT JOIN n_edd ON (l.ed = n_edd.pcod) " +
 	                "LEFT JOIN n_svl ON (l.sposv = n_svl.pcod) " +
+	                "LEFT JOIN n_opl1 ON (l.opl = n_opl1.pcod) " +
+	                "LEFT JOIN n_c00 ON (l.diag = n_c00.pcod) " +
                 "WHERE (l.id_gosp = ?) AND (l.klek IS NOT NULL) " +
                 "UNION " +
                 "SELECT l.lek_name AS name, l.nlek, l.id_gosp, " +
 	        		"l.vrach, l.datan, l.klek, l.flek, l.doza, l.ed, l.sposv, " +
 	        		"l.spriem, l.pereod, l.datae, l.komm, l.datao, l.vracho, " +
-	        		"l.dataz, l.id_kap, l.id_inj, " +
+	        		"l.dataz, l.id_kap, l.id_inj, l.opl, l.diag, " +
 	                "n_edd.name AS ed_name, " +
 	        		"n_svl.name AS sposv_name, " +
 	        		"(v.fam || ' ' || v.im || ' ' || v.ot) AS vrach_name, " +
-	        		"(vo.fam || ' ' || vo.im || ' ' || vo.ot) AS vracho_name " +
+	        		"(vo.fam || ' ' || vo.im || ' ' || vo.ot) AS vracho_name, " +
+	        		"n_opl1.name AS opl_name, n_c00.name AS diag_name " +
                 "FROM c_lek l " +
 	                "JOIN s_vrach v ON (l.vrach = v.pcod) " +
 	                "LEFT JOIN s_vrach vo ON (l.vracho = vo.pcod) " +
 	                "LEFT JOIN n_edd ON (l.ed = n_edd.pcod) " +
 	                "LEFT JOIN n_svl ON (l.sposv = n_svl.pcod) " +
+	                "LEFT JOIN n_opl1 ON (l.opl = n_opl1.pcod) " +
+	                "LEFT JOIN n_c00 ON (l.diag = n_c00.pcod) " +
                 "WHERE (l.id_gosp = ?) AND (l.klek IS NULL)";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp, idGosp)) {
             return rsmMedication.mapToList(acrs.getResultSet());
