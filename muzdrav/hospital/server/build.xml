@@ -39,7 +39,6 @@
 			<classpath refid="build.classpath" />
 		</javac>
 	    <copy file="${src_reports.dir}/ChildBirthDocument.htm" todir="${dst_reports.dir}" />
-	    <copy file="${src_reports.dir}/ChildDeathDocument.htm" todir="${dst_reports.dir}" />
 	</target>
 
 	<!-- Создание jar файла -->
