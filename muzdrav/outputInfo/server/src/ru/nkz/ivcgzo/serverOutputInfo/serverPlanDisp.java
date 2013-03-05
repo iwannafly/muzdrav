@@ -45,6 +45,8 @@ public class serverPlanDisp extends serverTemplate {
 		
 		try (AutoCloseableResultSet zapznach = sse.execPreparedQuery(sqlQueryDetVzPol)) {
 			
+			zapznach.getResultSet().next();
+			
 			poldv = zapznach.getResultSet().getInt("c_nom");
 			
 		} catch (SQLException e1) {
@@ -57,9 +59,9 @@ public class serverPlanDisp extends serverTemplate {
 				"p.adm_kv,	pm.diag, na.name, pm.pdat, pn.nuch, pd.d_grup, pm.pdat, pd.d_uch, pm.cod_sp, pm.cpol,pm.fdat, pd.ishod " +
 				"from patient p join p_nambk pn on(p.npasp = pn.npasp) join p_mer pm on(p.npasp =pm.npasp) " +
 				"join p_disp pd on(p.npasp = pd.npasp) join n_abd na on(pm.pmer = na.pcod) " +
-				"where (pm.pdat between "+ dn+" and "+ dk+")and(pd.diag = pm.diag)and(pm.fdat is null)and(pd.ishod is null) and(pn.dataot is null)" +
+				"where (pm.pdat between '"+ dn+"' and '"+ dk+"')and(pd.diag = pm.diag)and(pm.fdat is null)and(pd.ishod is null) and(pn.dataot is null)" +
 						"and(pm.cpol = "+kodpol+")";
-		if (uc !=null) sqlQueryPlanDis = sqlQueryPlanDis+"and(pd.d_uch ="+uc+")";
+		if (uc.length() > 0) sqlQueryPlanDis = sqlQueryPlanDis+"and(pd.d_uch ="+uc+")";
 		if (poldv == 1){
 			sqlQueryPlanDis = sqlQueryPlanDis + "Order by pm.cod_sp, pd.d_uch, pm.cpol, p.fam, p.im, p.ot, p.datar";
 			}else{
@@ -67,7 +69,7 @@ public class serverPlanDisp extends serverTemplate {
 			
 		}
 		
-		
+		System.out.println(sqlQueryPlanDis);
 		
 		
 		try (AutoCloseableResultSet spat = sse.execPreparedQuery(sqlQueryPlanDis)) {
@@ -98,7 +100,7 @@ public class serverPlanDisp extends serverTemplate {
 			sb.append(String.format("</HEAD>"));
 			sb.append(String.format("<BODY LANG=\"ru-RU\" TEXT=\"#000000\" LINK=\"#000080\" VLINK=\"#800000\" DIR=\"LTR\">"));
 		
-			spat.getResultSet().first();
+			spat.getResultSet().next();
 			
 			int spuch = 0;
 			int spuch1 = 0;

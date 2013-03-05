@@ -204,7 +204,7 @@ public class Option {
 		
 		JSplitPane splitPane_1 = new JSplitPane();
 		
-		splitPane_1.setResizeWeight(0.5);
+		splitPane_1.setResizeWeight(0.7);
 		
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(

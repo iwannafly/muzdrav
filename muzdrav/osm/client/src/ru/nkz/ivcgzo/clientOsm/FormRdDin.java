@@ -105,17 +105,17 @@ public class FormRdDin extends JFrame {
 	public FormRdDin() {
 		setExtendedState(Frame.MAXIMIZED_BOTH);
 		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowOpened(WindowEvent arg0) {
-				try {
-					tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
-				} catch (KmiacServerException e) {
-					e.printStackTrace();
-				} catch (TException e) {
-					MainForm.conMan.reconnect(e);
-				}
-				
-			}
+//			@Override
+//			public void windowOpened(WindowEvent arg0) {
+//				try {
+//					tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+//				} catch (KmiacServerException e) {
+//					e.printStackTrace();
+//				} catch (TException e) {
+//					MainForm.conMan.reconnect(e);
+//				}
+//				
+//			}
 		});
 		setTitle("Динамика диспансерного наблюдения за беременной");
 		setTitle(String.format(" %s - %d, %s %s %s, %6$td.%6$tm.%6$tY ", getTitle(), Vvod.zapVr.getNpasp(), Vvod.zapVr.getFam(), Vvod.zapVr.getIm(), Vvod.zapVr.getOth(),  Vvod.zapVr.getDatar()));
@@ -257,7 +257,6 @@ public class FormRdDin extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 				RdDinStruct rddin = new RdDinStruct();
-				rddin.setDatap(Vvod.zapVr.datap);
 				rddin.setNpasp(Vvod.pvizitAmb.npasp);
 				rddin.setId_pos(Vvod.pvizitAmb.id);
 				rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
@@ -295,14 +294,14 @@ public class FormRdDin extends JFrame {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-try {
-	tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
-	if (tablePos.getRowCount() > 0)
-		tablePos.setRowSelectionInterval(tablePos.getRowCount() - 1, tablePos.getRowCount() - 1);
-} catch (TException e1) {
-	// TODO Auto-generated catch block
-	e1.printStackTrace();
-}
+//try {
+//	tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+//	if (tablePos.getRowCount() > 0)
+//		tablePos.setRowSelectionInterval(tablePos.getRowCount() - 1, tablePos.getRowCount() - 1);
+//} catch (TException e1) {
+//	// TODO Auto-generated catch block
+//	e1.printStackTrace();
+//}
 			}
 
 			private void showMessage(RdDinStruct rddin) {
@@ -362,12 +361,12 @@ try {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 	}
-		try {
-			tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
-		} catch (TException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+//		try {
+//			tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+//		} catch (TException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
 			}
 		});
 		GroupLayout gl_panel = new GroupLayout(panel);
@@ -622,7 +621,6 @@ try {
 			public void valueChanged(ListSelectionEvent arg0) {
 				if (!arg0.getValueIsAdjusting() && tablePos.getSelectedItem() != null) {
 					rddin = tablePos.getSelectedItem();
-					SDataPos.setDate(rddin.getDatap());
 					SSrok.setText(String.valueOf(rddin.getSrok()));
 					SVes.setText(String.valueOf(rddin.getVes()));
 					SOkrj.setText(String.valueOf(rddin.getOj()));

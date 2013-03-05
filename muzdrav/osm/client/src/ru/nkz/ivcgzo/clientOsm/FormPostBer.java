@@ -330,15 +330,6 @@ public class FormPostBer extends JFrame {
 			}
 		});
 		BPeshOK.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
-		
-		JButton btnNewButton_1 = new JButton("Динамическое наблюдение");
-		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				dinform = new FormRdDin();
-				dinform.setVisible(true);
-}
-		});
-		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD, 12));
 //		ot.setText(Vvod.zapVr.oth);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
@@ -352,9 +343,7 @@ public class FormPostBer extends JFrame {
 							.addComponent(ButSave)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(ButDelete)
-							.addGap(133)
-							.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 219, GroupLayout.PREFERRED_SIZE)
-							.addGap(39)
+							.addGap(136)
 							.addComponent(BPeshOK))
 						.addComponent(panel, GroupLayout.PREFERRED_SIZE, 1011, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap(3, Short.MAX_VALUE))
@@ -362,13 +351,13 @@ public class FormPostBer extends JFrame {
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-							.addComponent(btnNewButton_1)
-							.addComponent(BPeshOK))
-						.addComponent(ButDelete)
-						.addComponent(ButSave)
-						.addComponent(btnNewButton))
+					.addContainerGap()
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+						.addComponent(BPeshOK)
+						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+							.addComponent(ButDelete)
+							.addComponent(ButSave)
+							.addComponent(btnNewButton)))
 					.addGap(29)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 624, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(57, Short.MAX_VALUE))
