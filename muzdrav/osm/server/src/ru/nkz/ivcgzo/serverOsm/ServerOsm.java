@@ -1757,7 +1757,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 						"where p_isl_ld.id_pos = ? ", pvizit_ambId, pvizit_ambId);
 					if (acrs.getResultSet().isBeforeFirst()) {
 						sb.append("<b>Назначенные исследования </b><br>");
-						while (acrs.getResultSet().next()) {
+						if (acrs.getResultSet().next()) {
 							if (acrs.getResultSet().getString(4) != null) {
 								sb.append("<table border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">Наименование показателя</th><th style=\"font: 10px times new roman;\">Результат</th></tr>");
 		//						if (sb.length()>4697){
@@ -1792,7 +1792,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 							"where p_isl_ld.id_pos = ? ", pvizit_ambId, pvizit_ambId);
 					if (acrs.getResultSet().isBeforeFirst()) {
 						sb.append("<br><b>Назначенные исследования </b><br>");
-						while (acrs.getResultSet().next()) {
+						if (acrs.getResultSet().next()) {
 							if (sb.length()>4600){
 								sb.append("</table>");
 								sb.append("<td style=\"border-top: 1px solid white; border-bottom: 1px solid white; border-left: 1px solid white; border-right: none; padding: 5px; font: 10px times new roman;\" width=\"40%\">");
@@ -1824,8 +1824,12 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 						
 								
 						}
+//						else {
+//							
+//						}
 							sb.append("</table><br>");	
 					}
+				
 				}
 					acrs.close();
 					
