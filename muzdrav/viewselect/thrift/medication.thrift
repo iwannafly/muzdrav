@@ -31,6 +31,8 @@ struct Lek {
 	17: optional string lek_name;
 	18: optional i32 id_kap;
 	19: optional i32 id_inj;
+	20: optional i32 opl;
+	21: optional string diag;
 }
 
 struct LekPriem {

@@ -44,7 +44,7 @@ public class ServerMedication extends Server implements Iface {
     private static final String[] LEK_FIELD_NAMES = {
         "nlek", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed", "sposv",
         "spriem", "pereod", "datae", "komm", "datao", "vracho", "dataz", "lek_name",
-        "id_kap", "id_inj"
+        "id_kap", "id_inj", "opl", "diag"
     };
     private static final String[] LEK_PRIEM_FIELD_NAMES = {
         "id", "nlek", "datap", "timep", "status"
@@ -64,8 +64,8 @@ public class ServerMedication extends Server implements Iface {
         Integer.class, Integer.class, Date.class,	String.class,
     //  datao       vracho         dataz		lek_name
         Date.class, Integer.class, Date.class,	String.class,
-    //	id_kap			id_inj
-        Integer.class,	Integer.class
+    //	id_kap			id_inj			opl				diag
+        Integer.class,	Integer.class,	Integer.class,	String.class
     };
     @SuppressWarnings("unused")
     private static final Class<?>[] LEK_PRIEM_TYPES = {
@@ -228,7 +228,7 @@ public class ServerMedication extends Server implements Iface {
 
     @Override
     public void changeLekPriemStatus(int id, boolean status) throws KmiacServerException {
-        final String sqlQuery = "UPDATE c_lek_priem SET status = ? WHERE id = ?";
+        final String sqlQuery = "UPDATE c_lek_priem SET status = ? WHERE (id = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedQuery(sqlQuery, status, id);
             sme.setCommit();
@@ -240,11 +240,12 @@ public class ServerMedication extends Server implements Iface {
 
     @Override
     public int addLek(Lek lek) throws KmiacServerException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
+        final int[] indexes = 
+        	{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
         final String sqlQuery = "INSERT INTO c_lek (id_gosp, vrach, datan, klek,"
             + "flek, doza, ed, sposv, spriem, pereod, datae, komm, datao, vracho, "
-            + "dataz, lek_name, id_kap, id_inj) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            + "dataz, lek_name, id_kap, id_inj, opl, diag) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, true, lek,
                  LEK_TYPES, indexes);
