@@ -42,6 +42,7 @@ public class serverSvodDispObs extends serverTemplate {
 			
 			try (AutoCloseableResultSet zapznach = sse.execPreparedQuery(sqlQueryDetVzPol)) {
 				
+				zapznach.getResultSet().next();
 				poldv = zapznach.getResultSet().getInt("c_nom");
 				
 			} catch (SQLException e1) {
@@ -59,7 +60,7 @@ public class serverSvodDispObs extends serverTemplate {
 			final String sqlQuerySvedDis = "select pd.d_uch, pm.cod_sp, pm.pmer, p.npasp, pm.pdat, pm.fdat, pd.ishod, pn.dataot " +
 				"from patient p join p_mer pm on(p.npasp = pm.npasp)"+
 						"join p_nambk pn on(p.npasp =pn.npasp) join p_disp pd on(p.npasp = pd.npasp)"+
-				"where ((pm.pdat between "+ dn+" and "+ dk+")or(pm.fdat between "+ dn+" and "+ dk+"))and(pd.diag = pm.diag)and(pd.ishod is null) and(pn.dataot is null)" +
+				"where ((pm.pdat between '"+ dn+"' and '"+ dk+"')or(pm.fdat between '"+ dn+"' and '"+ dk+"'))and(pd.diag = pm.diag)and(pd.ishod is null) and(pn.dataot is null)" +
 						"and(pm.cpol = "+kodpol+")"+
 				"Order by pm.cod_sp,pd.d_uch, pm.pmer";
 		
