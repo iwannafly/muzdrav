@@ -838,10 +838,7 @@ public class ConnectionManager {
      * @deprecated Процедура скоро будет удалена. Вместо нее следует использовать {@link #openFileInTextProcessor(String, boolean)}.
 	 */
 	public void openFileInEditor(String path, boolean print) {
-		if (print)
-			DocumentPrinter.printViaTextProcessor(path);
-		else
-			DocumentPrinter.openInTextProcessor(path);
+		throw new RuntimeException("Not implemented anymore. Use openFileInTextProcessor instead.");
 	}
 	
 	/**
