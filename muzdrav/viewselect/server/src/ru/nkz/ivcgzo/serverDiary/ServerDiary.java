@@ -119,7 +119,7 @@ public class ServerDiary extends Server implements Iface {
     public final List<TMedicalHistory> getMedicalHistory(final int idGosp)
             throws KmiacServerException, MedicalHistoryNotFoundException {
         final String sqlQuery = "SELECT * FROM c_osmotr " +
-        		"WHERE (id_gosp = ?) " +
+        		"WHERE (id_gosp = ?) AND (is_po) " +
         		"ORDER BY dataz, timez;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
             List<TMedicalHistory> tmpMedHistories =
