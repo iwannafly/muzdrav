@@ -893,8 +893,66 @@ public class PIslForm {
 						
 						tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl,tn_ldi.getSelectedItem().pcisl));
 						
-						//while(tlab_isl.get)
-						
+						if ((tn_ldi.getSelectedItem().isSetId_gosp())||(tn_ldi.getSelectedItem().isSetId_pos())){
+							
+							 LabIsl uplab = new LabIsl();
+							 List<Metod> stoim;
+							 stoim = MainForm.ltc.GetLabStoim(tn_ldi.getSelectedItem().pcisl, tn_ldi.getSelectedItem().kodotd);
+							 Boolean ch = false;
+							 
+							 for (int i = 0; i<tlab_isl.getData().size(); i++){
+								if (!tlab_isl.getData().get(i).isSetPcod_m()){
+									ch = false;
+									for (int j = 0; j<stoim.size(); j++){
+										
+										
+										
+										if ((tlab_isl.getData().get(i).cpok.equals(stoim.get(j).pcod))&&(ch == false)){
+											ch = true;
+										
+											uplab.setId(tlab_isl.getData().get(i).id);
+							     			uplab.setCpok(tlab_isl.getData().get(i).cpok);
+											uplab.setZpok(tlab_isl.getData().get(i).zpok);
+											uplab.setNisl(tn_ldi.getSelectedItem().nisl);
+											uplab.setNpasp(tn_ldi.getSelectedItem().npasp);
+											uplab.setStoim(stoim.get(j).stoim);
+											uplab.setPcod_m(stoim.get(j).c_obst);
+
+											MainForm.ltc.UpdLIsl(uplab);
+											
+											if ((j+1<stoim.size())&&(!tlab_isl.getData().get(i).cpok.equals(stoim.get(j+1).pcod))){
+												break;
+											}
+											
+										}
+										else{
+											if (tlab_isl.getData().get(i).cpok.equals(stoim.get(j).pcod)&&(ch == true)){
+											
+												
+								     			uplab.setCpok(stoim.get(j).pcod);
+												uplab.setNisl(tn_ldi.getSelectedItem().nisl);
+												uplab.setNpasp(tn_ldi.getSelectedItem().npasp);
+												uplab.setStoim(stoim.get(j).stoim);
+												uplab.setPcod_m(stoim.get(j).c_obst);
+												
+												MainForm.ltc.AddLIsl(uplab);
+												
+												if ((j+1<stoim.size())&&(!tlab_isl.getData().get(i).cpok.equals(stoim.get(j+1).pcod))){
+													break;
+												}												
+												
+											}
+
+											
+										}
+									}
+									
+									
+									
+								}
+							}
+							tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl,tn_ldi.getSelectedItem().pcisl));
+						}
 						
 					} catch (TException e) {
 						// TODO Auto-generated catch block
@@ -1968,7 +2026,7 @@ public class PIslForm {
 						uplab.setStoim(tlab_isl.getData().get(i).stoim);
 						uplab.setId(tlab_isl.getData().get(i).id);
 						
-						System.out.print(uplab);
+						//System.out.print(uplab);
 						try {
 							MainForm.ltc.UpdLIsl(uplab);
 						} catch (LIslExistsException e) {
@@ -2151,7 +2209,7 @@ public class PIslForm {
 					upLabMet.setZpok(tlab_isl.getSelectedItem().zpok);
 					upLabMet.setNisl(tn_ldi.getSelectedItem().nisl);
 					upLabMet.setCpok(tlab_isl.getSelectedItem().cpok);
-					
+					upLabMet.setId(tlab_isl.getSelectedItem().id);
 						List<Metod> Cena;
 						
 						try {
