@@ -124,14 +124,14 @@ public class MedicationOptionsFrame extends JDialog {
         lblMedicationName = new JLabel("Название лекарства:");
         lblMedicationName.setForeground(new Color(220, 20, 60));
         lblMedicationName.setFont(new Font("Tahoma", Font.BOLD, 15));
-        lblMedicationName.setAlignmentX(0.5f);
+        lblMedicationName.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblMedicationName.setMaximumSize(new Dimension(600, 30));
         pHeader.add(lblMedicationName);
 
         lblMedicationForm = new JLabel("Форма выпуска:");
         lblMedicationForm.setForeground(new Color(165, 42, 42));
         lblMedicationForm.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
-        lblMedicationForm.setAlignmentX(0.5f);
+        lblMedicationForm.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblMedicationForm.setMaximumSize(new Dimension(600, 30));
         pHeader.add(lblMedicationForm);
 
@@ -312,26 +312,33 @@ public class MedicationOptionsFrame extends JDialog {
         btnAdd = new JButton("Выбрать");
         btnAdd.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Lek tmpLek = new Lek();
-                tmpLek.setIdGosp(patient.getIdGosp());
-                tmpLek.setVrach(ClientMedication.authInfo.getPcod());
-                tmpLek.setKlek(curMedication.getPcod());
+                Lek newMedication = new Lek();
+                newMedication.setIdGosp(patient.getIdGosp());
+                newMedication.setVrach(ClientMedication.authInfo.getPcod());
+                if (curMedication.getPcod() >= 0) {
+                	newMedication.unsetLek_name();
+                	newMedication.setKlek(curMedication.getPcod());
+                } else {
+                	newMedication.unsetKlek();
+                	newMedication.setLek_name(curMedication.getName());
+                }
+                if (curMedicationForm != null)
+                	newMedication.setFlek(curMedicationForm.getName());
                 if (!tfDose.getText().isEmpty()) {
-                    tmpLek.setDoza(Integer.valueOf(tfDose.getText()));
+                	newMedication.setDoza(Integer.valueOf(tfDose.getText()));
                 }
-                tmpLek.setEd(cbxDoseEdd.getSelectedPcod());
-                tmpLek.setFlek(curMedicationForm.getName());
-                tmpLek.setKomm(taComment.getText());
-                tmpLek.setSposv(cbxInputMethod.getSelectedPcod());
-                tmpLek.setSpriem(cmbPeriod.getSelectedPcod());
+                newMedication.setEd(cbxDoseEdd.getSelectedPcod());
+                newMedication.setKomm(taComment.getText());
+                newMedication.setSposv(cbxInputMethod.getSelectedPcod());
+                newMedication.setSpriem(cmbPeriod.getSelectedPcod());
                 if (!tfIntakePerDay.getText().isEmpty()) {
-                    tmpLek.setPereod(Integer.valueOf(tfIntakePerDay.getText()));
+                	newMedication.setPereod(Integer.valueOf(tfIntakePerDay.getText()));
                 }
-                tmpLek.setDatae(cdeDateTo.getDate().getTime());
-                tmpLek.setDatan(cdeDateFrom.getDate().getTime());
-                tmpLek.setDataz(System.currentTimeMillis());
+                newMedication.setDatae(cdeDateTo.getDate().getTime());
+                newMedication.setDatan(cdeDateFrom.getDate().getTime());
+                newMedication.setDataz(System.currentTimeMillis());
                 try {
-                    tmpLek.setNlek(ClientMedication.tcl.addLek(tmpLek));
+                	newMedication.setNlek(ClientMedication.tcl.addLek(newMedication));
                 } catch (KmiacServerException e1) {
                     e1.printStackTrace();
                 } catch (TException e1) {
@@ -344,7 +351,7 @@ public class MedicationOptionsFrame extends JDialog {
         });
         btnAdd.setMinimumSize(new Dimension(200, 23));
         btnAdd.setMaximumSize(new Dimension(200, 23));
-        btnAdd.setAlignmentX(0.5f);
+        btnAdd.setAlignmentX(Component.CENTER_ALIGNMENT);
         pButtons.add(btnAdd);
     }
 
@@ -352,7 +359,7 @@ public class MedicationOptionsFrame extends JDialog {
         btnCancel = new JButton("Отмена");
         btnCancel.setMinimumSize(new Dimension(200, 23));
         btnCancel.setMaximumSize(new Dimension(200, 23));
-        btnCancel.setAlignmentX(0.5f);
+        btnCancel.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnCancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
