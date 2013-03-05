@@ -47,6 +47,8 @@ public class MainFrame extends JFrame {
             "/ru/nkz/ivcgzo/clientHospital/resources/issled.png");
     private static final URL TOOLBAR_OPERATION_ICON = MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientHospital/resources/Skalpell.png");
+    private static final URL TOOLBAR_REESTR_ICON = MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/archive.png");
 
 ////////////////////////////// SWING COMPONENTS ///////////////////////////////////////////////////
 
@@ -65,6 +67,7 @@ public class MainFrame extends JFrame {
     private JButton btnShowPatientBolList;
     private JButton btnIssled;
     private JButton btnOperation;
+    private JButton btnReestr;
 
 
     public MainFrame(final MainController inController, final IHospitalModel inModel) {
@@ -191,6 +194,17 @@ public class MainFrame extends JFrame {
         toolBar.setAlignmentX(Component.LEFT_ALIGNMENT);
         getContentPane().add(toolBar, BorderLayout.PAGE_START);
 
+        addPatientInfoToolButton();
+        addAnamnezToolButon();
+        addBolListToolButton();
+        toolBar.add(new JToolBar.Separator());
+        addIssledToolButton();
+        addOperationToolButton();
+        toolBar.add(new JToolBar.Separator());
+        addReestrToolButton();
+    }
+
+    private void addPatientInfoToolButton() {
         btnShowPatientInfo = new JButton();
         setTooltipButtonDefaults(btnShowPatientInfo, TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE,
                 TOOLBAR_PATIENT_INFO_ICON, "Информация о пациенте");
@@ -200,7 +214,9 @@ public class MainFrame extends JFrame {
             }
         });
         toolBar.add(btnShowPatientInfo);
+    }
 
+    private void addAnamnezToolButon() {
         btnShowPatientAnamnez = new JButton();
         setTooltipButtonDefaults(btnShowPatientAnamnez, TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE,
                 TOOLBAR_ANAMNEZ_ICON, "Анамнез жизни");
@@ -210,7 +226,9 @@ public class MainFrame extends JFrame {
             }
         });
         toolBar.add(btnShowPatientAnamnez);
+    }
 
+    private void addBolListToolButton() {
         btnShowPatientBolList = new JButton();
         setTooltipButtonDefaults(btnShowPatientBolList, TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE,
                 TOOLBAR_BOL_LIST_ICON, "Больничный лист");
@@ -220,9 +238,9 @@ public class MainFrame extends JFrame {
             }
         });
         toolBar.add(btnShowPatientBolList);
+    }
 
-        toolBar.add(new JToolBar.Separator());
-
+    private void addIssledToolButton() {
         btnIssled = new JButton();
         setTooltipButtonDefaults(btnIssled, TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE,
                 TOOLBAR_ISSLED_ICON, "Лабораторные исследования");
@@ -232,7 +250,9 @@ public class MainFrame extends JFrame {
             }
         });
         toolBar.add(btnIssled);
+    }
 
+    private void addOperationToolButton() {
         btnOperation = new JButton();
         setTooltipButtonDefaults(btnOperation, TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE,
                 TOOLBAR_OPERATION_ICON, "Операции");
@@ -242,6 +262,19 @@ public class MainFrame extends JFrame {
             }
         });
         toolBar.add(btnOperation);
+    }
+
+    private void addReestrToolButton() {
+        btnReestr = new JButton();
+        setTooltipButtonDefaults(btnReestr, TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE,
+                TOOLBAR_REESTR_ICON, "Исправление ошибок реестра");
+        btnReestr.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                controller.showExternalReestrFrame();
+            }
+        });
+        toolBar.add(btnReestr);
+
     }
 
     private void setTooltipButtonDefaults(

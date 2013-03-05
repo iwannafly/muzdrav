@@ -28,8 +28,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.ChildDocNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.ChildbirthNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
-import ru.nkz.ivcgzo.thriftHospital.DopShablon;
-import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.InfoNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MedicalHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MesNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
@@ -43,7 +42,6 @@ import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnostic;
-import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedication;
 import ru.nkz.ivcgzo.thriftHospital.TPatientCommonInfo;
@@ -71,7 +69,6 @@ public class ServerHospital extends Server implements Iface {
     private TResultSetMapper<TSimplePatient, TSimplePatient._Fields> rsmSimplePatient;
     private TResultSetMapper<TPatient, TPatient._Fields> rsmPatient;
     private TResultSetMapper<TPriemInfo, TPriemInfo._Fields> rsmPriemInfo;
-    private TResultSetMapper<TLifeHistory, TLifeHistory._Fields> rsmLifeHistory;
     private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmMedicalHistory;
     private TResultSetMapper<TDiagnosis, TDiagnosis._Fields> rsmDiagnosis;
     private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
@@ -95,9 +92,6 @@ public class ServerHospital extends Server implements Iface {
     private static final String[] PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "datar", "fam", "im", "ot", "pol", "nist", "sgrp", "poms",
         "pdms", "mrab", "npal", "reg_add", "real_add", "ngosp"
-    };
-    private static final String[] LIFE_HISTORY_FIELD_NAMES = {
-        "npasp", "allerg", "farmkol", "vitae"
     };
     private static final String[] MEDICAL_HISTORY_FIELD_NAMES = {
         "id", "id_gosp", "jalob", "morbi", "status_praesense", "status_localis",
@@ -186,10 +180,6 @@ public class ServerHospital extends Server implements Iface {
     //  fisical_obs   pcod_vrach     dataz       timez       pcod_added     cpodr
         String.class, Integer.class, Date.class, Time.class, Integer.class, Integer.class
     };
-    private static final Class<?>[] LIFE_HISTORY_TYPES = {
-    //  npasp          allerg        farmkol       vitae
-        Integer.class, String.class, String.class, String.class
-    };
     private static final Class<?>[] STAGE_TYPES = {
     //  id             id_gosp        stl            mes
         Integer.class, Integer.class, Integer.class, String.class,
@@ -217,7 +207,6 @@ public class ServerHospital extends Server implements Iface {
                 TSimplePatient.class, SIMPLE_PATIENT_FIELD_NAMES);
         rsmPatient = new TResultSetMapper<>(TPatient.class, PATIENT_FIELD_NAMES);
         rsmPriemInfo = new TResultSetMapper<>(TPriemInfo.class, PRIEM_INFO_FIELD_NAMES);
-        rsmLifeHistory = new TResultSetMapper<>(TLifeHistory.class, LIFE_HISTORY_FIELD_NAMES);
         rsmMedicalHistory = new TResultSetMapper<>(TMedicalHistory.class,
             MEDICAL_HISTORY_FIELD_NAMES);
         rsmDiagnosis = new TResultSetMapper<>(TDiagnosis.class, DIAGNOSIS_FIELD_NAMES);
@@ -407,7 +396,7 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final TPriemInfo getPriemInfo(final int idGosp)
-            throws PriemInfoNotFoundException, KmiacServerException {
+            throws InfoNotFoundException, KmiacServerException {
         final String sqlQuery = "SELECT n_vgo.name as pl_extr, datap, dataosm, "
                 + "n_k02.name as naprav, n_n00.name as n_org, diag_n, "
                 + "(SELECT name FROM n_c00 WHERE n_c00.pcod = c_gosp.diag_n) "
@@ -426,7 +415,7 @@ public class ServerHospital extends Server implements Iface {
                 return rsmPriemInfo.map(acrs.getResultSet());
             } else {
                 log.log(Level.INFO, "PriemInfoNotFoundException, idGosp = " + idGosp);
-                throw new PriemInfoNotFoundException();
+                throw new InfoNotFoundException();
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -555,7 +544,7 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final List<IntegerClassifier> getShablonNames(final int cspec, final int cslu,
             final String srcText) throws KmiacServerException {
-        String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, "
+        String sql = "SELECT DISTINCT sho.id AS pcod, "//sho.name, "
             + "sho.diag || ' ' || sho.name AS name "
             + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
             + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
@@ -569,7 +558,7 @@ public class ServerHospital extends Server implements Iface {
                     + "OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
         }
 
-        sql += "ORDER BY sho.name ";
+        sql += "ORDER BY name ";
         try (AutoCloseableResultSet acrs = (srcText == null)
                 ? sse.execPreparedQuery(sql, cspec)
                 : sse.execPreparedQuery(sql, cspec,
@@ -1705,13 +1694,13 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final TMedicalHistory getPriemOsmotr(final int idGosp)
-            throws KmiacServerException {
+            throws InfoNotFoundException, KmiacServerException {
         final String sqlQuery = "SELECT * FROM c_osmotr WHERE id_gosp = ? AND is_po = true;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
             if (acrs.getResultSet().next()) {
                 return rsmMedicalHistory.map(acrs.getResultSet());
             } else {
-                return null;
+                throw new InfoNotFoundException();
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);

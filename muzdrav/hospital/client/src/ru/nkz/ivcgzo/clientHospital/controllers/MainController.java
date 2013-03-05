@@ -146,4 +146,11 @@ public class MainController {
         }
     }
 
+    public final void showExternalReestrFrame() {
+        Integer result = ClientHospital.conMan.showMedStaErrorsForm();
+        if (result != null) {
+            model.setPatientByCotd(result);
+        }
+    }
+
 }

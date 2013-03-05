@@ -14,7 +14,6 @@ import java.awt.event.WindowEvent;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -34,14 +33,11 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import org.apache.thrift.TException;
-
-import ru.nkz.ivcgzo.clientHospital.ClientHospital;
+import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 
@@ -53,10 +49,13 @@ public class ShablonForm  extends JDialog {
     private final CustomTextField tbSearch;
     private final SearchTree trSearch;
     private final JTextPane tbView;
+    private final IHospitalModel model;
     private Shablon sho;
     private boolean accepted;
 
-    public ShablonForm() {
+    public ShablonForm(final IHospitalModel inModel) {
+        this.model = inModel;
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
@@ -189,28 +188,20 @@ public class ShablonForm  extends JDialog {
 
     private void loadShablon(final int code) {
         clearFields();
+        String str;
+        String nl = System.lineSeparator();
+        sho = model.loadShablon(code);
 
-        try {
-            String str;
-            String nl = System.lineSeparator();
-            sho = ClientHospital.tcl.getShablon(code);
-
-            str = String.format("<FONT SIZE=3><b>Динамика</b>: %s%s<br>", sho.din, nl);
-            str += nl;
-            for (ShablonText st : sho.textList) {
-                if (st.text.length() > 0) {
-                    str += String.format("<b>%s</b>:<br>%s%s%s%s<br>",
-                        st.grupName, nl, st.text, nl, nl);
-                }
+        str = String.format("<FONT SIZE=3><b>Динамика</b>: %s%s<br>", sho.din, nl);
+        str += nl;
+        for (ShablonText st : sho.textList) {
+            if (st.text.length() > 0) {
+                str += String.format("<b>%s</b>:<br>%s%s%s%s<br>",
+                    st.grupName, nl, st.text, nl, nl);
             }
-            str += "</FONT SIZE>";
-            tbView.setText(str);
-        } catch (KmiacServerException e) {
-            JOptionPane.showMessageDialog(this, "Ошибка загрузки текстов шаблона",
-                "Ошибка", JOptionPane.ERROR_MESSAGE);
-        } catch (TException e) {
-            ClientHospital.conMan.reconnect(e);
         }
+        str += "</FONT SIZE>";
+        tbView.setText(str);
     }
 
     private void acceptShablon() {
@@ -257,25 +248,12 @@ public class ShablonForm  extends JDialog {
 
                     if (lp instanceof StrClassTreeNode) {
                         StrClassTreeNode node = (StrClassTreeNode) lp;
-
-                        try {
-                            node.removeAllChildren();
-                            for (IntegerClassifier ic
-                                    : ClientHospital.tcl.getShablonBySelectedDiagnosis(
-                                        ClientHospital.authInfo.cspec,
-                                        ClientHospital.authInfo.cslu, node.getCode(), srcStr)) {
-                                node.add(new IntClassTreeNode(ic));
-                            }
-                            ((DefaultTreeModel) getModel()).reload(node);
-                        } catch (KmiacServerException e) {
-                            collapsePath(new TreePath(lp));
-                            JOptionPane.showMessageDialog(ShablonForm.this,
-                                "Ошибка загрузки шаблонов на данный диагноз",
-                                "Ошибка", JOptionPane.ERROR_MESSAGE);
-                        } catch (TException e) {
-                            collapsePath(new TreePath(lp));
-                            ClientHospital.conMan.reconnect(e);
+                        node.removeAllChildren();
+                        for (IntegerClassifier ic : model.getShablonBySelectedDiagnosis(
+                                node.getCode(), srcStr)) {
+                            node.add(new IntClassTreeNode(ic));
                         }
+                        ((DefaultTreeModel) getModel()).reload(node);
                     }
                 }
 
@@ -333,23 +311,15 @@ public class ShablonForm  extends JDialog {
             timer.stop();
             clearFields();
 
-            try {
-                DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
+            DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 
-                for (StringClassifier sc : ClientHospital.tcl.getShablonDiagnosis(
-                        ClientHospital.authInfo.cspec, ClientHospital.authInfo.cslu, srcStr)) {
-                    StrClassTreeNode node = new StrClassTreeNode(sc);
+            for (StringClassifier sc : model.getShablonDiagnosis(srcStr)) {
+                StrClassTreeNode node = new StrClassTreeNode(sc);
 
-                    node.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));
-                    root.add(node);
-                }
-                setModel(new DefaultTreeModel(root));
-            } catch (KmiacServerException e) {
-                JOptionPane.showMessageDialog(ShablonForm.this,
-                    "Ошибка загрузки результатов поиска", "Ошибка", JOptionPane.ERROR_MESSAGE);
-            } catch (TException e) {
-                ClientHospital.conMan.reconnect(e);
+                node.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));
+                root.add(node);
             }
+            setModel(new DefaultTreeModel(root));
         }
 
         public void select(final IntegerClassifier shOsm) {

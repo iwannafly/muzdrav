@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,12 +32,15 @@ import javax.swing.border.MatteBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientHospital.ClientHospital;
 import ru.nkz.ivcgzo.clientHospital.MainFrame;
 import ru.nkz.ivcgzo.clientHospital.controllers.DiaryController;
+import ru.nkz.ivcgzo.clientHospital.model.IDiaryRecordObserver;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
 import ru.nkz.ivcgzo.clientHospital.model.IPatientObserver;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
@@ -46,13 +48,12 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftHospital.MedicalHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory._Fields;
 
-public class DiaryPanel extends JPanel  implements IPatientObserver {
+public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecordObserver {
     private static final long serialVersionUID = -2271316126670108144L;
     private static final String TOOLTIP_TEXT =
             "<html><b>Дневник осмотров</b> - позволяет лечащему врачу сохранять информацию, "
@@ -67,7 +68,6 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
             "/ru/nkz/ivcgzo/clientHospital/resources/diary.png");
     private static final String TITLE = "Дневник";
 
-    @SuppressWarnings("unused")
     private DiaryController controller;
     private IHospitalModel model;
     private Component hsMedicalHistoryFirst;
@@ -95,7 +95,6 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
     private ShablonSearchListener medHiSearchListener;
     private ThriftIntegerClassifierList lMedicalHistoryShablonNames;
     private JScrollPane spMedicalHistoryShablonNames;
-    private ShablonForm frmShablon;
     private JPanel pnlJal;
     private JPanel pnlMedicalHist;
     private JPanel pnlStatusPraence;
@@ -107,6 +106,7 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
         this.controller = inController;
         this.model = inModel;
         model.registerPatientObserver((IPatientObserver) this);
+        model.registerDiaryRecordObserver((IDiaryRecordObserver) this);
 
         setDiaryPanel();
     }
@@ -151,8 +151,10 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
 
     private void setMedicalHistoryTableScrollPane() {
         spMedHist = new JScrollPane();
+        spMedHist.setMaximumSize(new Dimension(32767, 150));
+        spMedHist.setMinimumSize(new Dimension(23, 150));
         spMedHist.setBorder(new MatteBorder(0, 0, 0, 1, (Color) new Color(0, 0, 0)));
-        spMedHist.setPreferredSize(new Dimension(300, 250));
+        spMedHist.setPreferredSize(new Dimension(300, 150));
         hbMedicalHistoryTableControls.add(spMedHist);
 
         addMedicalHistoryTable();
@@ -162,11 +164,12 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
         tbMedHist = new CustomTable<TMedicalHistory, TMedicalHistory._Fields>(
             true, true, TMedicalHistory.class, 8, "Дата", 9, "Время");
         spMedHist.setViewportView(tbMedHist);
-        tbMedHist.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                if (tbMedHist.getSelectedItem() != null) {
-                    setMedicalHistoryText();
+        tbMedHist.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(final ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    if (tbMedHist.getSelectedItem() != null) {
+                        controller.setCurrentDiaryRecord(tbMedHist.getSelectedItem());
+                    }
                 }
             }
         });
@@ -256,10 +259,10 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
         spOsm.setViewportView(pnlOsmOsm);
 
         addJalobComponents();
-        addDesiaseHistoryComponents();
+        addFisicalObsComponents();
+        addStatusLocalisComponents();
         addStatusPraenceComponents();
-        addStatusLocalis();
-        addFisicalObs();
+        addMedicalHistComponents();
 
         GroupLayout glPnlOsmOsm = new GroupLayout(pnlOsmOsm);
         glPnlOsmOsm.setHorizontalGroup(
@@ -325,122 +328,110 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
         pnlJal.setLayout(glPnlJal);
     }
 
-    private void addFisicalObs() {
+    private void addMedicalHistComponents() {
         pnlMedicalHist = new JPanel();
         pnlMedicalHist.setBorder(new TitledBorder(null, "История заболевания (anamnesis morbi)",
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        JScrollPane spAnam = new JScrollPane();
+        JScrollPane spDesiaseHistory = new JScrollPane();
         GroupLayout glPnlAnam = new GroupLayout(pnlMedicalHist);
         glPnlAnam.setHorizontalGroup(
             glPnlAnam.createParallelGroup(Alignment.LEADING).addGap(0, 578, Short.MAX_VALUE)
-                .addComponent(spAnam, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+                .addComponent(spDesiaseHistory, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
         );
         glPnlAnam.setVerticalGroup(
             glPnlAnam.createParallelGroup(Alignment.LEADING).addGap(0, 51, Short.MAX_VALUE)
-                .addComponent(spAnam, GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+                .addComponent(spDesiaseHistory, GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
         );
         taDesiaseHistory = new JTextArea();
         taDesiaseHistory.setWrapStyleWord(true);
         taDesiaseHistory.setLineWrap(true);
         taDesiaseHistory.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        spAnam.setViewportView(taDesiaseHistory);
+        spDesiaseHistory.setViewportView(taDesiaseHistory);
         pnlMedicalHist.setLayout(glPnlAnam);
     }
 
-    private void addStatusLocalis() {
+    private void addStatusPraenceComponents() {
         pnlStatusPraence = new JPanel();
         pnlStatusPraence.setBorder(new TitledBorder(null, "Объективный статус (status praesense)",
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        JScrollPane spStat = new JScrollPane();
+        JScrollPane spStatPraence = new JScrollPane();
         taStatusPraence = new JTextArea();
         taStatusPraence.setWrapStyleWord(true);
         taStatusPraence.setLineWrap(true);
         taStatusPraence.setFont(new Font("Tahoma", Font.PLAIN, 12));
         GroupLayout glPnlStat = new GroupLayout(pnlStatusPraence);
         glPnlStat.setHorizontalGroup(
-            glPnlStat.createParallelGroup(Alignment.LEADING).addComponent(spStat));
+            glPnlStat.createParallelGroup(Alignment.LEADING).addComponent(spStatPraence));
         glPnlStat.setVerticalGroup(
             glPnlStat.createParallelGroup(Alignment.LEADING)
             .addGroup(glPnlStat.createSequentialGroup()
-                    .addComponent(spStat, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE))
+                    .addComponent(spStatPraence, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE))
         );
-        spStat.setViewportView(taStatusPraence);
+        spStatPraence.setViewportView(taStatusPraence);
         pnlStatusPraence.setLayout(glPnlStat);
     }
 
-    private void addStatusPraenceComponents() {
+    private void addStatusLocalisComponents() {
         pnlStatusLocalis = new JPanel();
         pnlStatusLocalis.setBorder(new TitledBorder(null, "Локальный статус (localis status)",
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        JScrollPane spFiz = new JScrollPane();
+        JScrollPane spStatusLocalis = new JScrollPane();
         GroupLayout glPnlFiz = new GroupLayout(pnlStatusLocalis);
         glPnlFiz.setHorizontalGroup(
             glPnlFiz.createParallelGroup(Alignment.LEADING)
                 .addGap(0, 578, Short.MAX_VALUE).addGap(0, 562, Short.MAX_VALUE)
-                .addComponent(spFiz, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+                .addComponent(spStatusLocalis, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
         );
         glPnlFiz.setVerticalGroup(
             glPnlFiz.createParallelGroup(Alignment.LEADING)
                 .addGap(0, 51, Short.MAX_VALUE).addGap(0, 27, Short.MAX_VALUE)
-                .addComponent(spFiz, GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+                .addComponent(spStatusLocalis, GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
         );
         taStatusLocalis = new JTextArea();
         taStatusLocalis.setWrapStyleWord(true);
         taStatusLocalis.setLineWrap(true);
         taStatusLocalis.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        spFiz.setViewportView(taStatusLocalis);
+        spStatusLocalis.setViewportView(taStatusLocalis);
         pnlStatusLocalis.setLayout(glPnlFiz);
     }
 
-    private void addDesiaseHistoryComponents() {
+    private void addFisicalObsComponents() {
         pnlFisicalObs = new JPanel();
         pnlFisicalObs.setBorder(new TitledBorder(null, "Физикальное обследование",
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        JScrollPane spLoc = new JScrollPane();
+        JScrollPane spFisicalObs = new JScrollPane();
         GroupLayout glPnlLoc = new GroupLayout(pnlFisicalObs);
         glPnlLoc.setHorizontalGroup(
             glPnlLoc.createParallelGroup(Alignment.LEADING)
                 .addGap(0, 578, Short.MAX_VALUE).addGap(0, 562, Short.MAX_VALUE)
-                .addComponent(spLoc, GroupLayout.DEFAULT_SIZE, 562, Short.MAX_VALUE)
+                .addComponent(spFisicalObs, GroupLayout.DEFAULT_SIZE, 562, Short.MAX_VALUE)
         );
         glPnlLoc.setVerticalGroup(
             glPnlLoc.createParallelGroup(Alignment.LEADING)
                 .addGap(0, 51, Short.MAX_VALUE).addGap(0, 27, Short.MAX_VALUE)
-                .addComponent(spLoc, GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+                .addComponent(spFisicalObs, GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
         );
         taFisicalObs = new JTextArea();
         taFisicalObs.setWrapStyleWord(true);
         taFisicalObs.setLineWrap(true);
         taFisicalObs.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        spLoc.setViewportView(taFisicalObs);
+        spFisicalObs.setViewportView(taFisicalObs);
         pnlFisicalObs.setLayout(glPnlLoc);
     }
 
     private void deleteMedHistoryFormTable() {
-        try {
-            if (tbMedHist.getSelectedItem() != null) {
-                int opResult = JOptionPane.showConfirmDialog(
-                    btnMedHistDel, "Удалить запись?",
-                    "Удаление записи", JOptionPane.YES_NO_OPTION);
-                if (opResult == JOptionPane.YES_OPTION) {
-                    ClientHospital.tcl.deleteMedicalHistory(
-                        tbMedHist.getSelectedItem().getId());
-                    tbMedHist.setData(
-                        ClientHospital.tcl.getMedicalHistory((
-                                model.getPatient().getGospitalCod())));
-                }
-                if (tbMedHist.getRowCount() > 0) {
-                    tbMedHist.setRowSelectionInterval(tbMedHist.getRowCount() - 1,
-                        tbMedHist.getRowCount() - 1);
-                }
-                clearMedicalHistoryTextAreas();
+        if (tbMedHist.getSelectedItem() != null) {
+            int opResult = JOptionPane.showConfirmDialog(
+                btnMedHistDel, "Удалить запись?",
+                "Удаление записи", JOptionPane.YES_NO_OPTION);
+            if (opResult == JOptionPane.YES_OPTION) {
+                controller.deleteMedicalHistory(tbMedHist.getSelectedItem());
             }
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
-        } catch (MedicalHistoryNotFoundException e1) {
-            tbMedHist.setData(new ArrayList<TMedicalHistory>());
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
+            if (tbMedHist.getRowCount() > 0) {
+                tbMedHist.setRowSelectionInterval(tbMedHist.getRowCount() - 1,
+                    tbMedHist.getRowCount() - 1);
+            }
+            clearMedicalHistoryTextAreas();
         }
 
     }
@@ -468,42 +459,26 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
     }
 
     private void addMedHistoryToTable() {
-        try {
-            if (model.getPatient() != null) {
-                TMedicalHistory medHist = new TMedicalHistory();
-                medHist.setDataz(System.currentTimeMillis());
-                medHist.setTimez(System.currentTimeMillis());
-                medHist.setPcodVrach(ClientHospital.authInfo.getPcod());
-                medHist.setIdGosp(model.getPatient().getGospitalCod());
-                medHist.setId(ClientHospital.tcl.addMedicalHistory(medHist));
-                tbMedHist.addItem(medHist);
-                tbMedHist.setData(
-                        ClientHospital.tcl.getMedicalHistory(model.getPatient().getGospitalCod()));
-            }
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
-        } catch (MedicalHistoryNotFoundException e) {
-            tbMedHist.setData(new ArrayList<TMedicalHistory>());
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
+        if (model.getPatient() != null) {
+            controller.addDiaryRecord();
         }
     }
 
     private void setMedicalHistoryText() {
         if (taJalob != null) {
-            taJalob.setText(tbMedHist.getSelectedItem().getJalob());
+            taJalob.setText(model.getMedicalHistory().getJalob());
         }
         if (taDesiaseHistory != null) {
-            taDesiaseHistory.setText(tbMedHist.getSelectedItem().getMorbi());
+            taDesiaseHistory.setText(model.getMedicalHistory().getJalob());
         }
         if (taFisicalObs != null) {
-            taFisicalObs.setText(tbMedHist.getSelectedItem().getFisicalObs());
+            taFisicalObs.setText(model.getMedicalHistory().getJalob());
         }
         if (taStatusLocalis != null) {
-            taStatusLocalis.setText(tbMedHist.getSelectedItem().getStatusLocalis());
+            taStatusLocalis.setText(model.getMedicalHistory().getJalob());
         }
         if (taStatusPraence != null) {
-            taStatusPraence.setText(tbMedHist.getSelectedItem().getStatusPraesense());
+            taStatusPraence.setText(model.getMedicalHistory().getJalob());
         }
     }
 
@@ -570,13 +545,10 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
     private void setMedicalHistoryShablonButton() {
         btnMedicalHistoryShablonFind = new JButton("...");
         btnMedicalHistoryShablonFind.addActionListener(new ActionListener() {
-
+            @Override
             public void actionPerformed(final ActionEvent e) {
-                frmShablon.showShablonForm(tfMedHShablonFilter.getText(),
-                    lMedicalHistoryShablonNames.getSelectedValue());
-                syncShablonList(frmShablon.getSearchString(), frmShablon.getShablon(),
-                    medHiSearchListener, lMedicalHistoryShablonNames);
-                pasteSelectedShablon(frmShablon.getShablon());
+                controller.showShablonForm(tfMedHShablonFilter.getText(),
+                        lMedicalHistoryShablonNames.getSelectedValue());
             }
         });
         btnMedicalHistoryShablonFind.setMinimumSize(new Dimension(63, 23));
@@ -602,15 +574,8 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
             public void mouseClicked(final MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     if (lMedicalHistoryShablonNames.getSelectedValue() != null) {
-                        try {
-                            pasteSelectedShablon(ClientHospital.tcl.getShablon(
-                                lMedicalHistoryShablonNames.getSelectedValue().pcod));
-                        } catch (KmiacServerException e1) {
-                            JOptionPane.showMessageDialog(null,
-                                "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                        } catch (TException e1) {
-                            ClientHospital.conMan.reconnect(e1);
-                        }
+                        pasteSelectedShablon(model.loadShablon(
+                            lMedicalHistoryShablonNames.getSelectedValue().pcod));
                     }
                 }
             }
@@ -623,7 +588,7 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
         tfMedHShablonFilter.getDocument().addDocumentListener(medHiSearchListener);
     }
 
-    private void pasteSelectedShablon(final Shablon shablon) {
+    public final void pasteSelectedShablon(final Shablon shablon) {
         if (shablon == null) {
             return;
         }
@@ -655,16 +620,7 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
 
     private void fillMedHistoryTable() {
         if (model.getPatient() != null) {
-            try {
-                tbMedHist.setData(
-                    ClientHospital.tcl.getMedicalHistory(model.getPatient().getGospitalCod()));
-            } catch (MedicalHistoryNotFoundException e) {
-                tbMedHist.setData(Collections.<TMedicalHistory>emptyList());
-            } catch (KmiacServerException e) {
-                e.printStackTrace();
-            } catch (TException e) {
-                ClientHospital.conMan.reconnect(e);
-            }
+            tbMedHist.setData(model.getDiaryList());
         }
     }
 
@@ -714,32 +670,23 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
 
     private void loadShablonList(final CustomTextField inCtf,
             final ThriftIntegerClassifierList inTicl) {
-        try {
-            List<IntegerClassifier> intClassif = ClientHospital.tcl.getShablonNames(
-                ClientHospital.authInfo.getCpodr(), ClientHospital.authInfo.getCslu(),
+            List<IntegerClassifier> intClassif = model.loadMedicalHistoryShablons(
                 (inCtf.getText().length() < 3)
                 ? null : '%' + inCtf.getText() + '%');
             inTicl.setData(intClassif);
-        } catch (KmiacServerException e1) {
-            JOptionPane.showMessageDialog(null,
-                "Ошибка загрузки результатов поиска", "Ошибка", JOptionPane.ERROR_MESSAGE);
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
-        }
     }
 
-    private void syncShablonList(final String searchString, final Shablon shablon,
-            final ShablonSearchListener shSl, final ThriftIntegerClassifierList ticl) {
+    public final void syncShablonList(final String searchString, final Shablon shablon) {
         if (shablon != null) {
-            shSl.updateNow(searchString);
-            for (int i = 0; i < ticl.getData().size(); i++) {
-                if (ticl.getData().get(i).pcod == shablon.getId()) {
-                    ticl.setSelectedIndex(i);
+            medHiSearchListener.updateNow(searchString);
+            for (int i = 0; i < lMedicalHistoryShablonNames.getData().size(); i++) {
+                if (lMedicalHistoryShablonNames.getData().get(i).pcod == shablon.getId()) {
+                    lMedicalHistoryShablonNames.setSelectedIndex(i);
                     break;
                 }
             }
         } else {
-            ticl.setSelectedIndex(-1);
+            lMedicalHistoryShablonNames.setSelectedIndex(-1);
         }
     }
 
@@ -768,5 +715,14 @@ public class DiaryPanel extends JPanel  implements IPatientObserver {
 
     public final URL getIconURL() {
         return ICON;
+    }
+
+    @Override
+    public final void diaryRecordChanged() {
+        setMedicalHistoryText();
+    }
+
+    public final void updateDiaryTable() {
+        model.getDiaryList();
     }
 }

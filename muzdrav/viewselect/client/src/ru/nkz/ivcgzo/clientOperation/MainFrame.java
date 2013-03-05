@@ -507,14 +507,14 @@ public class MainFrame extends JFrame implements IOperationObserver {
     private void setTbOperationsControls() {
         tbOperation.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-            if (!e.getValueIsAdjusting()) {
-                if (tbOperation.getSelectedItem() != null) {
-                    controller.setCurrentOperation(tbOperation.getSelectedItem());
-                    taOperationDescription.setText(tbOperation.getSelectedItem().getOpOper());
-                    taOperationEpicris.setText(tbOperation.getSelectedItem().getPredP());
-                    taOperationMaterial.setText(tbOperation.getSelectedItem().getMaterial());
+                if (!e.getValueIsAdjusting()) {
+                    if (tbOperation.getSelectedItem() != null) {
+                        controller.setCurrentOperation(tbOperation.getSelectedItem());
+                        taOperationDescription.setText(tbOperation.getSelectedItem().getOpOper());
+                        taOperationEpicris.setText(tbOperation.getSelectedItem().getPredP());
+                        taOperationMaterial.setText(tbOperation.getSelectedItem().getMaterial());
+                    }
                 }
-            }
             }
         });
 

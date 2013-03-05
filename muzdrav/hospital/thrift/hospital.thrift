@@ -387,6 +387,18 @@ exception PatientNotFoundException {
 }
 
 /**
+ * Информация не найден
+ */
+exception InfoNotFoundException {
+}
+
+/**
+ * Пациент с такими данными не найден.
+ */
+exception PatientNotFoundException {
+}
+
+/**
  * История жизни с такими данными не найдена.
  */
 exception LifeHistoryNotFoundException {
@@ -487,13 +499,14 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	/**
 	 * Выбор информации из приемного отделения
 	 */
-	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
+	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: InfoNotFoundException infe,
 		2:kmiacServer.KmiacServerException kse);
 
 	/**
 	 * Выбор первичного осмотра
 	 */
-	TMedicalHistory getPriemOsmotr(1:i32 idGosp) throws (1: kmiacServer.KmiacServerException kse);
+	TMedicalHistory getPriemOsmotr(1:i32 idGosp) throws (1: InfoNotFoundException infe,
+		2: kmiacServer.KmiacServerException kse);
 
 /* Работа с шаблонами  */
 
