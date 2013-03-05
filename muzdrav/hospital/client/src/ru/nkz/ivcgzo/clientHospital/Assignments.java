@@ -1,7 +1,6 @@
 package ru.nkz.ivcgzo.clientHospital;
 
-//TODO: В ДНЕВНИКЕ ОСМОТРА ВЫВОДИТЬ ЗАПИСИ ПО ПРИЗНАКУ is_po
-//TODO: ДОБАВЛЕНИЕ МЕДИКАМЕНТА
+//TODO: ДОБАВЛЕНИЕ КАПЕЛЬНИЦЫ И ИНЪЕКЦИЙ
 
 import java.awt.Color;
 import java.awt.Dimension;
