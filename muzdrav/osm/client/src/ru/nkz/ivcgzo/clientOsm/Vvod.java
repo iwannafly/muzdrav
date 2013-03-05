@@ -2663,7 +2663,7 @@ public class Vvod extends JFrame {
 		JLabel lblNewLabel = new JLabel("Тонус матки");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
 //не добавлен классификатор DB14!!!		
-		CBTonus = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db4);
+		CBTonus = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db14);
 		CBTonus.setFont(new Font("Tahoma", Font.BOLD, 12));
 		GroupLayout gl_pnlIzmer = new GroupLayout(pnlIzmer);
 		gl_pnlIzmer.setHorizontalGroup(
