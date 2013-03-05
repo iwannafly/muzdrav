@@ -382,8 +382,8 @@ public class TestServerRegPatient {
         UserAuthInfo uai = new UserAuthInfo();
         PatientFullInfo patientFullInfo =
                 testServer.getPatientFullInfo(npasp);
-        String pathToTemplate = testServer.printMedCart(nambk, patientFullInfo,
-                uai, null, null, null);
+        String pathToTemplate = testServer.printStacCart(patientFullInfo, null, null, null, null, null, null);
+//        .printMedCart(nambk, patientFullInfo,uai, null, null, null);
         System.out.println(pathToTemplate);
     }
 
