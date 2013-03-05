@@ -79,6 +79,7 @@
 		<table srcName="OBST" dstName="n_obst" />
 		<table srcName="O00" dstName="n_o00" />
 		<table srcName="OPL" dstName="n_opl" />
+		<table srcName="OPL1" dstName="n_opl1" />
 		<table srcName="OT_STR" dstName="n_ot_str" />
 		<table srcName="OT9" dstName="n_ot9" />
 		<table srcName="OT63" dstName="n_ot63" />
