@@ -212,6 +212,7 @@ public class ServerPrint extends Server implements Iface {
 					if (acrs.getResultSet().getString(23) != null) tel = acrs.getResultSet().getString(23);
 					if (acrs.getResultSet().getString(24) != null) dog_oms = acrs.getResultSet().getString(24);
 					if (acrs.getResultSet().getInt(25) != 0) mesto_rab = acrs.getResultSet().getString(26);
+					if (mesto_rab==null) mesto_rab="";
 					
                  }
             acrs.close();
@@ -290,64 +291,68 @@ public class ServerPrint extends Server implements Iface {
 			sb.append("</h2>");
 			sb.append("<table border=\"1\" style=\"border-collapse: collapse;\">");	
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append(String.format("<td style=\"font: 15px times new roman;\">8.Пол: %s</td>", gender));
-			sb.append(String.format("<td style=\"font: 15px times new roman;\">9.Дата рождения: %s</td>", datar));
+			sb.append(String.format("<td style=\"font: 11px times new roman;\">8.Пол: %s</td>", gender));
+			sb.append(String.format("<td style=\"font: 11px times new roman;\">9.Дата рождения: %s</td>", datar));
 			sb.append("</tr>");
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td style=\"font: 15px times new roman;\">10.Адрес места жительства</td>");
-			sb.append(String.format("<td style=\"font: 15px times new roman;\">%s</td>", adp_adress));
+			sb.append("<td style=\"font: 11px times new roman;\">10.Адрес места жительства</td>");
+			sb.append(String.format("<td style=\"font: 11px times new roman;\">%s</td>", adp_adress));
 			sb.append("</tr>");
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td style=\"font: 15px times new roman;\">11.Адрес по прописке</td>");
-			sb.append(String.format("<td style=\"font: 15px times new roman;\"> %s</td>", adm_adress));
+			sb.append("<td style=\"font: 11px times new roman;\">11.Адрес по прописке</td>");
+			sb.append(String.format("<td style=\"font: 11px times new roman;\"> %s</td>", adm_adress));
 			sb.append("</tr>");
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td style=\"font: 15px times new roman;\">12.Телефоны: </td>");
+			sb.append("<td style=\"font: 11px times new roman;\">12.Телефоны: </td>");
 			sb.append(String.format("<td> %s</td>", tel));
 			sb.append("</tr>");
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td style=\"font: 15px times new roman;\">Документ, удостоверяющий личность: </td>");
-			sb.append(String.format("<td style=\"font: 15px times new roman;\"> %s</td>", doc_pat));
+			sb.append("<td style=\"font: 11px times new roman;\">Документ, удостоверяющий личность: </td>");
+			sb.append(String.format("<td style=\"font: 12px times new roman;\"> %s</td>", doc_pat));
 			sb.append("</tr>");
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td style=\"font: 15px times new roman;\">13.Документ, удостоверяющий право на льготное обеспечение: </td>");
-			sb.append("<td style=\"font: 15px times new roman;\">______________________________________________________</td>");
+			sb.append("<td style=\"font: 11px times new roman;\">13.Документ, удостоверяющий право на льготное обеспечение: </td>");
+			sb.append("<td style=\"font: 11px times new roman;\">______________________________________________________</td>");
 			sb.append("</tr>");
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("	<td style=\"font: 15px times new roman;\">14.Инвалидность</td>");
-			sb.append(String.format("<td>%s</td>", inv));
+			sb.append("	<td style=\"font: 11px times new roman;\">14.Инвалидность</td>");
+			sb.append(String.format("<td style=\"font: 11px times new roman;\">%s</td>", inv));
 			sb.append("</tr>");
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td style=\"font: 15px times new roman;\">15.Место работы</td>");
-			sb.append(String.format("<td style=\"font: 15px times new roman;\">%s </td>", mesto_rab));
+			sb.append("<td style=\"font: 11px times new roman;\">15.Место работы</td>");
+			sb.append(String.format("<td style=\"font: 11px times new roman;\">%s </td>", mesto_rab));
 			sb.append("</tr>");
 			sb.append("</table>");
 			sb.append("</td>");
-			sb.append("<td style=\"border-top: 1px solid white; border-bottom: 1px solid white; border-left: 1px solid white; border-right: none; padding: 5px;\">");
-			sb.append("<h3 style=\"text-align:center\">");
+			sb.append("<td style=\"border-top: 5px solid white; border-bottom: 5px solid white; border-left: 5px solid white; border-right: none; padding: 5px;\"font: 11px times new roman;\">");
+			sb.append("<h4 style=\"text-align:center\">");
 			sb.append("16. Перемена адреса и места работы");
-			sb.append("</h3>");
-			sb.append("<table border=\"1\" style=\"border-collapse: collapse;\">");		
+			sb.append("</h4>");
+			sb.append("<table bordercolor=\"black\" border=\"1\" style=\"border-collapse: collapse;\">");		
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<th style=\"font: 15px times new roman;\">Дата</th>");
-			sb.append("<th style=\"font: 15px times new roman;\">Новый адрес (новое место работы)</th>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">Дата</th>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">Новый адрес (новое место работы)</th>");
 			sb.append("</tr>");
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">&nbsp</td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">&nbsp</td>");
+			sb.append("</tr>");
+			sb.append("<tr bgcolor=\"white\">");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">&nbsp</td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">&nbsp</td>");
 			sb.append("</tr>");
 			sb.append("</table>");
-			sb.append("<h3 style=\"text-align:center\">");
+			sb.append("<h4 style=\"text-align:center\">");
 			sb.append("17.  ЗАБОЛЕВАНИЯ, ПОДЛЕЖАЩИЕ ДИСПАНСЕРНОМУ НАБЛЮДЕНИЮ");
-			sb.append("</h3>");
+			sb.append("</h4>");
 			sb.append("<table border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\">");		
 			sb.append("<tr bgcolor=\"white\" style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px;\">");
-			sb.append("<th style=\"font: 15px times new roman;\">№ п/п</th>");
-			sb.append("<th style=\"font: 15px times new roman;\">Наименование заболевания</th>");
-			sb.append("<th style=\"font: 15px times new roman;\">Дата постановки на д/у</th>");
-			sb.append("<th style=\"font: 15px times new roman;\">Должность подпись врача</th>");
-			sb.append("<th style=\"font: 15px times new roman;\">Дата снятия с д/у</th>");
-			sb.append("<th style=\"font: 15px times new roman;\">Должность подпись врача</th>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">№ п/п</td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">Наименование заболевания</td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">Дата постановки на д/у</td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">Должность подпись врача</td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">Дата снятия с д/у</td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">Должность подпись врача</td>");
 			sb.append("</tr>");
 			acrs.close();
 			acrs = sse.execPreparedQuery("select p_disp.diag, n_c00.name, p_disp.d_vz, n_s00.name, p_disp.dataish from p_disp inner join n_c00 on (p_disp.diag=n_c00.pcod) " +
@@ -355,38 +360,40 @@ public class ServerPrint extends Server implements Iface {
 										 "where p_disp.npasp = ? and p_disp.pcod = ? ", npasp, cpol);
 					while (acrs.getResultSet().next()) {
 						do {
-							sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 15px times new roman;\"> </th><th style=\"font: 15px times new roman;\"> " +
-									"%s %s </th><th style=\"font: 15px times new roman;\"> " +
-									"%3$td.%3$tm.%3$tY </th><th style=\"font: 15px times new roman;\"> " +
-									"%s </th><th style=\"font: 15px times new roman;\">  " +
-									"</th><th style=\"font: 15px times new roman;\"> " +
-									" </th></tr>", 
+							sb.append(String.format("<tr bgcolor=\"white\"><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
+									"%s %s </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
+									"%3$td.%3$tm.%3$tY </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
+									" </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">  " +
+									"</td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
+									" </td></tr>", 
 									acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), 
-									acrs.getResultSet().getDate(3),
-									acrs.getResultSet().getString(4)
+									acrs.getResultSet().getDate(3)
+									//acrs.getResultSet().getString(4)
 									));
 						} 
 						while (acrs.getResultSet().next());
 						}
 			
 			sb.append("</table>");
+			sb.append("<br>18. ГРУППА КРОВИ ");
 			acrs.close();
 			acrs = sse.execPreparedQuery("select numstr, vybor, comment "+
 			"from p_anamnez "+
 			"where npasp=? and numstr=180 ", npasp);
 			if (acrs.getResultSet().next())
 				if (acrs.getResultSet().getString(3)!=null)
-					sb.append(String.format("<br>18. ГРУППА КРОВИ %s ", acrs.getResultSet().getString(3)));
-				else sb.append("<br>18. ГРУППА КРОВИ_______ ");
+					sb.append(String.format(" %s ", acrs.getResultSet().getString(3)));
+				else sb.append("_______ ");
 			
 			acrs.close();
+			sb.append(" Rh ");
 			acrs = sse.execPreparedQuery("select numstr, vybor, comment "+
 										"from p_anamnez "+
 										"where npasp=? and numstr=181 ", npasp);
 			if (acrs.getResultSet().next())
 				if (acrs.getResultSet().getString(3)!=null)
-					sb.append(String.format(" Rh %s ", acrs.getResultSet().getString(3)));
-				else sb.append(" Rh__________");
+					sb.append(String.format(" %s ", acrs.getResultSet().getString(3)));
+				else sb.append("__________");
 			acrs.close();
 			acrs = sse.execPreparedQuery("select n_anz.name, vybor, comment "+
 										"from  p_anamnez left join n_anz on (p_anamnez.numstr=n_anz.nstr) "+
@@ -401,108 +408,37 @@ public class ServerPrint extends Server implements Iface {
 						while (acrs.getResultSet().next());
 						}
 					
-			sb.append("<br>");
-			sb.append("<h3 align=center>ПРОВЕДЕНИЕ ПРОФИЛАКТИЧЕСКИХ ПРИВИВОК");
-			sb.append("</h3>");
+			sb.append("<h4 align=center>ПРОВЕДЕНИЕ ПРОФИЛАКТИЧЕСКИХ ПРИВИВОК");
+			sb.append("</h4>");
 			sb.append("<table border=\"1\" style=\"border-collapse: collapse;\">	");	
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<th style=\"font: 15px times new roman;\">Дата</th>");
-			sb.append("<th style=\"font: 15px times new roman;\">Наименование прививки</th>");
-			sb.append("<th style=\"font: 15px times new roman;\">Вакцина</th>");
-			sb.append("<th style=\"font: 15px times new roman;\">Серия</th>");
-			sb.append("<th style=\"font: 15px times new roman;\">Доза</th>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">Дата</td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">Наименование прививки</td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">Вакцина</td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">Серия</td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">Доза</td>");
 			sb.append("</tr>");
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
 			sb.append("</tr>");
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
 			sb.append("</tr>");
 			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("</tr>");
-			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("</tr>");
-			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("</tr>");
-			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("</tr>");
-			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("</tr>");
-			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("</tr>");
-			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("</tr>");
-			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("</tr>");
-			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("</tr>");
-			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("</tr>");
-			sb.append("<tr bgcolor=\"white\">");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("<td></td>");
-			sb.append("</tr>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
+			sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"></td>");
 			sb.append("</table>");
 			sb.append("</td>");
 			sb.append("</tr>");
