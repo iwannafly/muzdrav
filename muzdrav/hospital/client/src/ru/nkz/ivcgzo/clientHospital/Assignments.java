@@ -1,6 +1,8 @@
 package ru.nkz.ivcgzo.clientHospital;
 
-//TODO: ДОБАВЛЕНИЕ КАПЕЛЬНИЦЫ И ИНЪЕКЦИЙ
+//TODO: ДОБАВЛЕНИЕ КАПЕЛЬНИЦ И ИНЪЕКЦИЙ
+//TODO: ДОБАВЛЕНИЕ КОНСУЛЬТАЦИЙ
+//TODO: ЮНИТ-ТЕСТИРОВАНИЕ
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -337,7 +339,7 @@ public final class Assignments extends JPanel {
 				return false;
 			}
 			if (!med.isSetVracho())
-				med.setVracho(userAuth.getPcod());
+				med.setVracho(this.userAuth.getPcod());
 		}
 		if (med.isSetDoza() && (med.getDoza() <= 0)) {
 			showErrorDialog("Некорректная разовая доза");
