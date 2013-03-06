@@ -81,7 +81,7 @@ public final class ServerAssignments {
 	                "LEFT JOIN n_svl ON (l.sposv = n_svl.pcod) " +
 	                "LEFT JOIN n_opl1 ON (l.opl = n_opl1.pcod) " +
 	                "LEFT JOIN n_c00 ON (l.diag = n_c00.pcod) " +
-                "WHERE (l.id_gosp = ?) AND (l.klek IS NULL)";
+                "WHERE (l.id_gosp = ?) AND (l.klek IS NULL);";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp, idGosp)) {
             return rsmMedication.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
@@ -123,26 +123,28 @@ public final class ServerAssignments {
         }
 	}
 
-	public List<TDiagnostic> getDiagnostics(int idGosp) throws KmiacServerException {
+	public List<TDiagnostic> getDiagnostics(final int idGosp) throws KmiacServerException {
         String sqlQuery = 
-		"SELECT DISTINCT p_isl_ld.nisl, p_rez_l.cpok AS cpok, " +
+		"SELECT DISTINCT isl.nisl, p_rez_l.cpok AS cpok, " +
 			"n_ldi.name_n AS cpok_name, " +
-			"p_rez_l.zpok AS result, p_isl_ld.datan, p_isl_ld.datav, " +
-			"'' AS op_name, '' AS rez_name " +
-		"FROM p_isl_ld " +
-			"JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) " +
+			"p_rez_l.zpok AS result, isl.datan, isl.datav, " +
+			"NULL AS op_name, NULL AS rez_name " +
+		"FROM p_isl_ld isl " +
+			"JOIN p_rez_l ON (p_rez_l.nisl = isl.nisl) " +
 			"JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " +
-		"WHERE (p_isl_ld.id_gosp = ?) " +
+			"JOIN n_lds ON (n_lds.pcod = isl.kodotd) " +
+		"WHERE (isl.id_gosp = ?) AND (n_lds.tip SIMILAR TO 'Д|Л') " +
 		"UNION " +
-		"SELECT DISTINCT p_isl_ld.nisl, p_rez_d.kodisl AS cpok, " +
+		"SELECT DISTINCT isl.nisl, p_rez_d.kodisl AS cpok, " +
 			"n_ldi.name_n AS cpok_name, " +
-			"n_arez.name AS result, p_isl_ld.datan, p_isl_ld.datav, " +
+			"n_arez.name AS result, isl.datan, isl.datav, " +
 			"p_rez_d.op_name, p_rez_d.rez_name " +
-		"FROM p_isl_ld " +
-			"JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) " +
+		"FROM p_isl_ld isl " +
+			"JOIN p_rez_d ON (p_rez_d.nisl = isl.nisl) " +
 			"JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) " +
+			"JOIN n_lds ON (n_lds.pcod = isl.kodotd) " +
 			"LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) " +
-		"WHERE (p_isl_ld.id_gosp = ?);";
+		"WHERE (isl.id_gosp = ?) AND (n_lds.tip SIMILAR TO 'Д|Л');";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp, idGosp)) {
         	List<TDiagnostic> list2 = rsmDiagnostic.mapToList(acrs.getResultSet());
             return list2;

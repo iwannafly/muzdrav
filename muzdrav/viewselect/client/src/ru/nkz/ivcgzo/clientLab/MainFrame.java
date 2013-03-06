@@ -112,6 +112,7 @@ public class MainFrame extends JFrame {
     private JButton btnAddDiag;
     private JLabel lblLabDate;
     private CustomDateEditor cdeLabDate;
+    private String labPattern;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuthInfo = authInfo;
@@ -137,13 +138,18 @@ public class MainFrame extends JFrame {
     }
 
     public final void fillPatient(final int id, final String surname,
-            final String name, final String middlename, final int idGosp) {
+            final String name, final String middlename, final int idGosp,
+            String pattern) {
         patient = new Patient();
         patient.setId(id);
         patient.setSurname(surname);
         patient.setName(name);
         patient.setMiddlename(middlename);
         patient.setIdGosp(idGosp);
+        if ((pattern == null) || (pattern.length() == 0))
+        	labPattern = "%";
+        else
+        	labPattern = pattern;
         updateTree(patient.getId());
         setDefaults();
     }
@@ -227,12 +233,13 @@ public class MainFrame extends JFrame {
         lblParaotdLpu = new JLabel("ЛПУ");        
         cbxParaotdLpu = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         cbxParaotdLpu.addActionListener(new ActionListener(){
-            @Override
+			@Override
             public void actionPerformed(ActionEvent e) {
                 if (cbxParaotdLpu.getSelectedItem() != null) {
                     try {
                         cbxLabs.setData(
-                            ClientLab.tcl.getLabs(cbxParaotdLpu.getSelectedItem().getPcod()));
+                            ClientLab.tcl.getLabs(
+                            		cbxParaotdLpu.getSelectedItem().getPcod(), labPattern));
                     } catch (KmiacServerException e1) {
                         e1.printStackTrace();
                     } catch (TException e1) {

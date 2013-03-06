@@ -104,7 +104,7 @@ struct Isl{
 
 service ThriftLab extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getVidIssled() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> getLabs(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getLabs(1: i32 clpu, 2: string pattern) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> getOrgAndSys(1: i32 cotd) throws (1: kmiacServer.KmiacServerException kse);
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
