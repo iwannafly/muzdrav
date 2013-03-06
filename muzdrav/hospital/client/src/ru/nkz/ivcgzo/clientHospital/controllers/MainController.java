@@ -136,7 +136,8 @@ public class MainController {
                 model.getPatient().getSurname(),
                 model.getPatient().getName(),
                 model.getPatient().getMiddlename(),
-                model.getPatient().getGospitalCod()
+                model.getPatient().getGospitalCod(),
+                "%"
             );
         }
     }

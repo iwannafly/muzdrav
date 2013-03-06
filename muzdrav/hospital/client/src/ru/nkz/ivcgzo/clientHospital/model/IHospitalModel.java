@@ -11,6 +11,7 @@ import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
+import ru.nkz.ivcgzo.thriftHospital.Zakl;
 
 public interface IHospitalModel {
 
@@ -82,4 +83,10 @@ public interface IHospitalModel {
     List<TDiagnosis> getDiagnosisList();
 
     void setCurrentDiagnosis(TDiagnosis inCurrentDiagnosis);
+
+    List<IntegerClassifier> getIshodClassifier();
+
+    List<IntegerClassifier> getResultClassifier();
+
+    void addZakl(Zakl tmpZakl) throws HospitalDataTransferException;
 }

@@ -20,6 +20,7 @@ import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
+import ru.nkz.ivcgzo.thriftHospital.Zakl;
 
 public class HospitalModel implements IHospitalModel {
     private List<IPatientObserver> patientObservers = new ArrayList<IPatientObserver>();
@@ -439,5 +440,43 @@ public class HospitalModel implements IHospitalModel {
             throw new HospitalDataTransferException("Ошибка при обновлении диагноза", e);
         }
     }
+
+    @Override
+    public final List<IntegerClassifier> getIshodClassifier() {
+        try {
+            return ClientHospital.tcl.getAp0();
+        } catch (KmiacServerException e) {
+            return Collections.<IntegerClassifier>emptyList();
+        } catch (TException e) {
+            ClientHospital.conMan.reconnect(e);
+            return Collections.<IntegerClassifier>emptyList();
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getResultClassifier() {
+        try {
+            return ClientHospital.tcl.getAq0();
+        } catch (KmiacServerException e) {
+            return Collections.<IntegerClassifier>emptyList();
+        } catch (TException e) {
+            ClientHospital.conMan.reconnect(e);
+            return Collections.<IntegerClassifier>emptyList();
+        }
+    }
+
+    @Override
+    public final void addZakl(final Zakl tmpZakl) throws HospitalDataTransferException {
+        try {
+            ClientHospital.tcl.addZakl(tmpZakl, ClientHospital.authInfo.getCpodr());
+        } catch (KmiacServerException e) {
+            throw new HospitalDataTransferException("Ошибка при обновлении заключения", e);
+        } catch (TException e) {
+            ClientHospital.conMan.reconnect(e);
+            throw new HospitalDataTransferException("Ошибка при обновлении заключения", e);
+        }
+    }
+//    ClientHospital.tcl.addZakl(tmpZakl,
+//            ClientHospital.authInfo.getCpodr());
 
 }
