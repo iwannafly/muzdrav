@@ -46,7 +46,6 @@ import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Svid_Rojd;
 
-//TODO: ЮНИТ-ТЕСТИРОВАНИЕ
 /**
  * Панель ввода\редактирования\отображения информации о новорождённом,
  * а также заполнения\выдачи медицинского свидетельства о рождении
@@ -357,25 +356,10 @@ public final class Children extends JPanel {
 	}
 	
 	/**
-	 * Проверка - выбран ли пациент (если нет, то уведомляет пользователя)
-	 * @return Возвращает <code>true</code>, если пациент выбран;
-	 * иначе - <code>false</code>
-	 */
-	private boolean checkPatient() {
-		if (this.patient != null) {
-			return true;
-		} else {
-			JOptionPane.showMessageDialog(this, "Пациент не выбран",
-					"Предупреждение", JOptionPane.WARNING_MESSAGE);
-			return false;
-		}
-	}
-	
-	/**
 	 * Сохранение изменений о новорождённом
 	 */
 	private void btnSaveChildClick() {
-		if (this.checkPatient()) {
+		if (this.patient != null) {
 			try {
 				if (this.childInfo != null)
 					this.updateChildInfo();	//Обновление информации о новорождённом
@@ -508,7 +492,7 @@ public final class Children extends JPanel {
 	 * иначе - <code>false</code>
 	 */
 	private boolean btnFillChildBirthDoc(boolean isGive) {
-		if (!this.checkPatient())
+		if (this.patient == null)
 			return false;
 		if (this.childInfo == null) {
 			JOptionPane.showMessageDialog(this, "Информация о новорождённом " +
@@ -700,7 +684,7 @@ public final class Children extends JPanel {
 		this.btnGiveDoc.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				btnGiveDocClick();
+				Children.this.btnGiveDocClick();
 			}
 		});
 		
@@ -726,7 +710,7 @@ public final class Children extends JPanel {
 		this.btnPrintBlank.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				btnPrintBlankDocClick();
+				Children.this.btnPrintBlankDocClick();
 			}
 		});
 		
@@ -739,7 +723,7 @@ public final class Children extends JPanel {
 		this.btnFillDoc = new JButton("Заполнить свидетельство");
 		this.btnFillDoc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				btnFillChildBirthDoc(false);
+				Children.this.btnFillChildBirthDoc(false);
 			}
 		});
 		GroupLayout gl_panelDoc = new GroupLayout(this.panelDoc);
@@ -826,7 +810,7 @@ public final class Children extends JPanel {
 		this.chckBxDead = new JCheckBox("Мертворождённый");
 		this.chckBxDead.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				chckBxDead();
+				Children.this.chckBxDead();
 			}
 		});
 		this.chckBxFull = new JCheckBox("Доношенный");
@@ -875,7 +859,7 @@ public final class Children extends JPanel {
 		this.btnSaveChild.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				btnSaveChildClick();
+				Children.this.btnSaveChildClick();
 			}
 		});
 		this.btnSaveChild.setIcon(new ImageIcon(Children.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
