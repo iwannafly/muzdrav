@@ -723,9 +723,17 @@ public class ConnectionManager {
 	 * @param im - имя
 	 * @param ot - отчество
 	 * @param idGosp - идентификатор госпитализации
+	 * @param labPattern - шаблон отображения только
+	 * определённого вида исследований ("Т" - терапевтических,
+	 * "Д" - диагностических, "Л" - лабораторных);
+	 * также возможно комбинировать виды исследований, разделяя их
+	 * вертикальной чертой "|". Для отображения всех видов исследований,
+	 * следует передать символ "%". В случае передачи некорректного шаблона
+	 * Будут выведены все виды исследований
 	 */
-	public void showLabRecordForm(int npasp, String fam, String im, String ot, int idGosp) {
-		viewClient.showModal(client, 18, npasp, fam, im, ot, idGosp);
+	public void showLabRecordForm(int npasp, String fam, String im, String ot,
+			int idGosp, String labPattern) {
+		viewClient.showModal(client, 18, npasp, fam, im, ot, idGosp, labPattern);
 	}
 
 	/**
