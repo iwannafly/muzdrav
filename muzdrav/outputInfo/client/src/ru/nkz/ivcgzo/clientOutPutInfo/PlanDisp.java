@@ -52,7 +52,7 @@ public class PlanDisp extends JPanel {
 						String servPath = MainForm.tcl.printPlanDisp(ipd);
 						String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
 						MainForm.conMan.transferFileFromServer(servPath, cliPath);
-						MainForm.conMan.openFileInEditor(cliPath, true);
+						MainForm.conMan.openFileInTextProcessor(cliPath, false);
 							//catch (TException e1) {
 							//	MainForm.conMan.reconnect(e1);
 					} catch (Exception e1) {
@@ -76,7 +76,7 @@ public class PlanDisp extends JPanel {
 						String servPath = MainForm.tcl.printSvedDispObs(ipd);
 						String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
 						MainForm.conMan.transferFileFromServer(servPath, cliPath);
-						MainForm.conMan.openFileInEditor(cliPath, true);
+						MainForm.conMan.openFileInTextProcessor(cliPath, false);
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}

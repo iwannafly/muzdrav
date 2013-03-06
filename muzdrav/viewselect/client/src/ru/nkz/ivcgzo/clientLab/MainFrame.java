@@ -354,7 +354,7 @@ public class MainFrame extends JFrame {
                     );
                 String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
                 ClientLab.conMan.transferFileFromServer(servPath, cliPath);
-                ClientLab.conMan.openFileInEditor(cliPath, false);
+                ClientLab.conMan.openFileInTextProcessor(cliPath, false);
             } catch (KmiacServerException e1) {
                 e1.printStackTrace();
             } catch (IOException e1) {

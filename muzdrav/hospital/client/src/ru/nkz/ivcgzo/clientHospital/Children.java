@@ -493,7 +493,7 @@ public final class Children extends JPanel {
             ClientHospital.conMan.transferFileFromServer(
             		ClientHospital.tcl.printChildBirthDocument(ndoc),
             		clientPath);
-            ClientHospital.conMan.openFileInEditor(clientPath, false);
+            ClientHospital.conMan.openFileInTextProcessor(clientPath, false);
 		} else
 			JOptionPane.showMessageDialog(this, "Информация о новорождённом " +
 					"отсутствует или свидетельство не найдено",
@@ -576,7 +576,7 @@ public final class Children extends JPanel {
 	        ClientHospital.conMan.transferFileFromServer(
 	        		ClientHospital.tcl.printChildBirthBlankDocument(),
 	        		clientPath);
-	        ClientHospital.conMan.openFileInEditor(clientPath, true);
+	        ClientHospital.conMan.openFileInTextProcessor(clientPath, true);
 			return;
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
@@ -722,7 +722,7 @@ public final class Children extends JPanel {
 
 		this.lblBirthHappen.setLabelFor(this.cbBirthHappen);
 		
-		this.btnPrintBlank = new JButton("Распечатать бланк");
+		this.btnPrintBlank = new JButton("Печать бланка");
 		this.btnPrintBlank.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {

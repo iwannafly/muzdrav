@@ -101,6 +101,7 @@ import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
+import ru.nkz.ivcgzo.thriftOsm.PrdDinNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
 import ru.nkz.ivcgzo.thriftOsm.Prez_l;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
@@ -370,7 +371,7 @@ public class Vvod extends JFrame {
 			}
 		});
 		
-		btnBer = new JButton("Наблюдение за беременными");
+		btnBer = new JButton("Учет по беременности");
 		btnBer.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnBer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -2631,7 +2632,7 @@ public class Vvod extends JFrame {
 		pnlPlod.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
 		pnlOtek = new JPanel();
-		pnlOtek.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		pnlOtek.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
 		JPanel pnlIzmer = new JPanel();
 		pnlIzmer.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -2657,7 +2658,7 @@ public class Vvod extends JFrame {
 		SOkrj.setColumns(10);
 		
 		 SVdm = new CustomTextField();
-		 SVdm.setFont(new Font("Tahoma", Font.ITALIC, 12));
+		 SVdm.setFont(new Font("Tahoma", Font.BOLD, 12));
 		SVdm.setColumns(10);
 		
 		 STolP = new CustomTextField();
@@ -2776,11 +2777,11 @@ public class Vvod extends JFrame {
             };
 			public void actionPerformed(ActionEvent e) {
 				try {
-					SimpleDateFormat frm = new SimpleDateFormat("MM");
-					int mes = Integer.parseInt(frm.format(Vvod.zapVr.getDatar()));
-					if (mes == 1) br = br+1;
-					if (mes == 2) br = br+1;
-					if (mes == 12) br = br+1;
+//					SimpleDateFormat frm = new SimpleDateFormat("MM");
+//					int mes = Integer.parseInt(frm.format(Vvod.zapVr.getDatar()));
+//					if (mes == 1) br = br+1;
+//					if (mes == 2) br = br+1;
+//					if (mes == 12) br = br+1;
 					rddin.setChcc(Integer.valueOf(SChcc.getText()));
 					rddin.setHdm(Integer.valueOf(SVdm.getText()));
 					rddin.setOj(Integer.valueOf(SOkrj.getText()));
@@ -2804,6 +2805,7 @@ public class Vvod extends JFrame {
 				else rddin.unsetTonus();
 				calcOteci();
 				rddin.setOteki(oslrod);
+				if (oslrod != 0) br=br+1;
 				rddin.setBall(br); 
 					MainForm.tcl.UpdateRdDin(rddin);
 				} catch (TException e1) {
@@ -2825,17 +2827,15 @@ public class Vvod extends JFrame {
 			gl_pnlDinBer.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlDinBer.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_pnlDinBer.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_pnlDinBer.createSequentialGroup()
-							.addComponent(pnlOtek, GroupLayout.PREFERRED_SIZE, 188, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_pnlDinBer.createParallelGroup(Alignment.LEADING)
-								.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-								.addComponent(button, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)))
-						.addComponent(pnlIzmer, GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE))
+					.addGroup(gl_pnlDinBer.createParallelGroup(Alignment.LEADING)
+						.addComponent(pnlOtek, GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+						.addComponent(pnlIzmer, GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE))
 					.addGap(18)
-					.addComponent(pnlPlod, GroupLayout.PREFERRED_SIZE, 354, GroupLayout.PREFERRED_SIZE)
-					.addGap(21))
+					.addGroup(gl_pnlDinBer.createParallelGroup(Alignment.LEADING)
+						.addComponent(pnlPlod, GroupLayout.PREFERRED_SIZE, 354, GroupLayout.PREFERRED_SIZE)
+						.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+						.addComponent(button, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE))
+					.addGap(16))
 		);
 		gl_pnlDinBer.setVerticalGroup(
 			gl_pnlDinBer.createParallelGroup(Alignment.LEADING)
@@ -2851,23 +2851,23 @@ public class Vvod extends JFrame {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE))
 						.addComponent(pnlOtek, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(234, Short.MAX_VALUE))
+					.addContainerGap(221, Short.MAX_VALUE))
 		);
 		
 		lblOtek = new JLabel("Отеки");
-		lblOtek.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 12));
+		lblOtek.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBot1 = new JCheckBox("Нижние конечности");
-		ChBot1.setFont(new Font("Tahoma", Font.BOLD, 12));
+		ChBot1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBot2 = new JCheckBox("Верхние конечности");
-		ChBot2.setFont(new Font("Tahoma", Font.BOLD, 12));
+		ChBot2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBot3 = new JCheckBox("Верхняя брюшная стенка");
-		ChBot3.setFont(new Font("Tahoma", Font.BOLD, 12));
+		ChBot3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBot4 = new JCheckBox("Генерализованные");
-		ChBot4.setFont(new Font("Tahoma", Font.BOLD, 12));
+		ChBot4.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		GroupLayout gl_pnlOtek = new GroupLayout(pnlOtek);
 		gl_pnlOtek.setHorizontalGroup(
 			gl_pnlOtek.createParallelGroup(Alignment.TRAILING)
@@ -3060,6 +3060,20 @@ public class Vvod extends JFrame {
 					pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 					tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.id_pvizit));
 					tblPos.requestFocusInWindow();
+					SSrok.setText("");
+                    SOkrj.setText("");
+                    SVdm.setText("");
+                    SChcc.setText("");
+                    STolP.setText("");
+                    CBPredPl.setSelectedItem(null);
+                    CBPolPl.setSelectedItem(null);
+                    CBCerd.setSelectedItem(null);
+                    CBSerd1.setSelectedItem(null);
+                    CBTonus.setSelectedItem(null);
+                    ChBot4.setSelected(false);
+                    ChBot3.setSelected(false);
+                    ChBot2.setSelected(false);
+                    ChBot1.setSelected(false);
 					if (tblPos.editCellAt(tblPos.getSelectedRow(), 0))
 						tblPos.getEditorComponent().requestFocusInWindow();
 				} catch (KmiacServerException e2) {
@@ -3330,7 +3344,7 @@ public class Vvod extends JFrame {
 						
 						priem = MainForm.tcl.getPriem(zapVr.npasp, tblPos.getSelectedItem().id);
 						pvizit = MainForm.tcl.getPvizit(zapVr.getId_pvizit());
-						rddin = MainForm.tcl.getRdDinInfo(zapVr.getId_pvizit(), zapVr.npasp, tblPos.getSelectedItem().id);
+							rddin = MainForm.tcl.getRdDinInfo(zapVr.getId_pvizit(), zapVr.npasp, tblPos.getSelectedItem().id);
 						tblObr.replaceSelectedItem(pvizit);
 						anamZab = MainForm.tcl.getAnamZab(zapVr.getId_pvizit(), zapVr.getNpasp());
 						btnRecPriem.setEnabled(!isStat &&!pvizit.isSetIshod());
