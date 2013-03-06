@@ -476,7 +476,7 @@ public class PacientInfoFrame extends JFrame {
                     if (curPatientId != 0 && tbl_priem.getSelectedItem() != null){
                 		curGospId = tbl_priem.getSelectedItem().id;
                 		tbMain.setSelectedIndex(5);
-                		MainForm.conMan.showLabRecordForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId);
+                		MainForm.conMan.showLabRecordForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId, "%");
                 	}else
                 		JOptionPane.showMessageDialog(tbl_priem, "Выберите обращения пациента.");
                 	}
