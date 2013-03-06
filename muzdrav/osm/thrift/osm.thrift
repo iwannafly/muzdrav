@@ -741,7 +741,6 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	
 	string printIsslMetod(1: IsslMet im) throws (1: kmiacServer.KmiacServerException kse);
-	string printIsslPokaz(1: IsslPokaz ip) throws (1: kmiacServer.KmiacServerException kse);
 	string printNapr(1: Napr na) throws (1: kmiacServer.KmiacServerException kse);//госпитализация и обследование
 	string printNaprKons(1: NaprKons nk) throws (1: kmiacServer.KmiacServerException kse);//консультация
 	string printVypis(1: Vypis vp) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
@@ -765,7 +764,6 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_m00() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_p0c() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_ap0() throws (1: kmiacServer.KmiacServerException kse);
-	string get_n_mkb(1: string pcod) throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	RdSlStruct getRdSlInfo(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PrdslNotFoundException pnf);
