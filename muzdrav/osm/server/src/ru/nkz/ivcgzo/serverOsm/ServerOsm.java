@@ -3626,7 +3626,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			if (acrs.getResultSet().next())
 			return rsmRdDin.map(acrs.getResultSet());
 			else
-				throw new PrdDinNotFoundException();
+				throw new KmiacServerException("rd inf not found");
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();

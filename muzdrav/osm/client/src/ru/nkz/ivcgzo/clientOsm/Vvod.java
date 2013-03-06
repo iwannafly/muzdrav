@@ -371,7 +371,7 @@ public class Vvod extends JFrame {
 			}
 		});
 		
-		btnBer = new JButton("Наблюдение за беременными");
+		btnBer = new JButton("Учет по беременности");
 		btnBer.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnBer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -2777,11 +2777,11 @@ public class Vvod extends JFrame {
             };
 			public void actionPerformed(ActionEvent e) {
 				try {
-					SimpleDateFormat frm = new SimpleDateFormat("MM");
-					int mes = Integer.parseInt(frm.format(Vvod.zapVr.getDatar()));
-					if (mes == 1) br = br+1;
-					if (mes == 2) br = br+1;
-					if (mes == 12) br = br+1;
+//					SimpleDateFormat frm = new SimpleDateFormat("MM");
+//					int mes = Integer.parseInt(frm.format(Vvod.zapVr.getDatar()));
+//					if (mes == 1) br = br+1;
+//					if (mes == 2) br = br+1;
+//					if (mes == 12) br = br+1;
 					rddin.setChcc(Integer.valueOf(SChcc.getText()));
 					rddin.setHdm(Integer.valueOf(SVdm.getText()));
 					rddin.setOj(Integer.valueOf(SOkrj.getText()));
@@ -2805,6 +2805,7 @@ public class Vvod extends JFrame {
 				else rddin.unsetTonus();
 				calcOteci();
 				rddin.setOteki(oslrod);
+				if (oslrod != 0) br=br+1;
 				rddin.setBall(br); 
 					MainForm.tcl.UpdateRdDin(rddin);
 				} catch (TException e1) {
@@ -3326,6 +3327,7 @@ public class Vvod extends JFrame {
 				pvizitAmb = new PvizitAmb();
 				priem = new Priem();
 				anamZab = new AnamZab();
+				rddin = new RdDinStruct();
 				pvizit = tblObr.getSelectedItem();
 				if (pvizit == null)
 					pvizit = new Pvizit();
@@ -3342,12 +3344,7 @@ public class Vvod extends JFrame {
 						
 						priem = MainForm.tcl.getPriem(zapVr.npasp, tblPos.getSelectedItem().id);
 						pvizit = MainForm.tcl.getPvizit(zapVr.getId_pvizit());
-						try {
 							rddin = MainForm.tcl.getRdDinInfo(zapVr.getId_pvizit(), zapVr.npasp, tblPos.getSelectedItem().id);
-						} catch (PrdDinNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
 						tblObr.replaceSelectedItem(pvizit);
 						anamZab = MainForm.tcl.getAnamZab(zapVr.getId_pvizit(), zapVr.getNpasp());
 						btnRecPriem.setEnabled(!isStat &&!pvizit.isSetIshod());
