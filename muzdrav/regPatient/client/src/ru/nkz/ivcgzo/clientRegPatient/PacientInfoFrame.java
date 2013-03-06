@@ -3706,19 +3706,20 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
     private void changePatientPriemInfo(int PatId){
 //		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy hh:mm");
         Id_gosp = new Gosp();
-        NewPriemInfo();
+        Id_gosp_old = new Gosp(Id_gosp);
         if (tbl_priem.getSelectedItem() == null){
             return;
         }
-           try {
-        	   curGospId = tbl_priem.getSelectedItem().id;
-        	   curNgosp = tbl_priem.getSelectedItem().ngosp;
-        	   Id_gosp = MainForm.tcl.getGosp(curGospId);
-               Id_gosp_old = new Gosp(Id_gosp);
-            if (Id_gosp.isSetPl_extr()){
-                rbtn_plan.setSelected(Id_gosp.pl_extr == 2);
-                rbtn_extr.setSelected(Id_gosp.pl_extr == 1);
-            }
+        try {
+        	NewPriemInfo();
+           curGospId = tbl_priem.getSelectedItem().id;
+           curNgosp = tbl_priem.getSelectedItem().ngosp;
+           Id_gosp = MainForm.tcl.getGosp(curGospId);
+           Id_gosp_old = new Gosp(Id_gosp);
+           if (Id_gosp.isSetPl_extr()){
+        	   rbtn_plan.setSelected(Id_gosp.pl_extr == 2);
+        	   rbtn_extr.setSelected(Id_gosp.pl_extr == 1);
+           }
             if (Id_gosp.isSetPr_ber()){
                 cbx_ber.setSelected(Id_gosp.pr_ber);
             }
@@ -3903,9 +3904,9 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
             Id_gosp.setVid(1);
             if (tf_datap.getDate() != null) Id_gosp.setDatap(tf_datap.getDate().getTime());
             if (tf_dataosm.getDate() != null) Id_gosp.setDataosm(tf_dataosm.getDate().getTime());
+            if (tf_timeosm.getTime() != null) Id_gosp.setVremosm(tf_timeosm.getTime().getTime());
+            if (tf_timep.getTime() != null) Id_gosp.setVremp(tf_timep.getTime().getTime());
 
-            Id_gosp.setVremosm(tf_timeosm.getTime().getTime());
-            Id_gosp.setVremp(tf_timep.getTime().getTime());
             if (cbx_smp.isSelected()){
                 if (tf_datasmp.getDate() != null) Id_gosp.setSmp_data(tf_datasmp.getDate().getTime());
                 Id_gosp.setSmp_time(tf_timesmp.getTime().getTime());
@@ -3943,11 +3944,8 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
             Id_gosp.setCuser(Id_gosp_old.getCuser());
             Id_gosp.setDataz(Id_gosp_old.getDataz());
 
-            CheckNotNullTableCgosp();
 //FIXME
             if(checkDataChanged()){
-//            	Object source = btnSave_priem.getSource();
-//            	if (source == firstButton) {
 				if(is_btnSave_priem){
        				is_btnSave_priem = true;
 					int res = JOptionPane.showConfirmDialog(PacientInfoFrame.this, "Данные изменились, но не были сохранены. Сохранить?", "Подтверждение", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -3959,6 +3957,7 @@ item.setDrg(tbl_lgota.getSelectedItem().datau);
        					return;
        				}
 				}
+                CheckNotNullTableCgosp();
 	            Id_gosp.setDataz(new Date().getTime());
 	            Id_gosp.setCotd_p(MainForm.authInfo.cpodr);
 	            Id_gosp.setCuser(MainForm.authInfo.pcod);

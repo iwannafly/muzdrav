@@ -106,7 +106,7 @@ public class LabGur extends JFrame {
 					
 					String cliPath = DocumentPrinter.createReportFile("Lab_gur");
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
-					MainForm.conMan.openFileInEditor(cliPath, false);
+					MainForm.conMan.openFileInTextProcessor(cliPath, false);
 				} catch (TException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
