@@ -1599,6 +1599,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		}
 	}
 	
+	@SuppressWarnings("resource")
 	@Override
 	public String printProtokol(int npasp, int userId, int pvizit_id, int pvizit_ambId, int cpol, int clpu, int nstr) throws KmiacServerException, TException {
 		AutoCloseableResultSet acrs = null;
@@ -1793,6 +1794,20 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					if (acrs.getResultSet().isBeforeFirst()) {
 						sb.append("<br><b>Назначенные исследования </b><br>");
 						if (acrs.getResultSet().next()) {
+							
+							if (sb.length()<4600){
+								sb.append("<br>");
+								sb.append("<table border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">Наименование показателя</th><th style=\"font: 10px times new roman;\">Результат</th></tr>");
+								do{
+									if (acrs.getResultSet().getString(4) != null)
+										sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\"> %s </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
+									else 
+										sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\" width=\"30\">  </th></tr>", acrs.getResultSet().getString(3)));
+								}
+								
+								while ((sb.length()<4600) && (acrs.getResultSet().next()));
+								
+							}
 							if (sb.length()>4600){
 								sb.append("</table>");
 								sb.append("<td style=\"border-top: 1px solid white; border-bottom: 1px solid white; border-left: 1px solid white; border-right: none; padding: 5px; font: 10px times new roman;\" width=\"40%\">");
@@ -1807,32 +1822,17 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 								
 								while (acrs.getResultSet().next());
 							}
-							if (sb.length()<4600){
-							//while(sb.length()<4550){
-								sb.append("<br>");
-								sb.append("<table border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">Наименование показателя</th><th style=\"font: 10px times new roman;\">Результат</th></tr>");
-								do{
-									if (acrs.getResultSet().getString(4) != null)
-										sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\"> %s </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
-									else 
-										sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\" width=\"30\">  </th></tr>", acrs.getResultSet().getString(3)));
-								}
-								
-								while ((sb.length()<4600) && (acrs.getResultSet().next()));
-								
-							}
 						
 								
 						}
-//						else {
-//							
-//						}
+
 							sb.append("</table><br>");	
+							
 					}
 				
 				}
 					acrs.close();
-					
+				sb.append("<td style=\"border-top: 1px solid white; border-bottom: 1px solid white; border-left: 1px solid white; border-right: none; padding: 5px; font: 10px times new roman;\" width=\"40%\">&nbsp<td>");
 				sb.append("</td></tr></table></div>");
 				sb.append("</body>");
 				sb.append("</html>");
@@ -3626,7 +3626,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			if (acrs.getResultSet().next())
 			return rsmRdDin.map(acrs.getResultSet());
 			else
-				throw new PrdDinNotFoundException();
+				throw new KmiacServerException("rd inf not found");
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
