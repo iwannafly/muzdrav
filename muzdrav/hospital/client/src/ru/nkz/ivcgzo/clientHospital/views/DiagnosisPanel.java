@@ -203,7 +203,7 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
             public void actionPerformed(final ActionEvent e) {
                 if (tbDiag.getSelectedItem() != null) {
                     int opResult = JOptionPane.showConfirmDialog(
-                        btnDelDiag, "Удалить диагноз?",
+                        DiagnosisPanel.this, "Удалить диагноз?",
                         "Удаление диагноза", JOptionPane.YES_NO_OPTION);
                     if (opResult == JOptionPane.YES_OPTION) {
                         controller.deleteDiagnosis(tbDiag.getSelectedItem());
@@ -228,32 +228,27 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
         btnSaveDiag.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 if (tbDiag.getSelectedItem() != null) {
-                    int opResult = JOptionPane.showConfirmDialog(
-                        btnDelDiag, "Добавить информацию о диагнозе?",
-                        "Изменение диагноза", JOptionPane.YES_NO_OPTION);
-                    if (opResult == JOptionPane.YES_OPTION) {
-                        tbDiag.getSelectedItem().setMedOp(taDiagMedOp.getText());
-                        if (rdbtnMain.isSelected()) {
-                            tbDiag.getSelectedItem().setPrizn(1);
-                        }
-                        if (rdbtnSoput.isSelected()) {
-                            tbDiag.getSelectedItem().setPrizn(3);
-                        }
-                        if (rdbtnOsl.isSelected()) {
-                            tbDiag.getSelectedItem().setPrizn(2);
-                        }
-                        if (chbxPredv.isSelected()) {
-                            tbDiag.getSelectedItem().setPredv(true);
-                        }
-                        tbDiag.getSelectedItem().setIdGosp(model.getPatient().getGospitalCod());
-
-                        // сохраняем номер выделенной строки
-                        int selRowNumber = tbDiag.getSelectedRow();
-                        // передаем контроллеру строку для обновления
-                        controller.updateDiagnosis(tbDiag.getSelectedItem());
-                        // устанавливаем выделение на строку с сохраненным ранее номером
-                        tbDiag.setRowSelectionInterval(selRowNumber, selRowNumber);
+                    tbDiag.getSelectedItem().setMedOp(taDiagMedOp.getText());
+                    if (rdbtnMain.isSelected()) {
+                        tbDiag.getSelectedItem().setPrizn(1);
                     }
+                    if (rdbtnSoput.isSelected()) {
+                        tbDiag.getSelectedItem().setPrizn(3);
+                    }
+                    if (rdbtnOsl.isSelected()) {
+                        tbDiag.getSelectedItem().setPrizn(2);
+                    }
+                    if (chbxPredv.isSelected()) {
+                        tbDiag.getSelectedItem().setPredv(true);
+                    }
+                    tbDiag.getSelectedItem().setIdGosp(model.getPatient().getGospitalCod());
+
+                    // сохраняем номер выделенной строки
+                    int selRowNumber = tbDiag.getSelectedRow();
+                    // передаем контроллеру строку для обновления
+                    controller.updateDiagnosis(tbDiag.getSelectedItem());
+                    // устанавливаем выделение на строку с сохраненным ранее номером
+                    tbDiag.setRowSelectionInterval(selRowNumber, selRowNumber);
                 }
             }
         });

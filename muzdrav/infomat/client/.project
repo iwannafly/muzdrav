@@ -31,5 +31,35 @@
 			<type>2</type>
 			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/infomat/thrift/gen-java</locationURI>
 		</link>
+		<link>
+ 			<name>src/ru/nkz/ivcgzo/clientInfomat/ui/resources/appointment.png</name>
+ 			<type>1</type>
+ 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/appointment.png</locationURI>
+ 		</link>
+ 		<link>
+ 			<name>src/ru/nkz/ivcgzo/clientInfomat/ui/resources/backward.png</name>
+ 			<type>1</type>
+ 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/backward.png</locationURI>
+ 		</link>
+ 		<link>
+ 			<name>src/ru/nkz/ivcgzo/clientInfomat/ui/resources/backwardBig.png</name>
+ 			<type>1</type>
+ 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/backwardBig.png</locationURI>
+ 		</link>
+ 		<link>
+ 			<name>src/ru/nkz/ivcgzo/clientInfomat/ui/resources/forward.png</name>
+ 			<type>1</type>
+ 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/forward.png</locationURI>
+ 		</link>
+ 		<link>
+ 			<name>src/ru/nkz/ivcgzo/clientInfomat/ui/resources/personalOffice.png</name>
+ 			<type>1</type>
+ 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/personalOffice.png</locationURI>
+ 		</link>
+ 		<link>
+ 			<name>src/ru/nkz/ivcgzo/clientInfomat/ui/resources/shedule.png</name>
+ 			<type>1</type>
+ 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/shedule.png</locationURI>
+ 		</link>
 	</linkedResources>
 </projectDescription>
