@@ -32,6 +32,9 @@ import java.util.Collections;
 
 import javax.swing.JLabel;
 
+/**
+ * Форма приёма в курацию
+ */
 public class CurationFrame extends JDialog {
 
     private static final long serialVersionUID = -6475694293017689541L;
@@ -87,6 +90,7 @@ public class CurationFrame extends JDialog {
                         (CurationTableModel) table.getModel()).getPatientList()
                         .get(table.convertRowIndexToModel(table.getSelectedRow()));
                     try {
+                        // Закрепление пациента за определенным врачём
                         ClientHospital.tcl.addPatientToDoctor(currentPatient.getIdGosp(),
                                 ClientHospital.authInfo.getPcod(),
                                 cbxStationType.getSelectedPcod());
@@ -141,6 +145,9 @@ public class CurationFrame extends JDialog {
         pStationType.add(cbxStationType);
     }
 
+    /**
+     * Обновление таблицы пациентов
+     */
     public final void refreshModel(final UserAuthInfo authInfo) {
         CurationTableModel tbModel = new CurationTableModel();
         table.setModel(tbModel);

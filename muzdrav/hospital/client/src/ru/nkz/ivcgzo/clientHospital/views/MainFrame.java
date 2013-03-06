@@ -22,6 +22,9 @@ import javax.swing.border.EtchedBorder;
 import ru.nkz.ivcgzo.clientHospital.controllers.MainController;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
 
+/**
+ * Главный фрейм стационара. Панели добавляютcя в TabPane через контроллер фрейма
+ */
 public class MainFrame extends JFrame {
     private static final long serialVersionUID = -6126551810745026830L;
     @SuppressWarnings("unused")
@@ -88,6 +91,7 @@ public class MainFrame extends JFrame {
         pack();
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
+        // Замена текста по умолчанию в кнопках confirm dialog
         UIManager.put("OptionPane.yesButtonText", "Да");
         UIManager.put("OptionPane.noButtonText", "Нет");
     }
@@ -100,6 +104,9 @@ public class MainFrame extends JFrame {
         addPrintFormsMenu();
     }
 
+    /**
+     * Добавление меню управления пациентами
+     */
     private void addPatientOptionsMenu() {
         mnPatientOperation = new JMenu("Управление пациентами");
         mbMain.add(mnPatientOperation);
@@ -123,6 +130,9 @@ public class MainFrame extends JFrame {
         mnPatientOperation.add(mntmReception);
     }
 
+    /**
+     * Добавление меню печатных форм
+     */
     private void addPrintFormsMenu() {
         mnPrintForms = new JMenu("Печатные формы");
         mbMain.add(mnPrintForms);
@@ -192,6 +202,9 @@ public class MainFrame extends JFrame {
         mnPrintForms.add(mntmPrintHospitalDeathSummary);
     }
 
+    /**
+     * Добавление панели инструментов
+     */
     private void setToolBar() {
         getContentPane().setLayout(new BorderLayout(0, 0));
         toolBar = new JToolBar("Панель инструментов");
@@ -281,6 +294,9 @@ public class MainFrame extends JFrame {
 
     }
 
+    /**
+     * Установки для кнопок панели инструментов
+     */
     private void setTooltipButtonDefaults(
             final JButton button, final int height, final int width,
             final URL iconUrl, final String tooltipText) {
@@ -301,10 +317,16 @@ public class MainFrame extends JFrame {
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
     }
 
+    /**
+     * Установка заголовка формы
+     */
     public final void setFrameTitle(final String title) {
         setTitle(title);
     }
 
+    /**
+     * Добавляет компонент в TabPane
+     */
     public final void addComponentInTabbedPane(final Component component, final String title,
             final URL iconURL, final String tootlipText) {
         tabbedPane.addTab(title, new ImageIcon(iconURL), component, tootlipText);

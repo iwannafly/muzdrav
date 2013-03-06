@@ -476,7 +476,5 @@ public class HospitalModel implements IHospitalModel {
             throw new HospitalDataTransferException("Ошибка при обновлении заключения", e);
         }
     }
-//    ClientHospital.tcl.addZakl(tmpZakl,
-//            ClientHospital.authInfo.getCpodr());
 
 }

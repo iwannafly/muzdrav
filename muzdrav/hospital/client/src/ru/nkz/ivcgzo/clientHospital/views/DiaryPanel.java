@@ -572,6 +572,7 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
             @Override
             public void mouseClicked(final MouseEvent e) {
                 if (e.getClickCount() == 2) {
+                    // Выбор и вставка шаблона
                     if (lMedicalHistoryShablonNames.getSelectedValue() != null) {
                         Shablon selectedShablon = model.loadShablon(
                                 lMedicalHistoryShablonNames.getSelectedValue().pcod);

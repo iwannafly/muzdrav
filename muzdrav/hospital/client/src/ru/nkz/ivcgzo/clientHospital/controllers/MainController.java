@@ -9,6 +9,11 @@ import ru.nkz.ivcgzo.clientHospital.views.MainFrame;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 
+/**
+ * Контроллер главной формы.
+ * Все события, не имеющее отношения к определенной вкладке происходят здесь
+ *
+ */
 public class MainController {
     private IComponentController personalInfoController;
     private IComponentController diaryController;
@@ -34,6 +39,10 @@ public class MainController {
         curFrame.setVisible(true);
     }
 
+    /**
+     * Выполняет инициализацию и добавление на главную форму всех побочных компонентов программы
+     * (панелей TabPane, вспомогательных форм и т.п.).
+     */
     public final void onConnect() {
         curFrame = new ru.nkz.ivcgzo.clientHospital.views.CurationFrame();
         patSelectFrame = new ru.nkz.ivcgzo.clientHospital.views.PatientSelectFrame(this, model);
@@ -58,6 +67,9 @@ public class MainController {
         addComponentInTabbedPane(zaklController);
     }
 
+    /**
+     * Добавляет компонент в TabPane
+     */
     private void addComponentInTabbedPane(final IComponentController controller) {
         view.addComponentInTabbedPane(
             controller.getComponent(),
@@ -67,6 +79,10 @@ public class MainController {
         );
     }
 
+    /**
+     * Определяет является ли данное ЛПУ роддомом или отделением для новорожденных
+     * @return
+     */
     private boolean isRd() {
         return (ClientHospital.authInfo.getClpu() == 62)
                 || (ClientHospital.authInfo.getClpu() == 63)
@@ -79,6 +95,9 @@ public class MainController {
                 || (ClientHospital.authInfo.getCpodr() == 8305);
     }
 
+    /**
+     * Выбор пациента
+     */
     public final void selectPatient(final TSimplePatient selectedPatient) {
         patSelectFrame.refreshModel();
         patSelectFrame.setVisible(true);
@@ -100,11 +119,17 @@ public class MainController {
         }
     }
 
+    /**
+     * Отображение формы выбора пациента
+     */
     public final void showPatientSelectFrame() {
         patSelectFrame.refreshModel();
         patSelectFrame.setVisible(true);
     }
 
+    /**
+     * Вызов модуля персональной информации
+     */
     public final void showExternalPatientInfoFrame() {
         if (model.getPatient() != null) {
             ClientHospital.conMan.showPatientInfoForm(
@@ -113,6 +138,9 @@ public class MainController {
         }
     }
 
+    /**
+     * Вызов модуля истории жизни
+     */
     public final void showExternalAnamnezFrame() {
         if (model.getPatient() != null) {
             ClientHospital.conMan.showPatientAnamnezForm(
@@ -121,6 +149,9 @@ public class MainController {
         }
     }
 
+    /**
+     * Вызов модуля больничных листов
+     */
     public final void showExternalBolListFrame() {
         if (model.getPatient() != null) {
             ClientHospital.conMan.showBolListForm(
@@ -129,6 +160,9 @@ public class MainController {
         }
     }
 
+    /**
+     * Вызов модуля записи на исследование
+     */
     public final void showExternalIssledFrame() {
         if (model.getPatient() != null) {
             ClientHospital.conMan.showLabRecordForm(
@@ -142,6 +176,9 @@ public class MainController {
         }
     }
 
+    /**
+     * Вызов модуля операций
+     */
     public final void showExternalOperationFrame() {
         if (model.getPatient() != null) {
             ClientHospital.conMan.showOperationForm(
@@ -154,6 +191,9 @@ public class MainController {
         }
     }
 
+    /**
+     * Вызов модуля правки ошибок в реестре
+     */
     public final void showExternalReestrFrame() {
         Integer result = ClientHospital.conMan.showMedStaErrorsForm();
         if (result != null) {
