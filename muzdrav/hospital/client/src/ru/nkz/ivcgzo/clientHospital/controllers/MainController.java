@@ -67,6 +67,7 @@ public class MainController {
         assignmentsController = new AssignmentsController(model);
         addComponentInTabbedPane(assignmentsController);
 
+        // формы отображаются только в роддомах
         if (isRd()) {
             childbirthController = new ChildbirthController(model);
             addComponentInTabbedPane(childbirthController);

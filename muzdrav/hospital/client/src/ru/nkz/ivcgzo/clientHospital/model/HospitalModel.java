@@ -10,6 +10,9 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientHospital.ClientHospital;
 import ru.nkz.ivcgzo.clientHospital.controllers.HospitalDataTransferException;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IDiagnosisObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IDiaryRecordObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -28,7 +31,6 @@ import ru.nkz.ivcgzo.thriftHospital.Zakl;
  * Модель стационара.
  * Здесь хранится состояние основных объектов системы и
  * происходит вся работа с серверной частью.
- *
  */
 public class HospitalModel implements IHospitalModel {
     private List<IPatientObserver> patientObservers = new ArrayList<IPatientObserver>();
@@ -115,16 +117,25 @@ public class HospitalModel implements IHospitalModel {
         currentDiaryRecord = null;
     }
 
+    /**
+     * Возвращает информацию из приемного отделения
+     */
     @Override
     public final TPriemInfo getPriemInfo() {
         return this.priemInfo;
     }
 
+    /**
+     * Возвращает информацию о первичном осмотре
+     */
     @Override
     public final TMedicalHistory getPerOsmotr() {
         return this.perOsmotr;
     }
 
+    /**
+     * Устанавливает информацию о первичном осмотре
+     */
     private void setPerOsmotr() {
         if (patient != null) {
             try {
@@ -141,7 +152,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
-    //FIXME private ?
+    /**
+     * Устанавливает информацию из приемного отделения
+     */
     @Override
     public final void setPriemInfo() {
         if (patient != null) {
@@ -207,6 +220,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Возвращает доступные профили для данного коек отделения
+     */
     @Override
     public final List<IntegerClassifier> getOtdProfs() {
         try {
@@ -221,6 +237,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Обновляет информацию о пациенте
+     */
     @Override
     public final void updatePatient(final String chamber, final int otdProf,
             final String surname, final String name, final String middlename)
@@ -240,6 +259,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Возвращает список названий шаблонов осмотров для данного отделения
+     */
     @Override
     public final List<IntegerClassifier> loadMedicalHistoryShablons() {
         try {
@@ -256,6 +278,31 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Загрузка списка названий шаблонов для всех диагнозов, уставновленных у данного
+     * пациента
+     */
+    @Override
+    public final List<IntegerClassifier> loadZaklShablons() {
+        if (patient != null) {
+            try {
+                return ClientHospital.tcl.getZaklShablonNames(
+                        ClientHospital.authInfo.getCpodr(),
+                        ClientHospital.authInfo.getCslu(), null, patient.getGospitalCod());
+            } catch (KmiacServerException e) {
+                return Collections.<IntegerClassifier>emptyList();
+            } catch (TException e) {
+                ClientHospital.conMan.reconnect(e);
+                return Collections.<IntegerClassifier>emptyList();
+            }
+        } else {
+            return Collections.<IntegerClassifier>emptyList();
+        }
+    }
+
+    /**
+     * Возвращает список названий шаблонов осмотров для данного отделения
+     */
     @Override
     public final List<IntegerClassifier> loadMedicalHistoryShablons(final String srcText) {
         try {
@@ -272,6 +319,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Возвращает текст данного шаблона
+     */
     @Override
     public final Shablon loadShablon(final int idSh) {
         try {
@@ -284,6 +334,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Возвращает шаблоны для данного диагноза
+     */
     @Override
     public final List<IntegerClassifier> getShablonBySelectedDiagnosis(
             final String diag, final String srcText) {
@@ -299,6 +352,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Возвращает диагнозы для данного отделения по которым есть шаблоны
+     */
     @Override
     public final List<StringClassifier> getShablonDiagnosis(final String srcText) {
         try {
@@ -313,6 +369,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Возвращает дневник
+     */
     @Override
     public final List<TMedicalHistory> getDiaryList() {
         if (diaryList == null) {
@@ -321,6 +380,9 @@ public class HospitalModel implements IHospitalModel {
         return diaryList;
     }
 
+    /**
+     * Устанавливает дневник
+     */
     @Override
     public final void setDiaryList() throws HospitalDataTransferException {
         try {
@@ -337,17 +399,26 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Возвращает текущую (выбранную в таблице) запись дневника
+     */
     @Override
     public final TMedicalHistory getMedicalHistory() {
         return currentDiaryRecord;
     }
 
+    /**
+     * Устанавливает текущую (выбранную в таблице) запись дневника
+     */
     @Override
     public final void setMedicalHistory(final TMedicalHistory currentMedicalHistory) {
         currentDiaryRecord = currentMedicalHistory;
         notifyDiaryRecordObserver();
     }
 
+    /**
+     * Добавляет новую запись дневника
+     */
     @Override
     public final void addMedicalHistory(final TMedicalHistory newMedHist)
             throws HospitalDataTransferException {
@@ -361,6 +432,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Удаляет запись дневника
+     */
     @Override
     public final void deleteMedicalHistory(final TMedicalHistory currentMedHist)
             throws HospitalDataTransferException {
@@ -374,6 +448,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Обновляет запись дневника
+     */
     @Override
     public final void updateMedicalHistory(final TMedicalHistory currenMedHist)
             throws HospitalDataTransferException {
@@ -386,6 +463,10 @@ public class HospitalModel implements IHospitalModel {
             throw new HospitalDataTransferException("Ошибка при изменении записи в дневнике", e);
         }
     }
+
+    /**
+     * Устанавливает список диагнозов для данного пациента
+     */
     @Override
     public final void setDiagnosisList() throws HospitalDataTransferException {
         try {
@@ -401,6 +482,10 @@ public class HospitalModel implements IHospitalModel {
             throw new HospitalDataTransferException("Ошибка при загрузке списка диагнозов", e);
         }
     }
+
+    /**
+     * Возвращает список диагнозов для данного пациента
+     */
     @Override
     public final List<TDiagnosis> getDiagnosisList() {
         if (diagnosisList == null) {
@@ -409,17 +494,26 @@ public class HospitalModel implements IHospitalModel {
         return diagnosisList;
     }
 
+    /**
+     * Устанавливает текущий диагноз
+     */
     @Override
     public final void setCurrentDiagnosis(final TDiagnosis inCurrentDiagnosis) {
         currentDiagnosis = inCurrentDiagnosis;
         notifyDiagnosisObserver();
     }
 
+    /**
+     * Возвращает текущий диагноз
+     */
     @Override
     public final TDiagnosis getCurrentDiagnosis() {
         return currentDiagnosis;
     }
 
+    /**
+     * Добавляет новый диагноз
+     */
     @Override
     public final void addDiagnosis(final TDiagnosis diagnosis)
             throws HospitalDataTransferException {
@@ -433,6 +527,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Удаляет диагноз
+     */
     @Override
     public final void deleteDiagnosis(final TDiagnosis diagnosis)
             throws HospitalDataTransferException {
@@ -446,6 +543,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Обновляет диагноз
+     */
     @Override
     public final void updateDiagnosis(final TDiagnosis diagnosis)
             throws HospitalDataTransferException {
@@ -459,6 +559,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Получает список возможных исходов
+     */
     @Override
     public final List<IntegerClassifier> getIshodClassifier() {
         try {
@@ -471,6 +574,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Получает список возможных результатов лечения
+     */
     @Override
     public final List<IntegerClassifier> getResultClassifier() {
         try {
@@ -483,6 +589,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Добавляет заключение
+     */
     @Override
     public final void addZakl(final Zakl tmpZakl) throws HospitalDataTransferException {
         try {
@@ -495,6 +604,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Заполняет сводку выписного эпикриза
+     */
     @Override
     public final void printOutEpicris() throws HospitalDataTransferException, IOException {
         try {
@@ -514,6 +626,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Заполняет сводку посмертного эпикриза
+     */
     @Override
     public final void printDeathEpicris() throws IOException, HospitalDataTransferException {
         if (patient != null) {
@@ -526,12 +641,45 @@ public class HospitalModel implements IHospitalModel {
                 ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
                 ClientHospital.conMan.openFileInTextProcessor(cliPath, false);
             }  catch (KmiacServerException e1) {
-                e1.printStackTrace();
+                throw new HospitalDataTransferException("Ошибка при печати выписного эпикриза", e1);
             } catch (TException e1) {
-                e1.printStackTrace();
                 ClientHospital.conMan.reconnect(e1);
+                throw new HospitalDataTransferException("Ошибка при печати выписного эпикриза", e1);
             }
         }
     }
 
+    /**
+     * Получает список установленных диагнозов данного пациента
+     */
+    @Override
+    public final List<StringClassifier> getExistedDiags() {
+        if (patient != null) {
+            try {
+                return ClientHospital.tcl.getExistedDiags(patient.getGospitalCod());
+            } catch (KmiacServerException e) {
+                return Collections.<StringClassifier>emptyList();
+            } catch (TException e) {
+                ClientHospital.conMan.reconnect(e);
+                return Collections.<StringClassifier>emptyList();
+            }
+        } else {
+            return Collections.<StringClassifier>emptyList();
+        }
+    }
+
+    /**
+     * Получает список всех отделений данного ЛПУ
+     */
+    @Override
+    public final List<IntegerClassifier> getAllOtd() {
+        try {
+            return ClientHospital.tcl.getOtd(ClientHospital.authInfo.getClpu());
+        } catch (KmiacServerException e) {
+            return Collections.<IntegerClassifier>emptyList();
+        } catch (TException e) {
+            ClientHospital.conMan.reconnect(e);
+            return Collections.<IntegerClassifier>emptyList();
+        }
+    }
 }

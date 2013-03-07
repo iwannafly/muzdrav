@@ -19,7 +19,7 @@ import javax.swing.JTextPane;
 
 import ru.nkz.ivcgzo.clientHospital.controllers.PersonalInfoController;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
-import ru.nkz.ivcgzo.clientHospital.model.IPatientObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import javax.swing.Box;

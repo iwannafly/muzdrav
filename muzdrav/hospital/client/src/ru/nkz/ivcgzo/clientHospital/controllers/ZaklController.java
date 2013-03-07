@@ -23,7 +23,7 @@ public class ZaklController implements IComponentController {
         this.view = new ZaklPanel(this, model);
 
         // установка списка шаблонов в представлении
-        view.setZaklHistoryShablons(model.loadMedicalHistoryShablons());
+        view.setZaklHistoryShablons(model.loadZaklShablons());
     }
 
     /**

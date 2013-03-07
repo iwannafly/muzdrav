@@ -36,10 +36,9 @@ import java.util.Date;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientHospital.ClientHospital;
-import ru.nkz.ivcgzo.clientHospital.MainFrame;
 import ru.nkz.ivcgzo.clientHospital.controllers.ChildrenController;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
-import ru.nkz.ivcgzo.clientHospital.model.IPatientObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;

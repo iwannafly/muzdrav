@@ -35,11 +35,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import ru.nkz.ivcgzo.clientHospital.MainFrame;
 import ru.nkz.ivcgzo.clientHospital.controllers.DiaryController;
-import ru.nkz.ivcgzo.clientHospital.model.IDiaryRecordObserver;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
-import ru.nkz.ivcgzo.clientHospital.model.IPatientObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IDiaryRecordObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;

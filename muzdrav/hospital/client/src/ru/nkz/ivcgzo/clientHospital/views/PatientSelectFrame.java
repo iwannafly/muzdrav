@@ -15,6 +15,7 @@ import javax.swing.JTable;
 
 import ru.nkz.ivcgzo.clientHospital.ClientHospital;
 import ru.nkz.ivcgzo.clientHospital.controllers.MainController;
+import ru.nkz.ivcgzo.clientHospital.model.AllPatientTableModel;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 

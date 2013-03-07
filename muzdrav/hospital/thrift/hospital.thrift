@@ -123,6 +123,8 @@ struct Zakl {
 	11: optional double ukl;
 	12: optional i32 npasp;
 	13: optional i32 ngosp;
+	14: optional TDiagnosis zaklDiag;
+	15: optional TDiagnosis patalogDiag;
 }
 
 struct TStage {
@@ -527,6 +529,12 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	Shablon getShablon(1:i32 idSh) throws (1:kmiacServer.KmiacServerException kse);
 
 	/**
+	 * Выбор наименований шалонов (по установленным диагнозам данного пациента)
+	 */
+	list<classifier.IntegerClassifier> getZaklShablonNames(1:i32 cspec, 2:i32 cslu, 3:string srcText,
+		4:i32 gospId) throws (1:kmiacServer.KmiacServerException kse);
+
+	/**
 	 * Загрузка списка диагнозов по котрым есть шаблоны
 	 */
 	list<classifier.StringClassifier> getShablonDiagnosis(1:i32 cspec, 2:i32 cslu, 3:string srcText)
@@ -614,6 +622,11 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 * Добавление информации о заключении лечения в данном отделении стационара
 	 */
 	void addZakl(1:Zakl zakl, 2:i32 otd) throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	 * Выбор установленных диагнозов пациента для утановки в списках выбора закючительного и помертного диагноза
+	 */
+	list<classifier.StringClassifier> getExistedDiags(1:i32 gospId)
+            throws (1:kmiacServer.KmiacServerException kse);
 
 /* Печатные формы */
 

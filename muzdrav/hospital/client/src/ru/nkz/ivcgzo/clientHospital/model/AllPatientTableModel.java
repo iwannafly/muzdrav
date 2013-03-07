@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientHospital.views;
+package ru.nkz.ivcgzo.clientHospital.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;

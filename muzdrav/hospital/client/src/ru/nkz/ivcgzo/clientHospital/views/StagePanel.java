@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -19,10 +20,9 @@ import javax.swing.border.EtchedBorder;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientHospital.ClientHospital;
-import ru.nkz.ivcgzo.clientHospital.MainFrame;
 import ru.nkz.ivcgzo.clientHospital.controllers.StageController;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
-import ru.nkz.ivcgzo.clientHospital.model.IPatientObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -374,10 +374,13 @@ public class StagePanel extends JPanel implements IPatientObserver {
                     ClientHospital.tcl.getStage(model.getPatient().getGospitalCod());
                 tbStages.setData(tmpStages);
             } catch (KmiacServerException e) {
-                e.printStackTrace();
+                tbStages.setData(Collections.<TStage>emptyList());
             } catch (TException e) {
+                tbStages.setData(Collections.<TStage>emptyList());
                 ClientHospital.conMan.reconnect(e);
             }
+        } else {
+            tbStages.setData(Collections.<TStage>emptyList());
         }
     }
 

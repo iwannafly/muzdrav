@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import ru.nkz.ivcgzo.clientHospital.controllers.HospitalDataTransferException;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IDiagnosisObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IDiaryRecordObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
@@ -14,6 +17,12 @@ import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.Zakl;
 
+//TODO удалить лишнее
+/**
+ * Интерфейс модели.
+ * Модель активная - все вьюхи могут получать данные из модели
+ * get методами (но не менять состояние модели!) от интерфейсной ссылки на модель.
+ */
 public interface IHospitalModel {
 
     TPatient getPatient();
@@ -94,4 +103,10 @@ public interface IHospitalModel {
     void printOutEpicris() throws HospitalDataTransferException, IOException;
 
     void printDeathEpicris() throws IOException, HospitalDataTransferException;
+
+    List<StringClassifier> getExistedDiags();
+
+    List<IntegerClassifier> getAllOtd();
+
+    List<IntegerClassifier> loadZaklShablons();
 }

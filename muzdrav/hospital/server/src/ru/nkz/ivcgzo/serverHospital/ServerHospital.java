@@ -35,7 +35,6 @@ import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PrdDinNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PrdIshodNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PrdSlNotFoundException;
-import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.RdDinStruct;
 import ru.nkz.ivcgzo.thriftHospital.RdSlStruct;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
@@ -65,6 +64,8 @@ import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 
 public class ServerHospital extends Server implements Iface {
     protected static Logger log = Logger.getLogger(ServerHospital.class.getName());
+    private static final int ISHOD_DEAD = 2;
+    private static final int ISHOD_NAPR = 3;
     private TServer tServer = null;
     private TResultSetMapper<TSimplePatient, TSimplePatient._Fields> rsmSimplePatient;
     private TResultSetMapper<TPatient, TPatient._Fields> rsmPatient;
@@ -440,7 +441,8 @@ public class ServerHospital extends Server implements Iface {
     public final List<TDiagnosis> getDiagnosis(final int gospId)
             throws KmiacServerException, DiagnosisNotFoundException {
         String sqlQuery = "SELECT c_diag.id, c_diag.id_gosp, c_diag.cod, c_diag.med_op, "
-            + "c_diag.date_ustan, c_diag.prizn, c_diag.vrach, n_c00.name as diagname "
+            + "c_diag.date_ustan, c_diag.prizn, c_diag.vrach, n_c00.name as diagname, "
+            + "c_diag.predv "
             + "FROM c_diag INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE id_gosp = ? "
             + "ORDER BY c_diag.date_ustan;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
@@ -572,6 +574,36 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
+    public final List<IntegerClassifier> getZaklShablonNames(final int cspec, final int cslu,
+            final String srcText, final int gospId) throws KmiacServerException {
+        String sql = "SELECT DISTINCT sho.id AS pcod, "//sho.name, "
+            + "sho.diag || ' ' || sho.name AS name "
+            + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
+            + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
+            + "JOIN n_c00 c00 ON (c00.pcod = sho.diag) "
+            + "JOIN n_t00 t00 ON t00.spec = shp.cspec  "
+            + "JOIN n_n45 n45 ON n45.codprof = t00.pcod "
+            + "WHERE (n45.codotd = ?) AND ((sho.cslu = 1) OR (sho.cslu =3)) "
+            + "AND sho.diag IN (SELECT c_diag.cod FROM c_diag WHERE c_diag.id_gosp = ?) ";
+
+        if (srcText != null) {
+            sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?) "
+                    + "OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
+        }
+
+        sql += "ORDER BY name ";
+        try (AutoCloseableResultSet acrs = (srcText == null)
+                ? sse.execPreparedQuery(sql, cspec, gospId)
+                : sse.execPreparedQuery(sql, cspec, gospId,
+                        srcText, srcText, srcText, srcText)) {
+            return rsmIntClas.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Template searching error", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
     public final Shablon getShablon(final int idSh) throws KmiacServerException {
         final String sqlQuery = "SELECT sho.id, nd.name, sho.next, nsh.pcod,nsh.name, sht.sh_text "
             + "FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) "
@@ -673,22 +705,25 @@ public class ServerHospital extends Server implements Iface {
             + "sostv = ?, recom = ?, vrach = ?,  vid_opl = ?, vid_pom = ?, ukl = ? "
             + "WHERE id_gosp = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            if (zakl.isSetNewOtd() && (zakl.getIshod() == 3)) {
+            if (zakl.isSetNewOtd() && (zakl.getIshod() == ISHOD_NAPR)) {
                 int newIdGosp = addToGosp(zakl, otd);
                 addToOtd(zakl, newIdGosp);
+                addOrUpdateDiagnosis(zakl.getZaklDiag());
                 sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
                         new Date(zakl.getDatav()), new Time(zakl.getVremv()),
                         zakl.getSostv(), zakl.getRecom(),
                         null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
                         zakl.getIdGosp());
-//                sqlQuery = "UPDATE c_otd SET ishod = ?, "
-//                    + "sostv = ?, recom = ?, vrach = ?, vid_opl = ?, vid_pom = ?, ukl = ? "
-//                    + "WHERE id_gosp = ?";
-//                sme.execPrepared(sqlQuery, false, zakl.getIshod(),
-//                    zakl.getSostv(), zakl.getRecom(),
-//                    null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
-//                    zakl.getIdGosp());
+            } else if (zakl.getIshod() == ISHOD_DEAD) {
+                addOrUpdateDiagnosis(zakl.getZaklDiag());
+                addOrUpdateDiagnosis(zakl.getPatalogDiag());
+                sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
+                    new Date(zakl.getDatav()), new Time(zakl.getVremv()),
+                    zakl.getSostv(), zakl.getRecom(),
+                    null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
+                    zakl.getIdGosp());
             } else {
+                addOrUpdateDiagnosis(zakl.getZaklDiag());
                 sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
                     new Date(zakl.getDatav()), new Time(zakl.getVremv()),
                     zakl.getSostv(), zakl.getRecom(),
@@ -697,6 +732,46 @@ public class ServerHospital extends Server implements Iface {
             }
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    private void addOrUpdateDiagnosis(final TDiagnosis diag) throws KmiacServerException {
+        final int[] indexesInsert = {1, 2, 4, 6, 3};
+        final int[] indexesUpdate = {1, 2, 4, 6, 3, 1, 5};
+        final String sqlInsertQuery = "INSERT INTO c_diag "
+                + "(id_gosp, cod, date_ustan, vrach, med_op) "
+                + "VALUES (?, ?, ?, ?, ?);";
+        final String sqlUpdateQuery = "UPDATE c_diag SET id_gosp = ?, cod = ?, date_ustan = ?,"
+                + " vrach = ?, med_op = ? WHERE id_gosp = ? AND prizn = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            if (!isDiagnosisAlreadyExist(diag)) {
+                sme.execPreparedT(sqlInsertQuery, false, diag,
+                        DIAGNOSIS_TYPES, indexesInsert);
+                sme.setCommit();
+            } else {
+                sme.execPreparedT(sqlUpdateQuery, false, diag,
+                        DIAGNOSIS_TYPES, indexesUpdate);
+                sme.setCommit();
+            }
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    /**
+     * Проверяет есть ли уже в базе диагноз данного типа на выбранного пациента
+     * (применять только с заключительными или паталогоанатомическими диагнозами)
+     */
+    private boolean isDiagnosisAlreadyExist(final TDiagnosis diag)
+            throws KmiacServerException {
+        String sqlQuery = "SELECT * FROM c_diag WHERE id_gosp = ? AND prizn = ?;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+                sqlQuery, diag.getIdGosp(), diag.getPrizn())) {
+            return acrs.getResultSet().next();
+        } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
@@ -1709,6 +1784,18 @@ public class ServerHospital extends Server implements Iface {
         }
     }
 
+    @Override
+    public final List<StringClassifier> getExistedDiags(final int gospId)
+            throws KmiacServerException {
+        final String sqlQuery = "SELECT c_diag.cod as pcod, n_c00.name as name FROM c_diag "
+        		+ "INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE id_gosp = ?;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
+            return rsmStrClas.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
 //	public void addRdIshod(int npasp, int ngosp) throws KmiacServerException,
 //			TException {
 //		// TODO Auto-generated method stub

@@ -12,9 +12,11 @@ import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.SwingConstants;
 
+import ru.nkz.ivcgzo.clientHospital.ClientHospital;
 import ru.nkz.ivcgzo.clientHospital.controllers.ZaklController;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
-import ru.nkz.ivcgzo.clientHospital.model.IPatientObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IDiagnosisObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
@@ -29,6 +31,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
+import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.Zakl;
 
 import javax.swing.border.LineBorder;
@@ -53,7 +56,7 @@ import javax.swing.JTextField;
 /**
  * Панель заключения
  */
-public class ZaklPanel extends JPanel implements IPatientObserver {
+public class ZaklPanel extends JPanel implements IPatientObserver, IDiagnosisObserver {
     private static final long serialVersionUID = 1454864680563116962L;
     private static final String TOOLTIP_TEXT =
             "<html><b>Панель заключения</b> - позволяет врачу стационара  "
@@ -62,6 +65,15 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
     private static final URL ICON = MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientHospital/resources/out.png");
     private static final String TITLE = "Заключение";
+
+    // код исхода при переводе пациента в другое отделение
+    private static final int ISHOD_NAPRAV = 3;
+    // код исхода при смерти пациента
+    private static final int ISHOD_DEAD = 2;
+    // признак заключительного диагноза
+    private static final int DIAG_ZAKL_PRIZN = 4;
+    // признак паталогоанатомического диагноза
+    private static final int DIAG_PATALOG_PRIZN = 5;
 
     private ZaklController controller;
     private IHospitalModel model;
@@ -89,8 +101,8 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
     private JLabel lblVipPom;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxVidPom;
     private Box vbDiag;
-    private JLabel cbxZaklDiag;
-    private ThriftStringClassifierCombobox<StringClassifier> cbzZaklDiag;
+    private JLabel lblZaklDiag;
+    private ThriftStringClassifierCombobox<StringClassifier> cbxZaklDiag;
     private JLabel lblPatalogDiag;
     private ThriftStringClassifierCombobox<StringClassifier> cbxPatalogDiag;
     private Box vbIshod;
@@ -124,10 +136,18 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         this.controller = inController;
         this.model = inModel;
         model.registerPatientObserver((IPatientObserver) this);
+        // регистрируем наблюдателем за текущим диагнозом -
+        // для перезаполнения копмпонент выбора заключительного
+        // и паталогоанатомического диагноза
+        model.registerDiagnosisObserver((IDiagnosisObserver) this);
 
         setZaklPanel();
+        cbxNaprav.setData(model.getAllOtd());
     }
 
+    /**
+     * Формирование панели заключения
+     */
     private void setZaklPanel() {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
@@ -145,6 +165,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         add(hsRight);
     }
 
+    /**
+     * Установка компонентов для ввода/отображения данных
+     */
     private void setDataComponentsPanel() {
         vbZaklInfoComponents = Box.createVerticalBox();
         vbZaklInfoComponents.setPreferredSize(new Dimension(500, 0));
@@ -162,6 +185,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         setButtonOut();
     }
 
+    /**
+     * Установка компонентов для ввода/отображения данных о рекомендациях
+     */
     private void setRecomendationComponents() {
         vbRecomendations = Box.createVerticalBox();
         vbRecomendations.setBorder(
@@ -176,10 +202,15 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         vbRecomendations.add(spRecomend);
 
         taRecomend = new JTextArea();
+        taRecomend.setWrapStyleWord(true);
+        taRecomend.setLineWrap(true);
         taRecomend.setFont(new Font("Monospaced", Font.PLAIN, 11));
         spRecomend.setViewportView(taRecomend);
     }
 
+    /**
+     * Установка компонентов для ввода/отображения данных о состоянии при выписке
+     */
     private void setSostComponents() {
         vbSost = Box.createVerticalBox();
         vbSost.setBorder(
@@ -197,6 +228,8 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         vbSost.add(spSost);
 
         taSost = new JTextArea();
+        taSost.setLineWrap(true);
+        taSost.setWrapStyleWord(true);
         taSost.setFont(new Font("Monospaced", Font.PLAIN, 11));
         spSost.setViewportView(taSost);
     }
@@ -216,6 +249,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
 
     }
 
+    /**
+     * Установка компонентов для ввода/отображения данных о виде помощи
+     */
     private void setVidPomComponents() {
         hgDataLeft = Box.createHorizontalGlue();
         hbZaklOplComponents.add(hgDataLeft);
@@ -236,6 +272,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         vbVipPom.add(cbxVidPom);
     }
 
+    /**
+     * Установка компонентов для ввода/отображения данных об УКЛ
+     */
     private void setUklComponents() {
         hsDataLeft = Box.createHorizontalStrut(20);
         hsDataLeft.setMaximumSize(new Dimension(20, 0));
@@ -257,6 +296,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         vbUkl.add(tfUkl);
     }
 
+    /**
+     * Установка компонентов для ввода/отображения данных об оплате
+     */
     private void setOplatComponents() {
         hsOplat = Box.createHorizontalStrut(20);
         hsOplat.setMaximumSize(new Dimension(20, 0));
@@ -278,6 +320,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         vbOplat.add(cbxOplat);
     }
 
+    /**
+     * Установка компонентов для ввода/отображения данных о дефектах догоспитального этапа
+     */
     private void setDefectsComponents() {
         hsDataRight = Box.createHorizontalStrut(20);
         hsDataRight.setMaximumSize(new Dimension(20, 0));
@@ -301,6 +346,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         hbZaklOplComponents.add(hgDataRight);
     }
 
+    /**
+     * Установка компонентов для ввода/отображения данных о диагнозах
+     */
     private void setDiagnosisComponents() {
         verticalStrut = Box.createVerticalStrut(15);
         vbZaklInfoComponents.add(verticalStrut);
@@ -316,14 +364,14 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         );
         vbZaklInfoComponents.add(vbDiag);
 
-        cbxZaklDiag = new JLabel("Заключительный диагноз");
-        vbDiag.add(cbxZaklDiag);
+        lblZaklDiag = new JLabel("Заключительный диагноз");
+        vbDiag.add(lblZaklDiag);
 
-        cbzZaklDiag = new ThriftStringClassifierCombobox<StringClassifier>(true);
-        cbzZaklDiag.setEditable(false);
-        cbzZaklDiag.setMaximumSize(new Dimension(32767, 25));
-        cbzZaklDiag.setAlignmentX(Component.LEFT_ALIGNMENT);
-        vbDiag.add(cbzZaklDiag);
+        cbxZaklDiag = new ThriftStringClassifierCombobox<StringClassifier>(true);
+        cbxZaklDiag.setEditable(false);
+        cbxZaklDiag.setMaximumSize(new Dimension(32767, 25));
+        cbxZaklDiag.setAlignmentX(Component.LEFT_ALIGNMENT);
+        vbDiag.add(cbxZaklDiag);
 
         lblPatalogDiag = new JLabel("Паталогоанатомический диагноз");
         vbDiag.add(lblPatalogDiag);
@@ -338,6 +386,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         cbxPatalogDiag.setVisible(false);
     }
 
+    /**
+     * Установка компонентов для ввода/отображения данных об исходе
+     */
     private void setIshodComponents() {
         vbIshod = Box.createVerticalBox();
         vbIshod.setBorder(
@@ -352,16 +403,21 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         cbxIshod.setEditable(false);
         cbxIshod.setMaximumSize(new Dimension(32767, 25));
         cbxIshod.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // регулирование отображения компонентов выбора отделения куда направлен пациент
+        // и паталогоанаомического диагноза в зависимости от вида исхода
         cbxIshod.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
-                if (((IntegerClassifier) e.getItem()).getPcod() == 3) {
+                if (((IntegerClassifier) e.getItem()).getPcod() == ISHOD_NAPRAV) {
+                    // если пациент переведен в другое отделение
                     cbxNaprav.setVisible(true);
                     setPatalAnatComponentsVisble(false);
-                } else if (((IntegerClassifier) e.getItem()).getPcod() == 2) {
-                    setPatalAnatComponentsVisble(true);
+                } else if (((IntegerClassifier) e.getItem()).getPcod() == ISHOD_DEAD) {
+                    // если пациент умер
                     cbxNaprav.setVisible(false);
+                    setPatalAnatComponentsVisble(true);
                 } else {
+                    // остальные варианты исхода
                     cbxNaprav.setVisible(false);
                     setPatalAnatComponentsVisble(false);
                 }
@@ -380,6 +436,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         cbxNaprav.setVisible(false);
     }
 
+    /**
+     * Управление отображением/скрытием компонентов ввода паталогоанатомического диагноза
+     */
     private void setPatalAnatComponentsVisble(final boolean visibility) {
         if (visibility) {
             lblPatalogDiag.setVisible(true);
@@ -390,6 +449,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         }
     }
 
+    /**
+     * Установка компонентов для ввода/отображения данных о результате лечения
+     */
     private void setResultComponents() {
         vbResult = Box.createVerticalBox();
         vbResult.setBorder(
@@ -408,6 +470,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         vbResult.add(cbxResult);
     }
 
+    /**
+     * Установка компонентов для ввода/отображения данных о дате и времени выписки
+     */
     private void setDateOutComponents() {
         hbDateOut = Box.createHorizontalBox();
         hbDateOut.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -441,6 +506,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         hbDateOut.add(hgRight);
     }
 
+    /**
+     * Установка кнопки выписки
+     */
     private void setButtonOut() {
         verticalStrut = Box.createVerticalStrut(15);
         vbZaklInfoComponents.add(verticalStrut);
@@ -456,6 +524,7 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         btnOut.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 //FIXME вернуть проверку дат
+                //TODO перенести логику выбора в контроллер
                 if (isStagesCorrect()) { // && isStageDatesCorrect()) {
                     if (isPatientOut()) {
                         if (isAllRequiredOutFieldsSet()) {
@@ -470,6 +539,7 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
                             tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
                             tmpZakl.setNpasp(model.getPatient().getPatientId());
                             tmpZakl.setNgosp(model.getPatient().getNgosp());
+                            setZaklDiag(tmpZakl);
                             if (!tfUkl.getText().isEmpty()) {
                                 tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                             }
@@ -491,6 +561,8 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
                             tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
                             tmpZakl.setNpasp(model.getPatient().getPatientId());
                             tmpZakl.setNgosp(model.getPatient().getNgosp());
+                            setZaklDiag(tmpZakl);
+                            setPatalogDiag(tmpZakl);
                             if (!tfUkl.getText().isEmpty()) {
                                 tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                             }
@@ -514,22 +586,23 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
                             tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
                             tmpZakl.setNpasp(model.getPatient().getPatientId());
                             tmpZakl.setNgosp(model.getPatient().getNgosp());
+                            setZaklDiag(tmpZakl);
                             if (!tfUkl.getText().isEmpty()) {
                                 tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                             }
                             tmpZakl.setIdGosp(model.getPatient().getGospitalCod());
                             controller.addZakl(tmpZakl);
-                            JOptionPane.showMessageDialog(null,
+                            JOptionPane.showMessageDialog(ZaklPanel.this,
                                 "Пациент успешно выписан", "Выписка пациента",
                                 JOptionPane.INFORMATION_MESSAGE);
                         }
                     } else {
-                        JOptionPane.showMessageDialog(null,
+                        JOptionPane.showMessageDialog(ZaklPanel.this,
                             "Не выбран пациент или не установлен исход. "
                             + "Информация не сохранена", "Ошибка", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null,
+                    JOptionPane.showMessageDialog(ZaklPanel.this,
                         "Этапы лечения заполнены некорректно! Выписка невозможна!",
                         "Ошибка", JOptionPane.ERROR_MESSAGE);
                 }
@@ -537,6 +610,31 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         });
     }
 
+    private void setZaklDiag(final Zakl tmpZakl) {
+        TDiagnosis diag = new TDiagnosis();
+        diag.setIdGosp(model.getPatient().getGospitalCod());
+        diag.setCod(cbxZaklDiag.getSelectedPcod());
+        diag.setDateUstan(cdeDate.getDate().getTime());
+        diag.setVrach(ClientHospital.authInfo.getPcod());
+        diag.setMedOp(cbxZaklDiag.getSelectedItem().getName());
+        diag.setPrizn(DIAG_ZAKL_PRIZN);
+        tmpZakl.setZaklDiag(diag);
+    }
+
+    private void setPatalogDiag(final Zakl tmpZakl) {
+        TDiagnosis diag = new TDiagnosis();
+        diag.setIdGosp(model.getPatient().getGospitalCod());
+        diag.setCod(cbxPatalogDiag.getSelectedPcod());
+        diag.setDateUstan(cdeDate.getDate().getTime());
+        diag.setVrach(ClientHospital.authInfo.getPcod());
+        diag.setMedOp(cbxPatalogDiag.getSelectedItem().getName());
+        diag.setPrizn(DIAG_PATALOG_PRIZN);
+        tmpZakl.setPatalogDiag(diag);
+    }
+
+    /**
+     * Установка компонентов отображения шаблонов
+     */
     private void setShablonComponentsPanel() {
         vbZaklShablon = Box.createVerticalBox();
         vbZaklShablon.setPreferredSize(new Dimension(300, 0));
@@ -548,6 +646,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         setShablonListener();
     }
 
+    /**
+     * Установка компонентов поиска шаблонов
+     */
     private void setShablonFindComponents() {
         lblZaklShablon = new JLabel("Строка поиска шаблона");
         lblZaklShablon.setHorizontalTextPosition(SwingConstants.LEFT);
@@ -572,7 +673,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         hbZaklShbalonFind.add(btnZaklShablon);
     }
 
-
+    /**
+     * Установка списка шаблонов
+     */
     private void setShablonNamesListComponents() {
         spZaklShablon = new JScrollPane();
         vbZaklShablon.add(spZaklShablon);
@@ -698,7 +801,8 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
 
     private boolean isPatientOut() {
         if (isPrimaryOutValueSet()) {
-            return (cbxIshod.getSelectedPcod() != 2) && (cbxIshod.getSelectedPcod() != 3);
+            return (cbxIshod.getSelectedPcod() != ISHOD_DEAD)
+                && (cbxIshod.getSelectedPcod() != ISHOD_NAPRAV);
         } else {
             return false;
         }
@@ -706,7 +810,7 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
 
     private boolean isPatientDead() {
         if (isPrimaryOutValueSet()) {
-            return (cbxIshod.getSelectedPcod() == 2);
+            return (cbxIshod.getSelectedPcod() == ISHOD_DEAD);
         } else {
             return false;
         }
@@ -714,7 +818,7 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
 
     private boolean isPatientMoved() {
         if (isPrimaryOutValueSet()) {
-            return (cbxIshod.getSelectedPcod() == 3);
+            return (cbxIshod.getSelectedPcod() == ISHOD_NAPRAV);
         } else {
             return false;
         }
@@ -736,12 +840,12 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
                 JOptionPane.ERROR_MESSAGE);
             return false;
         }
-//        if ((tfZaklDiagPcod.getText().isEmpty()) || (tfZaklDiagName.getText().isEmpty())) {
-//            JOptionPane.showMessageDialog(null,
-//                "Не выбран заключительный диагноз. Информация не сохранена", "Ошибка",
-//                JOptionPane.ERROR_MESSAGE);
-//            return false;
-//        }
+        if (cbxZaklDiag.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(null,
+                "Не выбран заключительный диагноз. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
         if (cbxResult.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(null,
                 "Не выбран результат лечения. Информация не сохранена", "Ошибка",
@@ -779,21 +883,19 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
                 JOptionPane.ERROR_MESSAGE);
             return false;
         }
-//        if ((tfZaklDiagPcod.getText().isEmpty())
-//                || (tfZaklDiagName.getText().isEmpty())) {
-//            JOptionPane.showMessageDialog(null,
-//                "Не выбран заключительный диагноз. Информация не сохранена", "Ошибка",
-//                JOptionPane.ERROR_MESSAGE);
-//            return false;
-//        }
-//FIXME
-//        if ((tfPatalogoAnDiagPcod.getText().isEmpty())
-//                || (tfPatalogoAnDiagName.getText().isEmpty())) {
-//            JOptionPane.showMessageDialog(null,
-//                "Не выбран паталогоанатомический диагноз. Информация не сохранена", "Ошибка",
-//                JOptionPane.ERROR_MESSAGE);
-//            return false;
-//        }
+        if (cbxZaklDiag.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(null,
+                "Не выбран заключительный диагноз. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if ((cbxZaklDiag.getSelectedItem() == null)
+                || (cbxPatalogDiag.getSelectedItem() == null)) {
+            JOptionPane.showMessageDialog(null,
+                "Не выбран паталогоанатомический диагноз. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
         if (cdeDate.getDate() == null) {
             JOptionPane.showMessageDialog(null,
                 "Не выбрана дата смерти. Информация не сохранена", "Ошибка",
@@ -825,13 +927,12 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
                 JOptionPane.ERROR_MESSAGE);
             return false;
         }
-//        if ((tfZaklDiagPcod.getText().isEmpty())
-//                || (tfZaklDiagName.getText().isEmpty())) {
-//            JOptionPane.showMessageDialog(null,
-//                "Не выбран заключительный диагноз. Информация не сохранена", "Ошибка",
-//                JOptionPane.ERROR_MESSAGE);
-//            return false;
-//        }
+        if (cbxZaklDiag.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(null,
+                "Не выбран заключительный диагноз. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
         if (cdeDate.getDate() == null) {
             JOptionPane.showMessageDialog(null,
                 "Не выбрана дата перевода. Информация не сохранена", "Ошибка",
@@ -945,9 +1046,28 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         lZaklShablon.setData(zaklShablonList);
     }
 
+    /**
+     * Реакция на смену пациента
+     */
     @Override
-    public void patientChanged() {
-        // TODO Auto-generated method stub
+    public final void patientChanged() {
+        clearZaklText();
 
+        //FIXME очень вероятно что здесь они не нужны и просто дублируют
+        //      свой же вызов в diagnosisChanged(), не успеваю проверить
+        //      как будет время - протестите и попровьте если надо
+        cbxZaklDiag.setData(model.getExistedDiags());
+        cbxPatalogDiag.setData(model.getExistedDiags());
+        lZaklShablon.setData(model.loadZaklShablons());
+    }
+
+    /**
+     * При смене диагноза перезаполняем соответствующие компоненты
+     */
+    @Override
+    public final void diagnosisChanged() {
+        cbxZaklDiag.setData(model.getExistedDiags());
+        cbxPatalogDiag.setData(model.getExistedDiags());
+        lZaklShablon.setData(model.loadZaklShablons());
     }
 }

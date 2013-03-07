@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientHospital;
+package ru.nkz.ivcgzo.clientHospital.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -12,9 +12,13 @@ import javax.swing.table.TableModel;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientHospital.ClientHospital;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 
+/**
+ * Модель таблицы фрейма приёма в курацию
+ */
 public class CurationTableModel implements TableModel {
     private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
     private List<TSimplePatient> patients;
@@ -23,9 +27,14 @@ public class CurationTableModel implements TableModel {
         "№ истории болезни", "Фамилия", "Имя", "Отчество", "Дата рождения", "Дата прибытия"
     };
 
-    public CurationTableModel(final int pcod, final int cpodr) {
+    /**
+     * Конструктор модели для определенного врача
+     * @param pcod
+     */
+    public CurationTableModel(final int pcod) {
         try {
-            patients = ClientHospital.tcl.getAllPatientForDoctor(pcod, cpodr);
+            patients = ClientHospital.tcl.getAllPatientForDoctor(pcod,
+                    ClientHospital.authInfo.getCpodr());
         } catch (PatientNotFoundException e) {
             patients = Collections.<TSimplePatient>emptyList();
         } catch (TException e) {
@@ -35,9 +44,13 @@ public class CurationTableModel implements TableModel {
         }
     }
 
-    public CurationTableModel(final int cpodr) {
+    /**
+     * Конструктор модели для всех врачей отделения
+     * @param pcod
+     */
+    public CurationTableModel() {
         try {
-            patients = ClientHospital.tcl.getAllPatientFromOtd(cpodr);
+            patients = ClientHospital.tcl.getAllPatientFromOtd(ClientHospital.authInfo.getCpodr());
         } catch (PatientNotFoundException e) {
             patients = Collections.<TSimplePatient>emptyList();
         } catch (TException e) {

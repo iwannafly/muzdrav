@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JTable;
 
 import ru.nkz.ivcgzo.clientHospital.ClientHospital;
+import ru.nkz.ivcgzo.clientHospital.model.CurationTableModel;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;

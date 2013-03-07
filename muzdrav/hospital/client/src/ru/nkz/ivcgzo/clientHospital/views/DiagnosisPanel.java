@@ -27,9 +27,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import ru.nkz.ivcgzo.clientHospital.controllers.DiagnosisController;
-import ru.nkz.ivcgzo.clientHospital.model.IDiagnosisObserver;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
-import ru.nkz.ivcgzo.clientHospital.model.IPatientObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IDiagnosisObserver;
+import ru.nkz.ivcgzo.clientHospital.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis._Fields;
@@ -132,7 +132,7 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
     }
 
     /**
-     * добавление таблицы диагнозов
+     * Добавление таблицы диагнозов
      */
     private void addDiagnosisTable() {
         tbDiag = new CustomTable<TDiagnosis, TDiagnosis._Fields>(
@@ -266,6 +266,8 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
                     }
                     if (chbxPredv.isSelected()) {
                         tbDiag.getSelectedItem().setPredv(true);
+                    } else {
+                        tbDiag.getSelectedItem().setPredv(false);
                     }
                     tbDiag.getSelectedItem().setIdGosp(model.getPatient().getGospitalCod());
 
@@ -301,7 +303,7 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
     }
 
     /**
-     *   Добавление компонета отображения предварительности диагноза
+     *   Добавление компонента отображения предварительности диагноза
      */
     private void addDiagnosisCheckBox() {
         chbxPredv = new JCheckBox("Предварительный диагноз");
@@ -325,7 +327,7 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
     }
 
     /**
-     *   Добавление компонета отображения медицинского описания диагноза
+     *   Добавление компонента отображения медицинского описания диагноза
      */
     private void addDiagnosisMedOpTextArea() {
         taDiagMedOp = new JTextArea();
@@ -394,16 +396,16 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
      */
     private void setDiagPriznRdbtn() {
         if (tbDiag.getSelectedItem() != null) {
-            if (tbDiag.getSelectedItem().getPrizn() == 1) {
+            if (!tbDiag.getSelectedItem().isSetPrizn()) {
+                btgDiag.clearSelection();
+            } else if (tbDiag.getSelectedItem().getPrizn() == 1) {
                 rdbtnMain.setSelected(true);
             } else if (tbDiag.getSelectedItem().getPrizn() == 3) {
                 rdbtnSoput.setSelected(true);
             } else if (tbDiag.getSelectedItem().getPrizn() == 2) {
                 rdbtnOsl.setSelected(true);
             } else {
-                rdbtnMain.setSelected(false);
-                rdbtnSoput.setSelected(false);
-                rdbtnOsl.setSelected(false);
+                btgDiag.clearSelection();
             }
         }
     }
