@@ -50,6 +50,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.UIManager;
 import javax.swing.JTextField;
 
+/**
+ * Панель заключения
+ */
 public class ZaklPanel extends JPanel implements IPatientObserver {
     private static final long serialVersionUID = 1454864680563116962L;
     private static final String TOOLTIP_TEXT =
@@ -717,6 +720,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         }
     }
 
+    /**
+     * Проверяет - все ли необходимые поля заполнены (при выписке пациента)
+     */
     private boolean isAllRequiredOutFieldsSet() {
         if (cbxVidPom.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(null,
@@ -757,6 +763,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         return true;
     }
 
+    /**
+     * Проверяет - все ли необходимые поля заполнены (при смерти пациента)
+     */
     private boolean isAllRequiredDeadFieldsSet() {
         if (cbxVidPom.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(null,
@@ -800,6 +809,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         return true;
     }
 
+    /**
+     * Проверяет - все ли необходимые поля заполнены (при переводе пациента в другое отделение)
+     */
     private boolean isAllRequiredMovedFieldsSet() {
         if (cbxVidPom.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(null,
@@ -897,6 +909,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         }
     }
 
+    /**
+     * Загрузка списка шаблонов
+     */
     private void loadShablonList(final CustomTextField inCtf,
             final ThriftIntegerClassifierList inTicl) {
         List<IntegerClassifier> intClassif = model.loadMedicalHistoryShablons(
@@ -905,6 +920,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         inTicl.setData(intClassif);
     }
 
+    /**
+     * Синхронизация списка шаблонов (с формой выбора)
+     */
     public final void syncShablonList(final String searchString, final Shablon shablon) {
         if (shablon != null) {
             shablonListener.updateNow(searchString);
@@ -919,6 +937,9 @@ public class ZaklPanel extends JPanel implements IPatientObserver {
         }
     }
 
+    /**
+     * Установка списка шаблонов
+     */
     public final void setZaklHistoryShablons(
             final List<IntegerClassifier> zaklShablonList) {
         lZaklShablon.setData(zaklShablonList);

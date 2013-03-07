@@ -25,6 +25,10 @@ import javax.swing.border.EtchedBorder;
 import java.awt.Color;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
+
+/**
+ * Фрейм выбора диапозона дат для которых следут распечатать дневник осмотров
+ */
 public class PrintFrame extends JDialog {
 
     private static final long serialVersionUID = -5679060070597306575L;
@@ -135,7 +139,7 @@ public class PrintFrame extends JDialog {
                                 cdeDateStart.getDate().getTime(), cdeDateEnd.getDate().getTime());
                         String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
                         ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
-                        ClientHospital.conMan.openFileInEditor(cliPath, false);
+                        ClientHospital.conMan.openFileInTextProcessor(cliPath, false);
                     } catch (KmiacServerException e1) {
                         e1.printStackTrace();
                     } catch (IOException e1) {

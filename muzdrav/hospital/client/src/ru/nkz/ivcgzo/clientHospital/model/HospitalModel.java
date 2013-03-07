@@ -24,6 +24,12 @@ import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.Zakl;
 
+/**
+ * Модель стационара.
+ * Здесь хранится состояние основных объектов системы и
+ * происходит вся работа с серверной частью.
+ *
+ */
 public class HospitalModel implements IHospitalModel {
     private List<IPatientObserver> patientObservers = new ArrayList<IPatientObserver>();
     private List<IDiaryRecordObserver> diaryObservers = new ArrayList<IDiaryRecordObserver>();
@@ -41,6 +47,9 @@ public class HospitalModel implements IHospitalModel {
         return this.patient;
     }
 
+    /**
+     * Установка текущего пациента (по номеру госпитализации)
+     */
     @Override
     public final void setPatient(final int patientGospId) throws PatientNotFoundException,
             HospitalDataTransferException {
@@ -65,6 +74,9 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+    /**
+     * Установка текущего пациента (по идентификатору в отделении)
+     */
     @Override
     public final void setPatientByCotd(final int idCotd) throws PatientNotFoundException,
             HospitalDataTransferException {
@@ -89,6 +101,10 @@ public class HospitalModel implements IHospitalModel {
         }
     }
 
+
+    /**
+     * Очистка всех объектов
+     */
     private void setNullFields() {
         patient = null;
         priemInfo = null;

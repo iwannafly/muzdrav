@@ -16,6 +16,11 @@ import ru.nkz.ivcgzo.clientHospital.ClientHospital;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 
+/**
+ * Модель для таблицы фрейма выбора пациента
+ * @author as
+ *
+ */
 public class AllPatientTableModel implements TableModel {
     private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
     private List<TSimplePatient> patients;
@@ -25,6 +30,9 @@ public class AllPatientTableModel implements TableModel {
         "Номер палаты"
     };
 
+    /**
+     * Конструктор для создания модели содержащей всех пациентов определенного врача
+     */
     public AllPatientTableModel(final int pcod) {
         try {
             patients = ClientHospital.tcl.getAllPatientForDoctor(pcod,
@@ -38,6 +46,9 @@ public class AllPatientTableModel implements TableModel {
         }
     }
 
+    /**
+     * Конструктор для создания модели содержащей всех пациентов всех враче отделения
+     */
     public AllPatientTableModel() {
         try {
             patients = ClientHospital.tcl.getAllPatientFromOtd(

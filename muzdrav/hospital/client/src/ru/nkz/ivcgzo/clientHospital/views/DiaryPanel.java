@@ -49,6 +49,9 @@ import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory._Fields;
 
+/**
+ * Панель дневника осмотров
+ */
 public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecordObserver {
     private static final long serialVersionUID = -2271316126670108144L;
     private static final String TOOLTIP_TEXT =
@@ -236,6 +239,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         addMedicalHistoryTabbedPane();
     }
 
+    /**
+     * Установка компонентов панели осмотров
+     */
     private void addMedicalHistoryTabbedPane() {
         JPanel pnlOsm = new JPanel();
         vbMedicalHistoryTextFields.add(pnlOsm);
@@ -300,6 +306,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         pnlOsm.setLayout(glPnlOsm);
     }
 
+    /**
+     * Установка компонентов панели жалоб
+     */
     private void addJalobComponents() {
         pnlJal = new JPanel();
         pnlJal.setBorder(new TitledBorder(null, "Жалобы",
@@ -324,6 +333,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         pnlJal.setLayout(glPnlJal);
     }
 
+    /**
+     * Установка компонентов панели истории болезни
+     */
     private void addMedicalHistComponents() {
         pnlMedicalHist = new JPanel();
         pnlMedicalHist.setBorder(new TitledBorder(null, "История заболевания (anamnesis morbi)",
@@ -346,6 +358,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         pnlMedicalHist.setLayout(glPnlAnam);
     }
 
+    /**
+     * Установка компонентов панели объективного статуса
+     */
     private void addStatusPraenceComponents() {
         pnlStatusPraence = new JPanel();
         pnlStatusPraence.setBorder(new TitledBorder(null, "Объективный статус (status praesense)",
@@ -367,6 +382,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         pnlStatusPraence.setLayout(glPnlStat);
     }
 
+    /**
+     * Установка компонентов панели локльного статуса
+     */
     private void addStatusLocalisComponents() {
         pnlStatusLocalis = new JPanel();
         pnlStatusLocalis.setBorder(new TitledBorder(null, "Локальный статус (localis status)",
@@ -391,6 +409,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         pnlStatusLocalis.setLayout(glPnlFiz);
     }
 
+    /**
+     * Установка компонентов панели физикального обследования
+     */
     private void addFisicalObsComponents() {
         pnlFisicalObs = new JPanel();
         pnlFisicalObs.setBorder(new TitledBorder(null, "Физикальное обследование",
@@ -415,6 +436,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         pnlFisicalObs.setLayout(glPnlLoc);
     }
 
+    /**
+     * Удаление записи дневника
+     */
     private void deleteMedHistoryFormTable() {
         if (tbMedHist.getSelectedItem() != null) {
             int opResult = JOptionPane.showConfirmDialog(
@@ -435,6 +459,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
 
     }
 
+    /**
+     * Обновление записи дневника
+     */
     private void updateMedHistoryToTable() {
         if (tbMedHist.getSelectedItem() != null) {
             tbMedHist.getSelectedItem().setFisicalObs(taFisicalObs.getText());
@@ -451,6 +478,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         }
     }
 
+    /**
+     * Добавление новой записи дневника
+     */
     private void addMedHistoryToTable() {
         if (model.getPatient() != null) {
             // передаем контроллеру запрос на добавление строки
@@ -463,6 +493,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         }
     }
 
+    /**
+     * Установка текста выбранной записи дневника в текстовые поля
+     */
     private void setMedicalHistoryText() {
         if (taJalob != null) {
             taJalob.setText(model.getMedicalHistory().getJalob());
@@ -481,11 +514,17 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         }
     }
 
+    /**
+     * Очистка всех компонентов панели
+     */
     private void clearMedicalHistory() {
         tbMedHist.setData(Collections.<TMedicalHistory>emptyList());
         clearMedicalHistoryTextAreas();
     }
 
+    /**
+     * Очистка всех текстовых полей панели
+     */
     private void clearMedicalHistoryTextAreas() {
         if (taJalob != null) {
             taJalob.setText("");
@@ -568,6 +607,7 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         lMedicalHistoryShablonNames = new ThriftIntegerClassifierList();
         spMedicalHistoryShablonNames.setViewportView(lMedicalHistoryShablonNames);
         lMedicalHistoryShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
+        // действие при двойном клике на имя шаблона в списке шаблонов
         lMedicalHistoryShablonNames.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
@@ -604,6 +644,10 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         tfMedHShablonFilter.getDocument().addDocumentListener(medHiSearchListener);
     }
 
+    /**
+     * Проверят пусты ли текстовые поля
+     */
+
     private boolean isAllTextFieldsEmpty() {
         return ((taJalob.getText().isEmpty())
             && (taDesiaseHistory.getText().isEmpty())
@@ -612,6 +656,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
             && (taStatusLocalis.getText().isEmpty()));
     }
 
+    /**
+     *  Добавление текста из шаблон в заполненные текстовые поля (с заменой старого текста)
+     */
     private void pasteSelectedShablon(final Shablon shablon) {
         if (shablon == null) {
             return;
@@ -642,6 +689,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         }
     }
 
+    /**
+     *  Добавление текста из шаблон в заполненные текстовые поля (без замены старого текста)
+     */
     private void addSelectedShablon(final Shablon shablon) {
         if (shablon == null) {
             return;
@@ -670,6 +720,10 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         }
     }
 
+    /**
+     * Добавляет текст в поле если оно пустое, если поле уже заполнено -
+     * вставляет текст с новой строки.
+     */
     private void addToExistingTextField(final JTextArea tArea, final String text) {
         if (tArea.getText().isEmpty()) {
             tArea.setText(text);
@@ -678,6 +732,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         }
     }
 
+    /**
+     * Слушатель для строки поиска шаблонов
+     */
     private class ShablonSearchListener implements DocumentListener {
         private CustomTextField ctf;
         private ThriftIntegerClassifierList ticl;
@@ -722,6 +779,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         }
     }
 
+    /**
+     * Загрузка списка шаблонов
+     */
     private void loadShablonList(final CustomTextField inCtf,
             final ThriftIntegerClassifierList inTicl) {
         List<IntegerClassifier> intClassif = model.loadMedicalHistoryShablons(
@@ -730,6 +790,9 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         inTicl.setData(intClassif);
     }
 
+    /**
+     * Синхронизация списка шаблон (при выборе из формы)
+     */
     public final void syncShablonList(final String searchString, final Shablon shablon) {
         if (shablon != null) {
             medHiSearchListener.updateNow(searchString);
@@ -748,12 +811,18 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         return this;
     }
 
+    /**
+     * Реакия на изменения текущего пациента
+     */
     @Override
     public final void patientChanged() {
         clearMedicalHistory();
         updateDiaryTable();
     }
 
+    /**
+     * Установка списка шаблонов
+     */
     public final void setMedicalHistoryShablons(
             final List<IntegerClassifier> medicalHistoryShablonList) {
         lMedicalHistoryShablonNames.setData(medicalHistoryShablonList);
@@ -771,11 +840,17 @@ public class DiaryPanel extends JPanel  implements IPatientObserver, IDiaryRecor
         return ICON;
     }
 
+    /**
+     * Реакция на изменение текущей (выбранной в таблице записи)
+     */
     @Override
     public final void diaryRecordChanged() {
         setMedicalHistoryText();
     }
 
+    /**
+     * Обновление таблицы дневника
+     */
     public final void updateDiaryTable() {
         if (model.getPatient() != null) {
             tbMedHist.setData(model.getDiaryList());

@@ -30,6 +30,12 @@ import ru.nkz.ivcgzo.thriftHospital.MesNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TStage;
 import ru.nkz.ivcgzo.thriftHospital.TStage._Fields;
 
+/**
+ * Панель заполнения этапов лечения.
+ * Не успел привести к общему виду - но по последней информации,
+ * возможно эта панель не понадобится вообще
+ */
+
 public class StagePanel extends JPanel implements IPatientObserver {
     private static final long serialVersionUID = -1144680238391649525L;
     private static final String TOOLTIP_TEXT =

@@ -21,6 +21,10 @@ import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 import javax.swing.border.MatteBorder;
 import java.awt.Color;
 
+/**
+ * Фрейм выбора пациента
+ *
+ */
 public class PatientSelectFrame extends JDialog {
 
     private static final long serialVersionUID = -6475694293017689541L;

@@ -35,6 +35,9 @@ import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis._Fields;
 import javax.swing.JCheckBox;
 
+/**
+ * Панель диагнозов
+ */
 public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnosisObserver {
     private static final long serialVersionUID = -3813268997543431546L;
     private static final String TOOLTIP_TEXT =
@@ -76,7 +79,9 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
             final IHospitalModel inModel) {
         this.controller = inController;
         this.model = inModel;
+        // регистрация слушателя изменения пациента
         model.registerPatientObserver((IPatientObserver) this);
+        // регистрация слушателя изменения текущего (выбранного в таблице) диагноза
         model.registerDiagnosisObserver((IDiagnosisObserver) this);
 
         setDiagnosisPanel();
@@ -126,6 +131,9 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
         addDiagnosisTable();
     }
 
+    /**
+     * добавление таблицы диагнозов
+     */
     private void addDiagnosisTable() {
         tbDiag = new CustomTable<TDiagnosis, TDiagnosis._Fields>(
                 true, false, TDiagnosis.class, 4, "Дата", 2, "Код МКБ", 7, "Наименование диагноза");
@@ -144,12 +152,18 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
         spDiag.setViewportView(tbDiag);
     }
 
+    /**
+     * Заполнение информации о выбранном диагнозе
+     */
     private void fillCurrentDiagInfo() {
         setDiagPriznRdbtn();
         setDiagChBx();
         taDiagMedOp.setText(tbDiag.getSelectedItem().getMedOp());
     }
 
+    /**
+     * Заполнение информации о предварительности диагноза
+     */
     private void setDiagChBx() {
         if (!tbDiag.getSelectedItem().isSetPredv()) {
             chbxPredv.setSelected(false);
@@ -168,12 +182,18 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
         addDiagnosisButtons();
     }
 
+    /**
+     *   Добавление кнопок
+     */
     private void addDiagnosisButtons() {
         addDiagnosisAddButton();
         addDiagnosisDeleteButton();
         addDiagnosisUpdateButton();
     }
 
+    /**
+     *   Добавление кнопки "Добавить"
+     */
     private void addDiagnosisAddButton() {
         btnAddDiag = new JButton();
         btnAddDiag.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -193,6 +213,9 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
             "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
     }
 
+    /**
+     *   Добавление кнопки "Удалить"
+     */
     private void addDiagnosisDeleteButton() {
         btnDelDiag = new JButton();
         btnDelDiag.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -219,6 +242,9 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
             "/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png")));
     }
 
+    /**
+     *   Добавление кнопки "Обновить"
+     */
     private void addDiagnosisUpdateButton() {
         btnSaveDiag = new JButton();
         btnSaveDiag.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -274,6 +300,9 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
         addDiagnosisMedOpScrollPane();
     }
 
+    /**
+     *   Добавление компонета отображения предварительности диагноза
+     */
     private void addDiagnosisCheckBox() {
         chbxPredv = new JCheckBox("Предварительный диагноз");
         chbxPredv.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -295,6 +324,9 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
         addDiagnosisMedOpTextArea();
     }
 
+    /**
+     *   Добавление компонета отображения медицинского описания диагноза
+     */
     private void addDiagnosisMedOpTextArea() {
         taDiagMedOp = new JTextArea();
         taDiagMedOp.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -309,6 +341,9 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
         addDiagnosisRadioGroupButtons();
     }
 
+    /**
+     *   Добавление панели radioButton'ов
+     */
     private void addDiagnosisRadioGroupPanel() {
         pDiagTypes = new JPanel();
         pDiagTypes.setPreferredSize(new Dimension(425, 25));
@@ -319,6 +354,9 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
         pDiagTypes.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
+    /**
+     *   Добавление radioButton'ов
+     */
     private void addDiagnosisRadioGroupButtons() {
         rdbtnMain = new JRadioButton("Основной");
         rdbtnMain.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -350,6 +388,10 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
         btgDiag.add(rdbtnOsl);
     }
 
+    /**
+     *   Установка состояния radioButton'ов согласно полю Prizn
+     * выбранного объекта
+     */
     private void setDiagPriznRdbtn() {
         if (tbDiag.getSelectedItem() != null) {
             if (tbDiag.getSelectedItem().getPrizn() == 1) {
@@ -366,6 +408,9 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
         }
     }
 
+    /**
+     * Очистка всех полей
+     */
     private void clearDiagnosisText() {
         tbDiag.setData(Collections.<TDiagnosis>emptyList());
         taDiagMedOp.setText(null);
@@ -391,12 +436,18 @@ public class DiagnosisPanel extends JPanel implements IPatientObserver, IDiagnos
         return ICON;
     }
 
+    /**
+     * Все изменения, необходимые при смене пациента
+     */
     @Override
     public final void patientChanged() {
         clearDiagnosisText();
         updateDiagonsisTable();
     }
 
+    /**
+     * Все изменения, необходимые при смене текущего диагноза
+     */
     @Override
     public final void diagnosisChanged() {
         fillCurrentDiagInfo();

@@ -16,6 +16,9 @@ import ru.nkz.ivcgzo.clientHospital.ClientHospital;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 
+/**
+ * Модель таблицы фрейма приёма в курацию
+ */
 public class CurationTableModel implements TableModel {
     private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
     private List<TSimplePatient> patients;
@@ -24,6 +27,10 @@ public class CurationTableModel implements TableModel {
         "№ истории болезни", "Фамилия", "Имя", "Отчество", "Дата рождения", "Дата прибытия"
     };
 
+    /**
+     * Конструктор модели для определенного врача
+     * @param pcod
+     */
     public CurationTableModel(final int pcod) {
         try {
             patients = ClientHospital.tcl.getAllPatientForDoctor(pcod,
@@ -37,6 +44,10 @@ public class CurationTableModel implements TableModel {
         }
     }
 
+    /**
+     * Конструктор модели для всех врачей отделения
+     * @param pcod
+     */
     public CurationTableModel() {
         try {
             patients = ClientHospital.tcl.getAllPatientFromOtd(ClientHospital.authInfo.getCpodr());

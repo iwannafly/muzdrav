@@ -44,6 +44,10 @@ import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 import java.awt.Font;
 import javax.swing.JTextPane;
 
+/**
+ * Фрейм выбора шаблонов
+ *
+ */
 public class ShablonForm  extends JDialog {
     private static final long serialVersionUID = -6616098681222163927L;
     private final CustomTextField tbSearch;

@@ -25,6 +25,9 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import javax.swing.Box;
 import javax.swing.JScrollPane;
 
+/**
+ * Панель персональной информации о пациенте
+ */
 public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
     private static final long serialVersionUID = 5266597523898831944L;
     private IHospitalModel model;
@@ -78,6 +81,9 @@ public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
         setPatientInfoPanelGroupLayout();
     }
 
+    /**
+     * Очистка текстовых полей персональной информации
+     */
     private void clearPatientText() {
         tfNumberOfDesiaseHistory.setText("");
         tfSurname.setText("");
@@ -95,6 +101,9 @@ public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
         tfRealAddress.setText("");
     }
 
+    /**
+     * Заполнение текстовых полей персональной информации
+     */
     private void fillPersonalInfoTextFields() {
         if (model.getPatient() != null) {
             tfNumberOfDesiaseHistory.setText(String.valueOf(model.getPatient().getNist()));
@@ -132,6 +141,10 @@ public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
         textPane.setText("");
     }
 
+    /**
+     * Добавление информации из приемного отделения и первичного осмотра
+     * в textPane
+     */
     private void fillReceptionPanel() {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("<html>");
@@ -141,6 +154,9 @@ public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
         textPane.setText(strBuilder.toString());
     }
 
+    /**
+     * Заполнение информации из приемного отделения
+     */
     private String fillPriemInfo() {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("<b><u>Информация о пациенте из приёмного отделения:</u></b><br>");
@@ -203,8 +219,9 @@ public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
         return strBuilder.toString();
     }
 
-
-
+    /**
+     * Заполнение информации о первичном осмотре
+     */
     private String fillPervOsmotr() {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("<br><br><b><u>Первичный осмотр в приемном отделении:</u></b><br>");
@@ -257,10 +274,16 @@ public class PersonalInfoPanel extends JSplitPane implements IPatientObserver {
         return strBuilder.toString();
     }
 
+    /**
+     * Заполнение доступных профилей отделения
+     */
     public final void setOtdProfList(final List<IntegerClassifier> otdProfList) {
         cbxOtdProf.setData(otdProfList);
     }
 
+    /**
+     * Реакция на смену пациента
+     */
     @Override
     public final void patientChanged() {
         clearPatientText();

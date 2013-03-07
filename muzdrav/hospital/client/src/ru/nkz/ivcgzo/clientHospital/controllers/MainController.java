@@ -22,6 +22,9 @@ public class MainController {
     private IComponentController diaryController;
     private IComponentController diagnosisController;
     private IComponentController stageController;
+    private IComponentController assignmentsController;
+    private IComponentController childbirthController;
+    private IComponentController childrenController;
     private IComponentController zaklController;
     private IHospitalModel model;
     private MainFrame view;
@@ -61,8 +64,15 @@ public class MainController {
         diagnosisController = new DiagnosisController(model);
         addComponentInTabbedPane(diagnosisController);
 
+        assignmentsController = new AssignmentsController(model);
+        addComponentInTabbedPane(assignmentsController);
+
         if (isRd()) {
-            //TODO показать вкладки для роддомов
+            childbirthController = new ChildbirthController(model);
+            addComponentInTabbedPane(childbirthController);
+
+            childrenController = new ChildrenController(model);
+            addComponentInTabbedPane(childrenController);
         }
 
         stageController = new StageController(model);
