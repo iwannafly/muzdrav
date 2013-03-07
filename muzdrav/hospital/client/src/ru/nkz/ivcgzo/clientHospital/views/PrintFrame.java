@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientHospital;
+package ru.nkz.ivcgzo.clientHospital.views;
 
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
@@ -9,6 +9,7 @@ import javax.swing.JButton;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientHospital.ClientHospital;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;

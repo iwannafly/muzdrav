@@ -141,10 +141,7 @@ public class MainFrame extends JFrame {
         mntmPrintStationDiary.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-//                if (patient != null) {
-//                    frmPrint.setPatient(patient);
-//                    frmPrint.setVisible(true);
-//                }
+                controller.printStationDiary();
             }
         });
         mnPrintForms.add(mntmPrintStationDiary);
@@ -153,24 +150,7 @@ public class MainFrame extends JFrame {
         mntmPrintHospitalSummary.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-//                if (patient != null) {
-//                    try {
-//                        String servPath =
-//                            ClientHospital.tcl.printHospitalSummary(patient.getGospitalCod(),
-//                                doctorAuth.getClpu_name() + " "
-//                                + doctorAuth.getCpodr_name(), patient);
-//                        String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
-//                        ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
-//                        ClientHospital.conMan.openFileInEditor(cliPath, false);
-//                    } catch (KmiacServerException e1) {
-//                        e1.printStackTrace();
-//                    } catch (IOException e1) {
-//                        e1.printStackTrace();
-//                    } catch (TException e1) {
-//                        e1.printStackTrace();
-//                        ClientHospital.conMan.reconnect(e1);
-//                    }
-//                }
+                controller.printOutEpicris();
             }
         });
         mnPrintForms.add(mntmPrintHospitalSummary);
@@ -179,24 +159,7 @@ public class MainFrame extends JFrame {
         mntmPrintHospitalDeathSummary.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-//                if (patient != null) {
-//                    try {
-//                        String servPath =
-//                            ClientHospital.tcl.printHospitalDeathSummary(patient.getGospitalCod(),
-//                                doctorAuth.getClpu_name() + " "
-//                                + doctorAuth.getCpodr_name(), patient);
-//                        String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
-//                        ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
-//                        ClientHospital.conMan.openFileInEditor(cliPath, false);
-//                    } catch (KmiacServerException e1) {
-//                        e1.printStackTrace();
-//                    } catch (IOException e1) {
-//                        e1.printStackTrace();
-//                    } catch (TException e1) {
-//                        e1.printStackTrace();
-//                        ClientHospital.conMan.reconnect(e1);
-//                    }
-//                }
+                controller.printDeathEpicris();
             }
         });
         mnPrintForms.add(mntmPrintHospitalDeathSummary);
@@ -224,7 +187,7 @@ public class MainFrame extends JFrame {
     private void addPatientInfoToolButton() {
         btnShowPatientInfo = new JButton();
         setTooltipButtonDefaults(btnShowPatientInfo, TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE,
-                TOOLBAR_PATIENT_INFO_ICON, "Информация о пациенте");
+            TOOLBAR_PATIENT_INFO_ICON, "Информация о пациенте");
         btnShowPatientInfo.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 controller.showExternalPatientInfoFrame();
@@ -236,7 +199,7 @@ public class MainFrame extends JFrame {
     private void addAnamnezToolButon() {
         btnShowPatientAnamnez = new JButton();
         setTooltipButtonDefaults(btnShowPatientAnamnez, TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE,
-                TOOLBAR_ANAMNEZ_ICON, "Анамнез жизни");
+            TOOLBAR_ANAMNEZ_ICON, "Анамнез жизни");
         btnShowPatientAnamnez.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 controller.showExternalAnamnezFrame();
@@ -248,7 +211,7 @@ public class MainFrame extends JFrame {
     private void addBolListToolButton() {
         btnShowPatientBolList = new JButton();
         setTooltipButtonDefaults(btnShowPatientBolList, TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE,
-                TOOLBAR_BOL_LIST_ICON, "Больничный лист");
+            TOOLBAR_BOL_LIST_ICON, "Больничный лист");
         btnShowPatientBolList.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 controller.showExternalBolListFrame();
@@ -260,7 +223,7 @@ public class MainFrame extends JFrame {
     private void addIssledToolButton() {
         btnIssled = new JButton();
         setTooltipButtonDefaults(btnIssled, TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE,
-                TOOLBAR_ISSLED_ICON, "Лабораторные исследования");
+            TOOLBAR_ISSLED_ICON, "Лабораторные исследования");
         btnIssled.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 controller.showExternalIssledFrame();
@@ -272,7 +235,7 @@ public class MainFrame extends JFrame {
     private void addOperationToolButton() {
         btnOperation = new JButton();
         setTooltipButtonDefaults(btnOperation, TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE,
-                TOOLBAR_OPERATION_ICON, "Операции");
+            TOOLBAR_OPERATION_ICON, "Операции");
         btnOperation.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 controller.showExternalOperationFrame();
@@ -284,7 +247,7 @@ public class MainFrame extends JFrame {
     private void addReestrToolButton() {
         btnReestr = new JButton();
         setTooltipButtonDefaults(btnReestr, TOOLBAR_BUTTON_SIZE, TOOLBAR_BUTTON_SIZE,
-                TOOLBAR_REESTR_ICON, "Исправление ошибок реестра");
+            TOOLBAR_REESTR_ICON, "Исправление ошибок реестра");
         btnReestr.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 controller.showExternalReestrFrame();

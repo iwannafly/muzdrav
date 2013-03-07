@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.clientHospital.model;
 
+import java.io.IOException;
 import java.util.List;
 
 import ru.nkz.ivcgzo.clientHospital.controllers.HospitalDataTransferException;
@@ -89,4 +90,8 @@ public interface IHospitalModel {
     List<IntegerClassifier> getResultClassifier();
 
     void addZakl(Zakl tmpZakl) throws HospitalDataTransferException;
+
+    void printOutEpicris() throws HospitalDataTransferException, IOException;
+
+    void printDeathEpicris() throws IOException, HospitalDataTransferException;
 }

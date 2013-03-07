@@ -67,6 +67,7 @@ import java.io.IOException;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientHospital.views.PrintFrame;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;

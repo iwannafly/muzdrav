@@ -1,5 +1,7 @@
 package ru.nkz.ivcgzo.clientHospital.model;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -474,6 +476,45 @@ public class HospitalModel implements IHospitalModel {
         } catch (TException e) {
             ClientHospital.conMan.reconnect(e);
             throw new HospitalDataTransferException("Ошибка при обновлении заключения", e);
+        }
+    }
+
+    @Override
+    public final void printOutEpicris() throws HospitalDataTransferException, IOException {
+        try {
+            String servPath =
+                ClientHospital.tcl.printHospitalSummary(patient.getGospitalCod(),
+                    ClientHospital.authInfo.getClpu_name() + " "
+                    + ClientHospital.authInfo.getCpodr_name(), patient);
+            String cliPath;
+            cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+            ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
+            ClientHospital.conMan.openFileInTextProcessor(cliPath, false);
+        } catch (KmiacServerException e1) {
+            throw new HospitalDataTransferException("Ошибка при печати выписного эпикриза", e1);
+        } catch (TException e1) {
+            ClientHospital.conMan.reconnect(e1);
+            throw new HospitalDataTransferException("Ошибка при печати выписного эпикриза", e1);
+        }
+    }
+
+    @Override
+    public final void printDeathEpicris() throws IOException, HospitalDataTransferException {
+        if (patient != null) {
+            try {
+                String servPath =
+                    ClientHospital.tcl.printHospitalDeathSummary(patient.getGospitalCod(),
+                        ClientHospital.authInfo.getClpu_name() + " "
+                        + ClientHospital.authInfo.getCpodr_name(), patient);
+                String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+                ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
+                ClientHospital.conMan.openFileInTextProcessor(cliPath, false);
+            }  catch (KmiacServerException e1) {
+                e1.printStackTrace();
+            } catch (TException e1) {
+                e1.printStackTrace();
+                ClientHospital.conMan.reconnect(e1);
+            }
         }
     }
 

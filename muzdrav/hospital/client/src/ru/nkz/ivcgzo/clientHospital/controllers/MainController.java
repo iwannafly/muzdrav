@@ -1,11 +1,14 @@
 package ru.nkz.ivcgzo.clientHospital.controllers;
 
+import java.io.IOException;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import ru.nkz.ivcgzo.clientHospital.ClientHospital;
 import ru.nkz.ivcgzo.clientHospital.model.IHospitalModel;
 import ru.nkz.ivcgzo.clientHospital.views.MainFrame;
+import ru.nkz.ivcgzo.clientHospital.views.PrintFrame;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 
@@ -24,6 +27,7 @@ public class MainController {
     private MainFrame view;
     private ru.nkz.ivcgzo.clientHospital.views.CurationFrame curFrame;
     private ru.nkz.ivcgzo.clientHospital.views.PatientSelectFrame patSelectFrame;
+    private PrintFrame frmPrint;
 
     public MainController(final IHospitalModel inModel) {
         this.model = inModel;
@@ -46,6 +50,7 @@ public class MainController {
     public final void onConnect() {
         curFrame = new ru.nkz.ivcgzo.clientHospital.views.CurationFrame();
         patSelectFrame = new ru.nkz.ivcgzo.clientHospital.views.PatientSelectFrame(this, model);
+        frmPrint = new PrintFrame();
 
         personalInfoController = new PersonalInfoController(model);
         addComponentInTabbedPane(personalInfoController);
@@ -212,6 +217,50 @@ public class MainController {
                     view, e.getMessage(), "Ошибка!", JOptionPane.ERROR_MESSAGE);
                 view.setFrameTitle("Пациент не выбран");
             }
+        }
+    }
+
+    /**
+     * Вызов фрейма печати дневника осмотров
+     */
+    public final void printStationDiary() {
+        if (model.getPatient() != null) {
+            frmPrint.setPatient(model.getPatient());
+            frmPrint.setVisible(true);
+        }
+    }
+
+    /**
+     * Вызов печати выписного эпикриза
+     */
+    public final void printOutEpicris() {
+        if (model.getPatient() != null) {
+            try {
+                model.printOutEpicris();
+            } catch (HospitalDataTransferException e) {
+                JOptionPane.showMessageDialog(
+                    view, e.getMessage(), "Ошибка!", JOptionPane.ERROR_MESSAGE);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(
+                    view, "Ошибка при открытии файла для печати",
+                    "Ошибка!", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    /**
+     * Вызов печати посмертного эпикриза
+     */
+    public final void printDeathEpicris() {
+        try {
+            model.printDeathEpicris();
+        } catch (HospitalDataTransferException e) {
+            JOptionPane.showMessageDialog(
+                view, e.getMessage(), "Ошибка!", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(
+                view, "Ошибка при открытии файла для печати",
+                "Ошибка!", JOptionPane.ERROR_MESSAGE);
         }
     }
 
