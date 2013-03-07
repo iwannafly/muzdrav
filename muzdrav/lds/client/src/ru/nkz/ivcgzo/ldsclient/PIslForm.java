@@ -264,7 +264,7 @@ public class PIslForm {
 			
 			osw.write(sb.toString());
 			
-			MainForm.conMan.openFileInEditor(path, false);
+			MainForm.conMan.openFileInTextProcessor(path, false);
 			//System.out.print(MainForm.authInfo.clpu_name);
 			//return path;
 			} catch (UnsupportedEncodingException e) {

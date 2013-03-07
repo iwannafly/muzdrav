@@ -225,10 +225,11 @@ public class ServerLab extends Server implements Iface {
    @Override
     public final List<Metod> getMetod(final int kodissl) throws KmiacServerException {
         String sqlQuery = "SELECT DISTINCT np.pcod AS c_p0e1, no.obst, no.nameobst AS name_obst "
-            + "FROM n_nsi_obst no JOIN n_stoim ns ON (ns.c_obst = no.obst) "
+            + "FROM n_nsi_obst no "
+            + "JOIN n_stoim ns ON (ns.c_obst = no.obst) "
             + "JOIN n_p0e1 np ON (np.pcod = ns.c_p0e1) "
-            + "WHERE np.pcod = ? "
-            + "ORDER BY np.pcod, no.obst ";
+            + "WHERE (np.pcod = ?) "
+            + "ORDER BY np.pcod, no.obst;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, kodissl)) {
             return rsmMetod.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
@@ -240,10 +241,11 @@ public class ServerLab extends Server implements Iface {
     @Override
     public final List<PokazMet> getPokazMet(final String cNnz1, final int cotd)
             throws KmiacServerException {
-        String sqlQuery = "SELECT DISTINCT n_ldi.pcod, n_ldi.name_n FROM n_ldi "
-            + "JOIN s_ot01 ON (s_ot01.pcod=n_ldi.pcod) WHERE s_ot01.c_nz1 = ? "
-            + "AND s_ot01.cotd = ? "
-            + "ORDER BY n_ldi.pcod ";
+        String sqlQuery = "SELECT DISTINCT n_ldi.pcod, n_ldi.name_n "
+        	+ "FROM n_ldi "
+            + "JOIN s_ot01 ON (s_ot01.pcod = n_ldi.pcod) "
+            + "WHERE (s_ot01.c_nz1 = ?) AND (s_ot01.cotd = ?) "
+            + "ORDER BY n_ldi.pcod;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cNnz1, cotd)) {
             return rsmPokazMet.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
@@ -325,9 +327,17 @@ public class ServerLab extends Server implements Iface {
     }
 
     @Override
-    public final List<IntegerClassifier> getLabs(final int clpu)
+    public final List<IntegerClassifier> getLabs(final int clpu, final String pattern)
             throws KmiacServerException {
-        final String sqlQuery = "SELECT pcod, name FROM n_lds WHERE clpu = ?;";
+    	String labPattern;
+    	if ((pattern == null) || (!pattern.matches("^([ЛДТ](\\|[ЛДТ])?(\\|[ЛДТ])?|%)$"))) {
+    		labPattern = "%";
+    	} else
+    		labPattern = pattern;
+        final String sqlQuery =
+        		"SELECT pcod, name " +
+        		"FROM n_lds " +
+        		"WHERE (clpu = ?) AND (tip SIMILAR TO '" + labPattern + "');";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, clpu)) {
             return rsmIntClass.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
@@ -341,7 +351,8 @@ public class ServerLab extends Server implements Iface {
     public final List<StringClassifier> getOrgAndSys(final int cotd)
             throws KmiacServerException, TException {
         final String sqlQuery = "SELECT DISTINCT n_nz1.pcod, n_nz1.name "
-            + "FROM n_nz1 JOIN s_ot01 ON (n_nz1.pcod=s_ot01.c_nz1) WHERE s_ot01.cotd = ?;";
+            + "FROM n_nz1 JOIN s_ot01 ON (n_nz1.pcod=s_ot01.c_nz1) "
+            + "WHERE s_ot01.cotd = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cotd)) {
             return rsmStrClass.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
@@ -368,7 +379,7 @@ public class ServerLab extends Server implements Iface {
     @Override
     public final List<IntegerClassifier> getStacionarTypes()
             throws KmiacServerException, TException {
-        final String sqlQuery = "SELECT pcod, name FROM n_tip WHERE pcod != 9 ";
+        final String sqlQuery = "SELECT pcod, name FROM n_tip WHERE (pcod != 9);";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery)) {
             return rsmIntClass.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
@@ -394,7 +405,7 @@ public class ServerLab extends Server implements Iface {
     @Override
     public final List<IntegerClassifier> getVidIssled() throws KmiacServerException,
             TException {
-        final String sqlQuery = "SELECT pcod, tip as name FROM n_lds;";
+        final String sqlQuery = "SELECT pcod, tip AS name FROM n_lds;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery)) {
             return rsmIntClass.mapToList(acrs.getResultSet());
         } catch (SQLException e) {

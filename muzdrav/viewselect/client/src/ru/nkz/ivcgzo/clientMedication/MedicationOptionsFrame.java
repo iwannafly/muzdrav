@@ -75,12 +75,14 @@ public class MedicationOptionsFrame extends JDialog {
     private Component vsFirstInterval;
     private Component vsSecondInterval;
     private Component vsThirdInterval;
+    private Component vsFourInterval;
     private Component hsSecond;
     private Component hsThird;
     private Component hsFouth;
     private Component hsFirst;
     private Component hsFifth;
-    private Component hsDiagInterval;
+    private Component hsDiagFirstInterval;
+    private Component hsDiagSecondInterval;
     private Box hzbDose;
     private Box hzbDiagnosis;
 
@@ -206,7 +208,7 @@ public class MedicationOptionsFrame extends JDialog {
         addInputMethod();
         addDiagnosisHeader();
 
-        vsSecondInterval = Box.createVerticalStrut(20);
+        vsSecondInterval = Box.createVerticalStrut(10);
         pOptions.add(vsSecondInterval);
     }
 
@@ -232,11 +234,18 @@ public class MedicationOptionsFrame extends JDialog {
     }
     
     private void addDiagnosisHeader() {
-    	lblDiagnosis = new JLabel("Диагноз:");
-    	lblDiagnosis.setAlignmentX(Component.CENTER_ALIGNMENT);
-        pOptions.add(lblDiagnosis);
+    	vsFourInterval = Box.createVerticalStrut(10);
+    	pOptions.add(vsFourInterval);
         
         hzbDiagnosis = Box.createHorizontalBox();
+        
+    	lblDiagnosis = new JLabel("Диагноз:");
+    	lblDiagnosis.setAlignmentX(Component.CENTER_ALIGNMENT);
+    	hzbDiagnosis.add(lblDiagnosis);
+    	
+    	hsDiagFirstInterval = Box.createHorizontalStrut(15);
+    	hsDiagFirstInterval.setMaximumSize(new Dimension(15, 0));
+    	hzbDiagnosis.add(hsDiagFirstInterval);
         
         addDiagnosisInput();
         
@@ -250,9 +259,9 @@ public class MedicationOptionsFrame extends JDialog {
         tfDiagCode.setMaximumSize(new Dimension(70, 20));
         hzbDiagnosis.add(tfDiagCode);
 
-        hsDiagInterval = Box.createHorizontalStrut(15);
-        hsDiagInterval.setMaximumSize(new Dimension(15, 0));
-        hzbDiagnosis.add(hsDiagInterval);
+        hsDiagSecondInterval = Box.createHorizontalStrut(15);
+        hsDiagSecondInterval.setMaximumSize(new Dimension(15, 0));
+        hzbDiagnosis.add(hsDiagSecondInterval);
         
         btnAddDiag = new JButton("Выбрать");
         btnAddDiag.addActionListener(new ActionListener() {
@@ -449,14 +458,18 @@ public class MedicationOptionsFrame extends JDialog {
         	newMedication.unsetDiag();
         try {
         	newMedication.setNlek(ClientMedication.tcl.addLek(newMedication));
+            MedicationOptionsFrame.this.dispatchEvent(new WindowEvent(
+                    MedicationOptionsFrame.this, WindowEvent.WINDOW_CLOSING));
+            return;
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
         } catch (TException e1) {
             e1.printStackTrace();
             ClientMedication.conMan.reconnect(e1);
         }
-        MedicationOptionsFrame.this.dispatchEvent(new WindowEvent(
-            MedicationOptionsFrame.this, WindowEvent.WINDOW_CLOSING));
+    	JOptionPane.showMessageDialog(getContentPane(),
+        		"Ошибка во время добавления медикамента", "Ошибка",
+        		JOptionPane.ERROR_MESSAGE);
     }
 
     private void addButtonAdd() {
