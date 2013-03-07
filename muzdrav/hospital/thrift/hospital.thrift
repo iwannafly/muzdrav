@@ -387,6 +387,23 @@ struct TProcedures {
 	4: optional i32 kol;
 }
 
+struct TConsult {
+	1: optional i32 id;
+	2: optional i32 id_gosp;
+	3: optional i32 id_pvizit;
+	4: optional i32 vid_doc;
+	5: optional string text;
+	6: optional i32 preds;
+	7: optional i32 zaved;
+	8: optional string cdol;
+	9: optional i32 vrach;
+	10: optional i64 datan;
+	11: optional string diag;
+	12: optional i64 datao;
+	13: optional i32 vracho;
+	14: optional i64 dataz;
+}
+
 /**
  * Пациент с такими данными не найден.
  */
