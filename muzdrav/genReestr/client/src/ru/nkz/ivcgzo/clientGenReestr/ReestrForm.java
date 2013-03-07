@@ -98,7 +98,7 @@ public class ReestrForm extends JFrame {
 					String servPath = MainForm.tcl.getProtokolErrPol(pathfile);
 					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
-					MainForm.conMan.openFileInEditor(cliPath, false);
+					MainForm.conMan.openFileInTextProcessor(cliPath, false);
 				} catch (KmiacServerException e) {
 					e.printStackTrace();
 				} catch (TException e) {
@@ -121,7 +121,7 @@ public class ReestrForm extends JFrame {
 					String servPath = MainForm.tcl.getProtokolErrLDS(pathfile);
 					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
-					MainForm.conMan.openFileInEditor(cliPath, false);
+					MainForm.conMan.openFileInTextProcessor(cliPath, false);
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 				} catch (TException e1) {
@@ -143,7 +143,7 @@ public class ReestrForm extends JFrame {
 					String servPath = MainForm.tcl.getProtokolErrGosp(pathfile);
 					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
-					MainForm.conMan.openFileInEditor(cliPath, false);
+					MainForm.conMan.openFileInTextProcessor(cliPath, false);
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 				} catch (TException e1) {
@@ -164,7 +164,7 @@ public class ReestrForm extends JFrame {
 					String servPath = MainForm.tcl.getProtokolErrDSP(pathfile);//????
 					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
-					MainForm.conMan.openFileInEditor(cliPath, false);
+					MainForm.conMan.openFileInTextProcessor(cliPath, false);
 				} catch (KmiacServerException e) {
 					e.printStackTrace();
 				} catch (TException e) {

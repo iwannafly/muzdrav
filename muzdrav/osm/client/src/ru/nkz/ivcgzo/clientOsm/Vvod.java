@@ -2782,7 +2782,9 @@ public class Vvod extends JFrame {
 //					if (mes == 1) br = br+1;
 //					if (mes == 2) br = br+1;
 //					if (mes == 12) br = br+1;
+					if (SChcc.getText()== "")
 					rddin.setChcc(Integer.valueOf(SChcc.getText()));
+					else rddin.setChcc(0);
 					rddin.setHdm(Integer.valueOf(SVdm.getText()));
 					rddin.setOj(Integer.valueOf(SOkrj.getText()));
 					rddin.setSpl(Integer.valueOf(STolP.getText()));
@@ -3344,7 +3346,7 @@ public class Vvod extends JFrame {
 						
 						priem = MainForm.tcl.getPriem(zapVr.npasp, tblPos.getSelectedItem().id);
 						pvizit = MainForm.tcl.getPvizit(zapVr.getId_pvizit());
-							rddin = MainForm.tcl.getRdDinInfo(zapVr.getId_pvizit(), zapVr.npasp, tblPos.getSelectedItem().id);
+						rddin = MainForm.tcl.getRdDinInfo(zapVr.getId_pvizit(), zapVr.npasp, tblPos.getSelectedItem().id);
 						tblObr.replaceSelectedItem(pvizit);
 						anamZab = MainForm.tcl.getAnamZab(zapVr.getId_pvizit(), zapVr.getNpasp());
 						btnRecPriem.setEnabled(!isStat &&!pvizit.isSetIshod());

@@ -81,6 +81,7 @@ import javax.swing.JTextArea;
 public class PIslForm {
 	
 	ShabOpRezName winShab;
+	ViborIslMet winVib;
 	
 	public JFrame frame;
 	private CustomTable<Patient, Patient._Fields> tpatient;
@@ -129,6 +130,7 @@ public class PIslForm {
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		winShab = new ShabOpRezName();
+		winVib = new ViborIslMet();
 		
 		JPanel panel = new JPanel();
 		
@@ -2090,13 +2092,13 @@ public class PIslForm {
 			public void actionPerformed(ActionEvent arg0) {
 				
 				
-				List<StringClassifier> dnli;
+/*				List<StringClassifier> dnli;
 				List<Metod> dstoim;
-				LabIsl nLI = new LabIsl();
+				LabIsl nLI = new LabIsl();*/
 
 
 				try {
-					dnli = MainForm.ltc.GetKlasIsS_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcisl);
+					/*dnli = MainForm.ltc.GetKlasIsS_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcisl);
 					
 					
 					dstoim = MainForm.ltc.GetLabStoim(tn_ldi.getSelectedItem().pcisl, MainForm.authInfo.cpodr);
@@ -2113,11 +2115,7 @@ public class PIslForm {
 						
 						if (check == false){
 							
-							/*nLI.setNisl(tn_ldi.getSelectedItem().nisl);
-							nLI.setNpasp(tn_ldi.getSelectedItem().npasp);
-							nLI.setCpok(dnli.get(i).pcod);*/
-							//nLI.setPcod_m(dnli.get(i).c_obst);
-							
+						
 							for (int j = 0; j<dstoim.size(); j++){
 								
 								if (dnli.get(i).pcod.equals(dstoim.get(j).pcod)){
@@ -2142,21 +2140,53 @@ public class PIslForm {
 								}
 								
 							}
-							
-/*							try {
-								
-								MainForm.ltc.AddLIsl(nLI);
-								
-							} catch (LIslExistsException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}*/
 						}
 						
+					}*/	
+					
+					
+					if ((tn_ldi.getSelectedItem().isSetPcisl()) &&(tn_ldi.getSelectedItem().isSetKodotd())){
+						
+						
+						winVib.tLabMet.setData(MainForm.ltc.GetS_ot01IsMet(tn_ldi.getSelectedItem().kodotd, tn_ldi.getSelectedItem().pcisl));
+						winVib.npasp = tn_ldi.getSelectedItem().npasp;
+						winVib.nisl = tn_ldi.getSelectedItem().nisl;
+						
+						
+						String si= null;
+						String sm= null;
+						
+						String si1= null;
+						String sm1= null;
+						
+						for (int i = 0; i< tlab_isl.getData().size(); i++){
+							si = tlab_isl.getData().get(i).cpok;
+							sm = tlab_isl.getData().get(i).pcod_m;
+							
+							for (int j = 0; j< winVib.tLabMet.getData().size(); j++){
+								si1 = winVib.tLabMet.getData().get(j).pcod;
+								sm1 = winVib.tLabMet.getData().get(j).pcod_m;								
+								
+								if (si.equals(si1)&&(sm.equals(sm1))){
+									winVib.tLabMet.getModel().setValueAt(true, j, 3);
+									
+									break;
+									
+								}
+									
+									
+							}
+						}
+						
+						
+						winVib.setVisible(true);
+						
+						
+						
+					
+					
+						tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl, tn_ldi.getSelectedItem().pcisl));
 					}
-					
-					tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl, tn_ldi.getSelectedItem().pcisl));
-					
 					
 				} catch (TException e) {
 					// TODO Auto-generated catch block

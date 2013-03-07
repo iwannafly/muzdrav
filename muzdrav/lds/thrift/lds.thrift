@@ -65,6 +65,16 @@ struct S_ot01{
 }
 
 
+struct S_ot01IsMet{
+	1:string pcod;
+	2:string name;
+	3:string pcod_m;
+	4:string name_m;
+	5:double stoim;
+	6:bool vibor;
+}
+
+
 
 struct Patient {
 	1: i32 npasp;
@@ -249,7 +259,7 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	void UpdLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void DelLIsl(1: i32 nisl, 2: string cpok, 3: i32 id);
 	void DelLIslD(1: i32 nisl);
-
+	void DelLIsl2(1: i32 nisl, 2: string cpok, 3: string pcod_m);
 
 	list<S_ot01> GetS_ot01(1: i32 cotd, 2: string c_nz1);
 	list<S_ot01> GetMinS_ot01(1: i32 cotd);
@@ -259,6 +269,7 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	void DelS_ot01(1: i32 cotd, 2: string pcod, 3: string c_nz1);
 	void DelS_ot01D(1: i32 cotd, 2: string pcod, 3: string c_obst, 4: string c_nz1);
 	
+	list<S_ot01IsMet> GetS_ot01IsMet(1: i32 cotd, 2:string c_nz1);
 
     	list<Patient> getPatient(1: string npasp) throws (1: PatientNotFoundException pnfe);
     	list<Patient> getPatDat(1: i32 kodotd; 2: i64 datap) throws (1: PatientNotFoundException pnfe);

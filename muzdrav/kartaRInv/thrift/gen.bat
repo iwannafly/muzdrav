@@ -1,6 +1,8 @@
 @ECHO off
 
-RMDIR /S /Q gen-java
+IF EXIST gen-java\ (
+	RMDIR /S /Q gen-java\
+)
 
 "..\..\..\..\bin\thrift.exe" --gen java "KartaRInv.thrift"
 IF NOT %errorlevel% == 0 GOTO :end
