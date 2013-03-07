@@ -1,18 +1,19 @@
 package ru.nkz.ivcgzo.clientHospital;
 
 //TODO: ДОБАВЛЕНИЕ КАПЕЛЬНИЦ И ИНЪЕКЦИЙ
-//TODO: ДОБАВЛЕНИЕ КОНСУЛЬТАЦИЙ
+//TODO: ФУНКЦИОНАЛ ТРЁХ ПАНЕЛЕЙ
 //TODO: ЮНИТ-ТЕСТИРОВАНИЕ
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -31,14 +32,13 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftHospital.TConsult;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnostic;
 import ru.nkz.ivcgzo.thriftHospital.TDiet;
 import ru.nkz.ivcgzo.thriftHospital.TMedication;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TProcedures;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 /**
  * Панель учёта медицинских назначений: препаратов, 
@@ -59,25 +59,32 @@ public final class Assignments extends JPanel {
     private TPatient patient;
 	private UserAuthInfo userAuth;
     private Icon addIcon, saveIcon, delIcon;
-    private Dimension defaultDimension;
-    private JPanel pnlMedications, pnlDiagnostics, pnlDiet, pnlProcedures;
-    private JScrollPane spMedicationsTbl, spDiagnosticsTbl, spDiet, spProcedures;
+    private Dimension defaultBtnDim, defaultMaxPnlDim;
+    private JPanel pnlMain;
+    private JPanel pnlMedications, pnlDiagnostics;
+    private JPanel pnlDiet, pnlProcedures, pnlConsults;
+    private JScrollPane spMain;
+    private JScrollPane spMedicationsTbl, spDiagnosticsTbl;
+    private JScrollPane spDietTbl, spProceduresTbl, spConsultsTbl;
     private JScrollPane spMedicationsInfo, spDiagnosticsResult;
     private JTextArea taMedicationsInfo, taDiagnosticsResult;
     private Box vbMedicationsTbl, vbMedicationsBtn;
     private Box vbDiagnosticsTbl, vbDiagnosticsBtn;
     private Box vbDietTbl, vbDietBtn;
     private Box vbProceduresTbl, vbProceduresBtn;
+    private Box vbConsultsTbl, vbConsultsBtn;
     private CustomTable<TMedication, TMedication._Fields> tblMedications;
     private CustomTable<TDiagnostic, TDiagnostic._Fields> tblDiagnostics;
     private CustomTable<TDiet, TDiet._Fields> tblDiet;
     private CustomTable<TProcedures, TProcedures._Fields> tblProcedures;
+    private CustomTable<TConsult, TConsult._Fields> tblConsults;
     private TMedication lastMedItem;
     private TDiagnostic lastDiagItem;
     private JButton btnAddMedication, btnSaveMedication, btnDelMedication;
     private JButton btnAddDiagnostic;
     private JButton btnAddDiet, btnDelDiet;
     private JButton btnAddProcedure, btnDelProcedure;
+    private JButton btnAddConsult, btnDelConsult, btnSaveConsult;
 
 	/**
 	 * Создание экземпляра панели учёта медицинских назначений
@@ -136,6 +143,7 @@ public final class Assignments extends JPanel {
 			/*
 			this.fillTableDiet();
 			this.fillTableProcedures();
+			this.fillTableConsults();
 			*/
 		}
 	}
@@ -144,10 +152,11 @@ public final class Assignments extends JPanel {
 	 * Очистка всех таблиц
 	 */
 	private void clearAllTables() {
-		this.tblMedications.setData(new ArrayList<TMedication> (0));
-		this.tblDiagnostics.setData(new ArrayList<TDiagnostic> (0));
-		this.tblDiet.setData(new ArrayList<TDiet> (0));
-		this.tblProcedures.setData(new ArrayList<TProcedures> (0));
+		this.tblMedications.setData(Collections.<TMedication>emptyList());
+		this.tblDiagnostics.setData(Collections.<TDiagnostic>emptyList());
+		this.tblDiet.setData(Collections.<TDiet>emptyList());
+		this.tblProcedures.setData(Collections.<TProcedures>emptyList());
+		this.tblConsults.setData(Collections.<TConsult>emptyList());
 	}
 	
 	/**
@@ -233,19 +242,26 @@ public final class Assignments extends JPanel {
 	
 	/**
 	 * Установка параметров заданной панели
-	 * @param parentPanel Родительская панель, в которую будет добавлена текущая
+	 * @param parentCom Компонент, в который будет добавлена панель
 	 * @param curPanel Текущая панель
-	 * @param header Заголовок текущей панели
+	 * @param header Заголовок панели
 	 */
-	private void setCustomPanel(JPanel parentPanel, JPanel curPanel,
+	private void setCustomPanel(JComponent parentCom, JPanel curPanel,
 			final String header) {
+		if (curPanel == null)
+			return;
 		curPanel.setBorder(
 				new TitledBorder(
-						new LineBorder(new Color(0, 0, 0), 1, true),
-						header, TitledBorder.LEFT,
-						TitledBorder.TOP, null, null));
+						new LineBorder(null, 1, true),
+						header,
+						TitledBorder.LEFT,
+						TitledBorder.TOP,
+						null,
+						null));
 		curPanel.setLayout(new BoxLayout(curPanel, BoxLayout.X_AXIS));
-		parentPanel.add(curPanel);
+		curPanel.setMaximumSize(this.defaultMaxPnlDim);
+		if (parentCom != null)
+			parentCom.add(curPanel);
 	}
 	
 	/**
@@ -256,12 +272,16 @@ public final class Assignments extends JPanel {
 	 */
 	private void setCustomTextArea(JTextArea curArea,
 			final Font curFont, JScrollPane curSP) {
-		curArea.setFont(curFont);
+		if (curArea == null)
+			return;
+		if (curFont != null)
+			curArea.setFont(curFont);
 		curArea.setLineWrap(true);
 		curArea.setWrapStyleWord(true);
 		curArea.setEnabled(false);
 		curArea.setRows(6);
-		curSP.setViewportView(curArea);
+		if (curSP != null)
+			curSP.setViewportView(curArea);
 	}
 	
 	/**
@@ -418,12 +438,19 @@ public final class Assignments extends JPanel {
 		this.addIcon = new ImageIcon(Assignments.addIconURL);
 		this.saveIcon = new ImageIcon(Assignments.saveIconURL);
 		this.delIcon = new ImageIcon(Assignments.delIconURL);
-		this.defaultDimension = new Dimension(50, 50);
+		this.defaultBtnDim = new Dimension(50, 50);
+		this.defaultMaxPnlDim = new Dimension(2560, 256);
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.pnlMain = new JPanel();
+		this.pnlMain.setLayout(new BoxLayout(this.pnlMain, BoxLayout.Y_AXIS));
 		this.setPanelMedications();
 		this.setPanelDiagnostics();
 		this.setPanelDiet();
 		this.setPanelProcedures();
+		this.setPanelConsults();
+		this.spMain = new JScrollPane();
+		this.add(this.spMain);
+		this.spMain.setViewportView(this.pnlMain);
 	}
 	
     /**
@@ -431,7 +458,7 @@ public final class Assignments extends JPanel {
      */
 	private void setPanelMedications() {
 		this.pnlMedications = new JPanel();
-		this.setCustomPanel(this, this.pnlMedications, "Лекарственные назначения");
+		this.setCustomPanel(this.pnlMain, this.pnlMedications, "Лекарственные назначения");
 		this.vbMedicationsTbl = Box.createVerticalBox();
 		this.pnlMedications.add(this.vbMedicationsTbl);
 		this.setTableMedication();
@@ -446,7 +473,7 @@ public final class Assignments extends JPanel {
      */
 	private void setPanelDiagnostics() {
 		this.pnlDiagnostics = new JPanel();
-		this.setCustomPanel(this, this.pnlDiagnostics, "Лабораторные и диагностические исследования");
+		this.setCustomPanel(this.pnlMain, this.pnlDiagnostics, "Лабораторные и диагностические исследования");
 		this.vbDiagnosticsTbl = Box.createVerticalBox();
 		this.pnlDiagnostics.add(this.vbDiagnosticsTbl);
 		this.setTableDiagnostics();
@@ -461,7 +488,7 @@ public final class Assignments extends JPanel {
      */
 	private void setPanelDiet() {
 		this.pnlDiet = new JPanel();
-		this.setCustomPanel(this, this.pnlDiet, "Режим и диета");
+		this.setCustomPanel(this.pnlMain, this.pnlDiet, "Режим и диета");
 		this.vbDietTbl = Box.createVerticalBox();
 		this.pnlDiet.add(this.vbDietTbl);
 		this.setTableDiet();
@@ -475,13 +502,27 @@ public final class Assignments extends JPanel {
      */
 	private void setPanelProcedures() {
 		this.pnlProcedures = new JPanel();
-		this.setCustomPanel(this, this.pnlProcedures, "Лечебные процедуры");
+		this.setCustomPanel(this.pnlMain, this.pnlProcedures, "Лечебные процедуры");
 		this.vbProceduresTbl = Box.createVerticalBox();
 		this.pnlProcedures.add(this.vbProceduresTbl);
 		this.setTableProcedures();
 		this.vbProceduresBtn = Box.createVerticalBox();
 		this.pnlProcedures.add(this.vbProceduresBtn);
 		this.setButtonsProcedures();
+	}
+	
+    /**
+     * Инициализация панели консультаций
+     */
+	private void setPanelConsults() {
+		this.pnlConsults = new JPanel();
+		this.setCustomPanel(this.pnlMain, this.pnlConsults, "Консультации");
+		this.vbConsultsTbl = Box.createVerticalBox();
+		this.pnlConsults.add(this.vbConsultsTbl);
+		this.setTableConsults();
+		this.vbConsultsBtn = Box.createVerticalBox();
+		this.pnlConsults.add(this.vbConsultsBtn);
+		this.setButtonsConsults();
 	}
 	
 	/**
@@ -539,29 +580,44 @@ public final class Assignments extends JPanel {
      * Инициализация таблицы режимов и диет
      */
 	private void setTableDiet() {
-		this.spDiet = new JScrollPane();
-		this.vbDietTbl.add(this.spDiet);
+		this.spDietTbl = new JScrollPane();
+		this.vbDietTbl.add(this.spDietTbl);
 		this.tblDiet = new CustomTable<TDiet, TDiet._Fields>(
 				false, false, TDiet.class, 0, "Тип",
 				1, "№", 2, "Дата назначения", 3, "Дата отмены");
 		this.tblDiet.setDateField(2);
 		this.tblDiet.setDateField(3);
-		this.spDiet.setViewportView(this.tblDiet);
+		this.spDietTbl.setViewportView(this.tblDiet);
 	}
 
 	/**
      * Инициализация таблицы лечебных процедур
      */
 	private void setTableProcedures() {
-		this.spProcedures = new JScrollPane();
-		this.vbProceduresTbl.add(this.spProcedures);
+		this.spProceduresTbl = new JScrollPane();
+		this.vbProceduresTbl.add(this.spProceduresTbl);
 		this.tblProcedures = new CustomTable<TProcedures, TProcedures._Fields>(
 				false, false, TProcedures.class,
 				0, "Наименование процедуры", 1, "Дата начала", 
 				2, "Дата окончания", 3, "Кол-во проведённых процедур");
 		this.tblProcedures.setDateField(1);
 		this.tblProcedures.setDateField(2);
-		this.spProcedures.setViewportView(this.tblProcedures);
+		this.spProceduresTbl.setViewportView(this.tblProcedures);
+	}
+
+	/**
+     * Инициализация таблицы консультаций
+     */
+	private void setTableConsults() {
+		this.spConsultsTbl = new JScrollPane();
+		this.vbConsultsTbl.add(this.spConsultsTbl);
+		this.tblConsults = new CustomTable<TConsult, TConsult._Fields>(
+				false, false, TConsult.class,
+				3, "Вид врачебного документа", 4, "Обоснование", 
+				9, "Дата назначения", 11, "Дата отмены");
+		this.tblConsults.setDateField(2);
+		this.tblConsults.setDateField(3);
+		this.spConsultsTbl.setViewportView(this.tblConsults);
 	}
 
 	/**
@@ -592,7 +648,7 @@ public final class Assignments extends JPanel {
 	private void setButtonsMedication() {
 		this.btnAddMedication = new JButton();
 		this.setCustomButton(this.vbMedicationsBtn, this.btnAddMedication,
-				this.defaultDimension, this.addIcon,
+				this.defaultBtnDim, this.addIcon,
 				"Добавить лекарственное назначение");
 		this.btnAddMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -602,7 +658,7 @@ public final class Assignments extends JPanel {
 		
 		this.btnSaveMedication = new JButton();
 		this.setCustomButton(this.vbMedicationsBtn, this.btnSaveMedication,
-				this.defaultDimension, this.saveIcon,
+				this.defaultBtnDim, this.saveIcon,
 				"Сохранить лекарственное назначение");
 		this.btnSaveMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -612,7 +668,7 @@ public final class Assignments extends JPanel {
 
 		this.btnDelMedication = new JButton();
 		this.setCustomButton(this.vbMedicationsBtn, this.btnDelMedication,
-				this.defaultDimension, this.delIcon,
+				this.defaultBtnDim, this.delIcon,
 				"Удалить лекарственное назначение");
 		this.btnDelMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -627,7 +683,7 @@ public final class Assignments extends JPanel {
 	private void setButtonsDiagnostics() {
 		this.btnAddDiagnostic = new JButton();
 		this.setCustomButton(this.vbDiagnosticsBtn, this.btnAddDiagnostic,
-				this.defaultDimension, this.addIcon, "Добавить исследование");
+				this.defaultBtnDim, this.addIcon, "Добавить исследование");
 		this.btnAddDiagnostic.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
             	Assignments.this.btnAddDiagnosticClick();
@@ -641,7 +697,7 @@ public final class Assignments extends JPanel {
 	private void setButtonsDiet() {
 		this.btnAddDiet = new JButton();
 		this.setCustomButton(this.vbDietBtn, this.btnAddDiet,
-				this.defaultDimension, this.addIcon, "Добавить режим (стол)");
+				this.defaultBtnDim, this.addIcon, "Добавить режим (стол)");
 		this.btnAddDiet.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
             	//TODO
@@ -650,7 +706,7 @@ public final class Assignments extends JPanel {
 
 		this.btnDelDiet = new JButton();
 		this.setCustomButton(this.vbDietBtn, this.btnDelDiet,
-				this.defaultDimension, this.delIcon, "Удалить режим (стол)");
+				this.defaultBtnDim, this.delIcon, "Удалить режим (стол)");
 		this.btnDelDiet.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
             	//TODO
@@ -664,7 +720,7 @@ public final class Assignments extends JPanel {
 	private void setButtonsProcedures() {
 		this.btnAddProcedure = new JButton();
 		this.setCustomButton(this.vbProceduresBtn, this.btnAddProcedure,
-				this.defaultDimension, this.addIcon, "Добавить процедуру");
+				this.defaultBtnDim, this.addIcon, "Добавить процедуру");
 		this.btnAddProcedure.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
             	Assignments.this.btnAddProcedureClick();
@@ -673,8 +729,40 @@ public final class Assignments extends JPanel {
 
 		this.btnDelProcedure = new JButton();
 		this.setCustomButton(this.vbProceduresBtn, this.btnDelProcedure,
-				this.defaultDimension, this.delIcon, "Удалить процедуру");
+				this.defaultBtnDim, this.delIcon, "Удалить процедуру");
 		this.btnDelProcedure.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+            	//TODO
+            }
+        });
+	}
+
+	/**
+     * Инициализация кнопок панели консультаций
+     */
+	private void setButtonsConsults() {
+		this.btnAddConsult = new JButton();
+		this.setCustomButton(this.vbConsultsBtn, this.btnAddConsult,
+				this.defaultBtnDim, this.addIcon, "Добавить консультацию");
+		this.btnAddConsult.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+            	//TODO
+            }
+        });
+
+		this.btnSaveConsult = new JButton();
+		this.setCustomButton(this.vbConsultsBtn, this.btnSaveConsult,
+				this.defaultBtnDim, this.saveIcon, "Сохранить консультацию");
+		this.btnSaveConsult.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+            	//TODO
+            }
+        });
+
+		this.btnDelConsult = new JButton();
+		this.setCustomButton(this.vbConsultsBtn, this.btnDelConsult,
+				this.defaultBtnDim, this.delIcon, "Удалить консультацию");
+		this.btnDelConsult.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
             	//TODO
             }
