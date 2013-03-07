@@ -32,6 +32,7 @@ import ru.nkz.ivcgzo.ldsThrift.ObInfIsl;
 import ru.nkz.ivcgzo.ldsThrift.Patient;
 import ru.nkz.ivcgzo.ldsThrift.PatientNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.SLdiNotFoundException;
+import ru.nkz.ivcgzo.ldsThrift.S_ot01IsMet;
 //import ru.nkz.ivcgzo.ldsThrift.S_ldi;
 import ru.nkz.ivcgzo.ldsThrift.S_ot01;
 import ru.nkz.ivcgzo.ldsThrift.S_ot01ExistsException;
@@ -62,6 +63,7 @@ public class LDSserver extends Server implements Iface {
 	private static final Class<?>[] lislTypes = new Class<?>[] {Integer.class, Integer.class, String.class, String.class, String.class, String.class, Double.class, String.class, String.class, Integer.class};
 	private TResultSetMapper<S_ot01, S_ot01._Fields> rsmS_ot01;	
 	private static final Class<?>[] s_ot01Types = new Class<?>[] {Integer.class, String.class, String.class, String.class, Date.class, String.class, String.class, Double.class};
+	private TResultSetMapper<S_ot01IsMet, S_ot01IsMet._Fields> rmsS_ot01IsMet;
 	private TResultSetMapper<Patient, Patient._Fields> rmsPatient;
 	private TResultSetMapper<N_lds, N_lds._Fields> rmsN_lds;
 	private TResultSetMapper<Metod, Metod._Fields> rmsMetod;
@@ -85,6 +87,7 @@ public class LDSserver extends Server implements Iface {
 		rsmLabIs = new TResultSetMapper<>(LabIsl.class, "npasp", "nisl", "cpok", "name", "zpok", "norma", "stoim", "pcod_m", "nameobst", "id");	
 		rmsPatient = new TResultSetMapper<>(Patient.class, "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom", "adp_gorod", "adp_ul", "adp_dom", "adp_kv", "adm_gorod", "adm_ul", "adm_dom", "adm_kv", "ter_liv");
 		rsmS_ot01 = new TResultSetMapper<>(S_ot01.class, "cotd", "pcod", "c_obst", "c_nz1", "stoim");
+		rmsS_ot01IsMet = new TResultSetMapper<>(S_ot01IsMet.class, "pcod", "name", "pcod_m", "name_m", "stoim", "vibor");
 		rmsnldi = new TResultSetMapper<>(N_ldi.class, "pcod", "c_nz1", "name_n", "name", "norma", "c_p0e1", "vibor", "id");
 		//rmssldi = new TResultSetMapper<>(S_ldi.class, "id", "name");
 		rmsMetod = new TResultSetMapper<>(Metod.class, "c_p0e1", "pcod", "c_obst", "name", "stoim", "vibor");
@@ -338,6 +341,19 @@ public class LDSserver extends Server implements Iface {
 		}
 
 	}
+	
+	@Override
+	public void DelLIsl2(int nisl, String cpok, String pcod_m)
+			throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_rez_l WHERE (nisl = ?) and (cpok = ?) and (pcod_m = ?)", false, nisl, cpok, pcod_m);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new TException(e);
+		}
+		
+	}
+	
 
 	@Override
 	public void DelLIslD(int nisl) throws TException {
@@ -768,6 +784,25 @@ public class LDSserver extends Server implements Iface {
 		
 	}
 
+	
+	@Override
+	public List<S_ot01IsMet> GetS_ot01IsMet(int cotd, String c_nz1)
+			throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select so.pcod, nl.name, so.c_obst as pcod_m, nno.nameobst as name_m, ns.stoim " +
+																	" from s_ot01 so join n_ldi nl on(so.pcod = nl.pcod)and(so.c_nz1 = nl.c_nz1) "+ 
+																			" join n_stoim ns on (so.c_obst = ns.c_obst)and(nl.pcod = ns.pcod)and(ns.c_p0e1 = nl.c_p0e1) "+
+																			" join n_nsi_obst nno on (nno.obst = ns.c_obst) "+
+																 " where (so.c_nz1 = ?)and(so.cotd = ?)" +
+																 " order by so.pcod ", c_nz1, cotd)) {
+
+			return rmsS_ot01IsMet.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}	
+	
+	
+	
 	@Override
 	public List<IntegerClassifier> GetKlasSvrach(int cpodr) throws TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select s_vrach.pcod, (s_vrach.fam ||' '|| s_vrach.im ||' '|| s_vrach.ot) AS name FROM s_vrach JOIN s_mrab ON (s_vrach.pcod = s_mrab.pcod) WHERE (s_mrab.cpodr = ?)and(priznd = 1) ", cpodr)){
@@ -1099,6 +1134,10 @@ public class LDSserver extends Server implements Iface {
 			throw new TException(e);
 		}
 	}
+
+
+
+
 	
 
 }
