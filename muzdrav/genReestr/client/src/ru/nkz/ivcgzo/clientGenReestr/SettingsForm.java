@@ -232,7 +232,7 @@ public class SettingsForm extends JDialog {
 						else{
 							cliPath = File.createTempFile("reestrInfo", ".htm").getAbsolutePath();
 	   						MainForm.conMan.transferFileFromServer(servPath, cliPath);
-	   						MainForm.conMan.openFileInEditor(cliPath, false);
+	   						MainForm.conMan.openFileInTextProcessor(cliPath, false);
 	                        //Integer res = MainForm.conMan.showPaspErrorsForm();
 						}
 						dispose();

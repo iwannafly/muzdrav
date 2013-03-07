@@ -456,9 +456,10 @@ public class PacientInfoFrame extends JFrame {
         tbMain.setFont(new Font("Tahoma", Font.PLAIN, 12));
         tbMain.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                if (tbMain.getSelectedIndex() == 0 || tbMain.getSelectedIndex() == 1 || tbMain.getSelectedIndex() == 2 || tbMain.getSelectedIndex() == 3 || tbMain.getSelectedIndex() == 4 || tbMain.getSelectedIndex() == 6) {
+                if (MainForm.authInfo.getCslu() == 1) 
+                 if (tbMain.getSelectedIndex() == 0 || tbMain.getSelectedIndex() == 1 || tbMain.getSelectedIndex() == 2 || tbMain.getSelectedIndex() == 3 || tbMain.getSelectedIndex() == 4 || tbMain.getSelectedIndex() == 6) 
                 	if (Id_gosp != null)SavePriemInfo();
-                }
+                 
                 if (tbMain.getSelectedIndex() == 1) {
                     changePatientLgotaInfo(curPatientId);
                     InfoForLgotaPatient();
@@ -476,7 +477,7 @@ public class PacientInfoFrame extends JFrame {
                     if (curPatientId != 0 && tbl_priem.getSelectedItem() != null){
                 		curGospId = tbl_priem.getSelectedItem().id;
                 		tbMain.setSelectedIndex(5);
-                		MainForm.conMan.showLabRecordForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId);
+                		MainForm.conMan.showLabRecordForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), curGospId, "%");
                 	}else
                 		JOptionPane.showMessageDialog(tbl_priem, "Выберите обращения пациента.");
                 	}

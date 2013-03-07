@@ -360,16 +360,31 @@ public class ServerPrint extends Server implements Iface {
 										 "where p_disp.npasp = ? and p_disp.pcod = ? ", npasp, cpol);
 					while (acrs.getResultSet().next()) {
 						do {
-							sb.append(String.format("<tr bgcolor=\"white\"><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
+							if (acrs.getResultSet().getDate(5)!=null){
+								sb.append(String.format("<tr bgcolor=\"white\"><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
 									"%s %s </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
-									"%3$td.%3$tm.%3$tY </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
-									" </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">  " +
-									"</td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
+									"%td.%3$tm.%3$tY </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
+									" %s</td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">  " +
+									"%td.%5$tm.%5$tY </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
 									" </td></tr>", 
 									acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), 
-									acrs.getResultSet().getDate(3)
-									//acrs.getResultSet().getString(4)
+									acrs.getResultSet().getDate(3),
+									acrs.getResultSet().getString(4),
+									acrs.getResultSet().getDate(5)
 									));
+							}
+							else {
+								sb.append(String.format("<tr bgcolor=\"white\"><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
+									"%s %s </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
+									"%td.%3$tm.%3$tY </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
+									" %s</td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\">  " +
+									" </td><td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; \"font: 11px times new roman;\"\"> " +
+									" </td></tr>", 
+									acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), 
+									acrs.getResultSet().getDate(3),
+									acrs.getResultSet().getString(4)
+									));
+							}
 						} 
 						while (acrs.getResultSet().next());
 						}

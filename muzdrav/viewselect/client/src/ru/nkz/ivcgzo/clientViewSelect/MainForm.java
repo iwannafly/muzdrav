@@ -478,7 +478,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					}
 					
 				case 18:
-					labFrm.showModal(parent, params[1], params[2], params[3], params[4], params[5]);
+					labFrm.showModal(parent, params[1], params[2], params[3], params[4], params[5], params[6]);
 					break;
 					
 				case 19:

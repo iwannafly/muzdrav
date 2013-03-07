@@ -934,34 +934,35 @@ public class ServerOsm extends Server implements Iface {
 				
 				sb.append("<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"460\">");
 				sb.append("<tr valign=\"top\">");
-					sb.append("<td width=\"50%\" style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px; font: 11px times new roman;\">");
+					sb.append("<td width=\"50%\" style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px; font: 11px times new roman;\">");
 						sb.append("&nbsp;");
-						sb.append("<b>Информация для пациента:</b><br><br>");
+					//	sb.append("<b>Информация для пациента:</b><br><br>");
 						
 						iAcrs = sse.execPreparedQuery("select n_m00.name_s, n_lds.name from n_lds inner join n_m00 on (n_m00.pcod=n_lds.clpu) where n_lds.pcod = ? ", kod_lab);
 						if (iAcrs.getResultSet().next()) {
 							name_clpu = iAcrs.getResultSet().getString(1);
 							name_lab = iAcrs.getResultSet().getString(2);
 						}
-						sb.append("<b>Дата:</b><br>");
-						sb.append("<b>Время:</b><br>");
-						sb.append("<b>Подготовка:</b><br>");
-					sb.append("</td>");
+//						sb.append("<b>Дата:</b><br>");
+//						sb.append("<b>Время:</b><br>");
+//						sb.append("<b>Подготовка:</b><br>");
+					//sb.append("</td>");
 					
 					iAcrs.close();
 					iAcrs = sse.execPreparedQuery("SELECT v.fam, v.im, v.ot FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) WHERE v.pcod = ? ", napr_vr);
 					if (iAcrs.getResultSet().next()) {
 						vrInfo = String.format("%s %s %s", iAcrs.getResultSet().getString(1), iAcrs.getResultSet().getString(2), iAcrs.getResultSet().getString(3));
-						sb.append("<td width=\"50%\" style=\"border: 1px solid black; padding: 5px; font: 11px times new roman;\">");
-						sb.append("&nbsp;");
-						sb.append(String.format("<b>%s</b><br><br>", name_clpu));
-						sb.append("<b>Направление на исследование</b><br><br>");
-						sb.append(String.format("<b>Лаборатория: %s</b><br><br>", name_lab));
+						//sb.append("<td width=\"50%\" style=\"border: 1px solid black; padding: 5px; font: 11px times new roman;\">");
+						//sb.append("&nbsp;");
+						sb.append(String.format("<center><b>%s</b><br>", name_clpu));
+						sb.append("<font size=3><b>Направление на исследование</b></font><br>");
+						sb.append(String.format("<b> %s</b><br><br></center>", name_lab));
 					}
 					iAcrs.close();
 					
 					iAcrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom, poms_ser, poms_nom FROM patient WHERE npasp = ? ", im.getNpasp());
 					if (iAcrs.getResultSet().next()) {
+						sb.append(String.format("<b>Уникальный номер пациента: </b> %d <br>", im.getNpasp()));
 						sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br>", iAcrs.getResultSet().getString(1), iAcrs.getResultSet().getString(2), iAcrs.getResultSet().getString(3)));
 						if (iAcrs.getResultSet().getString(7)==null)sb.append(String.format("<b>Серия и номер полиса:</b> %s <br>", iAcrs.getResultSet().getString(8)));
 						if (iAcrs.getResultSet().getString(8)==null)sb.append(String.format("<b>Серия и номер полиса:</b> %s <br>", iAcrs.getResultSet().getString(7)));
@@ -1048,86 +1049,6 @@ public class ServerOsm extends Server implements Iface {
 			throw new KmiacServerException();
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
-
-	@Deprecated
-	@Override
-	public String printIsslPokaz(IsslPokaz ip) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\NaprIsslPokaz.htm"), "utf-8")) {
-			AutoCloseableResultSet acrs;
-			
-			StringBuilder sb = new StringBuilder(0x10000);
-			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-			sb.append("<head>");
-				sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-				sb.append("<title>Направление на…</title>");
-			sb.append("</head>");
-			sb.append("<body>");
-			sb.append("<div>");
-			
-			sb.append("<table cellpadding=\"5\" cellspacing=\"0\">");
-			sb.append("<tr valign=\"top\">");
-				sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px;\" width=\"40%\">");
-					sb.append("<h3>Информация для пациента:</h3>");
-					if (ip.getMesto()!=null)sb.append(String.format("<b>Место: </b>%s<br />", ip.getMesto()));
-					if (ip.getKab()!=null)sb.append(String.format("<b>Каб. №: </b>%s<br />", ip.getKab()));
-					sb.append("<b>Дата:</b><br />");
-					sb.append("<b>Время:</b><br />");
-					sb.append("<b>Подготовка:</b><br />");
-				sb.append("</td>");
-				acrs = sse.execPreparedQuery("SELECT v.fam, v.im, v.ot FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) WHERE u.id = ? ", ip.getUserId());
-				if (!acrs.getResultSet().next())
-					throw new KmiacServerException("Logged user info not found.");
-				sb.append("<td style=\"border: 1px solid black; padding: 5px;\" width=\"60%\">");
-					sb.append(String.format("<h3>%s<br />", ip.getClpu_name()));
-					sb.append(String.format("%s<br />", ip.getCpodr_name()));
-					String vrInfo = String.format("%s %s %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3));
-					acrs.close();
-					acrs = sse.execPreparedQuery("SELECT name FROM n_p0e1 WHERE pcod = ?", ip.getKodVidIssl());
-					if (!acrs.getResultSet().next())
-						throw new KmiacServerException("Exam info info not found.");
-					sb.append(String.format("Направление на: %s</h3>", acrs.getResultSet().getString(1)));
-					acrs.close();
-					acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom FROM patient WHERE npasp = ? ", ip.getNpasp());
-					if (!acrs.getResultSet().next())
-						throw new KmiacServerException("Logged user info not found.");
-					sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-					sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
-					sb.append(String.format("<b>Адрес:</b> %s, %s<br />", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
-					sb.append("<b>Диагноз:</b><br />");
-					acrs.close();
-					acrs = sse.execPreparedQuery("select p_diag_amb.diag from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 and p_diag_amb.predv=false order by p_vizit_amb.datap", ip.getPvizitId());
-					if (!acrs.getResultSet().next()) 
-						throw new KmiacServerException("Diag is null");
-					sb.append(String.format("%s <br>", acrs.getResultSet().getString(1)));
-					sb.append(String.format("<b>Врач:</b> %s<br />", vrInfo));
-					sb.append("<h3>Наименование показателей:</h3>");
-					sb.append("<ol>");
-					for (String str : ip.getPokaz()) {
-						acrs.close();
-						acrs = sse.execPreparedQuery("SELECT name_n FROM n_ldi WHERE pcod = ? ", str);
-						if (!acrs.getResultSet().next())
-							throw new KmiacServerException("Mark info info not found.");
-						sb.append(String.format("<li>%s</li>", acrs.getResultSet().getString(1)));
-					}
-					sb.append("</ol>");
-					sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
-					sb.append("<b>Подпись врача:</b><br />");
-				sb.append("</td>");
-			sb.append("</tr>");
-			sb.append("</table>");
-			
-			sb.append("</div>");
-			sb.append("</body>");
-			sb.append("</html>");
-			
-			acrs.close();
-			osw.write(sb.toString());
-			return "e:\\NaprIsslPokaz.htm";
-		} catch (SQLException | IOException | KmiacServerException e) {
 			throw new KmiacServerException();
 		}
 	}
@@ -1599,6 +1520,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		}
 	}
 	
+	@SuppressWarnings("resource")
 	@Override
 	public String printProtokol(int npasp, int userId, int pvizit_id, int pvizit_ambId, int cpol, int clpu, int nstr) throws KmiacServerException, TException {
 		AutoCloseableResultSet acrs = null;
@@ -1793,6 +1715,20 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					if (acrs.getResultSet().isBeforeFirst()) {
 						sb.append("<br><b>Назначенные исследования </b><br>");
 						if (acrs.getResultSet().next()) {
+							
+							if (sb.length()<4600){
+								sb.append("<br>");
+								sb.append("<table border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">Наименование показателя</th><th style=\"font: 10px times new roman;\">Результат</th></tr>");
+								do{
+									if (acrs.getResultSet().getString(4) != null)
+										sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\"> %s </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
+									else 
+										sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\" width=\"30\">  </th></tr>", acrs.getResultSet().getString(3)));
+								}
+								
+								while ((sb.length()<4600) && (acrs.getResultSet().next()));
+								
+							}
 							if (sb.length()>4600){
 								sb.append("</table>");
 								sb.append("<td style=\"border-top: 1px solid white; border-bottom: 1px solid white; border-left: 1px solid white; border-right: none; padding: 5px; font: 10px times new roman;\" width=\"40%\">");
@@ -1807,32 +1743,17 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 								
 								while (acrs.getResultSet().next());
 							}
-							if (sb.length()<4600){
-							//while(sb.length()<4550){
-								sb.append("<br>");
-								sb.append("<table border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> <tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\">Наименование показателя</th><th style=\"font: 10px times new roman;\">Результат</th></tr>");
-								do{
-									if (acrs.getResultSet().getString(4) != null)
-										sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\"> %s </th></tr>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
-									else 
-										sb.append(String.format("<tr bgcolor=\"white\"><th style=\"font: 10px times new roman;\"> %s </th><th style=\"font: 10px times new roman;\" width=\"30\">  </th></tr>", acrs.getResultSet().getString(3)));
-								}
-								
-								while ((sb.length()<4600) && (acrs.getResultSet().next()));
-								
-							}
 						
 								
 						}
-//						else {
-//							
-//						}
+
 							sb.append("</table><br>");	
+							
 					}
 				
 				}
 					acrs.close();
-					
+				sb.append("<td style=\"border-top: 1px solid white; border-bottom: 1px solid white; border-left: 1px solid white; border-right: none; padding: 5px; font: 10px times new roman;\" width=\"40%\">&nbsp<td>");
 				sb.append("</td></tr></table></div>");
 				sb.append("</body>");
 				sb.append("</html>");
@@ -3600,23 +3521,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			e.printStackTrace();
 			throw new KmiacServerException();
 		}
-		
-
-
-	}
-
-	@Override
-	public String get_n_mkb(String pcod)
-			throws KmiacServerException, TException {
-		String	mkb = null;
-			try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, name  from n_c00 where pcod = ? ", pcod)) {
-				if (acrs.getResultSet().next())
-				mkb = acrs.getResultSet().getString(2);
-			} catch (SQLException e) {
-				((SQLException) e.getCause()).printStackTrace();
-				throw new KmiacServerException(); 
-			}
-			return mkb;
 	}
 
 	@Override
@@ -3626,7 +3530,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			if (acrs.getResultSet().next())
 			return rsmRdDin.map(acrs.getResultSet());
 			else
-				throw new PrdDinNotFoundException();
+				throw new KmiacServerException("rd inf not found");
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
